@@ -3,12 +3,14 @@
  * Export all shared types from this file
  */
 
+export type UserRole = 'farmer' | 'investor' | 'land_owner';
+
 // User & Authentication Types
 export interface User {
   id: string;
   name?: string;
   email: string;
-  role?: string;
+  role: UserRole;
   avatar?: string;
   createdAt?: Date;
   updatedAt?: Date;

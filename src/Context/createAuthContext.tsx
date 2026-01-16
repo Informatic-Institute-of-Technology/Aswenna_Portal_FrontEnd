@@ -1,9 +1,12 @@
 import { createContext } from 'react';
 
+export type UserRole = 'farmer' | 'investor' | 'land_owner';
+
 export interface User {
   id: string;
   email: string;
   name?: string;
+  role: UserRole;
 }
 
 export interface AuthContextType {
