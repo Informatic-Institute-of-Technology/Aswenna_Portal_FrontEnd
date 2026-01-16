@@ -1,4 +1,5 @@
 import AswendLogo from '@/assets/Aswenna Logo.png';
+import loginImage from '@/assets/Loging Image.png';
 import { useAuth } from '@/Context/useAuth';
 import '@/styles/Login.css';
 import { Eye, EyeOff } from 'lucide-react';
@@ -40,7 +41,7 @@ const Login = () => {
   return (
     <div className="login-container">
       <div className="login-content">
-        <div className="login-form-section">
+        <div className="login-form-section m">
           <div className="logo-container">
             <img src={AswendLogo} alt="Aswenna Logo" className="logo" />
           </div>
@@ -53,31 +54,40 @@ const Login = () => {
 
             <form onSubmit={handleSubmit} className="login-form">
               <div className="form-group">
+                <label htmlFor="email" className="visually-hidden">Email Address</label>
                 <input
+                  id="email"
                   type="email"
-                  placeholder="valera.aronjohnsmith@dnsc.edu.ph"
+                  placeholder="nimsaraofficial@gmail.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="form-input"
                   autoComplete="email"
+                  aria-label="Email address"
+                  required
                 />
               </div>
 
               <div className="form-group">
+                <label htmlFor="password" className="visually-hidden">Password</label>
                 <div className="password-input-wrapper">
                   <input
+                    id="password"
                     type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="form-input"
                     autoComplete="current-password"
+                    aria-label="Password"
+                    required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="password-toggle"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    tabIndex={0}
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
@@ -97,15 +107,19 @@ const Login = () => {
 
             <div className="signup-prompt">
               <span>Don't have an account? </span>
-              <Link to="/signup" className="signup-link">
+              <button 
+                type="button"
+                onClick={() => navigate('/signup')}
+                className="signup-button"
+              >
                 Sign up
-              </Link>
+              </button>
             </div>
           </div>
         </div>
 
         <div className="illustration-section">
-          <div className="illustration-image" />
+            <img src={loginImage} alt="Login Illustration" className="illustration-image" />
         </div>
       </div>
     </div>
