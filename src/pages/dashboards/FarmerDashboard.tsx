@@ -1,27 +1,26 @@
 import { CalendarMonth, PlaceholderWidget, ProjectLegendItem, StatCard } from '@/components';
 import DashboardLayout from '@/layouts/DashboardLayout';
 import {
-    AttachMoney,
-    CalendarMonth as CalendarIcon,
-    CheckCircle,
-    Description,
-    TrendingUp,
+  AttachMoney,
+  CalendarMonth as CalendarIcon,
+  CheckCircle,
+  Description,
+  TrendingUp,
 } from '@mui/icons-material';
 import {
-    Box,
-    Card,
-    CardContent,
-    CardHeader,
-    Typography,
+  Box,
+  Card,
+  CardContent,
+  CardHeader,
+  Typography,
 } from '@mui/material';
 
-// Mock project data (non-conflicting - sequential bookings)
 const mockProjects = [
   { 
     id: 1, 
     name: "Paddy field - Project A", 
     startDate: "2026-12-05", 
-    endDate: "2026-12-31", 
+    endDate: "2027-01-15", 
     color: "#E3C957" 
   },
   { 
@@ -201,7 +200,6 @@ const FarmerDashboard = () => {
                   p: 3,
                 }}
               >
-                {/* Single unified calendar showing all projects */}
                 <Box
                   sx={{
                     display: 'grid',
@@ -210,7 +208,6 @@ const FarmerDashboard = () => {
                     mb: 3,
                   }}
                 >
-                  {/* Display months dynamically based on project date ranges */}
                   {monthsToDisplay.map((monthData) => (
                     <CalendarMonth
                       key={`${monthData.year}-${monthData.month}`}
@@ -223,7 +220,6 @@ const FarmerDashboard = () => {
                   ))}
                 </Box>
 
-                {/* Project Legend - Shows all projects in unified view */}
                 <Box
                   sx={{
                     display: 'flex',

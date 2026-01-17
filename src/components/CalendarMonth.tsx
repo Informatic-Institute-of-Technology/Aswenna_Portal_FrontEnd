@@ -36,7 +36,6 @@ const CalendarMonth = ({
         overflow: 'hidden',
       }}
     >
-      {/* Month Header */}
       <Box
         sx={{
           backgroundColor: 'primary.main',
@@ -56,9 +55,7 @@ const CalendarMonth = ({
         </Typography>
       </Box>
 
-      {/* Calendar Grid */}
       <Box sx={{ p: 1.5 }}>
-        {/* Weekday labels */}
         <Box
           sx={{
             display: 'grid',
@@ -82,7 +79,6 @@ const CalendarMonth = ({
           ))}
         </Box>
 
-        {/* Day cells */}
         <Box
           sx={{
             display: 'grid',
@@ -90,7 +86,6 @@ const CalendarMonth = ({
             gap: 0.5,
           }}
         >
-          {/* Empty cells for days before month starts */}
           {Array.from({ length: firstDay }).map((_, idx) => (
             <Box
               key={`empty-${idx}`}
@@ -101,11 +96,9 @@ const CalendarMonth = ({
             />
           ))}
 
-          {/* Actual day cells */}
           {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((day) => {
             const currentDate = new Date(year, month, day);
             
-            // Find which project (if any) is active on this day
             const activeProject = projects.find(project =>
               isDateInRange(currentDate, project.startDate, project.endDate)
             );
@@ -147,7 +140,6 @@ const CalendarMonth = ({
                   {day}
                 </Typography>
                 
-                {/* Project indicator dot */}
                 {activeProject && (
                   <Box
                     sx={{

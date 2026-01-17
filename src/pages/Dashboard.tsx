@@ -6,7 +6,6 @@ import LandOwnerDashboard from './dashboards/LandOwnerDashboard';
 const Dashboard = () => {
   const { user } = useAuth();
 
-  // Route to appropriate dashboard based on user role
   switch (user?.role) {
     case 'farmer':
       return <FarmerDashboard />;

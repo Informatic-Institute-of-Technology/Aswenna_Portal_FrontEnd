@@ -1,255 +1,108 @@
+import {
+  CardHeaderWithIcon,
+  PlaceholderWidget,
+  StatCard,
+} from '@/components';
 import DashboardLayout from '@/layouts/DashboardLayout';
 import {
-    AttachMoney,
-    BarChart as BarChartIcon,
-    Description,
-    People,
-    TrendingUp,
+  AttachMoney,
+  BarChart as BarChartIcon,
+  Description,
+  People,
+  TrendingUp,
 } from '@mui/icons-material';
-import {
-    Box,
-    Card,
-    CardContent,
-    CardHeader,
-    Chip,
-    Typography,
-} from '@mui/material';
+import { Card, CardContent, Chip } from '@mui/material';
 
 const InvestorDashboard = () => {
   return (
     <DashboardLayout>
-      {/* Stats Cards */}
       <div className="row g-3" style={{ marginBottom: '1.5rem' }}>
         <div className="col-12 col-sm-6 col-md-4">
-          <Card>
-            <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Box
-                sx={{
-                  width: 60,
-                  height: 60,
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: 'rgba(107, 142, 35, 0.2)',
-                  color: 'primary.main',
-                }}
-              >
-                <AttachMoney sx={{ fontSize: 28 }} />
-              </Box>
-              <Box>
-                <Typography variant="body2" color="text.secondary">
-                  Active Investments
-                </Typography>
-                <Typography variant="h3" sx={{ fontWeight: 700 }}>
-                  $125K
-                </Typography>
-              </Box>
-            </CardContent>
-          </Card>
+          <StatCard
+            icon={AttachMoney}
+            iconBgColor="rgba(107, 142, 35, 0.2)"
+            iconColor="primary.main"
+            label="Active Investments"
+            value="$125K"
+          />
         </div>
         <div className="col-12 col-sm-6 col-md-4">
-          <Card>
-            <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Box
-                sx={{
-                  width: 60,
-                  height: 60,
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                  color: '#3b82f6',
-                }}
-              >
-                <People sx={{ fontSize: 28 }} />
-              </Box>
-              <Box>
-                <Typography variant="body2" color="text.secondary">
-                  Pending Applications
-                </Typography>
-                <Typography variant="h3" sx={{ fontWeight: 700 }}>
-                  18
-                </Typography>
-              </Box>
-            </CardContent>
-          </Card>
+          <StatCard
+            icon={People}
+            iconBgColor="rgba(59, 130, 246, 0.2)"
+            iconColor="#3b82f6"
+            label="Pending Applications"
+            value={18}
+          />
         </div>
         <div className="col-12 col-sm-6 col-md-4">
-          <Card>
-            <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Box
-                sx={{
-                  width: 60,
-                  height: 60,
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: 'rgba(251, 191, 36, 0.2)',
-                  color: '#fbbf24',
-                }}
-              >
-                <TrendingUp sx={{ fontSize: 28 }} />
-              </Box>
-              <Box>
-                <Typography variant="body2" color="text.secondary">
-                  Expected ROI
-                </Typography>
-                <Typography variant="h3" sx={{ fontWeight: 700 }}>
-                  24%
-                </Typography>
-              </Box>
-            </CardContent>
-          </Card>
+          <StatCard
+            icon={TrendingUp}
+            iconBgColor="rgba(251, 191, 36, 0.2)"
+            iconColor="#fbbf24"
+            label="Expected ROI"
+            value="24%"
+          />
         </div>
       </div>
 
-      {/* Widgets */}
       <div className="row g-3">
-        {/* Profitability Charts */}
         <div className="col-12 col-lg-6">
           <Card>
-            <CardHeader
-              title={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <BarChartIcon />
-                  <Typography variant="h6" component="span">
-                    Profitability Charts
-                  </Typography>
-                </Box>
-              }
+            <CardHeaderWithIcon
+              icon={BarChartIcon}
+              title="Profitability Charts"
               action={<Chip label="Live" size="small" color="primary" />}
             />
             <CardContent>
-              <Box
-                sx={{
-                  backgroundColor: 'rgba(107, 142, 35, 0.05)',
-                  border: '2px dashed',
-                  borderColor: 'divider',
-                  borderRadius: 2,
-                  p: 6,
-                  textAlign: 'center',
-                  color: 'text.secondary',
-                }}
-              >
-                <Typography variant="h6" gutterBottom>
-                  📊 Historical Price Charts & Predictions
-                </Typography>
-                <Typography variant="body2">
-                  Upcoming season price forecasts and profitability analysis
-                </Typography>
-              </Box>
+              <PlaceholderWidget
+                icon="📊"
+                title="Historical Price Charts & Predictions"
+                description="Upcoming season price forecasts and profitability analysis"
+              />
             </CardContent>
           </Card>
         </div>
 
-        {/* Investment Portfolio */}
         <div className="col-12 col-lg-6">
           <Card>
-            <CardHeader
-              title={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <AttachMoney />
-                  <Typography variant="h6" component="span">
-                    Investment Portfolio
-                  </Typography>
-                </Box>
-              }
-            />
+            <CardHeaderWithIcon icon={AttachMoney} title="Investment Portfolio" />
             <CardContent>
-              <Box
-                sx={{
-                  backgroundColor: 'rgba(107, 142, 35, 0.05)',
-                  border: '2px dashed',
-                  borderColor: 'divider',
-                  borderRadius: 2,
-                  p: 6,
-                  textAlign: 'center',
-                  color: 'text.secondary',
-                }}
-              >
-                <Typography variant="h6" gutterBottom>
-                  💰 Total Investment Value Deployed
-                </Typography>
-                <Typography variant="body2">
-                  Portfolio breakdown by crop type and region
-                </Typography>
-              </Box>
+              <PlaceholderWidget
+                icon="💰"
+                title="Total Investment Value Deployed"
+                description="Portfolio breakdown by crop type and region"
+              />
             </CardContent>
           </Card>
         </div>
 
-        {/* ROI Analysis */}
         <div className="col-12 col-lg-6">
           <Card>
-            <CardHeader
-              title={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <TrendingUp />
-                  <Typography variant="h6" component="span">
-                    ROI & Market Analysis
-                  </Typography>
-                </Box>
-              }
-            />
+            <CardHeaderWithIcon icon={TrendingUp} title="ROI & Market Analysis" />
             <CardContent>
-              <Box
-                sx={{
-                  backgroundColor: 'rgba(107, 142, 35, 0.05)',
-                  border: '2px dashed',
-                  borderColor: 'divider',
-                  borderRadius: 2,
-                  p: 6,
-                  textAlign: 'center',
-                  color: 'text.secondary',
-                }}
-              >
-                <Typography variant="h6" gutterBottom>
-                  📈 AI-Powered Crop Profitability Forecasts
-                </Typography>
-                <Typography variant="body2">
-                  Risk alerts and market opportunity indicators
-                </Typography>
-              </Box>
+              <PlaceholderWidget
+                icon="📈"
+                title="AI-Powered Crop Profitability Forecasts"
+                description="Risk alerts and market opportunity indicators"
+              />
             </CardContent>
           </Card>
         </div>
 
-        {/* Application Status */}
         <div className="col-12 col-lg-6">
           <Card>
-            <CardHeader
-              title={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Description />
-                  <Typography variant="h6" component="span">
-                    Recent Applications
-                  </Typography>
-                </Box>
-              }
+            <CardHeaderWithIcon
+              icon={Description}
+              title="Recent Applications"
               action={<Chip label="18 Pending" size="small" color="primary" />}
             />
             <CardContent>
-              <Box
-                sx={{
-                  backgroundColor: 'rgba(107, 142, 35, 0.05)',
-                  border: '2px dashed',
-                  borderColor: 'divider',
-                  borderRadius: 2,
-                  p: 6,
-                  textAlign: 'center',
-                  color: 'text.secondary',
-                }}
-              >
-                <Typography variant="h6" gutterBottom>
-                  📝 Farmers Awaiting Approval
-                </Typography>
-                <Typography variant="body2">
-                  Review and manage investment applications
-                </Typography>
-              </Box>
+              <PlaceholderWidget
+                icon="📝"
+                title="Farmers Awaiting Approval"
+                description="Review and manage investment applications"
+              />
             </CardContent>
           </Card>
         </div>

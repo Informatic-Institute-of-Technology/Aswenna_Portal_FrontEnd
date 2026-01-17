@@ -5,7 +5,6 @@ import { AuthContext } from './createAuthContext';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(() => {
-    // Initialize state from localStorage
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
@@ -58,25 +57,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  const signup = async (email: string, password: string, name: string) => {
-    // Simulate API call
-    return new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
-        if (email && password && name) {
-          const userData = {
-            email,
-            name,
-            id: Math.random().toString(36).substr(2, 9),
-          };
-          setUser(userData);
-          localStorage.setItem('user', JSON.stringify(userData));
-          resolve();
-        } else {
-          reject(new Error('Registration failed'));
-        }
-      }, 500);
-    });
-  };
+
+  //TODO  : User Sign Up Logic
+  
+  // const signup = async (email: string, password: string, name: string) => {
+  //   return new Promise<void>((resolve, reject) => {
+  //     setTimeout(() => {
+  //       if (email && password && name) {
+  //         const userData = {
+  //           email,
+  //           name,
+  //           id: Math.random().toString(36).substr(2, 9),
+  //         };
+  //         setUser(userData);
+  //         localStorage.setItem('user', JSON.stringify(userData));
+  //         resolve();
+  //       } else {
+  //         reject(new Error('Registration failed'));
+  //       }
+  //     }, 500);
+  //   });
+  // };
 
   const logout = () => {
     setUser(null);
@@ -84,7 +85,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
