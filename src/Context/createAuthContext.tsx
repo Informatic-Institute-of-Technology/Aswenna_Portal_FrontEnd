@@ -3,10 +3,24 @@ import { createContext } from 'react';
 export type UserRole = 'farmer' | 'investor' | 'land_owner';
 
 export interface User {
-  id: string;
-  email: string;
-  name?: string;
-  role: UserRole;
+  _id: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  fullName: string | null;
+  address: string | null;
+  email: string | null;
+  emailVerified: boolean | null;
+  phoneNumber: string | null;
+  phoneNumberVerified: boolean | null;
+  roles: string[];
+  permissions: string[];
+  createdBy: string | null;
+  updatedBy: string | null;
+  meta: any[];
+  createdAt: string | null;
+  updatedAt: string | null;
+  __v: number | null;
+  role?: UserRole;
 }
 
 export interface AuthContextType {
