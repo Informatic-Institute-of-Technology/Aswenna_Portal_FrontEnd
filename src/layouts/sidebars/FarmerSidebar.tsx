@@ -1,25 +1,25 @@
 import { useAuth } from '@/Context/useAuth';
 import {
-    AccountCircle,
-    BarChart as BarChartIcon,
-    Handshake,
-    Home,
-    Landscape,
-    Mail,
-    People,
-    Settings,
-    TrendingUp,
+  AccountCircle,
+  BarChart as BarChartIcon,
+  Handshake,
+  Home,
+  Landscape,
+  Mail,
+  People,
+  Settings,
+  TrendingUp,
 } from '@mui/icons-material';
 import {
-    Avatar,
-    Box,
-    Button,
-    Divider,
-    List,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-    Typography,
+  Avatar,
+  Box,
+  Button,
+  Divider,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Typography,
 } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -48,8 +48,8 @@ const FarmerSidebar = () => {
       {/* Profile Section */}
       <Box sx={{ p: 3, textAlign: 'center' }}>
         <Avatar
-          src="https://api.dicebear.com/7.x/avataaars/svg?seed=farmer"
-          alt={user?.name || 'Farmer'}
+          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJP8vN8tGwjdGdBoNRb3S7qP1VA0Q1F-SfWg&s"
+          alt={user?.fullName || 'null'}
           sx={{ 
             width: 120, 
             height: 120, 
@@ -60,10 +60,10 @@ const FarmerSidebar = () => {
           }}
         />
         <Typography variant="h6" sx={{ fontWeight: 600 }}>
-          {user?.name || 'Farmer'}
+          {user?.fullName || 'null'}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Farmer
+          {user?.role || 'null'}
         </Typography>
       </Box>
 

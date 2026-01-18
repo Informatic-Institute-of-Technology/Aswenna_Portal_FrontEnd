@@ -2,6 +2,7 @@ import AswendLogo from '@/assets/Aswenna Logo.png';
 import loginImage from '@/assets/Loging Image.png';
 import { useAuth } from '@/Context/useAuth';
 import '@/styles/Login.css';
+import { CircularProgress } from '@mui/material';
 import { Eye, EyeOff } from 'lucide-react';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
@@ -13,7 +14,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, loading } = useAuth();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -65,6 +66,7 @@ const Login = () => {
                   autoComplete="email"
                   aria-label="Email address"
                   required
+                  disabled={loading}
                 />
               </div>
 
@@ -81,6 +83,7 @@ const Login = () => {
                     autoComplete="current-password"
                     aria-label="Password"
                     required
+                    disabled={loading}
                   />
                   <button
                     type="button"
@@ -88,6 +91,7 @@ const Login = () => {
                     className="password-toggle"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                     tabIndex={0}
+                    disabled={loading}
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
@@ -100,8 +104,8 @@ const Login = () => {
                 </Link>
               </div>
 
-              <button type="submit" className="login-button">
-                Login
+              <button type="submit" className="login-button" disabled={loading}>
+                {loading ? <CircularProgress size={20} color="success" /> : 'Login'}
               </button>
             </form>
 
