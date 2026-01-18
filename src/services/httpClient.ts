@@ -1,8 +1,3 @@
-/**
- * HTTP Client with Authentication
- * Enhanced API client with token management
- */
-
 const API_BASE_URL = 'https://aswenna-backend.onrender.com/api';
 
 export class HttpClient {
