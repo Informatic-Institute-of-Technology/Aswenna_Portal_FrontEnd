@@ -89,5 +89,4 @@ export class HttpClient {
   }
 }
 
-// Export singleton instance
 export const httpClient = new HttpClient();

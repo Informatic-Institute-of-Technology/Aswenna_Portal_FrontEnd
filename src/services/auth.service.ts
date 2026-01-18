@@ -1,8 +1,3 @@
-/**
- * Authentication Service
- * Handles authentication API calls and token management
- */
-
 import type { User, UserRole } from '@/Context/createAuthContext';
 import { decryptToken } from '@/utils';
 import { httpClient } from './httpClient';
@@ -44,7 +39,6 @@ class AuthService {
     console.log('=== Authentication Service: Login ===');
     console.log('Request credentials:', { email: credentials.email });
 
-    // Step 1: Authenticate and get token
     const loginResponse = await httpClient.post<LoginResponse>('/auth/login', credentials);
 
     console.log('=== First API Response (Login) ===');
@@ -54,7 +48,6 @@ class AuthService {
       throw new Error('No access token received');
     }
 
-    // Step 2: Decrypt token to get user ID and role
     const token = loginResponse.access_token;
     console.log('=== Token Information ===');
     console.log('Token Type:', loginResponse.token_type);
@@ -75,20 +68,17 @@ class AuthService {
     console.log('User ID from token:', userId);
     console.log('User role from token:', userRole);
 
-    // Step 3: Store token
     localStorage.setItem('auth_token', token);
     localStorage.setItem('token_type', loginResponse.token_type || 'Bearer');
     localStorage.setItem('token_expires_in', loginResponse.expires_in?.toString() || '');
     console.log('Token saved to localStorage');
 
-    // Step 4: Fetch full user profile
     console.log('\n=== Making Second API Call to Get User Details ===');
     const userProfile = await httpClient.get<UserApiResponse>(`/v1/user/${userId}`);
 
     console.log('=== Second API Response (User Details) ===');
     console.log('Raw user details:', userProfile);
 
-    // Step 5: Map and store user data
     const userData: User = {
       _id: userProfile._id || null,
       firstName: userProfile.firstName || null,
@@ -153,5 +143,4 @@ class AuthService {
   }
 }
 
-// Export singleton instance
 export const authService = new AuthService();
