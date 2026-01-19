@@ -51,7 +51,7 @@ const LandOwnerSidebar = () => {
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Box sx={{ p: 3, textAlign: 'center' }}>
         <Avatar
-          src="https://api.dicebear.com/7.x/avataaars/svg?seed=landowner"
+          src="https://businesstoday.lk/wp-content/uploads/2024/11/Ishara-Nanayakkara-Executive-Chairman-1.png"
           alt={user?.fullName || 'null'}
           sx={{ 
             width: 120, 

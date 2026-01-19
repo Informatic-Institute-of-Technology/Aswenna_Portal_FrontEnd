@@ -50,7 +50,7 @@ const InvestorSidebar = () => {
       {/* Profile Section */}
       <Box sx={{ p: 3, textAlign: 'center' }}>
         <Avatar
-          src="https://api.dicebear.com/7.x/avataaars/svg?seed=investor"
+          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWHUQslqLEawVVIzUcGFkYYRm30cguWYwuhg&s"
           alt={user?.fullName || 'null'}
           sx={{ 
             width: 120, 

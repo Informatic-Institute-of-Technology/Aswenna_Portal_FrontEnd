@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 
-export type UserRole = 'farmer' | 'investor' | 'land_owner';
+export type UserRole = 'farmer' | 'investor' | 'landowner';
 
 export interface User {
   _id: string | null;

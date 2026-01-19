@@ -1,4 +1,5 @@
-const API_BASE_URL = 'https://aswenna-backend.onrender.com/api';
+// const API_BASE_URL = 'https://aswenna-backend.onrender.com/api';
+const API_BASE_URL = 'http://localhost:3000/api';
 
 export class HttpClient {
   private baseURL: string;
@@ -8,14 +9,9 @@ export class HttpClient {
   }
 
   private getAuthHeaders(): HeadersInit {
-    const token = localStorage.getItem('auth_token');
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
-
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
 
     return headers;
   }
