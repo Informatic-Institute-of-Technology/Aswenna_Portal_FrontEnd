@@ -44,7 +44,6 @@ class AuthService {
     console.log('=== Authentication Service: Login ===');
     console.log('Request credentials:', { email: credentials.email });
 
-    // Step 1: Authenticate and get token
     const loginResponse = await httpClient.post<LoginResponse>('/auth/login', credentials);
 
     console.log('=== First API Response (Login) ===');
