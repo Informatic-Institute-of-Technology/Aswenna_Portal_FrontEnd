@@ -1,4 +1,4 @@
-import { ProtectedRoute, PublicRoute } from '@/components';
+import { ProtectedRoute, PublicRoute, SuperAdminGuard } from '@/components';
 import { AuthProvider } from '@/Context/AuthContext';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import AccountPage from './common/AccountPage';
@@ -18,6 +18,15 @@ import MyLandAdsPage from './landowner/MyLandAdsPage';
 import ReceivedRequestsPage from './landowner/ReceivedRequestsPage';
 import TenantSearchPage from './landowner/TenantSearchPage';
 import Login from './Login';
+import AuditLogsPage from './superadmin/AuditLogsPage';
+import CMSPage from './superadmin/CMSPage';
+import DisputeResolutionPage from './superadmin/DisputeResolutionPage';
+import EscrowManagementPage from './superadmin/EscrowManagementPage';
+import PaymentLedgerPage from './superadmin/PaymentLedgerPage';
+import ProjectOversightPage from './superadmin/ProjectOversightPage';
+import SuperAdminSettingsPage from './superadmin/SuperAdminSettingsPage';
+import UserManagementPage from './superadmin/UserManagementPage';
+import VerificationQueuePage from './superadmin/VerificationQueuePage';
 
 function App() {
   return (
@@ -215,6 +224,80 @@ function App() {
               <ProtectedRoute>
                 <TenantSearchPage />
               </ProtectedRoute>
+            }
+          />
+
+          {/* SuperAdmin Specific Routes */}
+          <Route
+            path="/dashboard/users"
+            element={
+              <SuperAdminGuard>
+                <UserManagementPage />
+              </SuperAdminGuard>
+            }
+          />
+          <Route
+            path="/dashboard/verification"
+            element={
+              <SuperAdminGuard>
+                <VerificationQueuePage />
+              </SuperAdminGuard>
+            }
+          />
+          <Route
+            path="/dashboard/projects"
+            element={
+              <SuperAdminGuard>
+                <ProjectOversightPage />
+              </SuperAdminGuard>
+            }
+          />
+          <Route
+            path="/dashboard/disputes"
+            element={
+              <SuperAdminGuard>
+                <DisputeResolutionPage />
+              </SuperAdminGuard>
+            }
+          />
+          <Route
+            path="/dashboard/payments"
+            element={
+              <SuperAdminGuard>
+                <PaymentLedgerPage />
+              </SuperAdminGuard>
+            }
+          />
+          <Route
+            path="/dashboard/escrow"
+            element={
+              <SuperAdminGuard>
+                <EscrowManagementPage />
+              </SuperAdminGuard>
+            }
+          />
+          <Route
+            path="/dashboard/audit-logs"
+            element={
+              <SuperAdminGuard>
+                <AuditLogsPage />
+              </SuperAdminGuard>
+            }
+          />
+          <Route
+            path="/dashboard/cms"
+            element={
+              <SuperAdminGuard>
+                <CMSPage />
+              </SuperAdminGuard>
+            }
+          />
+          <Route
+            path="/dashboard/settings"
+            element={
+              <SuperAdminGuard>
+                <SuperAdminSettingsPage />
+              </SuperAdminGuard>
             }
           />
 
