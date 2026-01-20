@@ -23,8 +23,6 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         return <LandOwnerSidebar />;
       case 'superadmin':
         return <SuperAdminSidebar />;
-      default:
-        return <FarmerSidebar />;
     }
   };
 
@@ -37,7 +35,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       case 'landowner':
         return 'Land Owner Dashboard';
       case 'superadmin':
-        return 'Super Admin Command Center';
+        return 'Super Admin Dashboard';
       default:
         return 'Dashboard';
     }

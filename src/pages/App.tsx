@@ -1,4 +1,4 @@
-import { ProtectedRoute, PublicRoute, SuperAdminGuard } from '@/components';
+import { ProtectedRoute, PublicRoute } from '@/components';
 import { AuthProvider } from '@/Context/AuthContext';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import AccountPage from './common/AccountPage';
@@ -18,15 +18,11 @@ import MyLandAdsPage from './landowner/MyLandAdsPage';
 import ReceivedRequestsPage from './landowner/ReceivedRequestsPage';
 import TenantSearchPage from './landowner/TenantSearchPage';
 import Login from './Login';
-import AuditLogsPage from './superadmin/AuditLogsPage';
-import CMSPage from './superadmin/CMSPage';
-import DisputeResolutionPage from './superadmin/DisputeResolutionPage';
-import EscrowManagementPage from './superadmin/EscrowManagementPage';
-import PaymentLedgerPage from './superadmin/PaymentLedgerPage';
-import ProjectOversightPage from './superadmin/ProjectOversightPage';
-import SuperAdminSettingsPage from './superadmin/SuperAdminSettingsPage';
-import UserManagementPage from './superadmin/UserManagementPage';
-import VerificationQueuePage from './superadmin/VerificationQueuePage';
+// Super Admin Pages
+import ActiveProjectsMonitoring from './admin/ActiveProjectsMonitoring';
+import GlobalPaymentLedger from './admin/GlobalPaymentLedger';
+import GlobalUserManagement from './admin/GlobalUserManagement';
+import SystemActivityLog from './admin/SystemActivityLog';
 
 function App() {
   return (
@@ -227,77 +223,45 @@ function App() {
             }
           />
 
-          {/* SuperAdmin Specific Routes */}
+          {/* Super Admin Specific Routes */}
           <Route
-            path="/dashboard/users"
+            path="/dashboard/admin/users"
             element={
-              <SuperAdminGuard>
-                <UserManagementPage />
-              </SuperAdminGuard>
+              <ProtectedRoute>
+                <GlobalUserManagement />
+              </ProtectedRoute>
             }
           />
           <Route
-            path="/dashboard/verification"
+            path="/dashboard/admin/payments"
             element={
-              <SuperAdminGuard>
-                <VerificationQueuePage />
-              </SuperAdminGuard>
+              <ProtectedRoute>
+                <GlobalPaymentLedger />
+              </ProtectedRoute>
             }
           />
           <Route
-            path="/dashboard/projects"
+            path="/dashboard/admin/projects"
             element={
-              <SuperAdminGuard>
-                <ProjectOversightPage />
-              </SuperAdminGuard>
+              <ProtectedRoute>
+                <ActiveProjectsMonitoring />
+              </ProtectedRoute>
             }
           />
           <Route
-            path="/dashboard/disputes"
+            path="/dashboard/admin/activity-log"
             element={
-              <SuperAdminGuard>
-                <DisputeResolutionPage />
-              </SuperAdminGuard>
+              <ProtectedRoute>
+                <SystemActivityLog />
+              </ProtectedRoute>
             }
           />
           <Route
-            path="/dashboard/payments"
+            path="/dashboard/admin/disputes"
             element={
-              <SuperAdminGuard>
-                <PaymentLedgerPage />
-              </SuperAdminGuard>
-            }
-          />
-          <Route
-            path="/dashboard/escrow"
-            element={
-              <SuperAdminGuard>
-                <EscrowManagementPage />
-              </SuperAdminGuard>
-            }
-          />
-          <Route
-            path="/dashboard/audit-logs"
-            element={
-              <SuperAdminGuard>
-                <AuditLogsPage />
-              </SuperAdminGuard>
-            }
-          />
-          <Route
-            path="/dashboard/cms"
-            element={
-              <SuperAdminGuard>
-                <CMSPage />
-              </SuperAdminGuard>
-            }
-          />
-          <Route
-            path="/dashboard/settings"
-            element={
-              <SuperAdminGuard>
-                <SuperAdminSettingsPage />
-              </SuperAdminGuard>
+              <ProtectedRoute>
+                <SettingsPage />
+              </ProtectedRoute>
             }
           />
 
