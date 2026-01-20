@@ -11,7 +11,7 @@ const Dashboard = () => {
       return <FarmerDashboard />;
     case 'investor':
       return <InvestorDashboard />;
-    case 'land_owner':
+    case 'landowner':
       return <LandOwnerDashboard />;
     default:
       return <FarmerDashboard />;

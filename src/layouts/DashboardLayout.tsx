@@ -19,7 +19,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         return <FarmerSidebar />;
       case 'investor':
         return <InvestorSidebar />;
-      case 'land_owner':
+      case 'landowner':
         return <LandOwnerSidebar />;
       default:
         return <FarmerSidebar />;
@@ -32,7 +32,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         return 'Farmer Dashboard';
       case 'investor':
         return 'Investor Dashboard';
-      case 'land_owner':
+      case 'landowner':
         return 'Land Owner Dashboard';
       default:
         return 'Dashboard';

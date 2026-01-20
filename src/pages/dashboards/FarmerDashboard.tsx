@@ -20,7 +20,7 @@ const mockProjects = [
     id: 1, 
     name: "Paddy field - Project A", 
     startDate: "2026-12-05", 
-    endDate: "2027-01-15", 
+    endDate: "2026-12-15", 
     color: "#E3C957" 
   },
   { 
@@ -55,7 +55,7 @@ const mockProjects = [
     id: 6, 
     name: "Flower Farming - F", 
     startDate: "2026-05-12", 
-    endDate: "2026-06-05", 
+    endDate: "2026-05-31", 
     color: "#FF5722" 
   }
 ];

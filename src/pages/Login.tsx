@@ -1,40 +1,41 @@
-import AswendLogo from '@/assets/Aswenna Logo.png';
-import loginImage from '@/assets/Loging Image.png';
-import { useAuth } from '@/Context/useAuth';
-import '@/styles/Login.css';
-import { Eye, EyeOff } from 'lucide-react';
-import type { FormEvent } from 'react';
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import AswendLogo from "@/assets/Aswenna Logo.png";
+import loginImage from "@/assets/Loging Image.png";
+import { useAuth } from "@/Context/useAuth";
+import "@/styles/Login.css";
+import { CircularProgress } from "@mui/material";
+import { Eye, EyeOff } from "lucide-react";
+import type { FormEvent } from "react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, loading } = useAuth();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (!email || !password) {
-      setError('Please fill in all fields');
+      setError("Please fill in all fields");
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setError('Please enter a valid email address');
+      setError("Please enter a valid email address");
       return;
     }
 
     try {
       await login(email, password);
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch {
-      setError('Invalid credentials. Please try again.');
+      setError("Invalid credentials. Please try again.");
     }
   };
 
@@ -54,7 +55,9 @@ const Login = () => {
 
             <form onSubmit={handleSubmit} className="login-form">
               <div className="form-group">
-                <label htmlFor="email" className="visually-hidden">Email Address</label>
+                <label htmlFor="email" className="visually-hidden">
+                  Email Address
+                </label>
                 <input
                   id="email"
                   type="email"
@@ -65,15 +68,18 @@ const Login = () => {
                   autoComplete="email"
                   aria-label="Email address"
                   required
+                  disabled={loading}
                 />
               </div>
 
               <div className="form-group">
-                <label htmlFor="password" className="visually-hidden">Password</label>
+                <label htmlFor="password" className="visually-hidden">
+                  Password
+                </label>
                 <div className="password-input-wrapper">
                   <input
                     id="password"
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPassword ? "text" : "password"}
                     placeholder="••••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -81,13 +87,17 @@ const Login = () => {
                     autoComplete="current-password"
                     aria-label="Password"
                     required
+                    disabled={loading}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="password-toggle"
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
                     tabIndex={0}
+                    disabled={loading}
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
@@ -100,17 +110,21 @@ const Login = () => {
                 </Link>
               </div>
 
-              <button type="submit" className="login-button">
-                Login
+              <button type="submit" className="login-button" disabled={loading}>
+                {loading ? (
+                  <CircularProgress size={20} color="success" />
+                ) : (
+                  "Login"
+                )}
               </button>
             </form>
 
             <div className="signup-prompt">
               <span>Don't have an account? </span>
-              <button 
+              <button
                 type="button"
-                onClick={() => navigate('/signup')}
-                className="signup-button"
+                onClick={() => navigate("/signup")}
+                className="signup-login-button"
               >
                 Sign up
               </button>
@@ -119,7 +133,11 @@ const Login = () => {
         </div>
 
         <div className="illustration-section">
-            <img src={loginImage} alt="Login Illustration" className="illustration-image" />
+          <img
+            src={loginImage}
+            alt="Login Illustration"
+            className="illustration-image"
+          />
         </div>
       </div>
     </div>

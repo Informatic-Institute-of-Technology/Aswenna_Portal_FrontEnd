@@ -1,27 +1,27 @@
 import { useAuth } from '@/Context/useAuth';
 import {
-    AccountCircle,
-    AttachMoney,
-    BarChart as BarChartIcon,
-    Cloud,
-    Description,
-    Home,
-    Landscape,
-    Mail,
-    People,
-    Search,
-    Settings,
+  AccountCircle,
+  AttachMoney,
+  BarChart as BarChartIcon,
+  Cloud,
+  Description,
+  Home,
+  Landscape,
+  Mail,
+  People,
+  Search,
+  Settings,
 } from '@mui/icons-material';
 import {
-    Avatar,
-    Box,
-    Button,
-    Divider,
-    List,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-    Typography,
+  Avatar,
+  Box,
+  Button,
+  Divider,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Typography,
 } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -51,8 +51,8 @@ const LandOwnerSidebar = () => {
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Box sx={{ p: 3, textAlign: 'center' }}>
         <Avatar
-          src="https://api.dicebear.com/7.x/avataaars/svg?seed=landowner"
-          alt={user?.name || 'Land Owner'}
+          src="https://businesstoday.lk/wp-content/uploads/2024/11/Ishara-Nanayakkara-Executive-Chairman-1.png"
+          alt={user?.fullName || 'null'}
           sx={{ 
             width: 120, 
             height: 120, 
@@ -63,10 +63,10 @@ const LandOwnerSidebar = () => {
           }}
         />
         <Typography variant="h6" sx={{ fontWeight: 600 }}>
-          {user?.name || 'Land Owner'}
+          {user?.fullName || 'null'}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Land Owner
+          {user?.role || 'null'}
         </Typography>
       </Box>
 
