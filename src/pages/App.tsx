@@ -38,6 +38,14 @@ function App() {
               </PublicRoute>
             }
           />
+          <Route
+            path="/signup"
+            element={
+              <PublicRoute>
+                <SignUp />
+              </PublicRoute>
+            }
+          />
 
           {/* Protected Dashboard Routes */}
           <Route
