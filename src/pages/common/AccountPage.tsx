@@ -170,8 +170,17 @@ const AccountPage = () => {
                 <Box sx={{ textAlign: 'center', py: 3 }}>
                   <ProfileAvatar
                     fullName={user?.fullName || null}
+                    avatarUrl={
+                      user?.role === 'farmer' 
+                        ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJP8vN8tGwjdGdBoNRb3S7qP1VA0Q1F-SfWg&s'
+                        : user?.role === 'investor'
+                        ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWHUQslqLEawVVIzUcGFkYYRm30cguWYwuhg&s'
+                        : user?.role === 'landowner'
+                        ? 'https://businesstoday.lk/wp-content/uploads/2024/11/Ishara-Nanayakkara-Executive-Chairman-1.png'
+                        : undefined
+                    }
                     size={140}
-                    editable={false}
+                    editable={true}
                   />
                   <Typography variant="h5" sx={{ mt: 2, fontWeight: 600 }}>
                     {user?.fullName || 'User'}
