@@ -1,0 +1,259 @@
+/* Terms and Conditions Page Styles */
+
+.terms-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    135deg,
+    #1c1d21 0%,
+    #1c1d21 40%,
+    #2d3a1f 70%,
+    #3d4f28 100%
+  );
+  padding: 3rem 4rem;
+}
+
+.terms-content-wrapper {
+  display: grid;
+  grid-template-columns: minmax(300px, 450px) minmax(400px, 550px);
+  gap: 3rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Left Column */
+.terms-left-column {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Title Section */
+.terms-title {
+  font-family: "Inter", "Segoe UI", "Roboto", sans-serif;
+  font-size: 2rem;
+  color: #fff;
+  margin-bottom: 1.25rem;
+}
+
+.terms-title-normal {
+  font-weight: 400;
+}
+
+.terms-title-bold {
+  font-weight: 800;
+}
+
+/* Terms Intro */
+.terms-intro {
+  font-family: "Inter", "Segoe UI", "Roboto", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+/* Terms Section */
+.terms-section {
+  margin-bottom: 1rem;
+}
+
+.terms-section-title {
+  font-family: "Inter", "Segoe UI", "Roboto", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #b0b0b0;
+  line-height: 1.6;
+  margin-bottom: 0.25rem;
+}
+
+.terms-section-content {
+  font-family: "Inter", "Segoe UI", "Roboto", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #b0b0b0;
+  line-height: 1.6;
+}
+
+/* Bold text for section titles */
+.terms-bold {
+  font-weight: 800;
+  color: #6b8e23;
+}
+
+/* Checkbox Section */
+.terms-checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.terms-checkbox {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #555;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.terms-checkbox:checked {
+  background: #6b8e23;
+  border-color: #6b8e23;
+}
+
+.terms-checkbox:checked::after {
+  content: "✓";
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.terms-checkbox-label {
+  font-family: "Inter", "Segoe UI", "Roboto", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #b0b0b0;
+  cursor: pointer;
+}
+
+/* Enter Button */
+.terms-enter-button {
+  width: 100%;
+  max-width: 260px;
+  padding: 0.875rem 2rem;
+  font-family: "Inter", "Segoe UI", "Roboto", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  background: #6b8e23;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.terms-enter-button:hover:not(:disabled) {
+  background: #5a7519;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(107, 142, 35, 0.4);
+}
+
+.terms-enter-button:disabled {
+  background: #3a3a3a;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Right Column */
+.terms-right-column {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Progress Indicator in Right Column */
+.terms-progress-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 1.5rem;
+}
+
+.terms-progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.terms-progress-label {
+  font-size: 0.75rem;
+  color: #b0b0b0;
+  font-weight: 500;
+}
+
+.terms-progress-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid #6b8e23;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.terms-progress-line {
+  width: 140px;
+  height: 2px;
+  background: #666;
+  margin-top: 1.25rem;
+}
+
+/* Right Column Content */
+.terms-right-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.terms-right-section-title {
+  font-family: "Inter", "Segoe UI", "Roboto", sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #b0b0b0;
+  margin-bottom: 0.5rem;
+}
+
+.terms-right-section-content {
+  font-family: "Inter", "Segoe UI", "Roboto", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #b0b0b0;
+  line-height: 1.6;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .terms-container {
+    padding: 2rem 3rem;
+  }
+
+  .terms-content-wrapper {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .terms-progress-line {
+    width: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .terms-container {
+    padding: 1.5rem;
+  }
+
+  .terms-title {
+    font-size: 2rem;
+  }
+
+  .terms-progress-line {
+    width: 60px;
+  }
+}

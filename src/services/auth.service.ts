@@ -1,6 +1,6 @@
-import type { User, UserRole } from '@/Context/createAuthContext';
-import { decryptToken } from '@/utils';
-import { httpClient } from './httpClient';
+import type { User, UserRole, SignUpData } from "@/Context/createAuthContext";
+import { decryptToken } from "@/utils";
+import { httpClient } from "./httpClient";
 
 export interface LoginCredentials {
   email: string;
@@ -11,6 +11,12 @@ export interface LoginResponse {
   access_token: string;
   expires_in: number;
   token_type: string;
+}
+
+export interface SignUpResponse {
+  message: string;
+  userId?: string;
+  success: boolean;
 }
 
 export interface UserApiResponse {
@@ -34,50 +40,58 @@ export interface UserApiResponse {
 }
 
 class AuthService {
-
   async login(credentials: LoginCredentials): Promise<User> {
-    console.log('=== Authentication Service: Login ===');
-    console.log('Request credentials:', { email: credentials.email });
+    console.log("=== Authentication Service: Login ===");
+    console.log("Request credentials:", { email: credentials.email });
 
-    const loginResponse = await httpClient.post<LoginResponse>('/auth/login', credentials);
+    const loginResponse = await httpClient.post<LoginResponse>(
+      "/auth/login",
+      credentials,
+    );
 
-    console.log('=== First API Response (Login) ===');
-    console.log('Raw response data:', loginResponse);
+    console.log("=== First API Response (Login) ===");
+    console.log("Raw response data:", loginResponse);
 
     if (!loginResponse.access_token) {
-      throw new Error('No access token received');
+      throw new Error("No access token received");
     }
 
     const token = loginResponse.access_token;
-    console.log('=== Token Information ===');
-    console.log('Token Type:', loginResponse.token_type);
-    console.log('Expires In:', loginResponse.expires_in, 'seconds');
-    console.log('Encrypted Token:', token);
+    console.log("=== Token Information ===");
+    console.log("Token Type:", loginResponse.token_type);
+    console.log("Expires In:", loginResponse.expires_in, "seconds");
+    console.log("Encrypted Token:", token);
 
     const decryptedData = decryptToken(token);
-    console.log('Decrypted Token Payload:', decryptedData);
-    console.log('Raw Decrypted Data:', JSON.stringify(decryptedData, null, 2));
+    console.log("Decrypted Token Payload:", decryptedData);
+    console.log("Raw Decrypted Data:", JSON.stringify(decryptedData, null, 2));
 
-    const userId = decryptedData?.sub || decryptedData?.userId || decryptedData?.id;
+    const userId =
+      decryptedData?.sub || decryptedData?.userId || decryptedData?.id;
     const userRole = decryptedData?.role;
 
     if (!userId) {
-      throw new Error('No user ID found in token');
+      throw new Error("No user ID found in token");
     }
 
-    console.log('User ID from token:', userId);
-    console.log('User role from token:', userRole);
+    console.log("User ID from token:", userId);
+    console.log("User role from token:", userRole);
 
-    localStorage.setItem('auth_token', token);
-    localStorage.setItem('token_type', loginResponse.token_type || 'Bearer');
-    localStorage.setItem('token_expires_in', loginResponse.expires_in?.toString() || '');
-    console.log('Token saved to localStorage');
+    localStorage.setItem("auth_token", token);
+    localStorage.setItem("token_type", loginResponse.token_type || "Bearer");
+    localStorage.setItem(
+      "token_expires_in",
+      loginResponse.expires_in?.toString() || "",
+    );
+    console.log("Token saved to localStorage");
 
-    console.log('\n=== Making Second API Call to Get User Details ===');
-    const userProfile = await httpClient.get<UserApiResponse>(`/v1/user/${userId}`);
+    console.log("\n=== Making Second API Call to Get User Details ===");
+    const userProfile = await httpClient.get<UserApiResponse>(
+      `/v1/user/${userId}`,
+    );
 
-    console.log('=== Second API Response (User Details) ===');
-    console.log('Raw user details:', userProfile);
+    console.log("=== Second API Response (User Details) ===");
+    console.log("Raw user details:", userProfile);
 
     const userData: User = {
       _id: userProfile._id || null,
@@ -90,7 +104,9 @@ class AuthService {
       phoneNumber: userProfile.phoneNumber || null,
       phoneNumberVerified: userProfile.phoneNumberVerified ?? null,
       roles: Array.isArray(userProfile.roles) ? userProfile.roles : [],
-      permissions: Array.isArray(userProfile.permissions) ? userProfile.permissions : [],
+      permissions: Array.isArray(userProfile.permissions)
+        ? userProfile.permissions
+        : [],
       createdBy: userProfile.createdBy || null,
       updatedBy: userProfile.updatedBy || null,
       meta: Array.isArray(userProfile.meta) ? userProfile.meta : [],
@@ -100,30 +116,60 @@ class AuthService {
       role: userRole as UserRole,
     };
 
-    console.log('\n=== Parsed Final User Data ===');
+    console.log("\n=== Parsed Final User Data ===");
     console.log(JSON.stringify(userData, null, 2));
 
-    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem("user", JSON.stringify(userData));
 
     return userData;
+  }
+
+  /**
+   * Register a new user
+   */
+  async signup(data: SignUpData): Promise<SignUpResponse> {
+    console.log("=== Authentication Service: Signup ===");
+    console.log("Request data:", { email: data.email, role: data.role });
+
+    const signupPayload = {
+      email: data.email,
+      password: data.password,
+      fullName: data.name,
+      role: data.role,
+      nationalId: data.nationalId || null,
+      address: data.address || null,
+      phoneNumber: data.contactNumber || null,
+      province: data.province || null,
+      district: data.district || null,
+    };
+
+    const response = await httpClient.post<SignUpResponse>(
+      "/auth/register",
+      signupPayload,
+    );
+
+    console.log("=== Signup API Response ===");
+    console.log("Response:", response);
+
+    return response;
   }
 
   /**
    * Logout user
    */
   logout(): void {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('token_type');
-    localStorage.removeItem('token_expires_in');
-    localStorage.removeItem('user');
-    console.log('User logged out');
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("token_type");
+    localStorage.removeItem("token_expires_in");
+    localStorage.removeItem("user");
+    console.log("User logged out");
   }
 
   /**
    * Check if user is authenticated
    */
   isAuthenticated(): boolean {
-    return !!localStorage.getItem('auth_token');
+    return !!localStorage.getItem("auth_token");
   }
 
   /**
@@ -131,13 +177,13 @@ class AuthService {
    */
   getStoredUser(): User | null {
     try {
-      const storedUser = localStorage.getItem('user');
+      const storedUser = localStorage.getItem("user");
       if (storedUser) {
         return JSON.parse(storedUser);
       }
       return null;
     } catch (error) {
-      console.error('Failed to parse stored user:', error);
+      console.error("Failed to parse stored user:", error);
       return null;
     }
   }

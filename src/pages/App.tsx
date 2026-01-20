@@ -1,23 +1,24 @@
-import { ProtectedRoute, PublicRoute } from '@/components';
-import { AuthProvider } from '@/Context/AuthContext';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import AccountPage from './common/AccountPage';
-import InboxPage from './common/InboxPage';
-import InvestorsPage from './common/InvestorsPage';
-import LandOwnersPage from './common/LandOwnersPage';
-import MatchMakingPage from './common/MatchMakingPage';
-import MyProjectsPage from './common/MyProjectsPage';
-import OpportunitiesPage from './common/OpportunitiesPage';
-import SettingsPage from './common/SettingsPage';
-import Dashboard from './Dashboard';
-import FarmerSearchPage from './investor/FarmerSearchPage';
-import MyOffersPage from './investor/MyOffersPage';
-import RequestsPage from './investor/RequestsPage';
-import LandAnalysisPage from './landowner/LandAnalysisPage';
-import MyLandAdsPage from './landowner/MyLandAdsPage';
-import ReceivedRequestsPage from './landowner/ReceivedRequestsPage';
-import TenantSearchPage from './landowner/TenantSearchPage';
-import Login from './Login';
+import { ProtectedRoute, PublicRoute } from "@/components";
+import { AuthProvider } from "@/Context/AuthContext";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import AccountPage from "./common/AccountPage";
+import InboxPage from "./common/InboxPage";
+import InvestorsPage from "./common/InvestorsPage";
+import LandOwnersPage from "./common/LandOwnersPage";
+import MatchMakingPage from "./common/MatchMakingPage";
+import MyProjectsPage from "./common/MyProjectsPage";
+import OpportunitiesPage from "./common/OpportunitiesPage";
+import SettingsPage from "./common/SettingsPage";
+import Dashboard from "./Dashboard";
+import FarmerSearchPage from "./investor/FarmerSearchPage";
+import MyOffersPage from "./investor/MyOffersPage";
+import RequestsPage from "./investor/RequestsPage";
+import LandAnalysisPage from "./landowner/LandAnalysisPage";
+import MyLandAdsPage from "./landowner/MyLandAdsPage";
+import ReceivedRequestsPage from "./landowner/ReceivedRequestsPage";
+import TenantSearchPage from "./landowner/TenantSearchPage";
+import Login from "./Login";
+import SignUp from "./SignUp";
 
 function App() {
   return (
@@ -30,6 +31,14 @@ function App() {
             element={
               <PublicRoute>
                 <Login />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <PublicRoute>
+                <SignUp />
               </PublicRoute>
             }
           />

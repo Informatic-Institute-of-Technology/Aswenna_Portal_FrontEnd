@@ -3,7 +3,7 @@
  * Export all shared types from this file
  */
 
-export type UserRole = 'farmer' | 'investor' | 'landowner';
+export type UserRole = "farmer" | "investor" | "land_owner";
 
 // User & Authentication Types
 export interface User {
@@ -75,3 +75,25 @@ export interface SignUpFormState {
   confirmPassword: FormField;
 }
 
+// Registration Form Data
+export interface RegistrationData {
+  // Step 1: Initial signup
+  email: string;
+  password: string;
+
+  // Step 2: Role selection
+  role: UserRole;
+
+  // Step 3: Personal details
+  fullName: string;
+  nationalId: string;
+  address: string;
+  contactNumber: string;
+  alternateContact?: string;
+  dob: string;
+  province?: string;
+  district?: string;
+
+  // Step 4: Terms accepted
+  termsAccepted?: boolean;
+}
