@@ -134,6 +134,46 @@ const SuperAdminDashboard = () => {
 
   const growth = calculateGrowth();
 
+  // Extract top 5 districts from user addresses
+  const getTopDistricts = () => {
+    const districtCounts = users.reduce((acc: { [key: string]: number }, user) => {
+      if (!user.address) return acc;
+      
+      // Split by space/comma and filter empty strings
+      const words = user.address.trim().split(/[,\s]+/).filter(w => w.length > 0);
+      
+      if (words.length === 0) return acc;
+      
+      // Get last word and clean it
+      let rawDistrict = words[words.length - 1].replace(/[^\w\s]/gi, '');
+      
+      // If last word is a number (postal code like 07, 05) or "no", use the previous word
+      const isNumber = /^\d+$/.test(rawDistrict);
+      const isNo = rawDistrict.toLowerCase() === 'no';
+      
+      if ((isNumber || isNo) && words.length > 1) {
+        rawDistrict = words[words.length - 2].replace(/[^\w\s]/gi, '');
+      }
+      
+      const district = rawDistrict.trim();
+      
+      // Skip if still a number or "no" after processing
+      if (district && !/^\d+$/.test(district) && district.toLowerCase() !== 'no') {
+        acc[district] = (acc[district] || 0) + 1;
+      }
+      return acc;
+    }, {});
+
+    // Convert to array, sort by count, and take top 5
+    return Object.entries(districtCounts)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+  };
+
+  const topDistricts = getTopDistricts();
+  const maxDistrictCount = topDistricts[0]?.count || 1;
+
   const ModernStatCard = ({
     title,
     value,
@@ -399,7 +439,115 @@ const SuperAdminDashboard = () => {
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
                 Interactive map showing user concentration by province
               </Typography>
-              <SriLankaMap provinceDistribution={provinceDistribution} />
+              
+              <Grid container spacing={3}>
+                <Grid size={{ xs: 12, lg: 6 }}>
+                  <Box sx={{ position: 'relative' }}>
+                    <SriLankaMap provinceDistribution={provinceDistribution} />
+                    
+                    <Paper 
+                      sx={{ 
+                        position: 'absolute', 
+                        top: 10, 
+                        right: 10, 
+                        p: 1.5, 
+                        bgcolor: 'rgba(0, 0, 0, 0.3)',
+                        borderRadius: 1,
+                        boxShadow: 3,
+                        maxWidth: 180,
+                        zIndex: 1000
+                      }}
+                    >
+                      <Typography variant="caption" sx={{ fontWeight: 600, display: 'block', mb: 0.5, color: 'white' }}>
+                        Map Legend
+                      </Typography>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Agriculture sx={{ color: '#4CAF50', fontSize: 16 }} />
+                          <Typography variant="caption" sx={{ color: 'white' }}>Farmers</Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Business sx={{ color: '#FF9800', fontSize: 16 }} />
+                          <Typography variant="caption" sx={{ color: 'white' }}>Investors</Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Landscape sx={{ color: '#9C27B0', fontSize: 16 }} />
+                          <Typography variant="caption" sx={{ color: 'white' }}>Landowners</Typography>
+                        </Box>
+                      </Box>
+                    </Paper>
+                  </Box>
+                </Grid>
+
+                <Grid size={{ xs: 12, lg: 6 }}>
+                  <Paper sx={{ p: 3, height: '100%', minHeight: 500 }}>
+                    <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
+                      Top 5 User Districts
+                    </Typography>
+                    
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                      {topDistricts.map((district, index) => (
+                        <Box key={district.name}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                              <Box
+                                sx={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: '50%',
+                                  bgcolor: index === 0 ? '#FFD700' : index === 1 ? '#1a6ac5' : index === 2 ? '#CD7F32' : 'primary.main',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  color: 'white',
+                                  fontWeight: 700,
+                                  fontSize: '0.875rem',
+                                }}
+                              >
+                                {index + 1}
+                              </Box>
+                              <Box>
+                                <Typography variant="body1" sx={{ fontWeight: 600, textTransform: 'capitalize' }}>
+                                  {district.name}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                  {district.count.toLocaleString()} {district.count === 1 ? 'User' : 'Users'}
+                                </Typography>
+                              </Box>
+                            </Box>
+                            <Chip 
+                              label={district.count} 
+                              size="small" 
+                              color="primary" 
+                              sx={{ fontWeight: 600, minWidth: 50 }}
+                            />
+                          </Box>
+                          
+
+                          <Box
+                            sx={{
+                              height: 8,
+                              borderRadius: 4,
+                              bgcolor: 'grey.200',
+                              overflow: 'hidden',
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                height: '100%',
+                                width: `${(district.count / maxDistrictCount) * 100}%`,
+                                bgcolor: index === 0 ? '#FFD700' : index === 1 ? '#37c44a' : index === 2 ? '#CD7F32' : 'primary.main',
+                                transition: 'width 0.3s ease',
+                                borderRadius: 4,
+                              }}
+                            />
+                          </Box>
+                        </Box>
+                      ))}
+                    </Box>  
+                  </Paper>
+                </Grid>
+              </Grid>
             </CardContent>
           </TabPanel>
 
@@ -471,7 +619,6 @@ const SuperAdminDashboard = () => {
                 </Grid>
               </Grid>
 
-              {/* Verification Status Chart */}
               <Box sx={{ mt: 4 }}>
                 <Typography variant="h6" gutterBottom>
                   Verification Status
@@ -518,7 +665,6 @@ const SuperAdminDashboard = () => {
             </CardContent>
           </TabPanel>
 
-          {/* Tab 3: Recent Activity */}
           <TabPanel value={tabValue} index={2}>
             <CardContent>
               <Typography variant="h6" gutterBottom>

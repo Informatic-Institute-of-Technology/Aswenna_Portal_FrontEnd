@@ -40,14 +40,11 @@ const mapContainerStyle = {
   height: '500px',
 };
 
-// Custom marker icons as SVG data URLs using Material-UI icon paths
 const getMarkerIcon = (type: 'farmers' | 'investors' | 'landowners', size: number = 45) => {
   const icons = {
     farmers: `data:image/svg+xml,${encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size + 10}" viewBox="0 0 24 34">
-        <!-- Pin shape -->
         <path d="M12 0C7.03 0 3 4.03 3 9c0 6.5 9 18 9 18s9-11.5 9-18c0-4.97-4.03-9-9-9z" fill="#4CAF50"/>
-        <!-- Agriculture/Tractor icon inside pin -->
         <g transform="translate(7, 4) scale(0.42)">
           <path fill="#FFFFFF" d="M4,11h2v3H4V11z M18,10h2v4h-2V10z M1.5,5C0.67,5,0,5.67,0,6.5S0.67,8,1.5,8S3,7.33,3,6.5S2.33,5,1.5,5z M22.5,10c-0.83,0-1.5,0.67-1.5,1.5s0.67,1.5,1.5,1.5s1.5-0.67,1.5-1.5S23.33,10,22.5,10z M8,16h8v-5H8V16z M6,17c-1.1,0-2,0.9-2,2s0.9,2,2,2s2-0.9,2-2S7.1,17,6,17z M18,17c-1.1,0-2,0.9-2,2s0.9,2,2,2s2-0.9,2-2S19.1,17,18,17z M12,2L8,4v5h8V4L12,2z"/>
         </g>
@@ -55,9 +52,7 @@ const getMarkerIcon = (type: 'farmers' | 'investors' | 'landowners', size: numbe
     `)}`,
     investors: `data:image/svg+xml,${encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size + 10}" viewBox="0 0 24 34">
-        <!-- Pin shape -->
         <path d="M12 0C7.03 0 3 4.03 3 9c0 6.5 9 18 9 18s9-11.5 9-18c0-4.97-4.03-9-9-9z" fill="#FF9800"/>
-        <!-- Business/Building icon inside pin -->
         <g transform="translate(7, 4) scale(0.42)">
           <path fill="#FFFFFF" d="M12,7V3H2v18h20V7H12z M6,19H4v-2h2V19z M6,15H4v-2h2V15z M6,11H4V9h2V11z M6,7H4V5h2V7z M10,19H8v-2h2V19z M10,15H8v-2h2V15z M10,11H8V9h2V11z M10,7H8V5h2V7z M20,19h-8v-2h2v-2h-2v-2h2v-2h-2V9h8V19z M18,11h-2v2h2V11z M18,15h-2v2h2V15z"/>
         </g>
@@ -65,9 +60,7 @@ const getMarkerIcon = (type: 'farmers' | 'investors' | 'landowners', size: numbe
     `)}`,
     landowners: `data:image/svg+xml,${encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size + 10}" viewBox="0 0 24 34">
-        <!-- Pin shape -->
         <path d="M12 0C7.03 0 3 4.03 3 9c0 6.5 9 18 9 18s9-11.5 9-18c0-4.97-4.03-9-9-9z" fill="#9C27B0"/>
-        <!-- Landscape/Mountains icon inside pin -->
         <g transform="translate(7, 5) scale(0.42)">
           <path fill="#FFFFFF" d="M14,6l-3.75,5l2.85,3.8l-1.6,1.2C9.81,13.75,7,10,7,10l-6,8h22L14,6z"/>
         </g>
@@ -186,7 +179,6 @@ const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistrib
         
         if (fetchedMarkers.length > 0) {
           setMarkers(fetchedMarkers);
-          // Center map on Sri Lanka
           setMapCoordinates({ lat: 7.8731, lng: 80.7718 });
         }
         setLoading(false);
@@ -196,7 +188,6 @@ const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistrib
       return;
     }
 
-    // Fallback to city-based distribution (legacy support)
     if (userDistribution && Object.keys(userDistribution).length > 0) {
       const fetchDistributionMarkers = async () => {
         setLoading(true);
@@ -217,7 +208,6 @@ const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistrib
         
         if (fetchedMarkers.length > 0) {
           setMarkers(fetchedMarkers);
-          // Center map on Sri Lanka
           const centerLat = fetchedMarkers.reduce((sum, m) => sum + m.lat, 0) / fetchedMarkers.length;
           const centerLng = fetchedMarkers.reduce((sum, m) => sum + m.lng, 0) / fetchedMarkers.length;
           setMapCoordinates({ lat: centerLat, lng: centerLng });
@@ -229,7 +219,6 @@ const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistrib
       return;
     }
 
-    // If single coordinates provided, use them
     if (coordinates) {
       setMapCoordinates(coordinates);
       setMarkers([{ ...coordinates, name: location }]);
@@ -237,7 +226,6 @@ const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistrib
       return;
     }
 
-    // Otherwise, geocode the single location string
     const fetchCoordinates = async () => {
       setLoading(true);
       const coords = await getLocationData(location);
@@ -251,8 +239,6 @@ const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistrib
     fetchCoordinates();
   }, [location, coordinates, userDistribution, provinceDistribution, getLocationData]);
 
-
-  // Handle Google Maps loading error
   if (loadError) {
     return (
       <Box

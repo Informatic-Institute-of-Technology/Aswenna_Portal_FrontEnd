@@ -1,8 +1,3 @@
-/**
- * Admin API Service
- * Handles all API calls for super admin features
- */
-
 import { httpClient } from './httpClient';
 
 export interface ApiUser {
