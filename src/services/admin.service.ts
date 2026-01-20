@@ -118,6 +118,48 @@ class AdminService {
       throw error;
     }
   }
+
+  async getProvinceDistribution() {
+    try {
+      const users = await this.getAllUsersPaginated();
+      const distribution: { 
+        [province: string]: { 
+          farmers: number; 
+          investors: number; 
+          landowners: number; 
+          total: number 
+        } 
+      } = {};
+
+      const roleMap: { [key: string]: string } = {
+        '696e40fda4f896e9f40c8b93': 'farmers',
+        '696e6163b558abe269548099': 'investors',
+        '696e616db558abe26954809c': 'landowners',
+      };
+
+      users.forEach((user) => {
+        const { province } = this.parseLocation(user.address);
+        const roleKey = roleMap[user.role];
+        
+        // Ensure province is a valid string, use 'Unknown' as fallback
+        const provinceKey = province || 'Unknown';
+        
+        if (!distribution[provinceKey]) {
+          distribution[provinceKey] = { farmers: 0, investors: 0, landowners: 0, total: 0 };
+        }
+        
+        if (roleKey) {
+          distribution[provinceKey][roleKey as 'farmers' | 'investors' | 'landowners']++;
+        }
+        distribution[provinceKey].total++;
+      });
+
+      return distribution;
+    } catch (error) {
+      console.error('Failed to fetch province distribution:', error);
+      throw error;
+    }
+  }
 }
 
 export const adminService = new AdminService();

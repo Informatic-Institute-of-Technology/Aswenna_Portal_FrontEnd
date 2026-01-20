@@ -1,4 +1,5 @@
 import { Box, CircularProgress, Typography } from '@mui/material';
+import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
 import { useCallback, useEffect, useState } from 'react';
 
 const GOOGLE_MAPS_API_KEY = 'AIzaSyA3L-q18zc1dET4FtGpbC4GRfjd60KfWlc';
@@ -8,15 +9,83 @@ interface Coordinates {
   lng: number;
 }
 
+interface LocationMarker extends Coordinates {
+  id?: string | number;
+  name: string;
+  farmers?: number;
+  investors?: number;
+  landowners?: number;
+  total?: number;
+  type?: 'farmers' | 'investors' | 'landowners' | 'mixed';
+}
+
+interface ProvinceDistribution {
+  [province: string]: {
+    farmers: number;
+    investors: number;
+    landowners: number;
+    total: number;
+  };
+}
+
 interface SriLankaMapProps {
   location?: string;
   coordinates?: Coordinates;
+  userDistribution?: { [key: string]: number };
+  provinceDistribution?: ProvinceDistribution;
 }
 
-const SriLankaMap = ({ location = 'Colombo, Sri Lanka', coordinates }: SriLankaMapProps) => {
-  const [loading, setLoading] = useState(!coordinates);
+const mapContainerStyle = {
+  width: '100%',
+  height: '500px',
+};
+
+// Custom marker icons as SVG data URLs using Material-UI icon paths
+const getMarkerIcon = (type: 'farmers' | 'investors' | 'landowners', size: number = 45) => {
+  const icons = {
+    farmers: `data:image/svg+xml,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size + 10}" viewBox="0 0 24 34">
+        <!-- Pin shape -->
+        <path d="M12 0C7.03 0 3 4.03 3 9c0 6.5 9 18 9 18s9-11.5 9-18c0-4.97-4.03-9-9-9z" fill="#4CAF50"/>
+        <!-- Agriculture/Tractor icon inside pin -->
+        <g transform="translate(7, 4) scale(0.42)">
+          <path fill="#FFFFFF" d="M4,11h2v3H4V11z M18,10h2v4h-2V10z M1.5,5C0.67,5,0,5.67,0,6.5S0.67,8,1.5,8S3,7.33,3,6.5S2.33,5,1.5,5z M22.5,10c-0.83,0-1.5,0.67-1.5,1.5s0.67,1.5,1.5,1.5s1.5-0.67,1.5-1.5S23.33,10,22.5,10z M8,16h8v-5H8V16z M6,17c-1.1,0-2,0.9-2,2s0.9,2,2,2s2-0.9,2-2S7.1,17,6,17z M18,17c-1.1,0-2,0.9-2,2s0.9,2,2,2s2-0.9,2-2S19.1,17,18,17z M12,2L8,4v5h8V4L12,2z"/>
+        </g>
+      </svg>
+    `)}`,
+    investors: `data:image/svg+xml,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size + 10}" viewBox="0 0 24 34">
+        <!-- Pin shape -->
+        <path d="M12 0C7.03 0 3 4.03 3 9c0 6.5 9 18 9 18s9-11.5 9-18c0-4.97-4.03-9-9-9z" fill="#FF9800"/>
+        <!-- Business/Building icon inside pin -->
+        <g transform="translate(7, 4) scale(0.42)">
+          <path fill="#FFFFFF" d="M12,7V3H2v18h20V7H12z M6,19H4v-2h2V19z M6,15H4v-2h2V15z M6,11H4V9h2V11z M6,7H4V5h2V7z M10,19H8v-2h2V19z M10,15H8v-2h2V15z M10,11H8V9h2V11z M10,7H8V5h2V7z M20,19h-8v-2h2v-2h-2v-2h2v-2h-2V9h8V19z M18,11h-2v2h2V11z M18,15h-2v2h2V15z"/>
+        </g>
+      </svg>
+    `)}`,
+    landowners: `data:image/svg+xml,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size + 10}" viewBox="0 0 24 34">
+        <!-- Pin shape -->
+        <path d="M12 0C7.03 0 3 4.03 3 9c0 6.5 9 18 9 18s9-11.5 9-18c0-4.97-4.03-9-9-9z" fill="#9C27B0"/>
+        <!-- Landscape/Mountains icon inside pin -->
+        <g transform="translate(7, 5) scale(0.42)">
+          <path fill="#FFFFFF" d="M14,6l-3.75,5l2.85,3.8l-1.6,1.2C9.81,13.75,7,10,7,10l-6,8h22L14,6z"/>
+        </g>
+      </svg>
+    `)}`
+  };
+  return icons[type];
+};
+
+const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistribution, provinceDistribution }: SriLankaMapProps) => {
+  const [loading, setLoading] = useState(!coordinates && !userDistribution && !provinceDistribution);
   const [error, setError] = useState<string | null>(null);
   const [mapCoordinates, setMapCoordinates] = useState<Coordinates | null>(coordinates || null);
+  const [markers, setMarkers] = useState<LocationMarker[]>([]);
+
+  const { isLoaded, loadError } = useLoadScript({
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+  });
 
   const getLocationData = useCallback(async (address: string) => {
     if (!GOOGLE_MAPS_API_KEY) {
@@ -63,24 +132,152 @@ const SriLankaMap = ({ location = 'Colombo, Sri Lanka', coordinates }: SriLankaM
   }, []);
 
   useEffect(() => {
+    // If provinceDistribution provided, geocode all provinces and create markers for each role
+    if (provinceDistribution && Object.keys(provinceDistribution).length > 0) {
+      const fetchProvinceMarkers = async () => {
+        setLoading(true);
+        const fetchedMarkers: LocationMarker[] = [];
+        
+        for (const [province, data] of Object.entries(provinceDistribution)) {
+          const coords = await getLocationData(`${province} Province, Sri Lanka`);
+          if (coords) {
+            // Create separate markers for each user type in this province
+            const offset = 0.05; // Small offset to separate markers
+            
+            if (data.farmers > 0) {
+              fetchedMarkers.push({
+                ...coords,
+                lat: coords.lat + offset,
+                lng: coords.lng - offset,
+                id: `${province}-farmers`,
+                name: province,
+                farmers: data.farmers,
+                total: data.total,
+                type: 'farmers',
+              });
+            }
+            
+            if (data.investors > 0) {
+              fetchedMarkers.push({
+                ...coords,
+                lat: coords.lat - offset,
+                id: `${province}-investors`,
+                name: province,
+                investors: data.investors,
+                total: data.total,
+                type: 'investors',
+              });
+            }
+            
+            if (data.landowners > 0) {
+              fetchedMarkers.push({
+                ...coords,
+                lat: coords.lat + offset,
+                lng: coords.lng + offset,
+                id: `${province}-landowners`,
+                name: province,
+                landowners: data.landowners,
+                total: data.total,
+                type: 'landowners',
+              });
+            }
+          }
+        }
+        
+        if (fetchedMarkers.length > 0) {
+          setMarkers(fetchedMarkers);
+          // Center map on Sri Lanka
+          setMapCoordinates({ lat: 7.8731, lng: 80.7718 });
+        }
+        setLoading(false);
+      };
+
+      fetchProvinceMarkers();
+      return;
+    }
+
+    // Fallback to city-based distribution (legacy support)
+    if (userDistribution && Object.keys(userDistribution).length > 0) {
+      const fetchDistributionMarkers = async () => {
+        setLoading(true);
+        const fetchedMarkers: LocationMarker[] = [];
+        
+        for (const [city, count] of Object.entries(userDistribution)) {
+          const coords = await getLocationData(`${city}, Sri Lanka`);
+          if (coords) {
+            fetchedMarkers.push({
+              ...coords,
+              id: city,
+              name: city,
+              total: count,
+              type: 'mixed',
+            });
+          }
+        }
+        
+        if (fetchedMarkers.length > 0) {
+          setMarkers(fetchedMarkers);
+          // Center map on Sri Lanka
+          const centerLat = fetchedMarkers.reduce((sum, m) => sum + m.lat, 0) / fetchedMarkers.length;
+          const centerLng = fetchedMarkers.reduce((sum, m) => sum + m.lng, 0) / fetchedMarkers.length;
+          setMapCoordinates({ lat: centerLat, lng: centerLng });
+        }
+        setLoading(false);
+      };
+
+      fetchDistributionMarkers();
+      return;
+    }
+
+    // If single coordinates provided, use them
     if (coordinates) {
       setMapCoordinates(coordinates);
+      setMarkers([{ ...coordinates, name: location }]);
       setLoading(false);
       return;
     }
 
+    // Otherwise, geocode the single location string
     const fetchCoordinates = async () => {
       setLoading(true);
       const coords = await getLocationData(location);
       if (coords) {
         setMapCoordinates(coords);
+        setMarkers([{ ...coords, name: location }]);
       }
       setLoading(false);
     };
 
     fetchCoordinates();
-  }, [location, coordinates, getLocationData]);
+  }, [location, coordinates, userDistribution, provinceDistribution, getLocationData]);
 
+
+  // Handle Google Maps loading error
+  if (loadError) {
+    return (
+      <Box
+        sx={{
+          height: 500,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: 'background.paper',
+          borderRadius: 2,
+          border: '1px solid',
+          borderColor: 'divider',
+        }}
+      >
+        <Box sx={{ textAlign: 'center', p: 3 }}>
+          <Typography variant="h6" color="error" gutterBottom>
+            Failed to Load Google Maps
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {loadError.message}
+          </Typography>
+        </Box>
+      </Box>
+    );
+  }
 
   if (error) {
     return (
@@ -108,7 +305,7 @@ const SriLankaMap = ({ location = 'Colombo, Sri Lanka', coordinates }: SriLankaM
     );
   }
 
-  if (loading || !mapCoordinates) {
+  if (loading || !mapCoordinates || !isLoaded) {
     return (
       <Box
         sx={{
@@ -145,24 +342,40 @@ const SriLankaMap = ({ location = 'Colombo, Sri Lanka', coordinates }: SriLankaM
           position: 'relative',
         }}
       >
-        <iframe
-          title={location}
-          src={`https://www.google.com/maps?q=${mapCoordinates.lat},${mapCoordinates.lng}&output=embed`}
-          width="100%"
-          height="100%"
-          style={{ border: 'none' }}
-          allowFullScreen
-          loading="lazy"
-        />
-      </Box>
+        <GoogleMap
+          mapContainerStyle={mapContainerStyle}
+          center={mapCoordinates}
+          zoom={markers.length > 1 ? 7 : 12}
+          options={{
+            zoomControl: true,
+            streetViewControl: true,
+            mapTypeControl: true,
+            fullscreenControl: true,
+            mapTypeId: 'satellite', // Set satellite view as default
+          }}
+        >
+          {markers.map((marker, index) => {
+            const getTitle = () => {
+              if (marker.type === 'farmers') return `${marker.name} - Farmers: ${marker.farmers}`;
+              if (marker.type === 'investors') return `${marker.name} - Investors: ${marker.investors}`;
+              if (marker.type === 'landowners') return `${marker.name} - Landowners: ${marker.landowners}`;
+              return `${marker.name} - Total: ${marker.total}`;
+            };
 
-      <Box sx={{ mt: 2, display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Box sx={{ width: 16, height: 16, borderRadius: '50%', bgcolor: '#d32f2f' }} />
-          <Typography variant="caption">
-            {location}
-          </Typography>
-        </Box>
+            return (
+              <Marker
+                key={marker.id || index}
+                position={{ lat: marker.lat, lng: marker.lng }}
+                title={getTitle()}
+                icon={marker.type && marker.type !== 'mixed' ? {
+                  url: getMarkerIcon(marker.type),
+                  scaledSize: new window.google.maps.Size(45, 55),
+                  anchor: new window.google.maps.Point(22.5, 55),
+                } : undefined}
+              />
+            );
+          })}
+        </GoogleMap>
       </Box>
     </Box>
   );

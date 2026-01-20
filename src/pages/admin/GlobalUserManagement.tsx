@@ -30,6 +30,7 @@ import {
     TableCell,
     TableContainer,
     TableHead,
+    TablePagination,
     TableRow,
     Tabs,
     TextField,
@@ -135,6 +136,8 @@ const GlobalUserManagement = () => {
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [selectedUser, setSelectedUser] = useState<GlobalUser | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage] = useState(10);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -183,6 +186,16 @@ const GlobalUserManagement = () => {
   };
 
   const roleStats = getRoleStats();
+
+  // Pagination
+  const paginatedUsers = filteredUsers.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+
+  const handleChangePage = (_event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
 
   return (
     <DashboardLayout>
@@ -241,7 +254,7 @@ const GlobalUserManagement = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {filteredUsers.map((user) => (
+                {paginatedUsers.map((user) => (
                   <TableRow key={user.id} hover>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -356,6 +369,16 @@ const GlobalUserManagement = () => {
               </TableBody>
             </Table>
           </TableContainer>
+
+          <TablePagination
+            component="div"
+            count={filteredUsers.length}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            rowsPerPageOptions={[10]}
+            sx={{ borderTop: 1, borderColor: 'divider' }}
+          />
 
           {loading && (
             <Box sx={{ textAlign: 'center', py: 3 }}>

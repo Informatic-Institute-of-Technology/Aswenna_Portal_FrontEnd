@@ -2,45 +2,45 @@ import { SriLankaMap } from '@/components';
 import DashboardLayout from '@/layouts/DashboardLayout';
 import { adminService, type ApiUser } from '@/services/admin.service';
 import {
-    AccessTime,
-    Agriculture,
-    Assessment,
-    AssignmentOutlined,
-    BarChartOutlined,
-    Business,
-    CheckCircle,
-    GroupOutlined,
-    Landscape,
-    MapOutlined,
-    People,
-    PersonAdd,
-    RefreshOutlined,
-    TrendingDown,
-    TrendingUp,
-    Verified,
-    Warning
+  AccessTime,
+  Agriculture,
+  Assessment,
+  AssignmentOutlined,
+  BarChartOutlined,
+  Business,
+  CheckCircle,
+  GroupOutlined,
+  Landscape,
+  MapOutlined,
+  People,
+  PersonAdd,
+  RefreshOutlined,
+  TrendingDown,
+  TrendingUp,
+  Verified,
+  Warning
 } from '@mui/icons-material';
 import {
-    Alert,
-    Avatar,
-    Box,
-    Button,
-    Card,
-    CardContent,
-    Chip,
-    CircularProgress,
-    Grid,
-    LinearProgress,
-    Paper,
-    Tab,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Tabs,
-    Typography
+  Alert,
+  Avatar,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  CircularProgress,
+  Grid,
+  LinearProgress,
+  Paper,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Tabs,
+  Typography
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 
@@ -78,21 +78,28 @@ const SuperAdminDashboard = () => {
     verified: 0,
     unverified: 0,
   });
-  const [userDistribution, setUserDistribution] = useState<{ [key: string]: number }>({});
+  const [provinceDistribution, setProvinceDistribution] = useState<{
+    [province: string]: {
+      farmers: number;
+      investors: number;
+      landowners: number;
+      total: number;
+    };
+  }>({});
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = async () => {
     try {
       setError(null);
-      const [usersResponse, stats, distribution] = await Promise.all([
+      const [usersResponse, stats, provinceData] = await Promise.all([
         adminService.getAllUsers(),
         adminService.getUserStats(),
-        adminService.getUserDistribution(),
+        adminService.getProvinceDistribution(),
       ]);
 
       setUsers(usersResponse.data);
       setUserStats(stats);
-      setUserDistribution(distribution);
+      setProvinceDistribution(provinceData);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to load dashboard data';
       setError(message);
@@ -390,42 +397,9 @@ const SuperAdminDashboard = () => {
                 User Distribution Across Sri Lanka
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                Interactive map showing user concentration by city
+                Interactive map showing user concentration by province
               </Typography>
-              <SriLankaMap userDistribution={userDistribution} />
-
-              <Box sx={{ mt: 4 }}>
-                <Typography variant="h6" gutterBottom>
-                  City-wise Breakdown
-                </Typography>
-                <Grid container spacing={2} sx={{ mt: 1 }}>
-                  {Object.entries(userDistribution)
-                    .sort(([, a], [, b]) => b - a)
-                    .slice(0, 8)
-                    .map(([city, count]) => (
-                      <Grid size={{ xs: 12, sm: 6, md: 3 }} key={city}>
-                        <Paper
-                          sx={{
-                            p: 2,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                          }}
-                        >
-                          <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
-                            {city}
-                          </Typography>
-                          <Chip
-                            label={count}
-                            size="small"
-                            color="primary"
-                            sx={{ fontWeight: 600 }}
-                          />
-                        </Paper>
-                      </Grid>
-                    ))}
-                </Grid>
-              </Box>
+              <SriLankaMap provinceDistribution={provinceDistribution} />
             </CardContent>
           </TabPanel>
 
