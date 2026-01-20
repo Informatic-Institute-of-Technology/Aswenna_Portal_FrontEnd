@@ -2,7 +2,7 @@ import { useAuth } from '@/Context/useAuth';
 import { Mail, Notifications } from '@mui/icons-material';
 import { Badge, Box, Drawer, IconButton, Toolbar, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
-import { FarmerSidebar, InvestorSidebar, LandOwnerSidebar } from './sidebars';
+import { FarmerSidebar, InvestorSidebar, LandOwnerSidebar, SuperAdminSidebar } from './sidebars';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -21,6 +21,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         return <InvestorSidebar />;
       case 'landowner':
         return <LandOwnerSidebar />;
+      case 'superadmin':
+        return <SuperAdminSidebar />;
       default:
         return <FarmerSidebar />;
     }
@@ -34,6 +36,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         return 'Investor Dashboard';
       case 'landowner':
         return 'Land Owner Dashboard';
+      case 'superadmin':
+        return 'Super Admin Command Center';
       default:
         return 'Dashboard';
     }
