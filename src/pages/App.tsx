@@ -1,6 +1,7 @@
 import { ProtectedRoute, PublicRoute } from '@/components';
 import { AuthProvider } from '@/Context/AuthContext';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { usePageTitle } from '../hooks/usePageTitle';
 import AccountPage from './common/AccountPage';
 import InboxPage from './common/InboxPage';
 import InvestorsPage from './common/InvestorsPage';
@@ -25,11 +26,11 @@ import GlobalPaymentLedger from './admin/GlobalPaymentLedger';
 import GlobalUserManagement from './admin/GlobalUserManagement';
 import SystemActivityLog from './admin/SystemActivityLog';
 
-function App() {
+function AppRoutes() {
+  usePageTitle();
+
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <Routes>
+    <Routes>
           {/* Public Routes */}
           <Route
             path="/login"
@@ -278,6 +279,14 @@ function App() {
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRoutes />
       </AuthProvider>
     </BrowserRouter>
   );
