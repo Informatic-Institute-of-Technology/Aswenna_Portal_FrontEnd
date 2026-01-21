@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-export type UserRole = "farmer" | "investor" | "land_owner";
+export type UserRole = 'farmer' | 'investor' | 'landowner' | 'superadmin';
 
 export interface User {
   _id: string | null;
@@ -16,7 +16,7 @@ export interface User {
   permissions: string[];
   createdBy: string | null;
   updatedBy: string | null;
-  meta: any[];
+  meta: unknown[];
   createdAt: string | null;
   updatedAt: string | null;
   __v: number | null;

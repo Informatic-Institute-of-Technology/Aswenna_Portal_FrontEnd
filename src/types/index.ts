@@ -3,7 +3,7 @@
  * Export all shared types from this file
  */
 
-export type UserRole = "farmer" | "investor" | "land_owner";
+export type UserRole = 'farmer' | 'investor' | 'landowner' | 'superadmin';
 
 // User & Authentication Types
 export interface User {

@@ -1,13 +1,12 @@
-import { useState } from "react";
 import type { UserRole } from "@/types/index";
-import SignUpInitial from "./signup/SignUpInitial";
-import RoleSelection from "./signup/RoleSelection";
+import { useState } from "react";
 import PersonalDetails, {
   type PersonalDetailsData,
 } from "./signup/PersonalDetails";
-import TermsAndConditions from "./signup/TermsAndConditions";
 import RegistrationComplete from "./signup/RegistrationComplete";
-import { useAuth } from "@/Context/useAuth";
+import RoleSelection from "./signup/RoleSelection";
+import SignUpInitial from "./signup/SignUpInitial";
+import TermsAndConditions from "./signup/TermsAndConditions";
 
 type SignUpStep = "initial" | "role" | "details" | "terms" | "complete";
 
@@ -25,7 +24,6 @@ const SignUp = () => {
     password: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { signup } = useAuth();
 
   const handleInitialNext = (data: { email: string; password: string }) => {
     setSignUpData((prev) => ({ ...prev, ...data }));
