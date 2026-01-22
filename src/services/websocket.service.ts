@@ -3,7 +3,7 @@ import { io, Socket } from 'socket.io-client';
 
 class WebSocketService {
   private socket: Socket | null = null;
-  private readonly SOCKET_URL = 'http://localhost:3000'; // Update with your backend URL
+  private readonly SOCKET_URL = 'http://localhost:3000';
   private messageHandlers: ((message: Message) => void)[] = [];
   private statusHandlers: ((data: { userId: string; isOnline: boolean }) => void)[] = [];
   private typingHandlers: ((data: { userId: string; isTyping: boolean }) => void)[] = [];
