@@ -337,7 +337,7 @@ const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistrib
             streetViewControl: true,
             mapTypeControl: true,
             fullscreenControl: true,
-            mapTypeId: 'satellite', // Set satellite view as default
+            mapTypeId: 'satellite',
           }}
         >
           {markers.map((marker, index) => {
