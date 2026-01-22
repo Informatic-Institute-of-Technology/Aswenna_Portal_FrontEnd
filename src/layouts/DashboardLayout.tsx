@@ -2,6 +2,7 @@ import { useAuth } from '@/Context/useAuth';
 import { Mail, Notifications } from '@mui/icons-material';
 import { Badge, Box, Drawer, IconButton, Toolbar, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FarmerSidebar, InvestorSidebar, LandOwnerSidebar, SuperAdminSidebar } from './sidebars';
 
 interface DashboardLayoutProps {
@@ -12,6 +13,7 @@ const drawerWidth = 280;
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const renderSidebar = () => {
     switch (user?.role) {
@@ -80,7 +82,12 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             {getDashboardTitle()}
           </Typography>
           <Box sx={{ display: 'flex', gap: 1 }}>
-            <IconButton color="inherit" sx={{ border: '1px solid', borderColor: 'divider' }}>
+            <IconButton 
+              color="inherit" 
+              sx={{ border: '1px solid', borderColor: 'divider' }}
+              onClick={() => navigate('/dashboard/inbox')}
+              title="Messages"
+            >
               <Badge badgeContent={3} color="error">
                 <Mail />
               </Badge>

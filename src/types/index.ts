@@ -97,3 +97,8 @@ export interface RegistrationData {
   // Step 4: Terms accepted
   termsAccepted?: boolean;
 }
+
+// Re-export chat types
+export * from './admin.types';
+export * from './chat.types';
+
