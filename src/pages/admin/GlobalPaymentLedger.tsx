@@ -1,12 +1,12 @@
 import { CardHeaderWithIcon } from '@/components';
 import DashboardLayout from '@/layouts/DashboardLayout';
-import type { EscrowAccount, Transaction } from '@/types/admin.types';
+import type { Transaction } from '@/types/admin.types';
 import {
-    AccountBalanceWallet,
     AttachMoney,
+    CheckCircle,
     Download,
     Search,
-    SwapHoriz,
+    Sync,
     TrendingUp
 } from '@mui/icons-material';
 import {
@@ -32,7 +32,6 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 
-// Mock transaction data
 const mockTransactions: Transaction[] = [
   {
     id: '1',
@@ -54,16 +53,17 @@ const mockTransactions: Transaction[] = [
   {
     id: '2',
     transactionId: 'TXN-2026-00233',
-    type: 'escrow_deposit',
+    type: 'payment',
     payer: { id: 'INV-034', name: 'Agri Ventures PLC', role: 'investor' },
-    payee: { id: 'ESCROW', name: 'Platform Escrow', role: 'superadmin' },
+    payee: { id: 'FAR-102', name: 'Kamal Perera', role: 'farmer' },
     projectId: 'PRJ-102',
     projectName: 'Fruit Orchard - Matale',
     amount: 500000,
     currency: 'LKR',
     date: '2026-01-19T14:15:00',
-    status: 'in_escrow',
-    description: 'Initial Investment Deposit',
+    status: 'completed',
+    paymentMethod: 'Bank Transfer',
+    description: 'Initial Project Investment Payment',
   },
   {
     id: '3',
@@ -83,8 +83,8 @@ const mockTransactions: Transaction[] = [
   {
     id: '4',
     transactionId: 'TXN-2026-00231',
-    type: 'escrow_release',
-    payer: { id: 'ESCROW', name: 'Platform Escrow', role: 'superadmin' },
+    type: 'payment',
+    payer: { id: 'INV-089', name: 'AgroTech Investors', role: 'investor' },
     payee: { id: 'FAR-089', name: 'Nimal Fernando', role: 'farmer' },
     projectId: 'PRJ-045',
     projectName: 'Rice Cultivation - Polonnaruwa',
@@ -92,7 +92,8 @@ const mockTransactions: Transaction[] = [
     currency: 'LKR',
     date: '2026-01-18T16:20:00',
     status: 'completed',
-    description: 'Milestone 1 Completion - Escrow Release',
+    paymentMethod: 'Bank Transfer',
+    description: 'Milestone 1 Completion Payment',
     milestoneId: 'MIL-045-01',
     milestoneName: 'Site Survey',
   },
@@ -129,7 +130,7 @@ const mockTransactions: Transaction[] = [
     id: '7',
     transactionId: 'TXN-2026-00228',
     type: 'refund',
-    payer: { id: 'ESCROW', name: 'Platform Escrow', role: 'superadmin' },
+    payer: { id: 'PLATFORM', name: 'Aswenna Platform', role: 'superadmin' },
     payee: { id: 'INV-045', name: 'Investor Corp Ltd', role: 'investor' },
     projectId: 'PRJ-067',
     projectName: 'Tea Plantation - Nuwara Eliya',
@@ -137,6 +138,7 @@ const mockTransactions: Transaction[] = [
     currency: 'LKR',
     date: '2026-01-17T09:15:00',
     status: 'completed',
+    paymentMethod: 'Bank Transfer',
     description: 'Partial Refund - Project Cancellation',
   },
   {
@@ -156,35 +158,7 @@ const mockTransactions: Transaction[] = [
   },
 ];
 
-const mockEscrowAccounts: EscrowAccount[] = [
-  {
-    projectId: 'PRJ-102',
-    projectName: 'Fruit Orchard - Matale',
-    totalDeposited: 500000,
-    totalReleased: 0,
-    currentBalance: 500000,
-    pendingReleases: 150000,
-    lastUpdated: '2026-01-19T14:15:00',
-  },
-  {
-    projectId: 'PRJ-045',
-    projectName: 'Rice Cultivation - Polonnaruwa',
-    totalDeposited: 600000,
-    totalReleased: 200000,
-    currentBalance: 400000,
-    pendingReleases: 250000,
-    lastUpdated: '2026-01-20T08:30:00',
-  },
-  {
-    projectId: 'PRJ-133',
-    projectName: 'Coconut Plantation - Gampaha',
-    totalDeposited: 800000,
-    totalReleased: 320000,
-    currentBalance: 480000,
-    pendingReleases: 180000,
-    lastUpdated: '2026-01-18T10:30:00',
-  },
-];
+
 
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('en-LK', {
@@ -207,45 +181,40 @@ const formatDateTime = (dateString: string) => {
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'completed':
-      return 'success';
-    case 'in_escrow':
-      return 'info';
+      return { backgroundColor: '#1b5e20', color: '#ffffff' };
     case 'pending':
-      return 'warning';
+      return { backgroundColor: '#f57c00', color: '#ffffff' };
     case 'failed':
-      return 'error';
+      return { backgroundColor: '#c62828', color: '#ffffff' };
     case 'disputed':
-      return 'error';
+      return { backgroundColor: '#c62828', color: '#ffffff' };
     default:
-      return 'default';
+      return { backgroundColor: '#757575', color: '#ffffff' };
   }
 };
 
 const getTypeColor = (type: string) => {
   switch (type) {
     case 'payment':
-      return 'primary';
-    case 'escrow_deposit':
-      return 'info';
-    case 'escrow_release':
-      return 'success';
+      return { backgroundColor: '#1976d2', color: '#ffffff' };
     case 'refund':
-      return 'warning';
+      return { backgroundColor: '#ed6c02', color: '#ffffff' };
     case 'platform_fee':
-      return 'secondary';
+      return { backgroundColor: '#9c27b0', color: '#ffffff' };
     default:
-      return 'default';
+      return { backgroundColor: '#757575', color: '#ffffff' };
   }
 };
 
 const GlobalPaymentLedger = () => {
   const [transactions] = useState<Transaction[]>(mockTransactions);
-  const [escrowAccounts] = useState<EscrowAccount[]>(mockEscrowAccounts);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [platformPage, setPlatformPage] = useState(0);
+  const [platformRowsPerPage, setPlatformRowsPerPage] = useState(5);
 
   const filteredTransactions = transactions.filter((txn) => {
     const matchesSearch =
@@ -260,16 +229,28 @@ const GlobalPaymentLedger = () => {
     return matchesSearch && matchesStatus && matchesType;
   });
 
-  const totalEscrowBalance = escrowAccounts.reduce(
-    (sum, acc) => sum + acc.currentBalance,
+  const totalPayments = transactions.reduce(
+    (sum, txn) => (txn.type === 'payment' ? sum + txn.amount : sum),
     0
   );
-  const totalPendingReleases = escrowAccounts.reduce(
-    (sum, acc) => sum + acc.pendingReleases,
+  const totalRefunds = transactions.reduce(
+    (sum, txn) => (txn.type === 'refund' ? sum + txn.amount : sum),
     0
   );
   const totalProcessed = transactions.reduce(
     (sum, txn) => (txn.status === 'completed' ? sum + txn.amount : sum),
+    0
+  );
+  const pendingTransactions = transactions.filter(
+    (txn) => txn.status === 'pending'
+  ).length;
+
+  const platformTransactions = transactions.filter(
+    (txn) => txn.type === 'platform_fee' || txn.payee.id === 'PLATFORM'
+  );
+
+  const totalPlatformEarnings = platformTransactions.reduce(
+    (sum, txn) => sum + txn.amount,
     0
   );
 
@@ -280,13 +261,13 @@ const GlobalPaymentLedger = () => {
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                <AccountBalanceWallet color="primary" />
+                <AttachMoney color="primary" />
                 <Typography variant="body2" color="text.secondary">
-                  Total Escrow Balance
+                  Total Payments
                 </Typography>
               </Box>
               <Typography variant="h4" fontWeight={700}>
-                {formatCurrency(totalEscrowBalance)}
+                {formatCurrency(totalPayments)}
               </Typography>
             </CardContent>
           </Card>
@@ -295,13 +276,13 @@ const GlobalPaymentLedger = () => {
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                <SwapHoriz color="info" />
+                <Sync color="info" />
                 <Typography variant="body2" color="text.secondary">
-                  Pending Releases
+                  Total Refunds
                 </Typography>
               </Box>
               <Typography variant="h4" fontWeight={700}>
-                {formatCurrency(totalPendingReleases)}
+                {formatCurrency(totalRefunds)}
               </Typography>
             </CardContent>
           </Card>
@@ -310,9 +291,9 @@ const GlobalPaymentLedger = () => {
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                <TrendingUp color="success" />
+                <CheckCircle color="success" />
                 <Typography variant="body2" color="text.secondary">
-                  Total Processed
+                  Total Completed
                 </Typography>
               </Box>
               <Typography variant="h4" fontWeight={700}>
@@ -325,77 +306,215 @@ const GlobalPaymentLedger = () => {
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                <AttachMoney color="warning" />
+                <TrendingUp color="warning" />
                 <Typography variant="body2" color="text.secondary">
-                  Total Transactions
+                  Pending Transactions
                 </Typography>
               </Box>
               <Typography variant="h4" fontWeight={700}>
-                {transactions.length}
+                {pendingTransactions}
               </Typography>
             </CardContent>
           </Card>
         </Grid>
       </Grid>
 
-      {/* Escrow Accounts Overview */}
+      {/* Platform Payments Overview */}
       <Card sx={{ mb: 3 }}>
         <CardHeaderWithIcon
-          icon={AccountBalanceWallet}
-          title="Active Escrow Accounts"
+          icon={AttachMoney}
+          title="Platform Payments"
         />
         <CardContent>
-          <TableContainer>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Project</TableCell>
-                  <TableCell align="right">Total Deposited</TableCell>
-                  <TableCell align="right">Released</TableCell>
-                  <TableCell align="right">Current Balance</TableCell>
-                  <TableCell align="right">Pending Release</TableCell>
-                  <TableCell>Last Updated</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {escrowAccounts.map((account) => (
-                  <TableRow key={account.projectId} hover>
-                    <TableCell>
-                      <Typography variant="body2" fontWeight={600}>
-                        {account.projectName}
+          <Grid container spacing={3}>
+
+            <Grid size={{ xs: 12, md: 4 }}>
+              <Card
+                sx={{
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white',
+                  height: '100%',
+                  minHeight: 280,
+                  position: 'relative',
+                  overflow: 'hidden',
+                  borderRadius: 3,
+                }}
+              >
+                <CardContent sx={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  {/* Card Header */}
+                  <Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                      <Typography variant="overline" sx={{ opacity: 0.9, letterSpacing: 1.5 }}>
+                        Aswenna
                       </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {account.projectId}
+                      <Box
+                        sx={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: '50%',
+                          background: 'rgba(255, 255, 255, 0.2)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <AttachMoney />
+                      </Box>
+                    </Box>
+
+                    {/* Total Amount */}
+                    <Box sx={{ mb: 3 }}>
+                      <Typography variant="caption" sx={{ opacity: 0.8, display: 'block', mb: 1 }}>
+                        Total Platform Earnings
                       </Typography>
-                    </TableCell>
-                    <TableCell align="right">
-                      {formatCurrency(account.totalDeposited)}
-                    </TableCell>
-                    <TableCell align="right">
-                      {formatCurrency(account.totalReleased)}
-                    </TableCell>
-                    <TableCell align="right">
-                      <Typography variant="body2" fontWeight={700} color="primary">
-                        {formatCurrency(account.currentBalance)}
+                      <Typography variant="h3" fontWeight={700} sx={{ letterSpacing: 1 }}>
+                        {formatCurrency(totalPlatformEarnings)}
                       </Typography>
-                    </TableCell>
-                    <TableCell align="right">
-                      {formatCurrency(account.pendingReleases)}
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="caption" color="text.secondary">
-                        {formatDateTime(account.lastUpdated)}
+                    </Box>
+                  </Box>
+
+                  {/* Card Footer */}
+                  <Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Box>
+                        <Typography variant="caption" sx={{ opacity: 0.7, display: 'block' }}>
+                          Total Transactions
+                        </Typography>
+                        <Typography variant="h6" fontWeight={600}>
+                          {platformTransactions.length}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ textAlign: 'right' }}>
+                        <Typography variant="caption" sx={{ opacity: 0.7, display: 'block' }}>
+                          Completed
+                        </Typography>
+                        <Typography variant="h6" fontWeight={600}>
+                          {platformTransactions.filter((t) => t.status === 'completed').length}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                </CardContent>
+
+                {/* Decorative Background Elements */}
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: -50,
+                    right: -50,
+                    width: 200,
+                    height: 200,
+                    borderRadius: '50%',
+                    background: 'rgba(255, 255, 255, 0.1)',
+                  }}
+                />
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    bottom: -80,
+                    left: -80,
+                    width: 250,
+                    height: 250,
+                    borderRadius: '50%',
+                    background: 'rgba(255, 255, 255, 0.05)',
+                  }}
+                />
+              </Card>
+            </Grid>
+
+
+            <Grid size={{ xs: 12, md: 8 }}>
+              <Card variant="outlined" sx={{ height: '100%' }}>
+                <CardContent>
+                  <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
+                    Transaction History
+                  </Typography>
+                  
+                  {platformTransactions.length > 0 ? (
+                    <>
+                      <TableContainer>
+                        <Table size="small">
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Transaction ID</TableCell>
+                              <TableCell>From</TableCell>
+                              <TableCell>Project</TableCell>
+                              <TableCell align="right">Amount</TableCell>
+                              <TableCell align="center">Status</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {platformTransactions
+                              .slice(
+                                platformPage * platformRowsPerPage,
+                                platformPage * platformRowsPerPage + platformRowsPerPage
+                              )
+                              .map((txn) => (
+                                <TableRow key={txn.id} hover>
+                                  <TableCell>
+                                    <Typography variant="body2" fontWeight={600}>
+                                      {txn.transactionId}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                      {formatDateTime(txn.date)}
+                                    </Typography>
+                                  </TableCell>
+                                  <TableCell>
+                                    <Typography variant="body2">{txn.payer.name}</Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                      {txn.payer.role}
+                                    </Typography>
+                                  </TableCell>
+                                  <TableCell>
+                                    <Typography variant="body2" noWrap sx={{ maxWidth: 150 }}>
+                                      {txn.projectName || '-'}
+                                    </Typography>
+                                  </TableCell>
+                                  <TableCell align="right">
+                                    <Typography variant="body2" fontWeight={700} color="primary">
+                                      {formatCurrency(txn.amount)}
+                                    </Typography>
+                                  </TableCell>
+                                  <TableCell align="center">
+                                    <Chip
+                                      label={txn.status}
+                                      size="small"
+                                      sx={getStatusColor(txn.status)}
+                                    />
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+
+                      <TablePagination
+                        rowsPerPageOptions={[5, 10, 25]}
+                        component="div"
+                        count={platformTransactions.length}
+                        rowsPerPage={platformRowsPerPage}
+                        page={platformPage}
+                        onPageChange={(_, newPage) => setPlatformPage(newPage)}
+                        onRowsPerPageChange={(e) => {
+                          setPlatformRowsPerPage(parseInt(e.target.value, 10));
+                          setPlatformPage(0);
+                        }}
+                      />
+                    </>
+                  ) : (
+                    <Box sx={{ textAlign: 'center', py: 4 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        No platform payment transactions found
                       </Typography>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
         </CardContent>
       </Card>
 
-      {/* Transaction History */}
       <Card>
         <CardHeaderWithIcon
           icon={AttachMoney}
@@ -436,7 +555,6 @@ const GlobalPaymentLedger = () => {
                   <MenuItem value="all">All Status</MenuItem>
                   <MenuItem value="completed">Completed</MenuItem>
                   <MenuItem value="pending">Pending</MenuItem>
-                  <MenuItem value="in_escrow">In Escrow</MenuItem>
                   <MenuItem value="failed">Failed</MenuItem>
                 </Select>
               </FormControl>
@@ -451,8 +569,6 @@ const GlobalPaymentLedger = () => {
                 >
                   <MenuItem value="all">All Types</MenuItem>
                   <MenuItem value="payment">Payment</MenuItem>
-                  <MenuItem value="escrow_deposit">Escrow Deposit</MenuItem>
-                  <MenuItem value="escrow_release">Escrow Release</MenuItem>
                   <MenuItem value="refund">Refund</MenuItem>
                   <MenuItem value="platform_fee">Platform Fee</MenuItem>
                 </Select>
@@ -492,7 +608,7 @@ const GlobalPaymentLedger = () => {
                         <Chip
                           label={txn.type.replace(/_/g, ' ')}
                           size="small"
-                          color={getTypeColor(txn.type) as "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning"}
+                          sx={getTypeColor(txn.type)}
                         />
                       </TableCell>
                       <TableCell>
@@ -531,7 +647,7 @@ const GlobalPaymentLedger = () => {
                         <Chip
                           label={txn.status}
                           size="small"
-                          color={getStatusColor(txn.status) as "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning"}
+                          sx={getStatusColor(txn.status)}
                         />
                       </TableCell>
                     </TableRow>

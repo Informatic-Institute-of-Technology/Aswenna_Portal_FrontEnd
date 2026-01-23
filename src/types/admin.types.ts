@@ -1,11 +1,5 @@
-/**
- * Super Admin Type Definitions
- * Comprehensive types for global monitoring and administration
- */
-
 import type { UserRole } from './index';
 
-// ============= Dashboard & KPIs =============
 export interface SuperAdminDashboardData {
   totalUsers: number;
   totalFarmers: number;
@@ -53,7 +47,6 @@ export interface UserGrowthKPIs {
   };
 }
 
-// ============= User Management =============
 export interface GlobalUser {
   id: string;
   fullName: string;
@@ -66,23 +59,17 @@ export interface GlobalUser {
   isActive: boolean;
   avatar?: string;
   address?: string;
-  
-  // Activity metrics
   totalProjects: number;
   activeProjects: number;
   completedProjects: number;
   totalTransactions: number;
-  totalInvested?: number; // For investors
-  totalEarnings?: number; // For farmers/landowners
-  
-  // Verification
+  totalInvested?: number;
+  totalEarnings?: number;
   verificationStatus: VerificationStatus;
   documents: VerificationDocument[];
-  
-  // Risk indicators
   overduePayments: number;
   disputesInvolved: number;
-  trustScore: number; // 0-100
+  trustScore: number;
 }
 
 export interface VerificationStatus {
@@ -110,7 +97,6 @@ export interface UserDetailView {
   activityLog: SystemActivity[];
 }
 
-// ============= Payment & Financial Monitoring =============
 export interface Transaction {
   id: string;
   transactionId: string;
@@ -161,7 +147,6 @@ export interface EscrowAccount {
   lastUpdated: string;
 }
 
-// ============= Project Monitoring =============
 export interface ProjectSummary {
   id: string;
   name: string;
@@ -170,8 +155,6 @@ export interface ProjectSummary {
   startDate: string;
   endDate?: string;
   completionPercentage: number;
-  
-  // Parties
   farmer: {
     id: string;
     name: string;
@@ -184,19 +167,13 @@ export interface ProjectSummary {
     id: string;
     name: string;
   };
-  
-  // Financial
   totalInvestment: number;
   disbursedAmount: number;
   remainingBudget: number;
-  
-  // Progress
   totalMilestones: number;
   completedMilestones: number;
   pendingMilestones: number;
   overdueMilestones: number;
-  
-  // Location
   location: {
     district: string;
     province: string;
@@ -205,8 +182,6 @@ export interface ProjectSummary {
       lng: number;
     };
   };
-  
-  // Risk indicators
   hasDisputes: boolean;
   hasOverduePayments: boolean;
   riskLevel: 'low' | 'medium' | 'high';
@@ -278,10 +253,9 @@ export interface Dispute {
   amountInDispute?: number;
   resolution?: string;
   resolvedDate?: string;
-  resolutionTime?: number; // in days
+  resolutionTime?: number;
 }
 
-// ============= System Activity Log =============
 export interface SystemActivity {
   id: string;
   timestamp: string;
@@ -321,7 +295,6 @@ export type ActivityType =
   | 'message_sent'
   | 'system_alert';
 
-// ============= Filters & Search =============
 export interface AdminFilters {
   dateRange?: {
     from: string;
@@ -335,7 +308,6 @@ export interface AdminFilters {
   searchQuery?: string;
 }
 
-// ============= Analytics & Reports =============
 export interface AdminAnalytics {
   timeSeriesData: TimeSeriesData[];
   distributionData: DistributionData;

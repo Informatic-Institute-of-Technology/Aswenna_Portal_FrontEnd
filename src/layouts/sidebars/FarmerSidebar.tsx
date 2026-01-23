@@ -1,25 +1,25 @@
 import { useAuth } from '@/Context/useAuth';
 import {
-  AccountCircle,
-  BarChart as BarChartIcon,
-  Handshake,
-  Home,
-  Landscape,
-  Mail,
-  People,
-  Settings,
-  TrendingUp,
+    AccountCircle,
+    BarChart as BarChartIcon,
+    Handshake,
+    Home,
+    Landscape,
+    Mail,
+    People,
+    Settings,
+    TrendingUp,
 } from '@mui/icons-material';
 import {
-  Avatar,
-  Box,
-  Button,
-  Divider,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Typography,
+    Avatar,
+    Box,
+    Button,
+    Divider,
+    List,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Typography,
 } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -45,7 +45,6 @@ const FarmerSidebar = () => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      {/* Profile Section */}
       <Box sx={{ p: 3, textAlign: 'center' }}>
         <Avatar
           src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJP8vN8tGwjdGdBoNRb3S7qP1VA0Q1F-SfWg&s"
@@ -69,7 +68,6 @@ const FarmerSidebar = () => {
 
       <Divider />
 
-      {/* Main Navigation */}
       <List sx={{ flex: 1, py: 2 }}>
         {menuItems.map((item) => (
           <ListItemButton
@@ -87,7 +85,7 @@ const FarmerSidebar = () => {
 
       <Divider />
 
-      {/* Secondary Navigation */}
+
       <List sx={{ py: 2 }}>
         {secondaryItems.map((item) => (
           <ListItemButton
@@ -103,7 +101,6 @@ const FarmerSidebar = () => {
         ))}
       </List>
 
-      {/* Logout Button */}
       <Box sx={{ p: 2 }}>
         <Button
           variant="contained"

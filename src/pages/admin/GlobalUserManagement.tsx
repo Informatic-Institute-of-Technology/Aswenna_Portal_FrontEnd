@@ -187,7 +187,6 @@ const GlobalUserManagement = () => {
 
   const roleStats = getRoleStats();
 
-  // Pagination
   const paginatedUsers = filteredUsers.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
@@ -202,7 +201,6 @@ const GlobalUserManagement = () => {
       <Card sx={{ mb: 3 }}>
         <CardHeaderWithIcon icon={Person} title="Global User Management" />
         <CardContent>
-          {/* Filters and Search */}
           <Box sx={{ mb: 3 }}>
             <Grid container spacing={2} alignItems="center">
               <Grid size={{ xs: 12, md: 6 }}>
@@ -236,7 +234,6 @@ const GlobalUserManagement = () => {
             </Grid>
           </Box>
 
-          {/* Users Table */}
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
@@ -406,7 +403,6 @@ const GlobalUserManagement = () => {
         </CardContent>
       </Card>
 
-      {/* User Detail Dialog */}
       <Dialog
         open={detailDialogOpen}
         onClose={handleCloseDialog}
@@ -428,7 +424,7 @@ const GlobalUserManagement = () => {
             </DialogTitle>
             <DialogContent dividers>
               <Grid container spacing={3}>
-                {/* Contact Information */}
+
                 <Grid size={{ xs: 12 }}>
                   <Typography variant="subtitle2" fontWeight={700} gutterBottom>
                     Contact Information
@@ -440,7 +436,7 @@ const GlobalUserManagement = () => {
                   </Box>
                 </Grid>
 
-                {/* Account Status */}
+
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <Typography variant="subtitle2" fontWeight={700} gutterBottom>
                     Account Status
@@ -461,7 +457,6 @@ const GlobalUserManagement = () => {
                   </Box>
                 </Grid>
 
-                {/* Activity Metrics */}
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <Typography variant="subtitle2" fontWeight={700} gutterBottom>
                     Activity Metrics
@@ -482,7 +477,7 @@ const GlobalUserManagement = () => {
                   </Box>
                 </Grid>
 
-                {/* Financial Summary */}
+
                 <Grid size={{ xs: 12 }}>
                   <Typography variant="subtitle2" fontWeight={700} gutterBottom>
                     Financial Summary
@@ -504,7 +499,7 @@ const GlobalUserManagement = () => {
                   </Box>
                 </Grid>
 
-                {/* Verification Status */}
+
                 <Grid size={{ xs: 12 }}>
                   <Typography variant="subtitle2" fontWeight={700} gutterBottom>
                     Verification Status

@@ -1,26 +1,26 @@
 import { useAuth } from '@/Context/useAuth';
 import {
-  AccountCircle,
-  AttachMoney,
-  BarChart as BarChartIcon,
-  Description,
-  Home,
-  Landscape,
-  Mail,
-  People,
-  Settings,
-  TrendingUp,
+    AccountCircle,
+    AttachMoney,
+    BarChart as BarChartIcon,
+    Description,
+    Home,
+    Landscape,
+    Mail,
+    People,
+    Settings,
+    TrendingUp,
 } from '@mui/icons-material';
 import {
-  Avatar,
-  Box,
-  Button,
-  Divider,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Typography,
+    Avatar,
+    Box,
+    Button,
+    Divider,
+    List,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Typography,
 } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -47,7 +47,6 @@ const InvestorSidebar = () => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      {/* Profile Section */}
       <Box sx={{ p: 3, textAlign: 'center' }}>
         <Avatar
           src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWHUQslqLEawVVIzUcGFkYYRm30cguWYwuhg&s"
@@ -71,7 +70,6 @@ const InvestorSidebar = () => {
 
       <Divider />
 
-      {/* Main Navigation */}
       <List sx={{ flex: 1, py: 2 }}>
         {menuItems.map((item) => (
           <ListItemButton
@@ -89,7 +87,7 @@ const InvestorSidebar = () => {
 
       <Divider />
 
-      {/* Secondary Navigation */}
+
       <List sx={{ py: 2 }}>
         {secondaryItems.map((item) => (
           <ListItemButton
@@ -105,7 +103,6 @@ const InvestorSidebar = () => {
         ))}
       </List>
 
-      {/* Logout Button */}
       <Box sx={{ p: 2 }}>
         <Button
           variant="contained"

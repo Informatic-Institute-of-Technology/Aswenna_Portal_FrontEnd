@@ -31,7 +31,6 @@ function AppRoutes() {
 
   return (
     <Routes>
-          {/* Public Routes */}
           <Route
             path="/login"
             element={
@@ -59,7 +58,6 @@ function AppRoutes() {
             }
           />
 
-          {/* Common Routes (All Roles) */}
           <Route
             path="/dashboard/my-projects"
             element={
@@ -125,7 +123,6 @@ function AppRoutes() {
             }
           />
 
-          {/* Investor Specific Routes */}
           <Route
             path="/dashboard/my-offers"
             element={
@@ -175,7 +172,6 @@ function AppRoutes() {
             }
           />
 
-          {/* Land Owner Specific Routes */}
           <Route
             path="/dashboard/my-land-ads"
             element={
@@ -233,7 +229,6 @@ function AppRoutes() {
             }
           />
 
-          {/* Super Admin Specific Routes */}
           <Route
             path="/dashboard/admin/users"
             element={
