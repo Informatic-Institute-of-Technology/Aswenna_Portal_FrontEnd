@@ -1,4 +1,3 @@
-// const API_BASE_URL = 'https://aswenna-backend.onrender.com/api';
 const API_BASE_URL = 'http://localhost:3000/api';
 
 export class HttpClient {
@@ -20,11 +19,6 @@ export class HttpClient {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('API Error:', {
-        status: response.status,
-        statusText: response.statusText,
-        data,
-      });
       throw new Error(data.message || `HTTP ${response.status}: ${response.statusText}`);
     }
 

@@ -2,6 +2,7 @@ import { useAuth } from '@/Context/useAuth';
 import FarmerDashboard from './dashboards/FarmerDashboard';
 import InvestorDashboard from './dashboards/InvestorDashboard';
 import LandOwnerDashboard from './dashboards/LandOwnerDashboard';
+import SuperAdminDashboard from './dashboards/SuperAdminDashboardNew';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -13,8 +14,8 @@ const Dashboard = () => {
       return <InvestorDashboard />;
     case 'landowner':
       return <LandOwnerDashboard />;
-    default:
-      return <FarmerDashboard />;
+    case 'superadmin':
+      return <SuperAdminDashboard />;
   }
 };
 

@@ -51,7 +51,7 @@ export const theme = createTheme({
       fontSize: '1rem',
     },
     button: {
-      textTransform: 'none', // Prevent uppercase transformation
+      textTransform: 'none',
       fontWeight: 500,
     },
   },
@@ -59,7 +59,6 @@ export const theme = createTheme({
     borderRadius: 8,
   },
   components: {
-    // Override TextField to use underline variant styling
     MuiTextField: {
       defaultProps: {
         variant: 'standard',
@@ -67,14 +66,14 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiInput-underline:before': {
-            borderBottomColor: '#777', // Light grey underline
+            borderBottomColor: '#777',
             borderBottomWidth: '1px',
           },
           '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
-            borderBottomColor: '#6B8E23', // Olive green on hover
+            borderBottomColor: '#6B8E23',
           },
           '& .MuiInput-underline:after': {
-            borderBottomColor: '#6B8E23', // Olive green when focused
+            borderBottomColor: '#6B8E23',
           },
           '& .MuiInputBase-input::placeholder': {
             color: '#b0b0b0',
@@ -83,7 +82,6 @@ export const theme = createTheme({
         },
       },
     },
-    // Button customization
     MuiButton: {
       styleOverrides: {
         root: {
@@ -99,7 +97,6 @@ export const theme = createTheme({
         },
       },
     },
-    // Card customization
     MuiCard: {
       styleOverrides: {
         root: {
@@ -114,7 +111,6 @@ export const theme = createTheme({
         },
       },
     },
-    // Drawer customization
     MuiDrawer: {
       styleOverrides: {
         paper: {
@@ -124,7 +120,6 @@ export const theme = createTheme({
         },
       },
     },
-    // List item button customization
     MuiListItemButton: {
       styleOverrides: {
         root: {
@@ -143,7 +138,6 @@ export const theme = createTheme({
         },
       },
     },
-    // Chip customization
     MuiChip: {
       styleOverrides: {
         root: {
@@ -153,7 +147,6 @@ export const theme = createTheme({
         },
       },
     },
-    // Badge customization
     MuiBadge: {
       styleOverrides: {
         badge: {
