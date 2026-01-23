@@ -1,17 +1,11 @@
 import { useState } from 'react'
 
-/**
- * Hook for managing localStorage with React state
- * @param key - The localStorage key
- * @param initialValue - The initial value if key doesn't exist
- */
 export function useLocalStorage<T>(key: string, initialValue: T) {
   const [storedValue, setStoredValue] = useState<T>(() => {
     try {
       const item = window.localStorage.getItem(key)
       return item ? JSON.parse(item) : initialValue
     } catch (error) {
-      console.error(`Error reading localStorage key "${key}":`, error)
       return initialValue
     }
   })
@@ -22,7 +16,6 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       setStoredValue(valueToStore)
       window.localStorage.setItem(key, JSON.stringify(valueToStore))
     } catch (error) {
-      console.error(`Error setting localStorage key "${key}":`, error)
     }
   }
 

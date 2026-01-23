@@ -2,33 +2,33 @@ import { CardHeaderWithIcon } from '@/components';
 import DashboardLayout from '@/layouts/DashboardLayout';
 import type { Transaction } from '@/types/admin.types';
 import {
-  AttachMoney,
-  CheckCircle,
-  Download,
-  Search,
-  Sync,
-  TrendingUp
+    AttachMoney,
+    CheckCircle,
+    Download,
+    Search,
+    Sync,
+    TrendingUp
 } from '@mui/icons-material';
 import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Chip,
-  FormControl, Grid, InputAdornment,
-  InputLabel,
-  MenuItem,
-  Paper,
-  Select,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
-  TextField,
-  Typography
+    Box,
+    Button,
+    Card,
+    CardContent,
+    Chip,
+    FormControl, Grid, InputAdornment,
+    InputLabel,
+    MenuItem,
+    Paper,
+    Select,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TablePagination,
+    TableRow,
+    TextField,
+    Typography
 } from '@mui/material';
 import { useState } from 'react';
 
@@ -181,28 +181,28 @@ const formatDateTime = (dateString: string) => {
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'completed':
-      return { backgroundColor: '#1b5e20', color: '#ffffff' }; // Dark green with white text
+      return { backgroundColor: '#1b5e20', color: '#ffffff' };
     case 'pending':
-      return { backgroundColor: '#f57c00', color: '#ffffff' }; // Orange with white text
+      return { backgroundColor: '#f57c00', color: '#ffffff' };
     case 'failed':
-      return { backgroundColor: '#c62828', color: '#ffffff' }; // Dark red with white text
+      return { backgroundColor: '#c62828', color: '#ffffff' };
     case 'disputed':
-      return { backgroundColor: '#c62828', color: '#ffffff' }; // Dark red with white text
+      return { backgroundColor: '#c62828', color: '#ffffff' };
     default:
-      return { backgroundColor: '#757575', color: '#ffffff' }; // Gray with white text
+      return { backgroundColor: '#757575', color: '#ffffff' };
   }
 };
 
 const getTypeColor = (type: string) => {
   switch (type) {
     case 'payment':
-      return { backgroundColor: '#1976d2', color: '#ffffff' }; // Blue with white text
+      return { backgroundColor: '#1976d2', color: '#ffffff' };
     case 'refund':
-      return { backgroundColor: '#ed6c02', color: '#ffffff' }; // Orange with white text
+      return { backgroundColor: '#ed6c02', color: '#ffffff' };
     case 'platform_fee':
-      return { backgroundColor: '#9c27b0', color: '#ffffff' }; // Purple with white text
+      return { backgroundColor: '#9c27b0', color: '#ffffff' };
     default:
-      return { backgroundColor: '#757575', color: '#ffffff' }; // Gray with white text
+      return { backgroundColor: '#757575', color: '#ffffff' };
   }
 };
 
@@ -327,7 +327,7 @@ const GlobalPaymentLedger = () => {
         />
         <CardContent>
           <Grid container spacing={3}>
-            {/* Left Side - Credit Card Style Total */}
+
             <Grid size={{ xs: 12, md: 4 }}>
               <Card
                 sx={{
@@ -422,7 +422,7 @@ const GlobalPaymentLedger = () => {
               </Card>
             </Grid>
 
-            {/* Right Side - Transaction History */}
+
             <Grid size={{ xs: 12, md: 8 }}>
               <Card variant="outlined" sx={{ height: '100%' }}>
                 <CardContent>
@@ -515,7 +515,6 @@ const GlobalPaymentLedger = () => {
         </CardContent>
       </Card>
 
-      {/* Transaction History */}
       <Card>
         <CardHeaderWithIcon
           icon={AttachMoney}

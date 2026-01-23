@@ -2,45 +2,45 @@ import { SriLankaMap } from '@/components';
 import DashboardLayout from '@/layouts/DashboardLayout';
 import { adminService, type ApiUser } from '@/services/admin.service';
 import {
-  AccessTime,
-  Agriculture,
-  Assessment,
-  AssignmentOutlined,
-  BarChartOutlined,
-  Business,
-  CheckCircle,
-  GroupOutlined,
-  Landscape,
-  MapOutlined,
-  People,
-  PersonAdd,
-  RefreshOutlined,
-  TrendingDown,
-  TrendingUp,
-  Verified,
-  Warning
+    AccessTime,
+    Agriculture,
+    Assessment,
+    AssignmentOutlined,
+    BarChartOutlined,
+    Business,
+    CheckCircle,
+    GroupOutlined,
+    Landscape,
+    MapOutlined,
+    People,
+    PersonAdd,
+    RefreshOutlined,
+    TrendingDown,
+    TrendingUp,
+    Verified,
+    Warning
 } from '@mui/icons-material';
 import {
-  Alert,
-  Avatar,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Chip,
-  CircularProgress,
-  Grid,
-  LinearProgress,
-  Paper,
-  Tab,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Tabs,
-  Typography
+    Alert,
+    Avatar,
+    Box,
+    Button,
+    Card,
+    CardContent,
+    Chip,
+    CircularProgress,
+    Grid,
+    LinearProgress,
+    Paper,
+    Tab,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Tabs,
+    Typography
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 
@@ -134,20 +134,16 @@ const SuperAdminDashboard = () => {
 
   const growth = calculateGrowth();
 
-  // Extract top 5 districts from user addresses
   const getTopDistricts = () => {
     const districtCounts = users.reduce((acc: { [key: string]: number }, user) => {
       if (!user.address) return acc;
       
-      // Split by space/comma and filter empty strings
       const words = user.address.trim().split(/[,\s]+/).filter(w => w.length > 0);
       
       if (words.length === 0) return acc;
       
-      // Get last word and clean it
       let rawDistrict = words[words.length - 1].replace(/[^\w\s]/gi, '');
       
-      // If last word is a number (postal code like 07, 05) or "no", use the previous word
       const isNumber = /^\d+$/.test(rawDistrict);
       const isNo = rawDistrict.toLowerCase() === 'no';
       
@@ -157,14 +153,12 @@ const SuperAdminDashboard = () => {
       
       const district = rawDistrict.trim();
       
-      // Skip if still a number or "no" after processing
       if (district && !/^\d+$/.test(district) && district.toLowerCase() !== 'no') {
         acc[district] = (acc[district] || 0) + 1;
       }
       return acc;
     }, {});
 
-    // Convert to array, sort by count, and take top 5
     return Object.entries(districtCounts)
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count)
@@ -684,7 +678,6 @@ const SuperAdminDashboard = () => {
                   </TableHead>
                   <TableBody>
                     {users.slice(0, 10).map((user) => {
-                      // Map role ID to name
                       const roleMap: { [key: string]: { name: string; color: string; icon?: React.ReactElement } } = {
                         '696e40fda4f896e9f40c8b93': { name: 'Farmer', color: '#4CAF50', icon: <Agriculture sx={{ fontSize: 16 }} /> },
                         '696e6163b558abe269548099': { name: 'Investor', color: '#FF9800', icon: <Business sx={{ fontSize: 16 }} /> },
@@ -757,7 +750,6 @@ const SuperAdminDashboard = () => {
           </TabPanel>
         </Card>
 
-        {/* Quick Actions */}
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>

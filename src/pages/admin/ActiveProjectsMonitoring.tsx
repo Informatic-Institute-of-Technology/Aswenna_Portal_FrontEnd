@@ -2,44 +2,43 @@ import { CardHeaderWithIcon } from '@/components';
 import DashboardLayout from '@/layouts/DashboardLayout';
 import type { ProjectSummary } from '@/types/admin.types';
 import {
-    Assessment,
-    CheckCircle,
-    Error,
-    LocationOn,
-    Search,
-    TrendingUp,
-    Visibility,
-    Warning,
+  Assessment,
+  CheckCircle,
+  Error,
+  LocationOn,
+  Search,
+  TrendingUp,
+  Visibility,
+  Warning,
 } from '@mui/icons-material';
 import {
-    Avatar,
-    AvatarGroup,
-    Box,
-    Button,
-    Card,
-    CardContent,
-    Chip,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle, Grid, InputAdornment,
-    LinearProgress,
-    Paper,
-    Tab,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Tabs,
-    TextField,
-    Tooltip,
-    Typography
+  Avatar,
+  AvatarGroup,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle, Grid, InputAdornment,
+  LinearProgress,
+  Paper,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Tabs,
+  TextField,
+  Tooltip,
+  Typography
 } from '@mui/material';
 import { useState } from 'react';
 
-// Mock project data
 const mockProjects: ProjectSummary[] = [
   {
     id: 'PRJ-045',
@@ -293,7 +292,6 @@ const ActiveProjectsMonitoring = () => {
 
   return (
     <DashboardLayout>
-      {/* Summary Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
@@ -370,11 +368,9 @@ const ActiveProjectsMonitoring = () => {
         </Grid>
       </Grid>
 
-      {/* Projects Table */}
       <Card>
         <CardHeaderWithIcon icon={Assessment} title="All Projects - Real-time Monitoring" />
         <CardContent>
-          {/* Filters */}
           <Box sx={{ mb: 3 }}>
             <Grid container spacing={2} alignItems="center">
               <Grid size={{ xs: 12, md: 6 }}>
@@ -409,7 +405,6 @@ const ActiveProjectsMonitoring = () => {
             </Grid>
           </Box>
 
-          {/* Projects Table */}
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
@@ -557,7 +552,6 @@ const ActiveProjectsMonitoring = () => {
         </CardContent>
       </Card>
 
-      {/* Project Detail Dialog */}
       <Dialog
         open={detailDialogOpen}
         onClose={handleCloseDialog}
@@ -574,7 +568,6 @@ const ActiveProjectsMonitoring = () => {
             </DialogTitle>
             <DialogContent dividers>
               <Grid container spacing={3}>
-                {/* Progress Overview */}
                 <Grid size={{ xs: 12 }}>
                   <Typography variant="subtitle2" fontWeight={700} gutterBottom>
                     Progress Overview
@@ -598,7 +591,6 @@ const ActiveProjectsMonitoring = () => {
                   </Box>
                 </Grid>
 
-                {/* Financial Details */}
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <Typography variant="subtitle2" fontWeight={700} gutterBottom>
                     Financial Details
@@ -616,7 +608,6 @@ const ActiveProjectsMonitoring = () => {
                   </Box>
                 </Grid>
 
-                {/* Milestone Status */}
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <Typography variant="subtitle2" fontWeight={700} gutterBottom>
                     Milestone Status
@@ -639,7 +630,6 @@ const ActiveProjectsMonitoring = () => {
                   </Box>
                 </Grid>
 
-                {/* Tri-Party Members */}
                 <Grid size={{ xs: 12 }}>
                   <Typography variant="subtitle2" fontWeight={700} gutterBottom>
                     Tri-Party Agreement Members
@@ -681,7 +671,7 @@ const ActiveProjectsMonitoring = () => {
                   </Grid>
                 </Grid>
 
-                {/* Location */}
+
                 <Grid size={{ xs: 12 }}>
                   <Typography variant="subtitle2" fontWeight={700} gutterBottom>
                     Location
@@ -701,7 +691,7 @@ const ActiveProjectsMonitoring = () => {
                   </Box>
                 </Grid>
 
-                {/* Risk Indicators */}
+
                 <Grid size={{ xs: 12 }}>
                   <Typography variant="subtitle2" fontWeight={700} gutterBottom>
                     Risk Assessment

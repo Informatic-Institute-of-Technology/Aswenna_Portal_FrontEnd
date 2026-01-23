@@ -1,11 +1,4 @@
-/**
- * Global type definitions
- * Export all shared types from this file
- */
-
 export type UserRole = 'farmer' | 'investor' | 'landowner' | 'superadmin';
-
-// User & Authentication Types
 export interface User {
   id: string;
   name?: string;
@@ -32,7 +25,6 @@ export interface AuthResponse {
   refreshToken?: string;
 }
 
-// API Response Types
 export interface ApiResponse<T> {
   data: T;
   message?: string;
@@ -48,7 +40,6 @@ export interface PaginatedResponse<T> {
   totalPages?: number;
 }
 
-// Error Types
 export interface ApiError {
   message: string;
   code?: string;
@@ -56,7 +47,6 @@ export interface ApiError {
   errors?: Record<string, string[]>;
 }
 
-// Form Types
 export interface FormField {
   value: string;
   error?: string;
@@ -75,16 +65,10 @@ export interface SignUpFormState {
   confirmPassword: FormField;
 }
 
-// Registration Form Data
 export interface RegistrationData {
-  // Step 1: Initial signup
   email: string;
   password: string;
-
-  // Step 2: Role selection
   role: UserRole;
-
-  // Step 3: Personal details
   fullName: string;
   nationalId: string;
   address: string;
@@ -93,7 +77,5 @@ export interface RegistrationData {
   dob: string;
   province?: string;
   district?: string;
-
-  // Step 4: Terms accepted
   termsAccepted?: boolean;
 }

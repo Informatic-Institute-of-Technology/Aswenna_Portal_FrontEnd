@@ -29,7 +29,6 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 
-// Mock activity data
 const mockActivities: SystemActivity[] = [
   {
     id: '1',
@@ -352,7 +351,7 @@ const SystemActivityLog = () => {
                       </Typography>
                     </Box>
 
-                    {/* Action */}
+
                     <Box sx={{ mb: 1 }}>
                       <Chip
                         label={activity.action}
@@ -362,7 +361,7 @@ const SystemActivityLog = () => {
                       />
                     </Box>
 
-                    {/* Description */}
+
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                       {activity.description}
                     </Typography>
