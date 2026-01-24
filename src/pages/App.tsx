@@ -25,6 +25,8 @@ import ActiveProjectsMonitoring from './admin/ActiveProjectsMonitoring';
 import GlobalPaymentLedger from './admin/GlobalPaymentLedger';
 import GlobalUserManagement from './admin/GlobalUserManagement';
 import SystemActivityLog from './admin/SystemActivityLog';
+// Farmer Pages
+import CreateProjectWizard from './farmer/CreateProjectWizard';
 
 function AppRoutes() {
   usePageTitle();
@@ -119,6 +121,16 @@ function AppRoutes() {
             element={
               <ProtectedRoute>
                 <SettingsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Farmer Routes */}
+          <Route
+            path="/farmer/create-project"
+            element={
+              <ProtectedRoute>
+                <CreateProjectWizard />
               </ProtectedRoute>
             }
           />

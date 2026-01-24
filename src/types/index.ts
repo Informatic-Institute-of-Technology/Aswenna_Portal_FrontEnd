@@ -19,6 +19,9 @@ export interface SignUpData extends AuthCredentials {
   confirmPassword?: string;
 }
 
+// Export project-related types
+export * from './project.types';
+
 export interface AuthResponse {
   user: User;
   token: string;
