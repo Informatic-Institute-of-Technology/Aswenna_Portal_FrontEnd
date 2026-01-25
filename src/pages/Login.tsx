@@ -7,6 +7,8 @@ import { Eye, EyeOff } from "lucide-react";
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Notification from "../shared/components/Notification";
+import { useNotification } from "../shared/hooks/useNotification";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -15,27 +17,36 @@ const Login = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { login, loading } = useAuth();
+  const { notification, showError, hideNotification } = useNotification();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
 
     if (!email || !password) {
-      setError("Please fill in all fields");
+      const errorMsg = "Please fill in all fields";
+      setError(errorMsg);
+      showError(errorMsg);
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setError("Please enter a valid email address");
+      const errorMsg = "Please enter a valid email address";
+      setError(errorMsg);
+      showError(errorMsg);
       return;
     }
 
     try {
       await login(email, password);
       navigate("/dashboard");
-    } catch {
-      setError("Invalid credentials. Please try again.");
+    } catch (err) {
+      const errorMsg = err instanceof Error && err.message 
+        ? err.message 
+        : "Invalid credentials. Please try again.";
+      setError(errorMsg);
+      showError(errorMsg);
     }
   };
 
@@ -132,7 +143,8 @@ const Login = () => {
           </div>
         </div>
 
-        <div className="illustration-section">
+        {/* Right side - Illustration */}
+        <div className="right-container">
           <img
             src={loginImage}
             alt="Login Illustration"
@@ -140,6 +152,15 @@ const Login = () => {
           />
         </div>
       </div>
+
+      {/* Notification for errors - Auto-closes after 5 seconds */}
+      <Notification
+        open={notification.open}
+        message={notification.message}
+        severity={notification.severity}
+        duration={5000}
+        onClose={hideNotification}
+      />
     </div>
   );
 };

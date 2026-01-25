@@ -12,21 +12,86 @@ import {
     Typography,
 } from '@mui/material';
 
+export interface PaymentInstallment {
+    id: string;
+    milestoneId: string;
+    amount: number;
+    dueDate: string;
+    paidDate?: string;
+    status: 'paid' | 'pending' | 'overdue';
+    description: string;
+}
+
+export interface Milestone {
+    id: string;
+    title: string;
+    description: string;
+    progress: number;
+    status: 'completed' | 'in-progress' | 'pending' | 'delayed';
+    startDate: string;
+    endDate: string;
+    completedDate?: string;
+    payment: number;
+    tasks: {
+        total: number;
+        completed: number;
+    };
+}
+
+export interface PartyMember {
+    id: string;
+    name: string;
+    role: 'farmer' | 'investor' | 'landowner';
+    email: string;
+    phone: string;
+    image: string;
+    location?: string;
+    coordinates?: string; // Added coordinates field
+    specialization?: string;
+    experience?: string;
+    rating?: number;
+}
+
 export interface OfferCardProps {
     id: string;
     projectName: string;
+    projectId?: string;
     cropType: string;
     cropIcon: string;
     farmerName: string;
     farmerImage: string;
+    farmerId?: string;
     location: string;
+    district?: string;
+    province?: string;
+    coordinates?: string;
     budget: number;
+    disbursed?: number;
+    remaining?: number;
     expectedROI: number;
     status: 'active' | 'completed' | 'pending';
     progress?: number;
     startDate: string;
     endDate?: string;
     backgroundImage?: string;
+    investorName?: string;
+    investorId?: string;
+    landownerName?: string;
+    landownerId?: string;
+    totalMilestones?: number;
+    completedMilestones?: number;
+    pendingMilestones?: number;
+    riskLevel?: 'LOW' | 'MEDIUM' | 'HIGH';
+    riskStatus?: string;
+    // Detailed information
+    milestones?: Milestone[];
+    payments?: PaymentInstallment[];
+    partyMembers?: PartyMember[];
+    financialBreakdown?: {
+        category: string;
+        amount: number;
+        percentage: number;
+    }[];
     onViewDetails?: (id: string) => void;
 }
 

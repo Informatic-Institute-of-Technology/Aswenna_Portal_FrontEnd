@@ -1,0 +1,92 @@
+[
+  {
+    "id": "dh-1",
+    "offerType": "direct-harvest",
+    "investorName": "ABC Sauce Company",
+    "projectTitle": "Tomato Purchase for Sauce Production Q1 2026",
+    "cropType": "Tomatoes",
+    "cropVariety": "Cherry Tomatoes",
+    "requiredQuantity": 100,
+    "quantityUnit": "kg",
+    "pricePerUnit": 250,
+    "qualityStandards": "Organic certified, Grade A",
+    "deliveryDeadline": "2026-03-15T00:00:00.000Z",
+    "deliveryLocation": "Colombo Warehouse",
+    "totalBudget": 25000,
+    "currency": "LKR",
+    "companyName": "ABC Sauce Company",
+    "description": "Need 100KG of organic cherry tomatoes for sauce production. High quality required.",
+    "preferredRegion": ["Nuwara Eliya", "Badulla"],
+    "status": "active",
+    "applicationsCount": 12,
+    "selectedFarmer": {
+      "farmerId": "f1",
+      "farmerName": "Kamal Perera",
+      "farmerImage": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+      "location": "Nuwara Eliya",
+      "experience": 8,
+      "rating": 4.5,
+      "confirmedAt": "2026-01-20T00:00:00.000Z",
+      "farmerOwnedLand": true
+    },
+    "paymentInstallments": [
+      {
+        "id": "p1",
+        "installmentNumber": 1,
+        "amount": 10000,
+        "dueDate": "2026-02-01",
+        "milestone": "Project Start",
+        "status": "paid",
+        "paidDate": "2026-01-30"
+      },
+      {
+        "id": "p2",
+        "installmentNumber": 2,
+        "amount": 15000,
+        "dueDate": "2026-03-15",
+        "milestone": "Harvest Complete",
+        "status": "pending"
+      }
+    ],
+    "createdAt": "2026-01-15T00:00:00.000Z",
+    "updatedAt": "2026-01-20T00:00:00.000Z"
+  },
+  {
+    "id": "dh-2",
+    "offerType": "direct-harvest",
+    "investorName": "Green Foods Ltd",
+    "projectTitle": "Bulk Rice Purchase for Export 2026",
+    "cropType": "Rice",
+    "cropVariety": "Basmati",
+    "requiredQuantity": 500,
+    "quantityUnit": "kg",
+    "pricePerUnit": 150,
+    "deliveryDeadline": "2026-06-30T00:00:00.000Z",
+    "deliveryLocation": "Galle Factory",
+    "totalBudget": 75000,
+    "currency": "LKR",
+    "description": "Bulk rice order for export. Need consistent quality.",
+    "status": "pending",
+    "applicationsCount": 8,
+    "paymentInstallments": [
+      {
+        "id": "p3",
+        "installmentNumber": 1,
+        "amount": 30000,
+        "dueDate": "2026-03-01",
+        "milestone": "Project Start",
+        "status": "pending"
+      },
+      {
+        "id": "p4",
+        "installmentNumber": 2,
+        "amount": 45000,
+        "dueDate": "2026-06-30",
+        "milestone": "Delivery Complete",
+        "status": "pending"
+      }
+    ],
+    "createdAt": "2026-01-10T00:00:00.000Z",
+    "updatedAt": "2026-01-10T00:00:00.000Z"
+  }
+]

@@ -14,51 +14,10 @@ import {
   CardHeader,
   Typography,
 } from '@mui/material';
+import farmerProjectsData from '../../data/json/farmerProjects.json';
 
-const mockProjects = [
-  { 
-    id: 1, 
-    name: "Paddy field - Project A", 
-    startDate: "2026-12-05", 
-    endDate: "2026-12-15", 
-    color: "#E3C957" 
-  },
-  { 
-    id: 2, 
-    name: "Vegetable Cultivation - B", 
-    startDate: "2026-02-01", 
-    endDate: "2026-02-20", 
-    color: "#4CAF50" 
-  },
-  { 
-    id: 3, 
-    name: "Organic Farming - C", 
-    startDate: "2026-02-22", 
-    endDate: "2026-03-18", 
-    color: "#FF9800" 
-  },
-  { 
-    id: 4, 
-    name: "Fruit Plantation - D", 
-    startDate: "2026-03-20", 
-    endDate: "2026-04-15", 
-    color: "#9C27B0" 
-  },
-  {
-    id: 5, 
-    name: "Herb Cultivation - E", 
-    startDate: "2026-04-18", 
-    endDate: "2026-05-10", 
-    color: "#03A9F4" 
-  },
-  {
-    id: 6, 
-    name: "Flower Farming - F", 
-    startDate: "2026-05-12", 
-    endDate: "2026-05-31", 
-    color: "#FF5722" 
-  }
-];
+// Import mock projects from JSON
+const mockProjects = farmerProjectsData;
 
 const getDaysInMonth = (year: number, month: number) => {
   return new Date(year, month + 1, 0).getDate();

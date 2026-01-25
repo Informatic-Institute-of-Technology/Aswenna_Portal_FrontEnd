@@ -1,0 +1,32 @@
+[
+  {
+    "id": "3",
+    "projectId": "PRJ-201",
+    "projectName": "Tea Plantation Investment",
+    "cropType": "Ceylon Tea",
+    "cropIcon": "🍵",
+    "farmerName": "Nimal Jayawardena",
+    "farmerId": "FAR-298",
+    "farmerImage": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
+    "location": "Kandy",
+    "district": "Kandy",
+    "province": "Central",
+    "coordinates": "7.2906, 80.6337",
+    "budget": 450000,
+    "expectedROI": 22,
+    "status": "pending",
+    "progress": 0,
+    "startDate": "2026-02-01",
+    "endDate": "2026-08-30",
+    "backgroundImage": "https://images.unsplash.com/photo-1556881286-fc6915169721?w=600",
+    "investorName": "Ceylon Tea Ventures",
+    "investorId": "INV-094",
+    "landownerName": "Hill Country Estates",
+    "landownerId": "LND-067",
+    "totalMilestones": 10,
+    "completedMilestones": 0,
+    "pendingMilestones": 10,
+    "riskLevel": "LOW",
+    "riskStatus": "No Issues"
+  }
+]

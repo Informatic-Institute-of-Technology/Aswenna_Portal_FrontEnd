@@ -1,106 +1,57 @@
-import { CreateOfferButton, OfferCard } from '@/components/investor';
-import type { OfferCardProps } from '@/components/investor';
 import DashboardLayout from '@/layouts/DashboardLayout';
+import type { DirectHarvestOffer, SponsorshipOffer } from '@/types/investor.types';
 import { Settings } from '@mui/icons-material';
 import { Box, IconButton, Tooltip, Typography } from '@mui/material';
+import { useState } from 'react';
+import type { OfferCardProps } from '../../components/investor';
+import { CreateOfferButton, CreateOfferDialog, OfferCard, ProjectDetailsDialog } from '../../components/investor';
+import pastProjectsData from '../../data/json/pastProjects.json';
+import pendingProjectsData from '../../data/json/pendingProjects.json';
+import { comprehensiveProject, comprehensiveVegetableProject } from '../../data/mockProjectData';
+import Notification from '../../shared/components/Notification';
+import { useNotification } from '../../shared/hooks/useNotification';
 
-// Mock data for active projects
+// Use comprehensive mock data with all details
 const activeProjects: OfferCardProps[] = [
-  {
-    id: '1',
-    projectName: 'Premium Rice Cultivation',
-    cropType: 'Rice (Nadu)',
-    cropIcon: '🌾',
-    farmerName: 'Kamal Perera',
-    farmerImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
-    location: 'Anuradhapura',
-    budget: 250000,
-    expectedROI: 28,
-    status: 'active',
-    progress: 65,
-    startDate: '2025-11-15',
-    endDate: '2026-04-30',
-    backgroundImage: 'https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?w=600',
-  },
-  {
-    id: '2',
-    projectName: 'Organic Vegetable Farm',
-    cropType: 'Mixed Vegetables',
-    cropIcon: '🥬',
-    farmerName: 'Sunil Fernando',
-    farmerImage: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
-    location: 'Nuwara Eliya',
-    budget: 180000,
-    expectedROI: 35,
-    status: 'active',
-    progress: 40,
-    startDate: '2025-12-01',
-    endDate: '2026-03-15',
-    backgroundImage: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600',
-  },
-  {
-    id: '3',
-    projectName: 'Tea Plantation Investment',
-    cropType: 'Ceylon Tea',
-    cropIcon: '🍵',
-    farmerName: 'Nimal Jayawardena',
-    farmerImage: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
-    location: 'Kandy',
-    budget: 450000,
-    expectedROI: 22,
-    status: 'pending',
-    progress: 0,
-    startDate: '2026-02-01',
-    endDate: '2026-08-30',
-    backgroundImage: 'https://images.unsplash.com/photo-1556881286-fc6915169721?w=600',
-  },
+  comprehensiveProject,
+  comprehensiveVegetableProject,
 ];
 
-// Mock data for past projects
-const pastProjects: OfferCardProps[] = [
-  {
-    id: '4',
-    projectName: 'Coconut Plantation',
-    cropType: 'King Coconut',
-    cropIcon: '🥥',
-    farmerName: 'Mahinda Silva',
-    farmerImage: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=150',
-    location: 'Kurunegala',
-    budget: 320000,
-    expectedROI: 24,
-    status: 'completed',
-    progress: 100,
-    startDate: '2025-06-01',
-    endDate: '2025-11-30',
-    backgroundImage: 'https://images.unsplash.com/photo-1580093407531-eb4a7b007c2a?w=600',
-  },
-  {
-    id: '5',
-    projectName: 'Spice Garden',
-    cropType: 'Cinnamon & Pepper',
-    cropIcon: '🌿',
-    farmerName: 'Saman Kumara',
-    farmerImage: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150',
-    location: 'Matale',
-    budget: 280000,
-    expectedROI: 32,
-    status: 'completed',
-    progress: 100,
-    startDate: '2025-04-15',
-    endDate: '2025-10-20',
-    backgroundImage: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600',
-  },
-];
+// Import data from JSON files
+const pendingProjects: OfferCardProps[] = pendingProjectsData as OfferCardProps[];
+const pastProjects: OfferCardProps[] = pastProjectsData as OfferCardProps[];
 
 const MyOffersPage = () => {
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<OfferCardProps | null>(null);
+  const { notification, showError, showSuccess, hideNotification } = useNotification();
+
   const handleCreateOffer = () => {
-    // TODO: Open create offer modal or navigate to create offer page
-    console.log('Create new offer clicked');
+    setCreateDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setCreateDialogOpen(false);
+  };
+
+  const handleOfferSubmit = (offerData: Partial<DirectHarvestOffer> | Partial<SponsorshipOffer>) => {
+    try {
+      console.log('New offer created:', offerData);
+      // TODO: Send to backend API
+      showSuccess('Offer created successfully! Farmers will be notified.');
+      setCreateDialogOpen(false);
+    } catch {
+      showError('Failed to create offer. Please try again.');
+    }
   };
 
   const handleViewDetails = (id: string) => {
-    // TODO: Open offer details modal or navigate to details page
-    console.log('View details for offer:', id);
+    const project = [...activeProjects, ...pendingProjects].find(p => p.id === id);
+    if (project) {
+      setSelectedProject(project);
+      setDetailsDialogOpen(true);
+    }
   };
 
   return (
@@ -248,6 +199,29 @@ const MyOffersPage = () => {
           </Box>
         )}
       </section>
+
+      {/* Create Offer Dialog */}
+      <CreateOfferDialog
+        open={createDialogOpen}
+        onClose={handleCloseDialog}
+        onSubmit={handleOfferSubmit}
+      />
+
+      {/* Notification */}
+      <Notification
+        open={notification.open}
+        message={notification.message}
+        severity={notification.severity}
+        duration={5000}
+        onClose={hideNotification}
+      />
+
+      {/* Project Details Dialog */}
+      <ProjectDetailsDialog
+        open={detailsDialogOpen}
+        onClose={() => setDetailsDialogOpen(false)}
+        project={selectedProject}
+      />
     </DashboardLayout>
   );
 };
