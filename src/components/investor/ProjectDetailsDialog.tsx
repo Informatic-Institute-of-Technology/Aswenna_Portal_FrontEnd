@@ -1,4 +1,4 @@
-import { AccessTime, CalendarToday, CheckCircle, Close, Email, LocationOn, Person, Phone, WarningAmber } from '@mui/icons-material';
+import { AccessTime, CalendarToday, CheckCircle, Close, Email, ExpandLess, ExpandMore, LocationOn, Person, Phone, WarningAmber } from '@mui/icons-material';
 import {
     Avatar,
     Box,
@@ -15,9 +15,12 @@ import {
     Tabs,
     Typography,
 } from '@mui/material';
-import { useState } from 'react';
+import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
+import { useMemo, useState } from 'react';
 import LocationMapDialog from './LocationMapDialog';
 import type { OfferCardProps } from './OfferCard';
+
+const GOOGLE_MAPS_API_KEY = 'AIzaSyA3L-q18zc1dET4FtGpbC4GRfjd60KfWlc';
 
 interface ProjectDetailsDialogProps {
   open: boolean;
@@ -28,6 +31,67 @@ interface ProjectDetailsDialogProps {
 const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogProps) => {
   const [activeTab, setActiveTab] = useState(0);
   const [mapDialogOpen, setMapDialogOpen] = useState(false);
+  const [budgetExpanded, setBudgetExpanded] = useState(false);
+
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+  });
+
+  const calculatedBudgetBreakdown = useMemo(() => {
+    if (!project || !project.financialBreakdown || project.financialBreakdown.length === 0) return [];
+    
+    const totalBudget = project.financialBreakdown.reduce((sum, item) => sum + item.amount, 0);
+    
+    return project.financialBreakdown
+      .map(item => ({
+        ...item,
+        percentage: Math.round((item.amount / totalBudget) * 100 * 100) / 100,
+        calculatedTotal: totalBudget
+      }))
+      .sort((a, b) => b.amount - a.amount);
+  }, [project]);
+
+  const calculatedFinancials = useMemo(() => {
+    if (!project || !project.payments || project.payments.length === 0) {
+      const budget = project?.financialBreakdown?.reduce((sum, item) => sum + item.amount, 0) || 0;
+      return { budget, disbursed: 0, remaining: budget };
+    }
+
+    const budget = project.payments.reduce((sum, payment) => sum + payment.amount, 0);
+    const disbursed = project.payments
+      .filter(p => p.status === 'paid')
+      .reduce((sum, payment) => sum + payment.amount, 0);
+    const remaining = budget - disbursed;
+
+    return { budget, disbursed, remaining };
+  }, [project]);
+
+  const calculatedMilestones = useMemo(() => {
+    if (!project || !project.milestones || project.milestones.length === 0) {
+      return { total: 0, completed: 0, pending: 0, inProgress: 0 };
+    }
+
+    const total = project.milestones.length;
+    const completed = project.milestones.filter(m => m.status === 'completed').length;
+    const inProgress = project.milestones.filter(m => m.status === 'in-progress').length;
+    const pending = project.milestones.filter(m => m.status === 'pending').length;
+
+    return { total, completed, pending, inProgress };
+  }, [project]);
+
+  const calculatedProgress = useMemo(() => {
+    if (!project || !project.milestones || project.milestones.length === 0) return 0;
+
+    const totalProgress = project.milestones.reduce((sum, milestone) => sum + milestone.progress, 0);
+    return Math.round(totalProgress / project.milestones.length);
+  }, [project]);
+
+  const getCategoryColor = (index: number, percentage: number) => {
+    if (percentage >= 20) return '#ef5350'; 
+    if (percentage >= 15) return '#ffa726'; 
+    if (percentage >= 10) return '#66bb6a'; 
+    return `hsl(${120 + index * 25}, 60%, 55%)`;
+  };
 
   if (!project) return null;
 
@@ -165,11 +229,9 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
       </Box>
 
       <DialogContent sx={{ pt: 3, pb: 2, px: 3 }}>
-        {/* Overview Tab */}
         {activeTab === 0 && (
           <Box>
-            {/* Progress Overview */}
-            {project.progress !== undefined && project.status === 'active' && (
+            {calculatedProgress !== undefined && project.status === 'active' && (
               <Box sx={{ mb: 3, p: 3, bgcolor: 'rgba(118, 192, 67, 0.08)', borderRadius: 2, border: '1px solid rgba(118, 192, 67, 0.2)' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                   <Box>
@@ -177,7 +239,7 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                       OVERALL PROJECT PROGRESS
                     </Typography>
                     <Typography variant="h4" color="white" fontWeight={700}>
-                      {project.progress}% Complete
+                      {calculatedProgress}% Complete
                     </Typography>
                   </Box>
                   <Box sx={{ textAlign: 'right' }}>
@@ -191,7 +253,7 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                 </Box>
                 <LinearProgress 
                   variant="determinate" 
-                  value={project.progress} 
+                  value={calculatedProgress} 
                   sx={{
                     height: 12,
                     borderRadius: 6,
@@ -205,9 +267,7 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
               </Box>
             )}
 
-            {/* Financial Summary & Milestones */}
             <Box sx={{ display: 'flex', gap: 3, mb: 3 }}>
-              {/* Financial Summary */}
               <Box sx={{ flex: 1, p: 3, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
                 <Typography variant="h6" color="white" gutterBottom fontWeight={600}>
                   💰 Financial Summary
@@ -218,20 +278,20 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                       TOTAL INVESTMENT
                     </Typography>
                     <Typography variant="h5" color="white" fontWeight={700}>
-                      {formatCurrency(project.budget)}
+                      {formatCurrency(calculatedFinancials.budget)}
                     </Typography>
                   </Box>
-                  {project.disbursed !== undefined && (
+                  {calculatedFinancials.disbursed > 0 && (
                     <Box>
                       <Typography variant="caption" color="rgba(255,255,255,0.6)">
                         DISBURSED AMOUNT
                       </Typography>
                       <Typography variant="h6" color="#76c043" fontWeight={600}>
-                        {formatCurrency(project.disbursed)}
+                        {formatCurrency(calculatedFinancials.disbursed)}
                       </Typography>
                       <LinearProgress 
                         variant="determinate" 
-                        value={(project.disbursed / project.budget) * 100} 
+                        value={(calculatedFinancials.disbursed / calculatedFinancials.budget) * 100} 
                         sx={{
                           mt: 1,
                           height: 6,
@@ -245,13 +305,13 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                       />
                     </Box>
                   )}
-                  {project.remaining !== undefined && (
+                  {calculatedFinancials.remaining > 0 && (
                     <Box>
                       <Typography variant="caption" color="rgba(255,255,255,0.6)">
                         REMAINING BALANCE
                       </Typography>
                       <Typography variant="h6" color="#ffa726" fontWeight={600}>
-                        {formatCurrency(project.remaining)}
+                        {formatCurrency(calculatedFinancials.remaining)}
                       </Typography>
                     </Box>
                   )}
@@ -267,8 +327,7 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                 </Box>
               </Box>
 
-              {/* Milestone Status */}
-              {project.totalMilestones && (
+              {calculatedMilestones.total > 0 && (
                 <Box sx={{ flex: 1, p: 3, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
                   <Typography variant="h6" color="white" gutterBottom fontWeight={600}>
                     🎯 Milestone Status
@@ -279,7 +338,7 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                         TOTAL MILESTONES
                       </Typography>
                       <Typography variant="h5" color="white" fontWeight={700}>
-                        {project.totalMilestones}
+                        {calculatedMilestones.total}
                       </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
@@ -288,7 +347,7 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                           COMPLETED
                         </Typography>
                         <Typography variant="h4" color="#76c043" fontWeight={700}>
-                          {project.completedMilestones || 0}
+                          {calculatedMilestones.completed}
                         </Typography>
                       </Box>
                       <Box sx={{ flex: 1, p: 2, bgcolor: 'rgba(255, 167, 38, 0.1)', borderRadius: 1 }}>
@@ -296,7 +355,7 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                           PENDING
                         </Typography>
                         <Typography variant="h4" color="#ffa726" fontWeight={700}>
-                          {project.pendingMilestones || 0}
+                          {calculatedMilestones.pending + calculatedMilestones.inProgress}
                         </Typography>
                       </Box>
                     </Box>
@@ -306,7 +365,7 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                       </Typography>
                       <LinearProgress 
                         variant="determinate" 
-                        value={((project.completedMilestones || 0) / project.totalMilestones) * 100} 
+                        value={(calculatedMilestones.completed / calculatedMilestones.total) * 100} 
                         sx={{
                           mt: 1,
                           height: 8,
@@ -319,7 +378,7 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                         }}
                       />
                       <Typography variant="caption" color="white" sx={{ mt: 0.5, display: 'block' }}>
-                        {Math.round(((project.completedMilestones || 0) / project.totalMilestones) * 100)}% Complete
+                        {Math.round((calculatedMilestones.completed / calculatedMilestones.total) * 100)}% Complete
                       </Typography>
                     </Box>
                   </Box>
@@ -327,13 +386,11 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
               )}
             </Box>
 
-            {/* Tri-Party Agreement Members */}
             <Box sx={{ mb: 3, p: 3, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
               <Typography variant="h6" color="white" gutterBottom fontWeight={600}>
                 🤝 Tri-Party Agreement Members
               </Typography>
               <Box sx={{ display: 'flex', gap: 3, mt: 3 }}>
-                {/* Farmer */}
                 <Box sx={{ flex: 1, p: 2, bgcolor: 'rgba(118, 192, 67, 0.05)', borderRadius: 2, border: '1px solid rgba(118, 192, 67, 0.3)' }}>
                   <Chip 
                     label="Farmer" 
@@ -364,7 +421,6 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                   </Typography>
                 </Box>
 
-                {/* Investor */}
                 <Box sx={{ flex: 1, p: 2, bgcolor: 'rgba(33, 150, 243, 0.05)', borderRadius: 2, border: '1px solid rgba(33, 150, 243, 0.3)' }}>
                   <Chip 
                     label="Investor" 
@@ -396,7 +452,6 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                   </Typography>
                 </Box>
 
-                {/* Landowner */}
                 <Box sx={{ flex: 1, p: 2, bgcolor: 'rgba(255, 152, 0, 0.05)', borderRadius: 2, border: '1px solid rgba(255, 152, 0, 0.3)' }}>
                   <Chip 
                     label="Landowner" 
@@ -430,38 +485,100 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
               </Box>
             </Box>
 
-            {/* Location & Risk */}
             <Box sx={{ display: 'flex', gap: 3 }}>
-              {/* Location */}
               <Box sx={{ flex: 1, p: 3, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
                 <Typography variant="h6" color="white" gutterBottom fontWeight={600}>
                   📍 Location Details
                 </Typography>
-                <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <Box>
-                    <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                      DISTRICT
-                    </Typography>
-                    <Typography variant="body1" color="white" fontWeight={600}>
-                      {project.district || project.location}
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                      PROVINCE
-                    </Typography>
-                    <Typography variant="body1" color="white" fontWeight={600}>
-                      {project.province || 'Central'}
-                    </Typography>
-                  </Box>
-                  {project.coordinates && (
+                <Box sx={{ mt: 2, display: 'flex', gap: 3 }}>
+                  <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
                     <Box>
                       <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                        GPS COORDINATES
+                        DISTRICT
                       </Typography>
-                      <Typography variant="body2" color="rgba(255,255,255,0.8)" fontFamily="monospace">
-                        {project.coordinates}
+                      <Typography variant="body1" color="white" fontWeight={600}>
+                        {project.district || project.location}
                       </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                        PROVINCE
+                      </Typography>
+                      <Typography variant="body1" color="white" fontWeight={600}>
+                        {project.province || 'Central'}
+                      </Typography>
+                    </Box>
+                    {project.coordinates && (
+                      <Box>
+                        <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                          GPS COORDINATES
+                        </Typography>
+                        <Typography variant="body2" color="rgba(255,255,255,0.8)" fontFamily="monospace">
+                          {project.coordinates}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
+                  {project.coordinates && isLoaded && (
+                    <Box sx={{ flex: 1, minWidth: 250 }}>
+                      <Box
+                        sx={{
+                          width: '100%',
+                          height: '100%',
+                          minHeight: 180,
+                          borderRadius: 2,
+                          overflow: 'hidden',
+                          border: '2px solid rgba(255,255,255,0.1)',
+                          '& > div': {
+                            borderRadius: 2,
+                          },
+                        }}
+                      >
+                        <GoogleMap
+                          mapContainerStyle={{ width: '100%', height: '100%' }}
+                          center={{
+                            lat: parseFloat(project.coordinates.split(',')[0].trim()),
+                            lng: parseFloat(project.coordinates.split(',')[1].trim()),
+                          }}
+                          zoom={12}
+                          options={{
+                            disableDefaultUI: true,
+                            zoomControl: true,
+                            mapTypeControl: false,
+                            streetViewControl: false,
+                            fullscreenControl: false,
+                            styles: [
+                              {
+                                featureType: 'all',
+                                elementType: 'geometry',
+                                stylers: [{ color: '#242f3e' }],
+                              },
+                              {
+                                featureType: 'all',
+                                elementType: 'labels.text.stroke',
+                                stylers: [{ color: '#242f3e' }],
+                              },
+                              {
+                                featureType: 'all',
+                                elementType: 'labels.text.fill',
+                                stylers: [{ color: '#746855' }],
+                              },
+                              {
+                                featureType: 'water',
+                                elementType: 'geometry',
+                                stylers: [{ color: '#17263c' }],
+                              },
+                            ],
+                          }}
+                        >
+                          <Marker
+                            position={{
+                              lat: parseFloat(project.coordinates.split(',')[0].trim()),
+                              lng: parseFloat(project.coordinates.split(',')[1].trim()),
+                            }}
+                          />
+                        </GoogleMap>
+                      </Box>
                     </Box>
                   )}
                 </Box>
@@ -624,39 +741,100 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
               Payment Schedule & Financial Breakdown
             </Typography>
             
-            {/* Financial Breakdown */}
-            {project.financialBreakdown && project.financialBreakdown.length > 0 && (
+            {/* Financial Breakdown - Auto-Calculated */}
+            {calculatedBudgetBreakdown.length > 0 && (
               <Box sx={{ mb: 4, p: 3, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
-                <Typography variant="h6" color="white" gutterBottom fontWeight={600}>
-                  💵 Budget Breakdown by Category
-                </Typography>
-                <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  {project.financialBreakdown.map((item, index) => (
-                    <Box key={index}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h6" color="white" fontWeight={600}>
+                    💵 Budget Breakdown by Category
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                      Total Budget: {formatCurrency(calculatedBudgetBreakdown[0]?.calculatedTotal || 0)}
+                    </Typography>
+                    {calculatedBudgetBreakdown.length > 4 && (
+                      <Button
+                        size="small"
+                        endIcon={budgetExpanded ? <ExpandLess /> : <ExpandMore />}
+                        onClick={() => setBudgetExpanded(!budgetExpanded)}
+                        sx={{ 
+                          color: '#76c043',
+                          textTransform: 'none',
+                          fontWeight: 600
+                        }}
+                      >
+                        {budgetExpanded ? 'View Less' : `View All (${calculatedBudgetBreakdown.length})`}
+                      </Button>
+                    )}
+                  </Box>
+                </Box>
+                <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                  {(budgetExpanded ? calculatedBudgetBreakdown : calculatedBudgetBreakdown.slice(0, 4)).map((item, index) => (
+                    <Box 
+                      key={index}
+                      sx={{
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                          transform: 'translateX(4px)'
+                        }
+                      }}
+                    >
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Typography variant="body1" color="white">
+                        <Typography variant="body1" color="white" fontWeight={500}>
                           {item.category}
                         </Typography>
-                        <Typography variant="body1" color="white" fontWeight={600}>
-                          {formatCurrency(item.amount)} ({item.percentage}%)
-                        </Typography>
+                        <Box sx={{ textAlign: 'right' }}>
+                          <Typography variant="body1" color="white" fontWeight={700}>
+                            {formatCurrency(item.amount)}
+                          </Typography>
+                          <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                            {item.percentage}% of total
+                          </Typography>
+                        </Box>
                       </Box>
-                      <LinearProgress 
-                        variant="determinate" 
-                        value={item.percentage} 
-                        sx={{
-                          height: 8,
-                          borderRadius: 4,
-                          backgroundColor: 'rgba(255,255,255,0.1)',
-                          '& .MuiLinearProgress-bar': {
-                            borderRadius: 4,
-                            backgroundColor: `hsl(${120 - index * 30}, 65%, 50%)`,
-                          }
-                        }}
-                      />
+                      <Box sx={{ position: 'relative' }}>
+                        <LinearProgress 
+                          variant="determinate" 
+                          value={item.percentage} 
+                          sx={{
+                            height: 10,
+                            borderRadius: 5,
+                            backgroundColor: 'rgba(255,255,255,0.1)',
+                            '& .MuiLinearProgress-bar': {
+                              borderRadius: 5,
+                              backgroundColor: getCategoryColor(index, item.percentage),
+                              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                            }
+                          }}
+                        />
+                        {item.percentage >= 15 && (
+                          <Typography 
+                            variant="caption" 
+                            sx={{ 
+                              position: 'absolute',
+                              right: 8,
+                              top: '50%',
+                              transform: 'translateY(-50%)',
+                              color: 'white',
+                              fontWeight: 700,
+                              fontSize: '0.7rem',
+                              textShadow: '0 1px 2px rgba(0,0,0,0.5)'
+                            }}
+                          >
+                            {item.percentage}%
+                          </Typography>
+                        )}
+                      </Box>
                     </Box>
                   ))}
                 </Box>
+                {!budgetExpanded && calculatedBudgetBreakdown.length > 4 && (
+                  <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>
+                    <Typography variant="caption" color="rgba(255,255,255,0.5)">
+                      Showing top 4 categories • {calculatedBudgetBreakdown.length - 4} more categories available
+                    </Typography>
+                  </Box>
+                )}
               </Box>
             )}
 

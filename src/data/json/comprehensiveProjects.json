@@ -12,12 +12,8 @@
     "district": "Anuradhapura",
     "province": "North Central",
     "coordinates": "8.3114, 80.4037",
-    "budget": 250000,
-    "disbursed": 162500,
-    "remaining": 87500,
     "expectedROI": 28,
     "status": "active",
-    "progress": 65,
     "startDate": "2025-11-15",
     "endDate": "2026-04-30",
     "backgroundImage": "https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?w=600",
@@ -25,9 +21,6 @@
     "investorId": "INV-067",
     "landownerName": "Perera Estates",
     "landownerId": "LND-019",
-    "totalMilestones": 8,
-    "completedMilestones": 5,
-    "pendingMilestones": 3,
     "riskLevel": "LOW",
     "riskStatus": "No Issues",
     "milestones": [
@@ -197,13 +190,13 @@
       }
     ],
     "financialBreakdown": [
-      { "category": "Seeds & Planting Materials", "amount": 35000, "percentage": 14 },
-      { "category": "Fertilizers & Nutrients", "amount": 42500, "percentage": 17 },
-      { "category": "Irrigation & Water Management", "amount": 37500, "percentage": 15 },
-      { "category": "Pest & Disease Control", "amount": 30000, "percentage": 12 },
-      { "category": "Labor & Workforce", "amount": 62500, "percentage": 25 },
-      { "category": "Equipment & Machinery", "amount": 25000, "percentage": 10 },
-      { "category": "Post-Harvest Processing", "amount": 17500, "percentage": 7 }
+      { "category": "Seeds & Planting Materials", "amount": 35000 },
+      { "category": "Fertilizers & Nutrients", "amount": 42500 },
+      { "category": "Irrigation & Water Management", "amount": 37500 },
+      { "category": "Pest & Disease Control", "amount": 30000 },
+      { "category": "Labor & Workforce", "amount": 62500 },
+      { "category": "Equipment & Machinery", "amount": 25000 },
+      { "category": "Post-Harvest Processing", "amount": 17500 }
     ],
     "partyMembers": [
       {
@@ -260,12 +253,8 @@
     "district": "Nuwara Eliya",
     "province": "Central",
     "coordinates": "6.9497, 80.7891",
-    "budget": 180000,
-    "disbursed": 72000,
-    "remaining": 108000,
     "expectedROI": 35,
     "status": "active",
-    "progress": 40,
     "startDate": "2025-12-01",
     "endDate": "2026-03-15",
     "backgroundImage": "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600",
@@ -273,9 +262,6 @@
     "investorId": "INV-082",
     "landownerName": "Highland Farms",
     "landownerId": "LND-045",
-    "totalMilestones": 6,
-    "completedMilestones": 2,
-    "pendingMilestones": 4,
     "riskLevel": "MEDIUM",
     "riskStatus": "Weather concerns",
     "milestones": [
@@ -401,13 +387,13 @@
       }
     ],
     "financialBreakdown": [
-      { "category": "Organic Seeds & Seedlings", "amount": 32400, "percentage": 18 },
-      { "category": "Organic Fertilizers & Compost", "amount": 27000, "percentage": 15 },
-      { "category": "Natural Pest Control", "amount": 18000, "percentage": 10 },
-      { "category": "Irrigation System", "amount": 25200, "percentage": 14 },
-      { "category": "Labor & Skilled Workers", "amount": 54000, "percentage": 30 },
-      { "category": "Organic Certification", "amount": 10800, "percentage": 6 },
-      { "category": "Packaging & Transport", "amount": 12600, "percentage": 7 }
+      { "category": "Organic Seeds & Seedlings", "amount": 32400 },
+      { "category": "Organic Fertilizers & Compost", "amount": 27000 },
+      { "category": "Natural Pest Control", "amount": 18000 },
+      { "category": "Irrigation System", "amount": 25200 },
+      { "category": "Labor & Skilled Workers", "amount": 54000 },
+      { "category": "Organic Certification", "amount": 10800 },
+      { "category": "Packaging & Transport", "amount": 12600 }
     ],
     "partyMembers": [
       {

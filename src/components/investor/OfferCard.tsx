@@ -11,6 +11,7 @@ import {
     Tooltip,
     Typography,
 } from '@mui/material';
+import { useMemo } from 'react';
 
 export interface PaymentInstallment {
     id: string;
@@ -65,12 +66,12 @@ export interface OfferCardProps {
     district?: string;
     province?: string;
     coordinates?: string;
-    budget: number;
-    disbursed?: number;
-    remaining?: number;
+    budget?: number; // Optional - can be auto-calculated
+    disbursed?: number; // Optional - can be auto-calculated
+    remaining?: number; // Optional - can be auto-calculated
     expectedROI: number;
     status: 'active' | 'completed' | 'pending';
-    progress?: number;
+    progress?: number; // Optional - can be auto-calculated
     startDate: string;
     endDate?: string;
     backgroundImage?: string;
@@ -78,19 +79,19 @@ export interface OfferCardProps {
     investorId?: string;
     landownerName?: string;
     landownerId?: string;
-    totalMilestones?: number;
-    completedMilestones?: number;
-    pendingMilestones?: number;
+    totalMilestones?: number; // Optional - can be auto-calculated
+    completedMilestones?: number; // Optional - can be auto-calculated
+    pendingMilestones?: number; // Optional - can be auto-calculated
     riskLevel?: 'LOW' | 'MEDIUM' | 'HIGH';
     riskStatus?: string;
-    // Detailed information
+    // Detailed information - REQUIRED for auto-calculation
     milestones?: Milestone[];
     payments?: PaymentInstallment[];
     partyMembers?: PartyMember[];
     financialBreakdown?: {
         category: string;
         amount: number;
-        percentage: number;
+        percentage?: number; // Optional - auto-calculated on frontend
     }[];
     onViewDetails?: (id: string) => void;
 }
@@ -106,12 +107,36 @@ const OfferCard = ({
     budget,
     expectedROI,
     status,
-    progress = 0,
+    progress,
+    milestones,
+    payments,
+    financialBreakdown,
     startDate,
     endDate,
     backgroundImage,
     onViewDetails,
 }: OfferCardProps) => {
+    // Auto-calculate progress if not provided
+    const calculatedProgress = useMemo(() => {
+        if (progress !== undefined) return progress;
+        if (!milestones || milestones.length === 0) return 0;
+        
+        const totalProgress = milestones.reduce((sum, milestone) => sum + milestone.progress, 0);
+        return Math.round(totalProgress / milestones.length);
+    }, [progress, milestones]);
+
+    // Auto-calculate budget if not provided
+    const calculatedBudget = useMemo(() => {
+        if (budget !== undefined) return budget;
+        if (payments && payments.length > 0) {
+            return payments.reduce((sum, payment) => sum + payment.amount, 0);
+        }
+        if (financialBreakdown && financialBreakdown.length > 0) {
+            return financialBreakdown.reduce((sum, item) => sum + item.amount, 0);
+        }
+        return 0;
+    }, [budget, payments, financialBreakdown]);
+
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('en-LK', {
             style: 'currency',
@@ -276,7 +301,7 @@ const OfferCard = ({
                                 Budget
                             </Typography>
                             <Typography variant="h6" sx={{ fontWeight: 700, color: '#6B8E23', fontSize: '1rem' }}>
-                                {formatCurrency(budget)}
+                                {formatCurrency(calculatedBudget)}
                             </Typography>
                         </Box>
                     </div>
@@ -307,12 +332,12 @@ const OfferCard = ({
                                 Project Progress
                             </Typography>
                             <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
-                                {progress}%
+                                {calculatedProgress}%
                             </Typography>
                         </Box>
                         <LinearProgress
                             variant="determinate"
-                            value={progress}
+                            value={calculatedProgress}
                             sx={{
                                 height: 8,
                                 borderRadius: 1,
