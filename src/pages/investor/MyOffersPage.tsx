@@ -1,8 +1,9 @@
+import { useAuth } from '@/Context/useAuth';
 import DashboardLayout from '@/layouts/DashboardLayout';
 import type { DirectHarvestOffer, SponsorshipOffer } from '@/types/investor.types';
 import { Settings } from '@mui/icons-material';
 import { Box, IconButton, Tooltip, Typography } from '@mui/material';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { OfferCardProps } from '../../components/investor';
 import { CreateOfferButton, CreateOfferDialog, OfferCard, ProjectDetailsDialog } from '../../components/investor';
 import comprehensiveProjectsData from '../../data/json/comprehensiveProjects.json';
@@ -10,19 +11,33 @@ import pendingProjectsData from '../../data/json/pendingProjects.json';
 import Notification from '../../shared/components/Notification';
 import { useNotification } from '../../shared/hooks/useNotification';
 
-// Load all projects from comprehensive data and filter by status
-const allProjects: OfferCardProps[] = comprehensiveProjectsData as OfferCardProps[];
-const activeProjects: OfferCardProps[] = allProjects.filter(p => p.status === 'active');
-const pastProjects: OfferCardProps[] = allProjects.filter(p => p.status === 'completed');
-
-// Import pending projects from JSON
-const pendingProjects: OfferCardProps[] = pendingProjectsData as OfferCardProps[];
-
 const MyOffersPage = () => {
+  const { user } = useAuth();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<OfferCardProps | null>(null);
   const { notification, showError, showSuccess, hideNotification } = useNotification();
+
+  // Filter projects by logged-in user's investor ID
+  const allProjects = useMemo(() => {
+    const projects = comprehensiveProjectsData as (OfferCardProps & { investorId?: string })[];
+    return projects.filter(p => p.investorId === user?._id);
+  }, [user?._id]);
+
+  const activeProjects = useMemo(() => 
+    allProjects.filter(p => p.status === 'active'), 
+    [allProjects]
+  );
+
+  const pastProjects = useMemo(() => 
+    allProjects.filter(p => p.status === 'completed'), 
+    [allProjects]
+  );
+
+  const pendingProjects = useMemo(() => {
+    const projects = pendingProjectsData as (OfferCardProps & { investorId?: string })[];
+    return projects.filter(p => p.investorId === user?._id);
+  }, [user?._id]);
 
   const handleCreateOffer = () => {
     setCreateDialogOpen(true);

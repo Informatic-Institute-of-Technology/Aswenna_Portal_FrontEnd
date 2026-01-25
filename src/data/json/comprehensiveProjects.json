@@ -2,6 +2,7 @@
   {
     "id": "1",
     "projectId": "PRJ-156",
+    "investorId": "696e6196b558abe2695480a6",
     "projectName": "Premium Rice Cultivation",
     "cropType": "Rice (Nadu)",
     "cropIcon": "🌾",
@@ -19,7 +20,6 @@
     "endDate": "2026-04-30",
     "backgroundImage": "https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?w=600",
     "investorName": "Smart Agri Investments",
-    "investorId": "INV-067",
     "investorAmount": 250000,
     "landownerName": "Perera Estates",
     "landownerId": "LND-019",
@@ -232,6 +232,7 @@
   {
     "id": "2",
     "projectId": "PRJ-178",
+    "investorId": "696e6196b558abe2695480a6",
     "projectName": "Organic Vegetable Farm",
     "cropType": "Mixed Vegetables",
     "cropIcon": "🥬",
@@ -251,7 +252,6 @@
     "endDate": "2026-03-15",
     "backgroundImage": "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600",
     "investorName": "Green Valley Investors",
-    "investorId": "INV-082",
     "investorAmount": 180000,
     "landownerName": "Highland Farms",
     "landownerId": "LND-045",
@@ -421,6 +421,7 @@
   {
     "id": "3",
     "projectId": "PRJ-089",
+    "investorId": "696e6196b558abe2695480a6",
     "projectName": "Coconut Plantation",
     "cropType": "King Coconut",
     "cropIcon": "🥥",
@@ -440,7 +441,6 @@
     "endDate": "2025-11-30",
     "backgroundImage": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjw-qC7D9C8Ffg12xzEGnK_F9QCEcnpc90YQ&s",
     "investorName": "Smart Agri Investments",
-    "investorId": "INV-067",
     "investorAmount": 320000,
     "landownerName": "Silva Estates",
     "landownerId": "LND-054",
@@ -618,6 +618,7 @@
   {
     "id": "4",
     "projectId": "PRJ-123",
+    "investorId": "696e6196b558abe2695480a6",
     "projectName": "Spice Garden",
     "cropType": "Cinnamon & Pepper",
     "cropIcon": "🌿",
@@ -635,7 +636,6 @@
     "endDate": "2025-10-31",
     "backgroundImage": "https://imgcdn.flamingotravels.co.in/Images/PlacesOfInterest/Learn-About-Spices-at-a-Spice-Garden-Kandy-Sri-Lanka-Things-To-Do-3.jpg",
     "investorName": "Spice Trade International",
-    "investorId": "INV-091",
     "investorAmount": 420000,
     "landownerName": "Kumara Holdings",
     "landownerId": "LND-067",

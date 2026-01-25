@@ -1314,6 +1314,9 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   {project.payments.map((payment) => {
                     const daysRemaining = getDaysRemaining(payment.dueDate);
+                    // Determine actual display status: if pending and overdue, show as overdue
+                    const displayStatus = payment.status === 'pending' && daysRemaining < 0 ? 'overdue' : payment.status;
+                    
                     return (
                       <Box 
                         key={payment.id}
@@ -1322,7 +1325,7 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                           bgcolor: 'rgba(255,255,255,0.02)', 
                           borderRadius: 2, 
                           border: '1px solid rgba(255,255,255,0.1)',
-                          borderLeft: `4px solid ${getPaymentStatusColor(payment.status)}`
+                          borderLeft: `4px solid ${getPaymentStatusColor(displayStatus)}`
                         }}
                       >
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1332,12 +1335,13 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                                 {payment.description}
                               </Typography>
                               <Chip 
-                                label={payment.status.toUpperCase()} 
+                                label={displayStatus.toUpperCase()} 
                                 size="small"
                                 sx={{ 
-                                  bgcolor: getPaymentStatusColor(payment.status),
+                                  bgcolor: getPaymentStatusColor(displayStatus),
                                   color: 'white',
-                                  fontWeight: 600
+                                  fontWeight: 600,
+                                  fontSize: '0.75rem'
                                 }}
                               />
                             </Box>
@@ -1358,7 +1362,7 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                                   {daysRemaining} days remaining
                                 </Typography>
                               )}
-                              {payment.status === 'overdue' && (
+                              {displayStatus === 'overdue' && (
                                 <Typography variant="body2" color="#ef5350">
                                   <WarningAmber sx={{ fontSize: 14, mr: 0.5, verticalAlign: 'middle' }} />
                                   {Math.abs(daysRemaining)} days overdue
