@@ -20,7 +20,7 @@ import { useMemo, useState } from 'react';
 import LocationMapDialog from './LocationMapDialog';
 import type { OfferCardProps } from './OfferCard';
 
-const GOOGLE_MAPS_API_KEY = 'AIzaSyA3L-q18zc1dET4FtGpbC4GRfjd60KfWlc';
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 interface ProjectDetailsDialogProps {
   open: boolean;
@@ -86,6 +86,141 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
     return Math.round(totalProgress / project.milestones.length);
   }, [project]);
 
+  // Auto-generate notifications based on project data analysis
+  const notifications = useMemo(() => {
+    if (!project) return [];
+
+    const today = new Date();
+    const notifs: Array<{
+      id: string;
+      type: 'critical' | 'warning' | 'success' | 'info';
+      title: string;
+      message: string;
+      icon: string;
+      timestamp: string;
+    }> = [];
+
+    const formatCurrencyForNotif = (amount: number) => {
+      return new Intl.NumberFormat('en-LK', {
+        style: 'currency',
+        currency: 'LKR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(amount);
+    };
+
+    const formatDateForNotif = (dateStr: string) => {
+      return new Date(dateStr).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    };
+
+    // Analyze payments for overdue and paid status
+    if (project.payments) {
+      project.payments.forEach((payment) => {
+        const dueDate = new Date(payment.dueDate);
+        const daysDiff = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+        // Critical: Overdue payments
+        if (payment.status === 'pending' && daysDiff < 0) {
+          notifs.push({
+            id: `overdue-${payment.id}`,
+            type: 'critical',
+            title: '⚠️ OVERDUE PAYMENT',
+            message: `Payment of ${formatCurrencyForNotif(payment.amount)} is ${Math.abs(daysDiff)} days overdue. Due date was ${formatDateForNotif(payment.dueDate)}.`,
+            icon: '🚨',
+            timestamp: payment.dueDate,
+          });
+        }
+        // Warning: Payment due soon (within 7 days)
+        else if (payment.status === 'pending' && daysDiff >= 0 && daysDiff <= 7) {
+          notifs.push({
+            id: `due-soon-${payment.id}`,
+            type: 'warning',
+            title: '⏰ PAYMENT DUE SOON',
+            message: `Payment of ${formatCurrencyForNotif(payment.amount)} is due in ${daysDiff} day${daysDiff !== 1 ? 's' : ''}. Due date: ${formatDateForNotif(payment.dueDate)}.`,
+            icon: '⚠️',
+            timestamp: payment.dueDate,
+          });
+        }
+        // Success: Recently paid payments (within last 7 days)
+        else if (payment.status === 'paid' && payment.paidDate) {
+          const paidDate = new Date(payment.paidDate);
+          const daysSincePaid = Math.ceil((today.getTime() - paidDate.getTime()) / (1000 * 60 * 60 * 24));
+          
+          if (daysSincePaid <= 7) {
+            notifs.push({
+              id: `paid-${payment.id}`,
+              type: 'success',
+              title: '✅ PAYMENT COMPLETED',
+              message: `Payment of ${formatCurrencyForNotif(payment.amount)} was successfully processed on ${formatDateForNotif(payment.paidDate)}.`,
+              icon: '✅',
+              timestamp: payment.paidDate,
+            });
+          }
+        }
+      });
+    }
+
+    // Analyze milestones for delays
+    if (project.milestones) {
+      project.milestones.forEach((milestone) => {
+        const endDate = new Date(milestone.endDate);
+        const daysDiff = Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+        // Critical: Delayed milestones
+        if (milestone.status === 'delayed') {
+          notifs.push({
+            id: `delayed-${milestone.id}`,
+            type: 'critical',
+            title: '🚨 MILESTONE DELAYED',
+            message: `"${milestone.title}" is behind schedule. Expected completion was ${formatDateForNotif(milestone.endDate)}.`,
+            icon: '🚨',
+            timestamp: milestone.endDate,
+          });
+        }
+        // Warning: In-progress milestone nearing deadline
+        else if (milestone.status === 'in-progress' && daysDiff >= 0 && daysDiff <= 5) {
+          notifs.push({
+            id: `deadline-${milestone.id}`,
+            type: 'warning',
+            title: '⏳ MILESTONE DEADLINE APPROACHING',
+            message: `"${milestone.title}" is ${milestone.progress}% complete with ${daysDiff} day${daysDiff !== 1 ? 's' : ''} remaining.`,
+            icon: '⏳',
+            timestamp: milestone.endDate,
+          });
+        }
+        // Success: Recently completed milestones
+        else if (milestone.status === 'completed' && milestone.completedDate) {
+          const completedDate = new Date(milestone.completedDate);
+          const daysSinceCompleted = Math.ceil((today.getTime() - completedDate.getTime()) / (1000 * 60 * 60 * 24));
+          
+          if (daysSinceCompleted <= 7) {
+            notifs.push({
+              id: `completed-${milestone.id}`,
+              type: 'success',
+              title: '🎉 MILESTONE ACHIEVED',
+              message: `"${milestone.title}" was successfully completed on ${formatDateForNotif(milestone.completedDate)}.`,
+              icon: '🎉',
+              timestamp: milestone.completedDate,
+            });
+          }
+        }
+      });
+    }
+
+    // Sort by priority: critical > warning > success > info, then by date
+    const priorityOrder = { critical: 0, warning: 1, success: 2, info: 3 };
+    return notifs.sort((a, b) => {
+      if (priorityOrder[a.type] !== priorityOrder[b.type]) {
+        return priorityOrder[a.type] - priorityOrder[b.type];
+      }
+      return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+    });
+  }, [project]);
+
   const getCategoryColor = (index: number, percentage: number) => {
     if (percentage >= 20) return '#ef5350'; 
     if (percentage >= 15) return '#ffa726'; 
@@ -111,6 +246,23 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
       year: 'numeric',
     });
   };
+
+  const getNotificationColor = (type: string) => {
+    switch (type) {
+      case 'critical':
+        return { bg: 'rgba(239, 83, 80, 0.15)', border: '#ef5350', text: '#ef5350' };
+      case 'warning':
+        return { bg: 'rgba(255, 167, 38, 0.15)', border: '#ffa726', text: '#ffa726' };
+      case 'success':
+        return { bg: 'rgba(118, 192, 67, 0.15)', border: '#76c043', text: '#76c043' };
+      case 'info':
+        return { bg: 'rgba(33, 150, 243, 0.15)', border: '#2196f3', text: '#2196f3' };
+      default:
+        return { bg: 'rgba(255, 255, 255, 0.05)', border: '#757575', text: '#757575' };
+    }
+  };
+
+  if (!project) return null;
 
   const getRiskColor = () => {
     switch (project.riskLevel) {
@@ -324,6 +476,110 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                       {project.expectedROI}%
                     </Typography>
                   </Box>
+                  {/* Investment Type & Commission Info - Inline Display */}
+                  {project.investmentType && (
+                    <>
+                      <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)', my: 1 }} />
+                      <Box>
+                        <Typography variant="caption" color="rgba(255,255,255,0.6)" sx={{ mb: 1, display: 'block' }}>
+                          INVESTMENT DETAILS
+                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+                          {/* Investment Type Badge */}
+                          <Chip 
+                            label={project.investmentType === 'harvest' ? '🌾 Harvest-Based' : '💼 Commission-Based'}
+                            size="small"
+                            sx={{ 
+                              bgcolor: project.investmentType === 'harvest' ? 'rgba(76, 175, 80, 0.2)' : 'rgba(33, 150, 243, 0.2)',
+                              color: project.investmentType === 'harvest' ? '#76c043' : '#2196f3',
+                              fontWeight: 700,
+                              border: `1px solid ${project.investmentType === 'harvest' ? '#76c043' : '#2196f3'}`,
+                              fontSize: '0.8rem',
+                            }}
+                          />
+                          
+                          {/* Commission Rate & Earned Amount - Inline */}
+                          {project.investmentType === 'commission' && project.commissionRate && (
+                            <>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <Typography variant="caption" color="rgba(255,255,255,0.5)">
+                                  Rate:
+                                </Typography>
+                                <Typography variant="body2" color="#2196f3" fontWeight={700}>
+                                  {project.commissionRate}%
+                                </Typography>
+                              </Box>
+                              
+                              {project.earnedCommission !== undefined && project.earnedCommission > 0 && (
+                                <>
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                    <Typography variant="caption" color="rgba(255,255,255,0.5)">
+                                      •
+                                    </Typography>
+                                    <Box 
+                                      sx={{ 
+                                        bgcolor: 'rgba(33, 150, 243, 0.15)',
+                                        px: 1.5,
+                                        py: 0.5,
+                                        borderRadius: 1,
+                                        border: '1px solid rgba(33, 150, 243, 0.3)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 0.5,
+                                      }}
+                                    >
+                                      <Typography variant="body2" color="#2196f3" fontWeight={600}>
+                                        Earned:
+                                      </Typography>
+                                      <Typography variant="h6" color="#2196f3" fontWeight={700} sx={{ fontSize: '1.1rem' }}>
+                                        {formatCurrency(project.earnedCommission)}
+                                      </Typography>
+                                      {project.endDate && (
+                                        <Typography variant="caption" color="rgba(255,255,255,0.5)" sx={{ fontStyle: 'italic', ml: 0.5 }}>
+                                          ({project.status === 'active' ? `by ${new Date(project.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}` : 'final'})
+                                        </Typography>
+                                      )}
+                                    </Box>
+                                  </Box>
+                                  
+                                  {/* Net Income Calculation for Commission-Based Projects */}
+                                  {project.investorAmount && (
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                      <Typography variant="caption" color="rgba(255,255,255,0.5)">
+                                        •
+                                      </Typography>
+                                      <Box 
+                                        sx={{ 
+                                          bgcolor: 'rgba(76, 175, 80, 0.2)',
+                                          px: 1.5,
+                                          py: 0.5,
+                                          borderRadius: 1,
+                                          border: '1px solid rgba(76, 175, 80, 0.5)',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: 0.5,
+                                        }}
+                                      >
+                                        <Typography variant="body2" color="#76c043" fontWeight={600}>
+                                          Net Income:
+                                        </Typography>
+                                        <Typography variant="h6" color="#76c043" fontWeight={700} sx={{ fontSize: '1.1rem' }}>
+                                          {formatCurrency(project.earnedCommission - project.investorAmount)}
+                                        </Typography>
+                                        <Typography variant="caption" color="rgba(255,255,255,0.4)" sx={{ fontStyle: 'italic', ml: 0.5 }}>
+                                          (after investment)
+                                        </Typography>
+                                      </Box>
+                                    </Box>
+                                  )}
+                                </>
+                              )}
+                            </>
+                          )}
+                        </Box>
+                      </Box>
+                    </>
+                  )}
                 </Box>
               </Box>
 
@@ -385,6 +641,128 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                 </Box>
               )}
             </Box>
+
+            {/* Notifications Section - Compact & Scrollable */}
+            {notifications.length > 0 && (
+              <Box sx={{ mb: 3, p: 2.5, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
+                <Typography variant="h6" color="white" gutterBottom fontWeight={600} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                  🔔 Latest Notifications
+                  <Chip 
+                    label={notifications.length} 
+                    size="small" 
+                    sx={{ 
+                      bgcolor: notifications.some(n => n.type === 'critical') ? '#ef5350' : '#76c043',
+                      color: 'white',
+                      fontWeight: 700,
+                      height: 20,
+                      fontSize: '0.75rem'
+                    }} 
+                  />
+                </Typography>
+                <Box sx={{ 
+                  maxHeight: 250, 
+                  overflowY: 'auto',
+                  pr: 1,
+                  '&::-webkit-scrollbar': {
+                    width: '6px',
+                  },
+                  '&::-webkit-scrollbar-track': {
+                    background: 'rgba(255,255,255,0.05)',
+                    borderRadius: '3px',
+                  },
+                  '&::-webkit-scrollbar-thumb': {
+                    background: 'rgba(255,255,255,0.2)',
+                    borderRadius: '3px',
+                    '&:hover': {
+                      background: 'rgba(255,255,255,0.3)',
+                    },
+                  },
+                }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    {notifications.map((notif) => {
+                      const colors = getNotificationColor(notif.type);
+                      const notifDate = new Date(notif.timestamp);
+                      const today = new Date();
+                      const daysDiff = Math.ceil((today.getTime() - notifDate.getTime()) / (1000 * 60 * 60 * 24));
+                      const timeAgo = daysDiff === 0 ? 'Today' : daysDiff === 1 ? 'Yesterday' : `${daysDiff} days ago`;
+                      
+                      return (
+                        <Box
+                          key={notif.id}
+                          sx={{
+                            p: 1.5,
+                            bgcolor: colors.bg,
+                            borderRadius: 1.5,
+                            borderLeft: `4px solid ${colors.border}`,
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            gap: 1.5,
+                            transition: 'all 0.2s ease',
+                            '&:hover': {
+                              transform: 'translateX(2px)',
+                              bgcolor: `${colors.bg}dd`,
+                            },
+                          }}
+                        >
+                          <Box sx={{ fontSize: '20px', lineHeight: 1, flexShrink: 0 }}>
+                            {notif.icon}
+                          </Box>
+                          <Box sx={{ flex: 1, minWidth: 0 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 1, mb: 0.5 }}>
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  color: colors.text,
+                                  fontWeight: 700,
+                                  fontSize: '0.75rem',
+                                  textTransform: 'uppercase',
+                                  letterSpacing: '0.3px',
+                                  lineHeight: 1.2,
+                                }}
+                              >
+                                {notif.title}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  color: 'rgba(255,255,255,0.5)',
+                                  fontSize: '0.7rem',
+                                  flexShrink: 0,
+                                  whiteSpace: 'nowrap',
+                                }}
+                              >
+                                {timeAgo}
+                              </Typography>
+                            </Box>
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                color: 'rgba(255,255,255,0.85)',
+                                fontSize: '0.8rem',
+                                lineHeight: 1.4,
+                              }}
+                            >
+                              {notif.message}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                color: 'rgba(255,255,255,0.4)',
+                                fontSize: '0.7rem',
+                                mt: 0.5,
+                                display: 'block',
+                              }}
+                            >
+                              {formatDate(notif.timestamp)}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                </Box>
+              </Box>
+            )}
 
             <Box sx={{ mb: 3, p: 3, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
               <Typography variant="h6" color="white" gutterBottom fontWeight={600}>
@@ -575,6 +953,16 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                             position={{
                               lat: parseFloat(project.coordinates.split(',')[0].trim()),
                               lng: parseFloat(project.coordinates.split(',')[1].trim()),
+                            }}
+                            icon={{
+                              url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+                                <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60">
+                                  <circle cx="30" cy="30" r="28" fill="#115313" stroke="white" stroke-width="3"/>
+                                  <text x="30" y="42" font-size="32" text-anchor="middle" fill="white">${project.cropIcon}</text>
+                                </svg>
+                              `)}`,
+                              scaledSize: new google.maps.Size(50, 50),
+                              anchor: new google.maps.Point(25, 25),
                             }}
                           />
                         </GoogleMap>
@@ -907,6 +1295,53 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                     );
                   })}
                 </Box>
+                
+                {/* Total Income Summary for Commission-Based Projects */}
+                {project.investmentType === 'commission' && project.investorAmount && project.earnedCommission !== undefined && (
+                  <Box 
+                    sx={{ 
+                      p: 2.5, 
+                      bgcolor: 'rgba(255,255,255,0.02)', 
+                      borderRadius: 2, 
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      borderLeft: `4px solid #76c043`,
+                      mt: 2
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Box sx={{ flex: 1 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                          <Typography variant="body1" color="white" fontWeight={600}>
+                            💰 Total Income (Commission + Investment Return)
+                          </Typography>
+                          <Chip 
+                            label={`${project.commissionRate}% COMMISSION`}
+                            size="small"
+                            sx={{ 
+                              bgcolor: '#76c043',
+                              color: 'white',
+                              fontWeight: 600
+                            }}
+                          />
+                        </Box>
+                        <Box sx={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                          <Typography variant="body2" color="rgba(255,255,255,0.7)">
+                            Commission Earned: {formatCurrency(project.earnedCommission)}
+                          </Typography>
+                          <Typography variant="body2" color="rgba(255,255,255,0.7)">
+                            + Investment Return: {formatCurrency(project.investorAmount)}
+                          </Typography>
+                          <Typography variant="body2" color="#76c043">
+                            = Total: {formatCurrency(project.earnedCommission + project.investorAmount)}
+                          </Typography>
+                        </Box>
+                      </Box>
+                      <Typography variant="h6" color="#76c043" fontWeight={700}>
+                        {formatCurrency(project.earnedCommission + project.investorAmount)}
+                      </Typography>
+                    </Box>
+                  </Box>
+                )}
               </Box>
             ) : (
               <Typography variant="body1" color="rgba(255,255,255,0.5)">

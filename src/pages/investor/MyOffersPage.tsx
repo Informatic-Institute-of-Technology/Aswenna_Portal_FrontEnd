@@ -5,21 +5,18 @@ import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 import { useState } from 'react';
 import type { OfferCardProps } from '../../components/investor';
 import { CreateOfferButton, CreateOfferDialog, OfferCard, ProjectDetailsDialog } from '../../components/investor';
-import pastProjectsData from '../../data/json/pastProjects.json';
+import comprehensiveProjectsData from '../../data/json/comprehensiveProjects.json';
 import pendingProjectsData from '../../data/json/pendingProjects.json';
-import { comprehensiveProject, comprehensiveVegetableProject } from '../../data/mockProjectData';
 import Notification from '../../shared/components/Notification';
 import { useNotification } from '../../shared/hooks/useNotification';
 
-// Use comprehensive mock data with all details
-const activeProjects: OfferCardProps[] = [
-  comprehensiveProject,
-  comprehensiveVegetableProject,
-];
+// Load all projects from comprehensive data and filter by status
+const allProjects: OfferCardProps[] = comprehensiveProjectsData as OfferCardProps[];
+const activeProjects: OfferCardProps[] = allProjects.filter(p => p.status === 'active');
+const pastProjects: OfferCardProps[] = allProjects.filter(p => p.status === 'completed');
 
-// Import data from JSON files
+// Import pending projects from JSON
 const pendingProjects: OfferCardProps[] = pendingProjectsData as OfferCardProps[];
-const pastProjects: OfferCardProps[] = pastProjectsData as OfferCardProps[];
 
 const MyOffersPage = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -47,7 +44,7 @@ const MyOffersPage = () => {
   };
 
   const handleViewDetails = (id: string) => {
-    const project = [...activeProjects, ...pendingProjects].find(p => p.id === id);
+    const project = [...activeProjects, ...pendingProjects, ...pastProjects].find(p => p.id === id);
     if (project) {
       setSelectedProject(project);
       setDetailsDialogOpen(true);

@@ -84,6 +84,10 @@ export interface OfferCardProps {
     pendingMilestones?: number; // Optional - can be auto-calculated
     riskLevel?: 'LOW' | 'MEDIUM' | 'HIGH';
     riskStatus?: string;
+    investmentType?: 'harvest' | 'commission';
+    commissionRate?: number; // Percentage rate for commission-based investments
+    earnedCommission?: number; // Total commission earned (for completed or active commission projects)
+    investorAmount?: number; // Initial investment amount from investor
     // Detailed information - REQUIRED for auto-calculation
     milestones?: Milestone[];
     payments?: PaymentInstallment[];
@@ -136,6 +140,61 @@ const OfferCard = ({
         }
         return 0;
     }, [budget, payments, financialBreakdown]);
+
+    // Analyze for critical/warning notifications
+    const notificationStatus = useMemo(() => {
+        const today = new Date();
+        let hasCritical = false;
+        let hasWarning = false;
+        let criticalCount = 0;
+        let warningCount = 0;
+
+        // Check payments
+        if (payments) {
+            payments.forEach((payment) => {
+                const dueDate = new Date(payment.dueDate);
+                const daysDiff = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+                // Critical: Overdue payments
+                if (payment.status === 'pending' && daysDiff < 0) {
+                    hasCritical = true;
+                    criticalCount++;
+                }
+                // Warning: Payment due within 7 days
+                else if (payment.status === 'pending' && daysDiff >= 0 && daysDiff <= 7) {
+                    hasWarning = true;
+                    warningCount++;
+                }
+            });
+        }
+
+        // Check milestones
+        if (milestones) {
+            milestones.forEach((milestone) => {
+                const endDate = new Date(milestone.endDate);
+                const daysDiff = Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+                // Critical: Delayed milestones
+                if (milestone.status === 'delayed') {
+                    hasCritical = true;
+                    criticalCount++;
+                }
+                // Warning: Milestone nearing deadline (in-progress with <=5 days)
+                else if (milestone.status === 'in-progress' && daysDiff >= 0 && daysDiff <= 5) {
+                    hasWarning = true;
+                    warningCount++;
+                }
+            });
+        }
+
+        return {
+            hasCritical,
+            hasWarning,
+            totalCount: criticalCount + warningCount,
+            criticalCount,
+            warningCount,
+        };
+    }, [payments, milestones]);
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('en-LK', {
@@ -233,7 +292,7 @@ const OfferCard = ({
                     }}
                 >
                     {/* Status Badge */}
-                    <Box>
+                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                         <Chip
                             label={status.toUpperCase()}
                             color={getStatusColor()}
@@ -245,6 +304,78 @@ const OfferCard = ({
                                 textTransform: 'uppercase',
                             }}
                         />
+                        {/* Notification Badge */}
+                        {(notificationStatus.hasCritical || notificationStatus.hasWarning) && (
+                            <Tooltip 
+                                title={
+                                    notificationStatus.hasCritical 
+                                        ? `${notificationStatus.criticalCount} Critical Alert${notificationStatus.criticalCount > 1 ? 's' : ''}` 
+                                        : `${notificationStatus.warningCount} Warning${notificationStatus.warningCount > 1 ? 's' : ''}`
+                                }
+                                arrow
+                            >
+                                <Box
+                                    sx={{
+                                        position: 'relative',
+                                        width: 32,
+                                        height: 32,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        bgcolor: notificationStatus.hasCritical ? 'rgba(239, 83, 80, 0.2)' : 'rgba(255, 167, 38, 0.2)',
+                                        backdropFilter: 'blur(10px)',
+                                        borderRadius: '50%',
+                                        border: `2px solid ${notificationStatus.hasCritical ? '#ef5350' : '#ffa726'}`,
+                                        animation: 'pulse 2s infinite',
+                                        '@keyframes pulse': {
+                                            '0%, 100%': {
+                                                boxShadow: `0 0 0 0 ${notificationStatus.hasCritical ? 'rgba(239, 83, 80, 0.7)' : 'rgba(255, 167, 38, 0.7)'}`,
+                                            },
+                                            '50%': {
+                                                boxShadow: `0 0 0 8px ${notificationStatus.hasCritical ? 'rgba(239, 83, 80, 0)' : 'rgba(255, 167, 38, 0)'}`,
+                                            },
+                                        },
+                                    }}
+                                >
+                                    <Typography
+                                        sx={{
+                                            fontSize: '16px',
+                                            lineHeight: 1,
+                                        }}
+                                    >
+                                        {notificationStatus.hasCritical ? '🚨' : '⚠️'}
+                                    </Typography>
+                                    {notificationStatus.totalCount > 1 && (
+                                        <Box
+                                            sx={{
+                                                position: 'absolute',
+                                                top: -4,
+                                                right: -4,
+                                                width: 18,
+                                                height: 18,
+                                                bgcolor: notificationStatus.hasCritical ? '#ef5350' : '#ffa726',
+                                                borderRadius: '50%',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                border: '2px solid #1f1f1f',
+                                            }}
+                                        >
+                                            <Typography
+                                                sx={{
+                                                    fontSize: '0.65rem',
+                                                    fontWeight: 700,
+                                                    color: 'white',
+                                                    lineHeight: 1,
+                                                }}
+                                            >
+                                                {notificationStatus.totalCount}
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                </Box>
+                            </Tooltip>
+                        )}
                     </Box>
 
                     {/* Crop Info */}

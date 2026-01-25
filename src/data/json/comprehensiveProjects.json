@@ -14,11 +14,13 @@
     "coordinates": "8.3114, 80.4037",
     "expectedROI": 28,
     "status": "active",
+    "investmentType": "harvest",
     "startDate": "2025-11-15",
     "endDate": "2026-04-30",
     "backgroundImage": "https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?w=600",
     "investorName": "Smart Agri Investments",
     "investorId": "INV-067",
+    "investorAmount": 250000,
     "landownerName": "Perera Estates",
     "landownerId": "LND-019",
     "riskLevel": "LOW",
@@ -168,7 +170,7 @@
         "id": "P6",
         "milestoneId": "M6",
         "amount": 22000,
-        "dueDate": "2026-03-15",
+        "dueDate": "2026-01-15",
         "status": "pending",
         "description": "Milestone 6: Pre-Harvest Preparation Payment"
       },
@@ -255,11 +257,15 @@
     "coordinates": "6.9497, 80.7891",
     "expectedROI": 35,
     "status": "active",
+    "investmentType": "commission",
+    "commissionRate": 15,
+    "earnedCommission": 27000,
     "startDate": "2025-12-01",
     "endDate": "2026-03-15",
     "backgroundImage": "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600",
     "investorName": "Green Valley Investors",
     "investorId": "INV-082",
+    "investorAmount": 180000,
     "landownerName": "Highland Farms",
     "landownerId": "LND-045",
     "riskLevel": "MEDIUM",
@@ -393,7 +399,8 @@
       { "category": "Irrigation System", "amount": 25200 },
       { "category": "Labor & Skilled Workers", "amount": 54000 },
       { "category": "Organic Certification", "amount": 10800 },
-      { "category": "Packaging & Transport", "amount": 12600 }
+      { "category": "Packaging & Transport", "amount": 12600 },
+      { "category": "💰 Commission Income (15% Rate)", "amount": 27000 }
     ],
     "partyMembers": [
       {
@@ -434,6 +441,423 @@
         "specialization": "High-Altitude Agricultural Land Management",
         "experience": "25 years managing 100+ acres of highland farming land",
         "rating": 4.6
+      }
+    ]
+  },
+  {
+    "id": "3",
+    "projectId": "PRJ-089",
+    "projectName": "Coconut Plantation",
+    "cropType": "King Coconut",
+    "cropIcon": "🥥",
+    "farmerName": "Mahinda Silva",
+    "farmerId": "FAR-178",
+    "farmerImage": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
+    "location": "Kurunegala",
+    "district": "Kurunegala",
+    "province": "North Western",
+    "coordinates": "7.4863, 80.3623",
+    "expectedROI": 24,
+    "status": "completed",
+    "investmentType": "commission",
+    "commissionRate": 12,
+    "earnedCommission": 38400,
+    "startDate": "2025-06-01",
+    "endDate": "2025-11-30",
+    "backgroundImage": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjw-qC7D9C8Ffg12xzEGnK_F9QCEcnpc90YQ&s",
+    "investorName": "Smart Agri Investments",
+    "investorId": "INV-067",
+    "investorAmount": 320000,
+    "landownerName": "Silva Estates",
+    "landownerId": "LND-054",
+    "riskLevel": "LOW",
+    "riskStatus": "Successfully Completed",
+    "milestones": [
+      {
+        "id": "M1",
+        "title": "Land Survey & Preparation",
+        "description": "Complete land survey, soil testing, and preparation for coconut planting",
+        "progress": 100,
+        "status": "completed",
+        "startDate": "2025-06-01",
+        "endDate": "2025-06-15",
+        "completedDate": "2025-06-14",
+        "payment": 40000,
+        "tasks": { "total": 10, "completed": 10 }
+      },
+      {
+        "id": "M2",
+        "title": "Seedling Procurement & Planting",
+        "description": "Purchase certified coconut seedlings and complete plantation",
+        "progress": 100,
+        "status": "completed",
+        "startDate": "2025-06-16",
+        "endDate": "2025-07-15",
+        "completedDate": "2025-07-14",
+        "payment": 60000,
+        "tasks": { "total": 15, "completed": 15 }
+      },
+      {
+        "id": "M3",
+        "title": "Irrigation System Installation",
+        "description": "Install drip irrigation system across the plantation",
+        "progress": 100,
+        "status": "completed",
+        "startDate": "2025-07-16",
+        "endDate": "2025-08-10",
+        "completedDate": "2025-08-09",
+        "payment": 45000,
+        "tasks": { "total": 12, "completed": 12 }
+      },
+      {
+        "id": "M4",
+        "title": "Initial Fertilization & Care",
+        "description": "Apply organic fertilizers and establish maintenance schedule",
+        "progress": 100,
+        "status": "completed",
+        "startDate": "2025-08-11",
+        "endDate": "2025-09-10",
+        "completedDate": "2025-09-08",
+        "payment": 35000,
+        "tasks": { "total": 8, "completed": 8 }
+      },
+      {
+        "id": "M5",
+        "title": "Growth Monitoring & Pest Control",
+        "description": "Regular monitoring and integrated pest management",
+        "progress": 100,
+        "status": "completed",
+        "startDate": "2025-09-11",
+        "endDate": "2025-10-20",
+        "completedDate": "2025-10-19",
+        "payment": 40000,
+        "tasks": { "total": 14, "completed": 14 }
+      },
+      {
+        "id": "M6",
+        "title": "Final Assessment & Handover",
+        "description": "Complete health assessment and project documentation",
+        "progress": 100,
+        "status": "completed",
+        "startDate": "2025-10-21",
+        "endDate": "2025-11-30",
+        "completedDate": "2025-11-28",
+        "payment": 100000,
+        "tasks": { "total": 10, "completed": 10 }
+      }
+    ],
+    "payments": [
+      {
+        "id": "P1",
+        "milestoneId": "M1",
+        "amount": 40000,
+        "dueDate": "2025-06-15",
+        "paidDate": "2025-06-14",
+        "status": "paid",
+        "description": "Milestone 1: Land Survey & Preparation Payment"
+      },
+      {
+        "id": "P2",
+        "milestoneId": "M2",
+        "amount": 60000,
+        "dueDate": "2025-07-15",
+        "paidDate": "2025-07-15",
+        "status": "paid",
+        "description": "Milestone 2: Seedling Procurement & Planting Payment"
+      },
+      {
+        "id": "P3",
+        "milestoneId": "M3",
+        "amount": 45000,
+        "dueDate": "2025-08-10",
+        "paidDate": "2025-08-10",
+        "status": "paid",
+        "description": "Milestone 3: Irrigation System Payment"
+      },
+      {
+        "id": "P4",
+        "milestoneId": "M4",
+        "amount": 35000,
+        "dueDate": "2025-09-10",
+        "paidDate": "2025-09-09",
+        "status": "paid",
+        "description": "Milestone 4: Fertilization & Care Payment"
+      },
+      {
+        "id": "P5",
+        "milestoneId": "M5",
+        "amount": 40000,
+        "dueDate": "2025-10-20",
+        "paidDate": "2025-10-20",
+        "status": "paid",
+        "description": "Milestone 5: Growth Monitoring Payment"
+      },
+      {
+        "id": "P6",
+        "milestoneId": "M6",
+        "amount": 100000,
+        "dueDate": "2025-11-30",
+        "paidDate": "2025-11-29",
+        "status": "paid",
+        "description": "Milestone 6: Final Assessment & Handover Payment"
+      }
+    ],
+    "financialBreakdown": [
+      { "category": "Land Preparation & Survey", "amount": 50000 },
+      { "category": "Seedlings & Planting Materials", "amount": 65000 },
+      { "category": "Irrigation Infrastructure", "amount": 55000 },
+      { "category": "Fertilizers & Nutrients", "amount": 45000 },
+      { "category": "Pest & Disease Management", "amount": 35000 },
+      { "category": "Labor & Workforce", "amount": 55000 },
+      { "category": "Equipment & Tools", "amount": 15000 },
+      { "category": "💰 Commission Income (12% Rate)", "amount": 38400 }
+    ],
+    "partyMembers": [
+      {
+        "id": "FAR-178",
+        "name": "Mahinda Silva",
+        "role": "farmer",
+        "email": "mahinda.silva@coconutfarms.lk",
+        "phone": "+94 77 234 5678",
+        "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
+        "location": "Kurunegala, North Western Province",
+        "coordinates": "7.4863, 80.3623",
+        "specialization": "Coconut Plantation & Management",
+        "experience": "18 years in coconut farming, certified organic grower",
+        "rating": 4.8
+      },
+      {
+        "id": "INV-067",
+        "name": "Smart Agri Investments",
+        "role": "investor",
+        "email": "invest@smartagri.lk",
+        "phone": "+94 11 234 5678",
+        "image": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150",
+        "location": "Colombo, Western Province",
+        "coordinates": "6.9271, 79.8612",
+        "specialization": "Agricultural Technology Investment",
+        "experience": "8 years funding agritech projects, 92% ROI success",
+        "rating": 4.7
+      },
+      {
+        "id": "LND-054",
+        "name": "Silva Estates",
+        "role": "landowner",
+        "email": "contact@silvaestates.lk",
+        "phone": "+94 77 345 6789",
+        "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+        "location": "Kurunegala, North Western Province",
+        "coordinates": "7.4886, 80.3648",
+        "specialization": "Coconut & Tree Crop Land Management",
+        "experience": "30 years managing family-owned agricultural estates",
+        "rating": 4.9
+      }
+    ]
+  },
+  {
+    "id": "4",
+    "projectId": "PRJ-123",
+    "projectName": "Spice Garden",
+    "cropType": "Cinnamon & Pepper",
+    "cropIcon": "🌿",
+    "farmerName": "Saman Kumara",
+    "farmerId": "FAR-211",
+    "farmerImage": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150",
+    "location": "Matale",
+    "district": "Matale",
+    "province": "Central",
+    "coordinates": "7.4675, 80.6234",
+    "expectedROI": 32,
+    "status": "completed",
+    "investmentType": "harvest",
+    "startDate": "2025-04-01",
+    "endDate": "2025-10-31",
+    "backgroundImage": "https://imgcdn.flamingotravels.co.in/Images/PlacesOfInterest/Learn-About-Spices-at-a-Spice-Garden-Kandy-Sri-Lanka-Things-To-Do-3.jpg",
+    "investorName": "Spice Trade International",
+    "investorId": "INV-091",
+    "investorAmount": 420000,
+    "landownerName": "Kumara Holdings",
+    "landownerId": "LND-067",
+    "riskLevel": "LOW",
+    "riskStatus": "Successfully Completed",
+    "milestones": [
+      {
+        "id": "M1",
+        "title": "Land Clearing & Soil Enhancement",
+        "description": "Clear existing vegetation and enrich soil for spice cultivation",
+        "progress": 100,
+        "status": "completed",
+        "startDate": "2025-04-01",
+        "endDate": "2025-04-20",
+        "completedDate": "2025-04-18",
+        "payment": 35000,
+        "tasks": { "total": 12, "completed": 12 }
+      },
+      {
+        "id": "M2",
+        "title": "Cinnamon Sapling Plantation",
+        "description": "Plant certified cinnamon saplings across designated areas",
+        "progress": 100,
+        "status": "completed",
+        "startDate": "2025-04-21",
+        "endDate": "2025-05-15",
+        "completedDate": "2025-05-14",
+        "payment": 45000,
+        "tasks": { "total": 15, "completed": 15 }
+      },
+      {
+        "id": "M3",
+        "title": "Pepper Vine Installation",
+        "description": "Install support structures and plant pepper vines",
+        "progress": 100,
+        "status": "completed",
+        "startDate": "2025-05-16",
+        "endDate": "2025-06-10",
+        "completedDate": "2025-06-09",
+        "payment": 40000,
+        "tasks": { "total": 13, "completed": 13 }
+      },
+      {
+        "id": "M4",
+        "title": "Irrigation & Shade Setup",
+        "description": "Install micro-irrigation and natural shade systems",
+        "progress": 100,
+        "status": "completed",
+        "startDate": "2025-06-11",
+        "endDate": "2025-07-05",
+        "completedDate": "2025-07-04",
+        "payment": 38000,
+        "tasks": { "total": 10, "completed": 10 }
+      },
+      {
+        "id": "M5",
+        "title": "Growth Maintenance & Protection",
+        "description": "Regular care, organic pest control, and growth monitoring",
+        "progress": 100,
+        "status": "completed",
+        "startDate": "2025-07-06",
+        "endDate": "2025-09-15",
+        "completedDate": "2025-09-14",
+        "payment": 42000,
+        "tasks": { "total": 18, "completed": 18 }
+      },
+      {
+        "id": "M6",
+        "title": "Quality Certification & Harvest Prep",
+        "description": "Obtain organic certification and prepare for first harvest",
+        "progress": 100,
+        "status": "completed",
+        "startDate": "2025-09-16",
+        "endDate": "2025-10-31",
+        "completedDate": "2025-10-30",
+        "payment": 80000,
+        "tasks": { "total": 14, "completed": 14 }
+      }
+    ],
+    "payments": [
+      {
+        "id": "P1",
+        "milestoneId": "M1",
+        "amount": 35000,
+        "dueDate": "2025-04-20",
+        "paidDate": "2025-04-19",
+        "status": "paid",
+        "description": "Milestone 1: Land Clearing Payment"
+      },
+      {
+        "id": "P2",
+        "milestoneId": "M2",
+        "amount": 45000,
+        "dueDate": "2025-05-15",
+        "paidDate": "2025-05-15",
+        "status": "paid",
+        "description": "Milestone 2: Cinnamon Plantation Payment"
+      },
+      {
+        "id": "P3",
+        "milestoneId": "M3",
+        "amount": 40000,
+        "dueDate": "2025-06-10",
+        "paidDate": "2025-06-10",
+        "status": "paid",
+        "description": "Milestone 3: Pepper Vine Installation Payment"
+      },
+      {
+        "id": "P4",
+        "milestoneId": "M4",
+        "amount": 38000,
+        "dueDate": "2025-07-05",
+        "paidDate": "2025-07-05",
+        "status": "paid",
+        "description": "Milestone 4: Irrigation Setup Payment"
+      },
+      {
+        "id": "P5",
+        "milestoneId": "M5",
+        "amount": 42000,
+        "dueDate": "2025-09-15",
+        "paidDate": "2025-09-15",
+        "status": "paid",
+        "description": "Milestone 5: Maintenance & Protection Payment"
+      },
+      {
+        "id": "P6",
+        "milestoneId": "M6",
+        "amount": 80000,
+        "dueDate": "2025-10-31",
+        "paidDate": "2025-10-31",
+        "status": "paid",
+        "description": "Milestone 6: Certification & Harvest Prep Payment"
+      }
+    ],
+    "financialBreakdown": [
+      { "category": "Land Preparation & Clearing", "amount": 40000 },
+      { "category": "Cinnamon Saplings & Materials", "amount": 55000 },
+      { "category": "Pepper Vines & Support Structures", "amount": 48000 },
+      { "category": "Irrigation & Shade Systems", "amount": 45000 },
+      { "category": "Organic Fertilizers & Nutrients", "amount": 32000 },
+      { "category": "Pest Control & Disease Management", "amount": 22000 },
+      { "category": "Labor & Workforce", "amount": 38000 }
+    ],
+    "partyMembers": [
+      {
+        "id": "FAR-211",
+        "name": "Saman Kumara",
+        "role": "farmer",
+        "email": "saman.kumara@spicefarms.lk",
+        "phone": "+94 77 456 7890",
+        "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150",
+        "location": "Matale, Central Province",
+        "coordinates": "7.4675, 80.6234",
+        "specialization": "Ceylon Cinnamon & Black Pepper Cultivation",
+        "experience": "15 years specializing in premium spice production with export quality",
+        "rating": 4.9
+      },
+      {
+        "id": "INV-091",
+        "name": "Spice Trade International",
+        "role": "investor",
+        "email": "invest@spicetrade.com",
+        "phone": "+94 11 567 8901",
+        "image": "https://images.unsplash.com/photo-1556157382-97eda2d62296?w=150",
+        "location": "Colombo, Western Province",
+        "coordinates": "6.9271, 79.8612",
+        "specialization": "Premium Spice Export & Investment",
+        "experience": "12 years in global spice trade with guaranteed buyback agreements",
+        "rating": 4.8
+      },
+      {
+        "id": "LND-067",
+        "name": "Kumara Holdings",
+        "role": "landowner",
+        "email": "contact@kumaraholdings.lk",
+        "phone": "+94 77 678 9012",
+        "image": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
+        "location": "Matale, Central Province",
+        "coordinates": "7.4698, 80.6256",
+        "specialization": "Spice Garden Land Management",
+        "experience": "20 years managing premium spice cultivation lands in Matale region",
+        "rating": 4.7
       }
     ]
   }
