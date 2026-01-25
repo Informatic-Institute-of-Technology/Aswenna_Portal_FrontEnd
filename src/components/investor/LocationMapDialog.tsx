@@ -724,7 +724,10 @@ const LocationMapDialog = ({
                     <TableCell sx={{ color: 'white' }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                         <Avatar 
-                          src={member.image}
+                          src={member.role === 'investor' && !member.image 
+                            ? "https://media.licdn.com/dms/image/v2/D5603AQF7Qr6f1Gapug/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1704052697627?e=2147483647&v=beta&t=5lFwZUSaC8-lmnuNau2_IiprSNOENhJuVwTbRH6Q5mU"
+                            : member.image
+                          }
                           sx={{ bgcolor: getRoleColor(member.role), width: 40, height: 40 }}
                         >
                           {member.name.charAt(0)}

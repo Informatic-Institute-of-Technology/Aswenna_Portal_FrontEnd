@@ -814,10 +814,9 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                   />
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                     <Avatar 
-                      sx={{ width: 56, height: 56, bgcolor: '#2196f3', border: '2px solid #2196f3' }}
-                    >
-                      <Person />
-                    </Avatar>
+                      src="https://media.licdn.com/dms/image/v2/D5603AQF7Qr6f1Gapug/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1704052697627?e=2147483647&v=beta&t=5lFwZUSaC8-lmnuNau2_IiprSNOENhJuVwTbRH6Q5mU"
+                      sx={{ width: 56, height: 56, border: '2px solid #2196f3' }}
+                    />
                     <Box>
                       <Typography variant="h6" color="white" fontWeight={600}>
                         {user?.fullName || user?.firstName || 'You'}
@@ -1434,7 +1433,6 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
           </Box>
         )}
 
-        {/* Team Members Tab */}
         {activeTab === 3 && (
           <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
@@ -1462,7 +1460,6 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
             </Box>
             {project.partyMembers && project.partyMembers.length > 0 ? (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                {/* Current User as Investor */}
                 <Box 
                   sx={{ 
                     p: 3, 
@@ -1473,10 +1470,9 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                 >
                   <Box sx={{ display: 'flex', gap: 3 }}>
                     <Avatar 
-                      sx={{ width: 80, height: 80, border: '3px solid #2196f3', bgcolor: '#2196f3' }}
-                    >
-                      <Person sx={{ fontSize: 40 }} />
-                    </Avatar>
+                      src="https://media.licdn.com/dms/image/v2/D5603AQF7Qr6f1Gapug/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1704052697627?e=2147483647&v=beta&t=5lFwZUSaC8-lmnuNau2_IiprSNOENhJuVwTbRH6Q5mU"
+                      sx={{ width: 80, height: 80, border: '3px solid #2196f3' }}
+                    />
                     <Box sx={{ flex: 1 }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
                         <Typography variant="h6" color="white" fontWeight={600}>
