@@ -1,3 +1,4 @@
+import { useAuth } from '@/Context/useAuth';
 import { AccessTime, CalendarToday, CheckCircle, Close, Email, ExpandLess, ExpandMore, LocationOn, Person, Phone, WarningAmber } from '@mui/icons-material';
 import {
     Avatar,
@@ -15,12 +16,10 @@ import {
     Tabs,
     Typography,
 } from '@mui/material';
-import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
+import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
 import { useMemo, useState } from 'react';
 import LocationMapDialog from './LocationMapDialog';
 import type { OfferCardProps } from './OfferCard';
-
-const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 interface ProjectDetailsDialogProps {
   open: boolean;
@@ -31,11 +30,14 @@ interface ProjectDetailsDialogProps {
 const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogProps) => {
   const [activeTab, setActiveTab] = useState(0);
   const [mapDialogOpen, setMapDialogOpen] = useState(false);
-  const [budgetExpanded, setBudgetExpanded] = useState(false);
+  const { user } = useAuth();
 
-  const { isLoaded } = useJsApiLoader({
+  const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  const { isLoaded } = useLoadScript({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+    id: 'google-map-script', // Same ID as LocationMapDialog to share loading
   });
+  const [budgetExpanded, setBudgetExpanded] = useState(false);
 
   const calculatedBudgetBreakdown = useMemo(() => {
     if (!project || !project.financialBreakdown || project.financialBreakdown.length === 0) return [];
@@ -564,7 +566,7 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                                           Net Income:
                                         </Typography>
                                         <Typography variant="h6" color="#76c043" fontWeight={700} sx={{ fontSize: '1.1rem' }}>
-                                          {formatCurrency(project.earnedCommission - project.investorAmount)}
+                                          {formatCurrency(project.earnedCommission + project.investorAmount)}
                                         </Typography>
                                         <Typography variant="caption" color="rgba(255,255,255,0.4)" sx={{ fontStyle: 'italic', ml: 0.5 }}>
                                           (after investment)
@@ -818,10 +820,10 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                     </Avatar>
                     <Box>
                       <Typography variant="h6" color="white" fontWeight={600}>
-                        {project.investorName || 'You'}
+                        {user?.fullName || user?.firstName || 'You'}
                       </Typography>
                       <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                        ID: {project.investorId || 'INV-067'}
+                        ID: {user?._id ? `INV-${user._id.slice(-6).toUpperCase()}` : 'INV-USER'}
                       </Typography>
                     </Box>
                   </Box>
@@ -869,6 +871,7 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                   📍 Location Details
                 </Typography>
                 <Box sx={{ mt: 2, display: 'flex', gap: 3 }}>
+                  {/* Left side - Location text details */}
                   <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
                     <Box>
                       <Typography variant="caption" color="rgba(255,255,255,0.6)">
@@ -897,79 +900,155 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                       </Box>
                     )}
                   </Box>
+
+                  {/* Right side - Embedded Map */}
                   {project.coordinates && isLoaded && (
-                    <Box sx={{ flex: 1, minWidth: 250 }}>
-                      <Box
-                        sx={{
-                          width: '100%',
-                          height: '100%',
-                          minHeight: 180,
-                          borderRadius: 2,
-                          overflow: 'hidden',
-                          border: '2px solid rgba(255,255,255,0.1)',
-                          '& > div': {
-                            borderRadius: 2,
-                          },
+                    <Box
+                      sx={{
+                        flex: 1,
+                        height: 220,
+                        borderRadius: 2,
+                        overflow: 'hidden',
+                        border: '2px solid rgba(118, 192, 67, 0.3)',
+                      }}
+                    >
+                      <GoogleMap
+                        mapContainerStyle={{ width: '100%', height: '100%' }}
+                        center={{
+                          lat: parseFloat(project.coordinates.split(',')[0]),
+                          lng: parseFloat(project.coordinates.split(',')[1]),
+                        }}
+                        zoom={13}
+                        options={{
+                          styles: [
+                            { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
+                            { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
+                            { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
+                            {
+                              featureType: 'administrative.locality',
+                              elementType: 'labels.text.fill',
+                              stylers: [{ color: '#d59563' }],
+                            },
+                            {
+                              featureType: 'poi',
+                              elementType: 'labels.text.fill',
+                              stylers: [{ color: '#d59563' }],
+                            },
+                            {
+                              featureType: 'poi.park',
+                              elementType: 'geometry',
+                              stylers: [{ color: '#263c3f' }],
+                            },
+                            {
+                              featureType: 'poi.park',
+                              elementType: 'labels.text.fill',
+                              stylers: [{ color: '#6b9a76' }],
+                            },
+                            {
+                              featureType: 'road',
+                              elementType: 'geometry',
+                              stylers: [{ color: '#38414e' }],
+                            },
+                            {
+                              featureType: 'road',
+                              elementType: 'geometry.stroke',
+                              stylers: [{ color: '#212a37' }],
+                            },
+                            {
+                              featureType: 'road',
+                              elementType: 'labels.text.fill',
+                              stylers: [{ color: '#9ca5b3' }],
+                            },
+                            {
+                              featureType: 'road.highway',
+                              elementType: 'geometry',
+                              stylers: [{ color: '#746855' }],
+                            },
+                            {
+                              featureType: 'road.highway',
+                              elementType: 'geometry.stroke',
+                              stylers: [{ color: '#1f2835' }],
+                            },
+                            {
+                              featureType: 'road.highway',
+                              elementType: 'labels.text.fill',
+                              stylers: [{ color: '#f3d19c' }],
+                            },
+                            {
+                              featureType: 'transit',
+                              elementType: 'geometry',
+                              stylers: [{ color: '#2f3948' }],
+                            },
+                            {
+                              featureType: 'transit.station',
+                              elementType: 'labels.text.fill',
+                              stylers: [{ color: '#d59563' }],
+                            },
+                            {
+                              featureType: 'water',
+                              elementType: 'geometry',
+                              stylers: [{ color: '#17263c' }],
+                            },
+                            {
+                              featureType: 'water',
+                              elementType: 'labels.text.fill',
+                              stylers: [{ color: '#515c6d' }],
+                            },
+                            {
+                              featureType: 'water',
+                              elementType: 'labels.text.stroke',
+                              stylers: [{ color: '#17263c' }],
+                            },
+                          ],
+                          disableDefaultUI: false,
+                          zoomControl: true,
+                          mapTypeControl: false,
+                          streetViewControl: false,
+                          fullscreenControl: true,
                         }}
                       >
-                        <GoogleMap
-                          mapContainerStyle={{ width: '100%', height: '100%' }}
-                          center={{
-                            lat: parseFloat(project.coordinates.split(',')[0].trim()),
-                            lng: parseFloat(project.coordinates.split(',')[1].trim()),
+                        <Marker
+                          position={{
+                            lat: parseFloat(project.coordinates.split(',')[0]),
+                            lng: parseFloat(project.coordinates.split(',')[1]),
                           }}
-                          zoom={12}
-                          options={{
-                            disableDefaultUI: true,
-                            zoomControl: true,
-                            mapTypeControl: false,
-                            streetViewControl: false,
-                            fullscreenControl: false,
-                            styles: [
-                              {
-                                featureType: 'all',
-                                elementType: 'geometry',
-                                stylers: [{ color: '#242f3e' }],
-                              },
-                              {
-                                featureType: 'all',
-                                elementType: 'labels.text.stroke',
-                                stylers: [{ color: '#242f3e' }],
-                              },
-                              {
-                                featureType: 'all',
-                                elementType: 'labels.text.fill',
-                                stylers: [{ color: '#746855' }],
-                              },
-                              {
-                                featureType: 'water',
-                                elementType: 'geometry',
-                                stylers: [{ color: '#17263c' }],
-                              },
-                            ],
+                          icon={{
+                            path: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z',
+                            fillColor: '#76c043',
+                            fillOpacity: 1,
+                            strokeWeight: 2,
+                            strokeColor: '#ffffff',
+                            scale: 2,
                           }}
-                        >
-                          <Marker
-                            position={{
-                              lat: parseFloat(project.coordinates.split(',')[0].trim()),
-                              lng: parseFloat(project.coordinates.split(',')[1].trim()),
-                            }}
-                            icon={{
-                              url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-                                <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60">
-                                  <circle cx="30" cy="30" r="28" fill="#115313" stroke="white" stroke-width="3"/>
-                                  <text x="30" y="42" font-size="32" text-anchor="middle" fill="white">${project.cropIcon}</text>
-                                </svg>
-                              `)}`,
-                              scaledSize: new google.maps.Size(50, 50),
-                              anchor: new google.maps.Point(25, 25),
-                            }}
-                          />
-                        </GoogleMap>
-                      </Box>
+                        />
+                      </GoogleMap>
                     </Box>
                   )}
                 </Box>
+                
+                {/* Button below both sections */}
+                {project.coordinates && (
+                  <Button
+                    variant="outlined"
+                    fullWidth
+                    startIcon={<LocationOn />}
+                    onClick={() => setMapDialogOpen(true)}
+                    sx={{
+                      mt: 2,
+                      borderColor: '#76c043',
+                      color: '#76c043',
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      py: 1.5,
+                      '&:hover': {
+                        borderColor: '#6ba83c',
+                        bgcolor: 'rgba(118, 192, 67, 0.1)',
+                      },
+                    }}
+                  >
+                    View All Party Locations
+                  </Button>
+                )}
               </Box>
 
               {/* Risk Assessment */}
@@ -1379,6 +1458,84 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
             </Box>
             {project.partyMembers && project.partyMembers.length > 0 ? (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                {/* Current User as Investor */}
+                <Box 
+                  sx={{ 
+                    p: 3, 
+                    bgcolor: 'rgba(33, 150, 243, 0.05)', 
+                    borderRadius: 2, 
+                    border: '2px solid rgba(33, 150, 243, 0.3)'
+                  }}
+                >
+                  <Box sx={{ display: 'flex', gap: 3 }}>
+                    <Avatar 
+                      sx={{ width: 80, height: 80, border: '3px solid #2196f3', bgcolor: '#2196f3' }}
+                    >
+                      <Person sx={{ fontSize: 40 }} />
+                    </Avatar>
+                    <Box sx={{ flex: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                        <Typography variant="h6" color="white" fontWeight={600}>
+                          {user?.fullName || user?.firstName || 'You'}
+                        </Typography>
+                        <Chip 
+                          label="INVESTOR (YOU)" 
+                          size="small"
+                          sx={{ 
+                            bgcolor: '#2196f3',
+                            color: 'white',
+                            fontWeight: 600
+                          }}
+                        />
+                      </Box>
+                      <Typography variant="body2" color="rgba(255,255,255,0.7)" sx={{ mb: 2 }}>
+                        ID: {user?._id ? `INV-${user._id.slice(-6).toUpperCase()}` : 'INV-USER'}
+                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 4, mb: 2 }}>
+                        {user?.email && (
+                          <Box>
+                            <Typography variant="caption" color="rgba(255,255,255,0.6)" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <Email sx={{ fontSize: 14 }} /> EMAIL
+                            </Typography>
+                            <Typography variant="body2" color="white">
+                              {user.email}
+                            </Typography>
+                          </Box>
+                        )}
+                        {user?.phoneNumber && (
+                          <Box>
+                            <Typography variant="caption" color="rgba(255,255,255,0.6)" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <Phone sx={{ fontSize: 14 }} /> PHONE
+                            </Typography>
+                            <Typography variant="body2" color="white">
+                              {user.phoneNumber}
+                            </Typography>
+                          </Box>
+                        )}
+                        {user?.address && (
+                          <Box>
+                            <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                              LOCATION
+                            </Typography>
+                            <Typography variant="body2" color="white">
+                              {user.address}
+                            </Typography>
+                          </Box>
+                        )}
+                      </Box>
+                      <Box>
+                        <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                          ROLE
+                        </Typography>
+                        <Typography variant="body2" color="white">
+                          Primary Investor - Agricultural Investment Portfolio
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                </Box>
+
+                {/* Other Team Members */}
                 {project.partyMembers.map((member) => (
                   <Box 
                     key={member.id}

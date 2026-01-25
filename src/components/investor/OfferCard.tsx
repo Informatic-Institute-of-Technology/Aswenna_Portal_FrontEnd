@@ -1,4 +1,4 @@
-import { LocationOn, Visibility } from '@mui/icons-material';
+import { Agriculture, Landscape, LocationOn, Visibility } from '@mui/icons-material';
 import {
     Avatar,
     Box,
@@ -118,8 +118,22 @@ const OfferCard = ({
     startDate,
     endDate,
     backgroundImage,
+    landownerName,
+    investmentType,
+    earnedCommission,
+    investorAmount,
     onViewDetails,
 }: OfferCardProps) => {
+    // Auto-calculate ROI based on investment type
+    const calculatedROI = useMemo(() => {
+        // For commission-based projects: ROI = (earnedCommission / investorAmount) × 100
+        if (investmentType === 'commission' && investorAmount && earnedCommission !== undefined) {
+            return Math.round((earnedCommission / investorAmount) * 100);
+        }
+        // For harvest-based or if no calculation possible, use provided expectedROI
+        return expectedROI;
+    }, [investmentType, earnedCommission, investorAmount, expectedROI]);
+
     // Auto-calculate progress if not provided
     const calculatedProgress = useMemo(() => {
         if (progress !== undefined) return progress;
@@ -446,10 +460,10 @@ const OfferCard = ({
                             }}
                         >
                             <Typography variant="caption" sx={{ color: '#808080', textTransform: 'uppercase' }}>
-                                Expected ROI
+                                {investmentType === 'commission' ? 'Calculated ROI' : 'Expected ROI'}
                             </Typography>
                             <Typography variant="h6" sx={{ fontWeight: 700, color: '#4caf50', fontSize: '1rem' }}>
-                                {expectedROI}%
+                                {calculatedROI}%
                             </Typography>
                         </Box>
                     </div>
@@ -481,55 +495,158 @@ const OfferCard = ({
                     </Box>
                 )}
 
-                {/* Farmer Section */}
                 <Box
                     sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1.5,
                         pt: 2,
                         borderTop: '1px solid rgba(255, 255, 255, 0.05)',
                     }}
                 >
-                    <Avatar
-                        src={farmerImage}
-                        alt={farmerName}
+                    <Box
                         sx={{
-                            width: 40,
-                            height: 40,
-                            border: '2px solid',
-                            borderColor: 'primary.main',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1.5,
+                            mb: landownerName ? 1.5 : 0,
                         }}
-                    />
-                    <Box sx={{ flex: 1 }}>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                            {farmerName}
-                        </Typography>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            <LocationOn sx={{ fontSize: 14, color: '#808080' }} />
-                            <Typography variant="caption" color="text.secondary">
-                                {location}
-                            </Typography>
+                    >
+                        <Box sx={{ position: 'relative' }}>
+                            <Avatar
+                                src={farmerImage}
+                                alt={farmerName}
+                                sx={{
+                                    width: 40,
+                                    height: 40,
+                                    border: '2px solid',
+                                    borderColor: '#76c043',
+                                }}
+                            />
+                            <Box
+                                sx={{
+                                    position: 'absolute',
+                                    bottom: -2,
+                                    right: -2,
+                                    width: 18,
+                                    height: 18,
+                                    bgcolor: '#76c043',
+                                    borderRadius: '50%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    border: '2px solid #1f1f1f',
+                                }}
+                            >
+                                <Agriculture sx={{ fontSize: 12, color: 'white' }} />
+                            </Box>
                         </Box>
+                        <Box sx={{ flex: 1 }}>
+                            <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.85rem' }}>
+                                {farmerName}
+                            </Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <Typography variant="caption" sx={{ color: '#76c043', fontSize: '0.7rem' }}>
+                                    Farmer
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: '#666' }}>
+                                    •
+                                </Typography>
+                                <LocationOn sx={{ fontSize: 12, color: '#808080' }} />
+                                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                                    {location}
+                                </Typography>
+                            </Box>
+                        </Box>
+                        {!landownerName && (
+                            <Tooltip title="View Details">
+                                <IconButton
+                                    size="small"
+                                    onClick={() => onViewDetails?.(id)}
+                                    sx={{
+                                        color: 'primary.main',
+                                        '&:hover': {
+                                            backgroundColor: 'rgba(107, 142, 35, 0.1)',
+                                        },
+                                    }}
+                                >
+                                    <Visibility fontSize="small" />
+                                </IconButton>
+                            </Tooltip>
+                        )}
                     </Box>
-                    <Tooltip title="View Details">
-                        <IconButton
-                            size="small"
-                            onClick={() => onViewDetails?.(id)}
+
+                    {landownerName && (
+                        <Box
                             sx={{
-                                color: 'primary.main',
-                                '&:hover': {
-                                    backgroundColor: 'rgba(107, 142, 35, 0.1)',
-                                },
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1.5,
                             }}
                         >
-                            <Visibility fontSize="small" />
-                        </IconButton>
-                    </Tooltip>
+                            <Box sx={{ position: 'relative' }}>
+                                <Avatar
+                                    sx={{
+                                        width: 40,
+                                        height: 40,
+                                        border: '2px solid',
+                                        borderColor: '#ff9800',
+                                        bgcolor: 'rgba(255, 152, 0, 0.2)',
+                                    }}
+                                >
+                                    <Landscape sx={{ fontSize: 20, color: '#ff9800' }} />
+                                </Avatar>
+                                <Box
+                                    sx={{
+                                        position: 'absolute',
+                                        bottom: -2,
+                                        right: -2,
+                                        width: 18,
+                                        height: 18,
+                                        bgcolor: '#ff9800',
+                                        borderRadius: '50%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        border: '2px solid #1f1f1f',
+                                    }}
+                                >
+                                    <Landscape sx={{ fontSize: 10, color: 'white' }} />
+                                </Box>
+                            </Box>
+                            <Box sx={{ flex: 1 }}>
+                                <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.85rem' }}>
+                                    {landownerName}
+                                </Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                    <Typography variant="caption" sx={{ color: '#ff9800', fontSize: '0.7rem' }}>
+                                        Landowner
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ color: '#666' }}>
+                                        •
+                                    </Typography>
+                                    <LocationOn sx={{ fontSize: 12, color: '#808080' }} />
+                                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                                        {location}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                            <Tooltip title="View Details">
+                                <IconButton
+                                    size="small"
+                                    onClick={() => onViewDetails?.(id)}
+                                    sx={{
+                                        color: 'primary.main',
+                                        '&:hover': {
+                                            backgroundColor: 'rgba(107, 142, 35, 0.1)',
+                                        },
+                                    }}
+                                >
+                                    <Visibility fontSize="small" />
+                                </IconButton>
+                            </Tooltip>
+                        </Box>
+                    )}
                 </Box>
             </CardContent>
 
-            {/* Date Footer */}
             <Box
                 className="row g-0"
                 sx={{

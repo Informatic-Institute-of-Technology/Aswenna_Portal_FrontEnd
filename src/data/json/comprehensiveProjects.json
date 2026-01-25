@@ -215,19 +215,6 @@
         "rating": 4.8
       },
       {
-        "id": "INV-067",
-        "name": "Smart Agri Investments",
-        "role": "investor",
-        "email": "investments@smartagri.lk",
-        "phone": "+94 11 234 5678",
-        "image": "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150",
-        "location": "Colombo, Western Province",
-        "coordinates": "6.9271, 79.8612",
-        "specialization": "Agricultural Investment & Crop Finance",
-        "experience": "8 years in agri-business funding, portfolio of 50+ successful projects",
-        "rating": 4.9
-      },
-      {
         "id": "LND-019",
         "name": "Perera Estates",
         "role": "landowner",
@@ -415,19 +402,6 @@
         "specialization": "Organic Vegetable Cultivation (EU & USDA Certified)",
         "experience": "12 years in organic farming, winner of National Organic Farmer Award 2024",
         "rating": 4.9
-      },
-      {
-        "id": "INV-082",
-        "name": "Green Valley Investors",
-        "role": "investor",
-        "email": "invest@greenvalley.lk",
-        "phone": "+94 11 345 6789",
-        "image": "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150",
-        "location": "Kandy, Central Province",
-        "coordinates": "7.2906, 80.6337",
-        "specialization": "Sustainable Agriculture & Organic Farming Investment",
-        "experience": "10 years funding organic projects, 95% success rate",
-        "rating": 4.8
       },
       {
         "id": "LND-045",
@@ -627,19 +601,6 @@
         "rating": 4.8
       },
       {
-        "id": "INV-067",
-        "name": "Smart Agri Investments",
-        "role": "investor",
-        "email": "invest@smartagri.lk",
-        "phone": "+94 11 234 5678",
-        "image": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150",
-        "location": "Colombo, Western Province",
-        "coordinates": "6.9271, 79.8612",
-        "specialization": "Agricultural Technology Investment",
-        "experience": "8 years funding agritech projects, 92% ROI success",
-        "rating": 4.7
-      },
-      {
         "id": "LND-054",
         "name": "Silva Estates",
         "role": "landowner",
@@ -832,19 +793,6 @@
         "specialization": "Ceylon Cinnamon & Black Pepper Cultivation",
         "experience": "15 years specializing in premium spice production with export quality",
         "rating": 4.9
-      },
-      {
-        "id": "INV-091",
-        "name": "Spice Trade International",
-        "role": "investor",
-        "email": "invest@spicetrade.com",
-        "phone": "+94 11 567 8901",
-        "image": "https://images.unsplash.com/photo-1556157382-97eda2d62296?w=150",
-        "location": "Colombo, Western Province",
-        "coordinates": "6.9271, 79.8612",
-        "specialization": "Premium Spice Export & Investment",
-        "experience": "12 years in global spice trade with guaranteed buyback agreements",
-        "rating": 4.8
       },
       {
         "id": "LND-067",
