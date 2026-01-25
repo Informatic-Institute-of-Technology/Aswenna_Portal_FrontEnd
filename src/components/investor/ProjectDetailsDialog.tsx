@@ -1,5 +1,5 @@
 import { useAuth } from '@/Context/useAuth';
-import { AccessTime, CalendarToday, CheckCircle, Close, Email, ExpandLess, ExpandMore, LocationOn, Person, Phone, WarningAmber } from '@mui/icons-material';
+import { AccessTime, Agriculture, AttachMoney, BusinessCenter, CalendarToday, CheckCircle, Close, Email, ExpandLess, ExpandMore, LocationOn, Payment, Person, Phone, Star, WarningAmber } from '@mui/icons-material';
 import {
     Avatar,
     Box,
@@ -423,8 +423,8 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
 
             <Box sx={{ display: 'flex', gap: 3, mb: 3 }}>
               <Box sx={{ flex: 1, p: 3, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
-                <Typography variant="h6" color="white" gutterBottom fontWeight={600}>
-                  💰 Financial Summary
+                <Typography variant="h6" color="white" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <AttachMoney /> Financial Summary
                 </Typography>
                 <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
                   <Box>
@@ -489,7 +489,8 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
                           {/* Investment Type Badge */}
                           <Chip 
-                            label={project.investmentType === 'harvest' ? '🌾 Harvest-Based' : '💼 Commission-Based'}
+                            icon={project.investmentType === 'harvest' ? <Agriculture sx={{ fontSize: 18 }} /> : <BusinessCenter sx={{ fontSize: 18 }} />}
+                            label={project.investmentType === 'harvest' ? 'Harvest-Based' : 'Commission-Based'}
                             size="small"
                             sx={{ 
                               bgcolor: project.investmentType === 'harvest' ? 'rgba(76, 175, 80, 0.2)' : 'rgba(33, 150, 243, 0.2)',
@@ -768,7 +769,7 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
 
             <Box sx={{ mb: 3, p: 3, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
               <Typography variant="h6" color="white" gutterBottom fontWeight={600}>
-                🤝 Tri-Party Agreement Members
+                Tri-Party Agreement Members
               </Typography>
               <Box sx={{ display: 'flex', gap: 3, mt: 3 }}>
                 <Box sx={{ flex: 1, p: 2, bgcolor: 'rgba(118, 192, 67, 0.05)', borderRadius: 2, border: '1px solid rgba(118, 192, 67, 0.3)' }}>
@@ -796,8 +797,8 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                       </Typography>
                     </Box>
                   </Box>
-                  <Typography variant="body2" color="rgba(255,255,255,0.7)">
-                    📍 {project.location}
+                  <Typography variant="body2" color="rgba(255,255,255,0.7)" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <LocationOn sx={{ fontSize: 16 }} /> {project.location}
                   </Typography>
                 </Box>
 
@@ -826,8 +827,8 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                       </Typography>
                     </Box>
                   </Box>
-                  <Typography variant="body2" color="rgba(255,255,255,0.7)">
-                    💼 Primary Investor
+                  <Typography variant="body2" color="rgba(255,255,255,0.7)" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <BusinessCenter sx={{ fontSize: 16 }} /> Primary Investor
                   </Typography>
                 </Box>
 
@@ -866,8 +867,8 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
 
             <Box sx={{ display: 'flex', gap: 3 }}>
               <Box sx={{ flex: 1, p: 3, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
-                <Typography variant="h6" color="white" gutterBottom fontWeight={600}>
-                  📍 Location Details
+                <Typography variant="h6" color="white" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <LocationOn /> Location Details
                 </Typography>
                 <Box sx={{ mt: 2, display: 'flex', gap: 3 }}>
                   {/* Left side - Location text details */}
@@ -1307,8 +1308,8 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
             {/* Payment Schedule */}
             {project.payments && project.payments.length > 0 ? (
               <Box>
-                <Typography variant="h6" color="white" gutterBottom fontWeight={600} sx={{ mb: 2 }}>
-                  📅 Payment Installments
+                <Typography variant="h6" color="white" gutterBottom fontWeight={600} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Payment /> Payment Installments
                 </Typography>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   {project.payments.map((payment) => {
@@ -1394,7 +1395,7 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                       <Box sx={{ flex: 1 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
                           <Typography variant="body1" color="white" fontWeight={600}>
-                            💰 Total Income (Commission + Investment Return)
+                            <AttachMoney sx={{ fontSize: 18, verticalAlign: 'middle', mr: 0.5 }} /> Total Income (Commission + Investment Return)
                           </Typography>
                           <Chip 
                             label={`${project.commissionRate}% COMMISSION`}
@@ -1567,8 +1568,9 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                           />
                           {member.rating && (
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <Star sx={{ fontSize: 16, color: '#ffc107' }} />
                               <Typography variant="body2" color="#ffa726">
-                                ⭐ {member.rating.toFixed(1)}
+                                {member.rating.toFixed(1)}
                               </Typography>
                             </Box>
                           )}

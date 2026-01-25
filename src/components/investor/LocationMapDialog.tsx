@@ -1,5 +1,5 @@
 import { useAuth } from '@/Context/useAuth';
-import { Close, LocationOn } from '@mui/icons-material';
+import { Agriculture, Close, Email, LocationOn, Map as MapIcon, Phone, Place, Public, Star } from '@mui/icons-material';
 import {
     Avatar,
     Box,
@@ -573,8 +573,9 @@ const LocationMapDialog = ({
             >
               <Box sx={{ p: 1, minWidth: 250 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                  <Agriculture sx={{ color: 'green', fontSize: 20 }} />
                   <Typography variant="subtitle1" fontWeight={600} color="text.primary">
-                    🌾 Project Location
+                    Project Location
                   </Typography>
                   <Chip 
                     label="ACTIVE PROJECT" 
@@ -587,17 +588,17 @@ const LocationMapDialog = ({
                     }}
                   />
                 </Box>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                  📍 {projectLocation}
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <LocationOn sx={{ fontSize: 16 }} /> {projectLocation}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                  🏛️ District: {district}
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <Public sx={{ fontSize: 16 }} /> District: {district}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                  🗺️ Province: {province}
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <MapIcon sx={{ fontSize: 16 }} /> Province: {province}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" fontWeight={600}>
-                  📌 GPS: {coordinates}
+                <Typography variant="body2" color="text.secondary" fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <Place sx={{ fontSize: 16 }} /> GPS: {coordinates}
                 </Typography>
               </Box>
             </InfoWindow>
@@ -626,29 +627,29 @@ const LocationMapDialog = ({
                   />
                 </Box>
                 {selectedMember.rating && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                    ⭐ Rating: {selectedMember.rating.toFixed(1)}/5.0
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Star sx={{ fontSize: 16, color: '#ffc107' }} /> Rating: {selectedMember.rating.toFixed(1)}/5.0
                   </Typography>
                 )}
                 {selectedMember.location && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                    📍 {selectedMember.location}
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <LocationOn sx={{ fontSize: 16 }} /> {selectedMember.location}
                   </Typography>
                 )}
                 {selectedMember.coordinates && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, fontSize: '0.75rem' }}>
-                    📌 GPS: {selectedMember.coordinates}
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Place sx={{ fontSize: 14 }} /> GPS: {selectedMember.coordinates}
                   </Typography>
                 )}
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                  📧 {selectedMember.email}
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <Email sx={{ fontSize: 16 }} /> {selectedMember.email}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  📞 {selectedMember.phone}
+                <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <Phone sx={{ fontSize: 16 }} /> {selectedMember.phone}
                 </Typography>
                 {selectedMember.specialization && (
                   <Typography variant="body2" color="text.secondary" sx={{ mt: 1, fontStyle: 'italic' }}>
-                    💼 {selectedMember.specialization}
+                    {selectedMember.specialization}
                   </Typography>
                 )}
               </Box>
@@ -679,7 +680,7 @@ const LocationMapDialog = ({
                   <TableCell sx={{ color: 'white' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                       <Avatar sx={{ bgcolor: getRoleColor('project'), width: 40, height: 40 }}>
-                        🌾
+                        <Agriculture />
                       </Avatar>
                       <Typography variant="body2" fontWeight={600}>
                         Project Site

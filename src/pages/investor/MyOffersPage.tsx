@@ -1,7 +1,7 @@
 import { useAuth } from '@/Context/useAuth';
 import DashboardLayout from '@/layouts/DashboardLayout';
 import type { DirectHarvestOffer, SponsorshipOffer } from '@/types/investor.types';
-import { Settings } from '@mui/icons-material';
+import { BarChart, Folder, Settings } from '@mui/icons-material';
 import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import type { OfferCardProps } from '../../components/investor';
@@ -137,7 +137,7 @@ const MyOffersPage = () => {
             }}
           >
             <Typography variant="h4" sx={{ mb: 1, opacity: 0.5 }}>
-              📊
+              <BarChart sx={{ fontSize: 40, opacity: 0.5 }} />
             </Typography>
             <Typography variant="h6" sx={{ mb: 1 }}>
               No Active Projects
@@ -200,7 +200,7 @@ const MyOffersPage = () => {
             }}
           >
             <Typography variant="h4" sx={{ mb: 1, opacity: 0.5 }}>
-              📁
+              <Folder sx={{ fontSize: 40, opacity: 0.5 }} />
             </Typography>
             <Typography variant="h6" sx={{ mb: 1 }}>
               No Past Projects
