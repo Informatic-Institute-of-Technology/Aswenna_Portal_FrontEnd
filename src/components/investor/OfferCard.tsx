@@ -96,6 +96,7 @@ export interface OfferCardProps {
         category: string;
         amount: number;
         percentage?: number; // Optional - auto-calculated on frontend
+        type?: 'expense' | 'commission'; // Optional - filters commission from expenses
     }[];
     onViewDetails?: (id: string) => void;
 }
@@ -138,7 +139,7 @@ const OfferCard = ({
     const calculatedProgress = useMemo(() => {
         if (progress !== undefined) return progress;
         if (!milestones || milestones.length === 0) return 0;
-        
+
         const totalProgress = milestones.reduce((sum, milestone) => sum + milestone.progress, 0);
         return Math.round(totalProgress / milestones.length);
     }, [progress, milestones]);
@@ -320,10 +321,10 @@ const OfferCard = ({
                         />
                         {/* Notification Badge */}
                         {(notificationStatus.hasCritical || notificationStatus.hasWarning) && (
-                            <Tooltip 
+                            <Tooltip
                                 title={
-                                    notificationStatus.hasCritical 
-                                        ? `${notificationStatus.criticalCount} Critical Alert${notificationStatus.criticalCount > 1 ? 's' : ''}` 
+                                    notificationStatus.hasCritical
+                                        ? `${notificationStatus.criticalCount} Critical Alert${notificationStatus.criticalCount > 1 ? 's' : ''}`
                                         : `${notificationStatus.warningCount} Warning${notificationStatus.warningCount > 1 ? 's' : ''}`
                                 }
                                 arrow

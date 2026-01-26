@@ -1,20 +1,20 @@
 import { useAuth } from '@/Context/useAuth';
 import { AccessTime, Agriculture, AttachMoney, BusinessCenter, CalendarToday, CheckCircle, Close, Email, ExpandLess, ExpandMore, LocationOn, Payment, Person, Phone, Star, WarningAmber } from '@mui/icons-material';
 import {
-    Avatar,
-    Box,
-    Button,
-    Chip,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Divider,
-    IconButton,
-    LinearProgress,
-    Tab,
-    Tabs,
-    Typography,
+  Avatar,
+  Box,
+  Button,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  IconButton,
+  LinearProgress,
+  Tab,
+  Tabs,
+  Typography,
 } from '@mui/material';
 import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
 import { useMemo, useState } from 'react';
@@ -41,10 +41,17 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
 
   const calculatedBudgetBreakdown = useMemo(() => {
     if (!project || !project.financialBreakdown || project.financialBreakdown.length === 0) return [];
-    
-    const totalBudget = project.financialBreakdown.reduce((sum, item) => sum + item.amount, 0);
-    
-    return project.financialBreakdown
+
+    const filteredBreakdown = project.financialBreakdown.filter(item => {
+      if (item.type) {
+        return item.type === 'expense';
+      }
+      return !item.category.toLowerCase().includes('commission');
+    });
+
+    const totalBudget = filteredBreakdown.reduce((sum, item) => sum + item.amount, 0);
+
+    return filteredBreakdown
       .map(item => ({
         ...item,
         percentage: Math.round((item.amount / totalBudget) * 100 * 100) / 100,
@@ -55,7 +62,13 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
 
   const calculatedFinancials = useMemo(() => {
     if (!project || !project.payments || project.payments.length === 0) {
-      const budget = project?.financialBreakdown?.reduce((sum, item) => sum + item.amount, 0) || 0;
+      const filteredBreakdown = project?.financialBreakdown?.filter(item => {
+        if (item.type) {
+          return item.type === 'expense';
+        }
+        return !item.category.toLowerCase().includes('commission');
+      });
+      const budget = filteredBreakdown?.reduce((sum, item) => sum + item.amount, 0) || 0;
       return { budget, disbursed: 0, remaining: budget };
     }
 
@@ -151,7 +164,7 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
         else if (payment.status === 'paid' && payment.paidDate) {
           const paidDate = new Date(payment.paidDate);
           const daysSincePaid = Math.ceil((today.getTime() - paidDate.getTime()) / (1000 * 60 * 60 * 24));
-          
+
           if (daysSincePaid <= 7) {
             notifs.push({
               id: `paid-${payment.id}`,
@@ -198,7 +211,7 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
         else if (milestone.status === 'completed' && milestone.completedDate) {
           const completedDate = new Date(milestone.completedDate);
           const daysSinceCompleted = Math.ceil((today.getTime() - completedDate.getTime()) / (1000 * 60 * 60 * 24));
-          
+
           if (daysSinceCompleted <= 7) {
             notifs.push({
               id: `completed-${milestone.id}`,
@@ -224,9 +237,9 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
   }, [project]);
 
   const getCategoryColor = (index: number, percentage: number) => {
-    if (percentage >= 20) return '#ef5350'; 
-    if (percentage >= 15) return '#ffa726'; 
-    if (percentage >= 10) return '#66bb6a'; 
+    if (percentage >= 20) return '#ef5350';
+    if (percentage >= 15) return '#ffa726';
+    if (percentage >= 10) return '#66bb6a';
     return `hsl(${120 + index * 25}, 60%, 55%)`;
   };
 
@@ -314,1381 +327,1384 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
 
   return (
     <>
-    <Dialog 
-      open={open} 
-      onClose={onClose}
-      maxWidth="xl"
-      fullWidth
-      PaperProps={{
-        sx: {
-          borderRadius: '16px',
-          background: '#1a1a1a',
-          maxHeight: '95vh',
-        }
-      }}
-    >
-      <DialogTitle sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'flex-start',
-        pb: 1,
-        pt: 3,
-        px: 3
-      }}>
-        <Box>
-          <Typography variant="h4" fontWeight={700} color="white" gutterBottom>
-            {project.projectName}
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-            <Typography variant="body2" color="rgba(255,255,255,0.6)">
-              {project.projectId || `PRJ-${project.id}`}
-            </Typography>
-            <Chip 
-              label={project.status.toUpperCase()} 
-              size="small"
-              sx={{ 
-                bgcolor: project.status === 'active' ? '#76c043' : project.status === 'completed' ? '#2196f3' : '#ffa726',
-                color: 'white',
-                fontWeight: 600
-              }}
-            />
-            <Typography variant="body2" color="rgba(255,255,255,0.6)">
-              <CalendarToday sx={{ fontSize: 14, mr: 0.5, verticalAlign: 'middle' }} />
-              Started {formatDate(project.startDate)}
-            </Typography>
-          </Box>
-        </Box>
-        <IconButton onClick={onClose} sx={{ color: 'white' }}>
-          <Close />
-        </IconButton>
-      </DialogTitle>
-
-      <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)' }} />
-
-      {/* Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: 'rgba(255,255,255,0.1)', px: 3 }}>
-        <Tabs 
-          value={activeTab} 
-          onChange={(_, newValue) => setActiveTab(newValue)}
-          textColor="inherit"
-          TabIndicatorProps={{
-            sx: { bgcolor: '#76c043' }
-          }}
-        >
-          <Tab label="Overview" sx={{ color: 'rgba(255,255,255,0.7)', '&.Mui-selected': { color: 'white' } }} />
-          <Tab label="Milestones & Progress" sx={{ color: 'rgba(255,255,255,0.7)', '&.Mui-selected': { color: 'white' } }} />
-          <Tab label="Payments & Finance" sx={{ color: 'rgba(255,255,255,0.7)', '&.Mui-selected': { color: 'white' } }} />
-          <Tab label="Team Members" sx={{ color: 'rgba(255,255,255,0.7)', '&.Mui-selected': { color: 'white' } }} />
-        </Tabs>
-      </Box>
-
-      <DialogContent sx={{ pt: 3, pb: 2, px: 3 }}>
-        {activeTab === 0 && (
+      <Dialog
+        open={open}
+        onClose={onClose}
+        maxWidth="xl"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: '16px',
+            background: '#1a1a1a',
+            maxHeight: '95vh',
+          }
+        }}
+      >
+        <DialogTitle sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          pb: 1,
+          pt: 3,
+          px: 3
+        }}>
           <Box>
-            {calculatedProgress !== undefined && project.status === 'active' && (
-              <Box sx={{ mb: 3, p: 3, bgcolor: 'rgba(118, 192, 67, 0.08)', borderRadius: 2, border: '1px solid rgba(118, 192, 67, 0.2)' }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                  <Box>
-                    <Typography variant="subtitle2" color="rgba(255,255,255,0.7)" gutterBottom>
-                      OVERALL PROJECT PROGRESS
-                    </Typography>
-                    <Typography variant="h4" color="white" fontWeight={700}>
-                      {calculatedProgress}% Complete
-                    </Typography>
-                  </Box>
-                  <Box sx={{ textAlign: 'right' }}>
-                    <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                      Expected Completion
-                    </Typography>
-                    <Typography variant="body1" color="white" fontWeight={600}>
-                      {project.endDate ? formatDate(project.endDate) : 'N/A'}
-                    </Typography>
-                  </Box>
-                </Box>
-                <LinearProgress 
-                  variant="determinate" 
-                  value={calculatedProgress} 
-                  sx={{
-                    height: 12,
-                    borderRadius: 6,
-                    backgroundColor: 'rgba(255,255,255,0.1)',
-                    '& .MuiLinearProgress-bar': {
-                      borderRadius: 6,
-                      backgroundColor: '#76c043',
-                    }
-                  }}
-                />
-              </Box>
-            )}
+            <Typography variant="h4" fontWeight={700} color="white" gutterBottom>
+              {project.projectName}
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <Typography variant="body2" color="rgba(255,255,255,0.6)">
+                {project.projectId || `PRJ-${project.id}`}
+              </Typography>
+              <Chip
+                label={project.status.toUpperCase()}
+                size="small"
+                sx={{
+                  bgcolor: project.status === 'active' ? '#76c043' : project.status === 'completed' ? '#2196f3' : '#ffa726',
+                  color: 'white',
+                  fontWeight: 600
+                }}
+              />
+              <Typography variant="body2" color="rgba(255,255,255,0.6)">
+                <CalendarToday sx={{ fontSize: 14, mr: 0.5, verticalAlign: 'middle' }} />
+                Started {formatDate(project.startDate)}
+              </Typography>
+            </Box>
+          </Box>
+          <IconButton onClick={onClose} sx={{ color: 'white' }}>
+            <Close />
+          </IconButton>
+        </DialogTitle>
 
-            <Box sx={{ display: 'flex', gap: 3, mb: 3 }}>
-              <Box sx={{ flex: 1, p: 3, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
-                <Typography variant="h6" color="white" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <AttachMoney /> Financial Summary
-                </Typography>
-                <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <Box>
-                    <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                      TOTAL INVESTMENT
-                    </Typography>
-                    <Typography variant="h5" color="white" fontWeight={700}>
-                      {formatCurrency(calculatedFinancials.budget)}
-                    </Typography>
-                  </Box>
-                  {calculatedFinancials.disbursed > 0 && (
+        <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)' }} />
+
+        {/* Tabs */}
+        <Box sx={{ borderBottom: 1, borderColor: 'rgba(255,255,255,0.1)', px: 3 }}>
+          <Tabs
+            value={activeTab}
+            onChange={(_, newValue) => setActiveTab(newValue)}
+            textColor="inherit"
+            TabIndicatorProps={{
+              sx: { bgcolor: '#76c043' }
+            }}
+          >
+            <Tab label="Overview" sx={{ color: 'rgba(255,255,255,0.7)', '&.Mui-selected': { color: 'white' } }} />
+            <Tab label="Milestones & Progress" sx={{ color: 'rgba(255,255,255,0.7)', '&.Mui-selected': { color: 'white' } }} />
+            <Tab label="Payments & Finance" sx={{ color: 'rgba(255,255,255,0.7)', '&.Mui-selected': { color: 'white' } }} />
+            <Tab label="Team Members" sx={{ color: 'rgba(255,255,255,0.7)', '&.Mui-selected': { color: 'white' } }} />
+          </Tabs>
+        </Box>
+
+        <DialogContent sx={{ pt: 3, pb: 2, px: 3 }}>
+          {activeTab === 0 && (
+            <Box>
+              {calculatedProgress !== undefined && project.status === 'active' && (
+                <Box sx={{ mb: 3, p: 3, bgcolor: 'rgba(118, 192, 67, 0.08)', borderRadius: 2, border: '1px solid rgba(118, 192, 67, 0.2)' }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                     <Box>
-                      <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                        DISBURSED AMOUNT
+                      <Typography variant="subtitle2" color="rgba(255,255,255,0.7)" gutterBottom>
+                        OVERALL PROJECT PROGRESS
                       </Typography>
-                      <Typography variant="h6" color="#76c043" fontWeight={600}>
-                        {formatCurrency(calculatedFinancials.disbursed)}
-                      </Typography>
-                      <LinearProgress 
-                        variant="determinate" 
-                        value={(calculatedFinancials.disbursed / calculatedFinancials.budget) * 100} 
-                        sx={{
-                          mt: 1,
-                          height: 6,
-                          borderRadius: 3,
-                          backgroundColor: 'rgba(255,255,255,0.1)',
-                          '& .MuiLinearProgress-bar': {
-                            borderRadius: 3,
-                            backgroundColor: '#76c043',
-                          }
-                        }}
-                      />
-                    </Box>
-                  )}
-                  {calculatedFinancials.remaining > 0 && (
-                    <Box>
-                      <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                        REMAINING BALANCE
-                      </Typography>
-                      <Typography variant="h6" color="#ffa726" fontWeight={600}>
-                        {formatCurrency(calculatedFinancials.remaining)}
+                      <Typography variant="h4" color="white" fontWeight={700}>
+                        {calculatedProgress}% Complete
                       </Typography>
                     </Box>
-                  )}
-                  <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)', my: 1 }} />
-                  <Box>
-                    <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                      EXPECTED ROI
-                    </Typography>
-                    <Typography variant="h5" color="#76c043" fontWeight={700}>
-                      {project.expectedROI}%
-                    </Typography>
+                    <Box sx={{ textAlign: 'right' }}>
+                      <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                        Expected Completion
+                      </Typography>
+                      <Typography variant="body1" color="white" fontWeight={600}>
+                        {project.endDate ? formatDate(project.endDate) : 'N/A'}
+                      </Typography>
+                    </Box>
                   </Box>
-                  {/* Investment Type & Commission Info - Inline Display */}
-                  {project.investmentType && (
-                    <>
-                      <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)', my: 1 }} />
+                  <LinearProgress
+                    variant="determinate"
+                    value={calculatedProgress}
+                    sx={{
+                      height: 12,
+                      borderRadius: 6,
+                      backgroundColor: 'rgba(255,255,255,0.1)',
+                      '& .MuiLinearProgress-bar': {
+                        borderRadius: 6,
+                        backgroundColor: '#76c043',
+                      }
+                    }}
+                  />
+                </Box>
+              )}
+
+              <Box sx={{ display: 'flex', gap: 3, mb: 3 }}>
+                <Box sx={{ flex: 1, p: 3, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
+                  <Typography variant="h6" color="white" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <AttachMoney /> Financial Summary
+                  </Typography>
+                  <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Box>
+                      <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                        TOTAL INVESTMENT
+                      </Typography>
+                      <Typography variant="h5" color="white" fontWeight={700}>
+                        {formatCurrency(calculatedFinancials.budget)}
+                      </Typography>
+                    </Box>
+                    {calculatedFinancials.disbursed > 0 && (
                       <Box>
-                        <Typography variant="caption" color="rgba(255,255,255,0.6)" sx={{ mb: 1, display: 'block' }}>
-                          INVESTMENT DETAILS
+                        <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                          DISBURSED AMOUNT
                         </Typography>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-                          {/* Investment Type Badge */}
-                          <Chip 
-                            icon={project.investmentType === 'harvest' ? <Agriculture sx={{ fontSize: 18 }} /> : <BusinessCenter sx={{ fontSize: 18 }} />}
-                            label={project.investmentType === 'harvest' ? 'Harvest-Based' : 'Commission-Based'}
-                            size="small"
-                            sx={{ 
-                              bgcolor: project.investmentType === 'harvest' ? 'rgba(76, 175, 80, 0.2)' : 'rgba(33, 150, 243, 0.2)',
-                              color: project.investmentType === 'harvest' ? '#76c043' : '#2196f3',
-                              fontWeight: 700,
-                              border: `1px solid ${project.investmentType === 'harvest' ? '#76c043' : '#2196f3'}`,
-                              fontSize: '0.8rem',
-                            }}
-                          />
-                          
-                          {/* Commission Rate & Earned Amount - Inline */}
-                          {project.investmentType === 'commission' && project.commissionRate && (
-                            <>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                <Typography variant="caption" color="rgba(255,255,255,0.5)">
-                                  Rate:
-                                </Typography>
-                                <Typography variant="body2" color="#2196f3" fontWeight={700}>
-                                  {project.commissionRate}%
-                                </Typography>
-                              </Box>
-                              
-                              {project.earnedCommission !== undefined && project.earnedCommission > 0 && (
-                                <>
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                    <Typography variant="caption" color="rgba(255,255,255,0.5)">
-                                      •
-                                    </Typography>
-                                    <Box 
-                                      sx={{ 
-                                        bgcolor: 'rgba(33, 150, 243, 0.15)',
-                                        px: 1.5,
-                                        py: 0.5,
-                                        borderRadius: 1,
-                                        border: '1px solid rgba(33, 150, 243, 0.3)',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 0.5,
-                                      }}
-                                    >
-                                      <Typography variant="body2" color="#2196f3" fontWeight={600}>
-                                        Earned:
-                                      </Typography>
-                                      <Typography variant="h6" color="#2196f3" fontWeight={700} sx={{ fontSize: '1.1rem' }}>
-                                        {formatCurrency(project.earnedCommission)}
-                                      </Typography>
-                                      {project.endDate && (
-                                        <Typography variant="caption" color="rgba(255,255,255,0.5)" sx={{ fontStyle: 'italic', ml: 0.5 }}>
-                                          ({project.status === 'active' ? `by ${new Date(project.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}` : 'final'})
-                                        </Typography>
-                                      )}
-                                    </Box>
-                                  </Box>
-                                  
-                                  {/* Net Income Calculation for Commission-Based Projects */}
-                                  {project.investorAmount && (
+                        <Typography variant="h6" color="#76c043" fontWeight={600}>
+                          {formatCurrency(calculatedFinancials.disbursed)}
+                        </Typography>
+                        <LinearProgress
+                          variant="determinate"
+                          value={(calculatedFinancials.disbursed / calculatedFinancials.budget) * 100}
+                          sx={{
+                            mt: 1,
+                            height: 6,
+                            borderRadius: 3,
+                            backgroundColor: 'rgba(255,255,255,0.1)',
+                            '& .MuiLinearProgress-bar': {
+                              borderRadius: 3,
+                              backgroundColor: '#76c043',
+                            }
+                          }}
+                        />
+                      </Box>
+                    )}
+                    {calculatedFinancials.remaining > 0 && (
+                      <Box>
+                        <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                          REMAINING BALANCE
+                        </Typography>
+                        <Typography variant="h6" color="#ffa726" fontWeight={600}>
+                          {formatCurrency(calculatedFinancials.remaining)}
+                        </Typography>
+                      </Box>
+                    )}
+                    <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)', my: 1 }} />
+                    <Box>
+                      <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                        EXPECTED ROI
+                      </Typography>
+                      <Typography variant="h5" color="#76c043" fontWeight={700}>
+                        {project.expectedROI}%
+                      </Typography>
+                    </Box>
+                    {/* Investment Type & Commission Info - Inline Display */}
+                    {project.investmentType && (
+                      <>
+                        <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)', my: 1 }} />
+                        <Box>
+                          <Typography variant="caption" color="rgba(255,255,255,0.6)" sx={{ mb: 1, display: 'block' }}>
+                            INVESTMENT DETAILS
+                          </Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+                            {/* Investment Type Badge */}
+                            <Chip
+                              icon={project.investmentType === 'harvest' ? <Agriculture sx={{ fontSize: 18 }} /> : <BusinessCenter sx={{ fontSize: 18 }} />}
+                              label={project.investmentType === 'harvest' ? 'Harvest-Based' : 'Commission-Based'}
+                              size="small"
+                              sx={{
+                                bgcolor: project.investmentType === 'harvest' ? 'rgba(76, 175, 80, 0.2)' : 'rgba(33, 150, 243, 0.2)',
+                                color: project.investmentType === 'harvest' ? '#76c043' : '#2196f3',
+                                fontWeight: 700,
+                                border: `1px solid ${project.investmentType === 'harvest' ? '#76c043' : '#2196f3'}`,
+                                fontSize: '0.8rem',
+                              }}
+                            />
+
+                            {/* Commission Rate & Earned Amount - Inline */}
+                            {project.investmentType === 'commission' && project.commissionRate && (
+                              <>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <Typography variant="caption" color="rgba(255,255,255,0.5)">
+                                    Rate:
+                                  </Typography>
+                                  <Typography variant="body2" color="#2196f3" fontWeight={700}>
+                                    {project.commissionRate}%
+                                  </Typography>
+                                </Box>
+
+                                {project.earnedCommission !== undefined && project.earnedCommission > 0 && (
+                                  <>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                       <Typography variant="caption" color="rgba(255,255,255,0.5)">
                                         •
                                       </Typography>
-                                      <Box 
-                                        sx={{ 
-                                          bgcolor: 'rgba(76, 175, 80, 0.2)',
+                                      <Box
+                                        sx={{
+                                          bgcolor: 'rgba(33, 150, 243, 0.15)',
                                           px: 1.5,
                                           py: 0.5,
                                           borderRadius: 1,
-                                          border: '1px solid rgba(76, 175, 80, 0.5)',
+                                          border: '1px solid rgba(33, 150, 243, 0.3)',
                                           display: 'flex',
                                           alignItems: 'center',
                                           gap: 0.5,
                                         }}
                                       >
-                                        <Typography variant="body2" color="#76c043" fontWeight={600}>
-                                          Net Income:
+                                        <Typography variant="body2" color="#2196f3" fontWeight={600}>
+                                          Earned:
                                         </Typography>
-                                        <Typography variant="h6" color="#76c043" fontWeight={700} sx={{ fontSize: '1.1rem' }}>
-                                          {formatCurrency(project.earnedCommission + project.investorAmount)}
+                                        <Typography variant="h6" color="#2196f3" fontWeight={700} sx={{ fontSize: '1.1rem' }}>
+                                          {formatCurrency(project.earnedCommission)}
                                         </Typography>
-                                        <Typography variant="caption" color="rgba(255,255,255,0.4)" sx={{ fontStyle: 'italic', ml: 0.5 }}>
-                                          (after investment)
-                                        </Typography>
+                                        {project.endDate && (
+                                          <Typography variant="caption" color="rgba(255,255,255,0.5)" sx={{ fontStyle: 'italic', ml: 0.5 }}>
+                                            ({project.status === 'active' ? `by ${new Date(project.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}` : 'final'})
+                                          </Typography>
+                                        )}
                                       </Box>
                                     </Box>
-                                  )}
-                                </>
-                              )}
-                            </>
-                          )}
+
+                                    {/* Net Income Calculation for Commission-Based Projects */}
+                                    {project.investorAmount && (
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                        <Typography variant="caption" color="rgba(255,255,255,0.5)">
+                                          •
+                                        </Typography>
+                                        <Box
+                                          sx={{
+                                            bgcolor: 'rgba(76, 175, 80, 0.2)',
+                                            px: 1.5,
+                                            py: 0.5,
+                                            borderRadius: 1,
+                                            border: '1px solid rgba(76, 175, 80, 0.5)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 0.5,
+                                          }}
+                                        >
+                                          <Typography variant="body2" color="#76c043" fontWeight={600}>
+                                            Net Income:
+                                          </Typography>
+                                          <Typography variant="h6" color="#76c043" fontWeight={700} sx={{ fontSize: '1.1rem' }}>
+                                            {formatCurrency(project.earnedCommission + project.investorAmount)}
+                                          </Typography>
+                                          <Typography variant="caption" color="rgba(255,255,255,0.4)" sx={{ fontStyle: 'italic', ml: 0.5 }}>
+                                            (after investment)
+                                          </Typography>
+                                        </Box>
+                                      </Box>
+                                    )}
+                                  </>
+                                )}
+                              </>
+                            )}
+                          </Box>
+                        </Box>
+                      </>
+                    )}
+                  </Box>
+                </Box>
+
+                {calculatedMilestones.total > 0 && (
+                  <Box sx={{ flex: 1, p: 3, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <Typography variant="h6" color="white" gutterBottom fontWeight={600}>
+                      🎯 Milestone Status
+                    </Typography>
+                    <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      <Box>
+                        <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                          TOTAL MILESTONES
+                        </Typography>
+                        <Typography variant="h5" color="white" fontWeight={700}>
+                          {calculatedMilestones.total}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
+                        <Box sx={{ flex: 1, p: 2, bgcolor: 'rgba(118, 192, 67, 0.1)', borderRadius: 1 }}>
+                          <Typography variant="caption" color="#76c043">
+                            COMPLETED
+                          </Typography>
+                          <Typography variant="h4" color="#76c043" fontWeight={700}>
+                            {calculatedMilestones.completed}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ flex: 1, p: 2, bgcolor: 'rgba(255, 167, 38, 0.1)', borderRadius: 1 }}>
+                          <Typography variant="caption" color="#ffa726">
+                            PENDING
+                          </Typography>
+                          <Typography variant="h4" color="#ffa726" fontWeight={700}>
+                            {calculatedMilestones.pending + calculatedMilestones.inProgress}
+                          </Typography>
                         </Box>
                       </Box>
-                    </>
-                  )}
-                </Box>
+                      <Box>
+                        <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                          COMPLETION RATE
+                        </Typography>
+                        <LinearProgress
+                          variant="determinate"
+                          value={(calculatedMilestones.completed / calculatedMilestones.total) * 100}
+                          sx={{
+                            mt: 1,
+                            height: 8,
+                            borderRadius: 4,
+                            backgroundColor: 'rgba(255,255,255,0.1)',
+                            '& .MuiLinearProgress-bar': {
+                              borderRadius: 4,
+                              backgroundColor: '#76c043',
+                            }
+                          }}
+                        />
+                        <Typography variant="caption" color="white" sx={{ mt: 0.5, display: 'block' }}>
+                          {Math.round((calculatedMilestones.completed / calculatedMilestones.total) * 100)}% Complete
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                )}
               </Box>
 
-              {calculatedMilestones.total > 0 && (
-                <Box sx={{ flex: 1, p: 3, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
-                  <Typography variant="h6" color="white" gutterBottom fontWeight={600}>
-                    🎯 Milestone Status
+              {/* Notifications Section - Compact & Scrollable */}
+              {notifications.length > 0 && (
+                <Box sx={{ mb: 3, p: 2.5, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
+                  <Typography variant="h6" color="white" gutterBottom fontWeight={600} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    🔔 Latest Notifications
+                    <Chip
+                      label={notifications.length}
+                      size="small"
+                      sx={{
+                        bgcolor: notifications.some(n => n.type === 'critical') ? '#ef5350' : '#76c043',
+                        color: 'white',
+                        fontWeight: 700,
+                        height: 20,
+                        fontSize: '0.75rem'
+                      }}
+                    />
                   </Typography>
-                  <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <Box>
-                      <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                        TOTAL MILESTONES
-                      </Typography>
-                      <Typography variant="h5" color="white" fontWeight={700}>
-                        {calculatedMilestones.total}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
-                      <Box sx={{ flex: 1, p: 2, bgcolor: 'rgba(118, 192, 67, 0.1)', borderRadius: 1 }}>
-                        <Typography variant="caption" color="#76c043">
-                          COMPLETED
-                        </Typography>
-                        <Typography variant="h4" color="#76c043" fontWeight={700}>
-                          {calculatedMilestones.completed}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ flex: 1, p: 2, bgcolor: 'rgba(255, 167, 38, 0.1)', borderRadius: 1 }}>
-                        <Typography variant="caption" color="#ffa726">
-                          PENDING
-                        </Typography>
-                        <Typography variant="h4" color="#ffa726" fontWeight={700}>
-                          {calculatedMilestones.pending + calculatedMilestones.inProgress}
-                        </Typography>
-                      </Box>
-                    </Box>
-                    <Box>
-                      <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                        COMPLETION RATE
-                      </Typography>
-                      <LinearProgress 
-                        variant="determinate" 
-                        value={(calculatedMilestones.completed / calculatedMilestones.total) * 100} 
-                        sx={{
-                          mt: 1,
-                          height: 8,
-                          borderRadius: 4,
-                          backgroundColor: 'rgba(255,255,255,0.1)',
-                          '& .MuiLinearProgress-bar': {
-                            borderRadius: 4,
-                            backgroundColor: '#76c043',
-                          }
-                        }}
-                      />
-                      <Typography variant="caption" color="white" sx={{ mt: 0.5, display: 'block' }}>
-                        {Math.round((calculatedMilestones.completed / calculatedMilestones.total) * 100)}% Complete
-                      </Typography>
+                  <Box sx={{
+                    maxHeight: 250,
+                    overflowY: 'auto',
+                    pr: 1,
+                    '&::-webkit-scrollbar': {
+                      width: '6px',
+                    },
+                    '&::-webkit-scrollbar-track': {
+                      background: 'rgba(255,255,255,0.05)',
+                      borderRadius: '3px',
+                    },
+                    '&::-webkit-scrollbar-thumb': {
+                      background: 'rgba(255,255,255,0.2)',
+                      borderRadius: '3px',
+                      '&:hover': {
+                        background: 'rgba(255,255,255,0.3)',
+                      },
+                    },
+                  }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      {notifications.map((notif) => {
+                        const colors = getNotificationColor(notif.type);
+                        const notifDate = new Date(notif.timestamp);
+                        const today = new Date();
+                        const daysDiff = Math.ceil((today.getTime() - notifDate.getTime()) / (1000 * 60 * 60 * 24));
+                        const timeAgo = daysDiff === 0 ? 'Today' : daysDiff === 1 ? 'Yesterday' : `${daysDiff} days ago`;
+
+                        return (
+                          <Box
+                            key={notif.id}
+                            sx={{
+                              p: 1.5,
+                              bgcolor: colors.bg,
+                              borderRadius: 1.5,
+                              borderLeft: `4px solid ${colors.border}`,
+                              display: 'flex',
+                              alignItems: 'flex-start',
+                              gap: 1.5,
+                              transition: 'all 0.2s ease',
+                              '&:hover': {
+                                transform: 'translateX(2px)',
+                                bgcolor: `${colors.bg}dd`,
+                              },
+                            }}
+                          >
+                            <Box sx={{ fontSize: '20px', lineHeight: 1, flexShrink: 0 }}>
+                              {notif.icon}
+                            </Box>
+                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 1, mb: 0.5 }}>
+                                <Typography
+                                  variant="caption"
+                                  sx={{
+                                    color: colors.text,
+                                    fontWeight: 700,
+                                    fontSize: '0.75rem',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.3px',
+                                    lineHeight: 1.2,
+                                  }}
+                                >
+                                  {notif.title}
+                                </Typography>
+                                <Typography
+                                  variant="caption"
+                                  sx={{
+                                    color: 'rgba(255,255,255,0.5)',
+                                    fontSize: '0.7rem',
+                                    flexShrink: 0,
+                                    whiteSpace: 'nowrap',
+                                  }}
+                                >
+                                  {timeAgo}
+                                </Typography>
+                              </Box>
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  color: 'rgba(255,255,255,0.85)',
+                                  fontSize: '0.8rem',
+                                  lineHeight: 1.4,
+                                }}
+                              >
+                                {notif.message}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  color: 'rgba(255,255,255,0.4)',
+                                  fontSize: '0.7rem',
+                                  mt: 0.5,
+                                  display: 'block',
+                                }}
+                              >
+                                {formatDate(notif.timestamp)}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        );
+                      })}
                     </Box>
                   </Box>
                 </Box>
               )}
-            </Box>
 
-            {/* Notifications Section - Compact & Scrollable */}
-            {notifications.length > 0 && (
-              <Box sx={{ mb: 3, p: 2.5, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
-                <Typography variant="h6" color="white" gutterBottom fontWeight={600} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                  🔔 Latest Notifications
-                  <Chip 
-                    label={notifications.length} 
-                    size="small" 
-                    sx={{ 
-                      bgcolor: notifications.some(n => n.type === 'critical') ? '#ef5350' : '#76c043',
-                      color: 'white',
-                      fontWeight: 700,
-                      height: 20,
-                      fontSize: '0.75rem'
-                    }} 
-                  />
+              <Box sx={{ mb: 3, p: 3, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
+                <Typography variant="h6" color="white" gutterBottom fontWeight={600}>
+                  Tri-Party Agreement Members
                 </Typography>
-                <Box sx={{ 
-                  maxHeight: 250, 
-                  overflowY: 'auto',
-                  pr: 1,
-                  '&::-webkit-scrollbar': {
-                    width: '6px',
-                  },
-                  '&::-webkit-scrollbar-track': {
-                    background: 'rgba(255,255,255,0.05)',
-                    borderRadius: '3px',
-                  },
-                  '&::-webkit-scrollbar-thumb': {
-                    background: 'rgba(255,255,255,0.2)',
-                    borderRadius: '3px',
-                    '&:hover': {
-                      background: 'rgba(255,255,255,0.3)',
-                    },
-                  },
-                }}>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    {notifications.map((notif) => {
-                      const colors = getNotificationColor(notif.type);
-                      const notifDate = new Date(notif.timestamp);
-                      const today = new Date();
-                      const daysDiff = Math.ceil((today.getTime() - notifDate.getTime()) / (1000 * 60 * 60 * 24));
-                      const timeAgo = daysDiff === 0 ? 'Today' : daysDiff === 1 ? 'Yesterday' : `${daysDiff} days ago`;
-                      
-                      return (
-                        <Box
-                          key={notif.id}
-                          sx={{
-                            p: 1.5,
-                            bgcolor: colors.bg,
-                            borderRadius: 1.5,
-                            borderLeft: `4px solid ${colors.border}`,
-                            display: 'flex',
-                            alignItems: 'flex-start',
-                            gap: 1.5,
-                            transition: 'all 0.2s ease',
-                            '&:hover': {
-                              transform: 'translateX(2px)',
-                              bgcolor: `${colors.bg}dd`,
-                            },
-                          }}
-                        >
-                          <Box sx={{ fontSize: '20px', lineHeight: 1, flexShrink: 0 }}>
-                            {notif.icon}
-                          </Box>
-                          <Box sx={{ flex: 1, minWidth: 0 }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 1, mb: 0.5 }}>
-                              <Typography
-                                variant="caption"
-                                sx={{
-                                  color: colors.text,
-                                  fontWeight: 700,
-                                  fontSize: '0.75rem',
-                                  textTransform: 'uppercase',
-                                  letterSpacing: '0.3px',
-                                  lineHeight: 1.2,
-                                }}
-                              >
-                                {notif.title}
-                              </Typography>
-                              <Typography
-                                variant="caption"
-                                sx={{
-                                  color: 'rgba(255,255,255,0.5)',
-                                  fontSize: '0.7rem',
-                                  flexShrink: 0,
-                                  whiteSpace: 'nowrap',
-                                }}
-                              >
-                                {timeAgo}
-                              </Typography>
-                            </Box>
-                            <Typography
-                              variant="body2"
-                              sx={{
-                                color: 'rgba(255,255,255,0.85)',
-                                fontSize: '0.8rem',
-                                lineHeight: 1.4,
-                              }}
-                            >
-                              {notif.message}
-                            </Typography>
-                            <Typography
-                              variant="caption"
-                              sx={{
-                                color: 'rgba(255,255,255,0.4)',
-                                fontSize: '0.7rem',
-                                mt: 0.5,
-                                display: 'block',
-                              }}
-                            >
-                              {formatDate(notif.timestamp)}
-                            </Typography>
-                          </Box>
-                        </Box>
-                      );
-                    })}
-                  </Box>
-                </Box>
-              </Box>
-            )}
-
-            <Box sx={{ mb: 3, p: 3, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
-              <Typography variant="h6" color="white" gutterBottom fontWeight={600}>
-                Tri-Party Agreement Members
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 3, mt: 3 }}>
-                <Box sx={{ flex: 1, p: 2, bgcolor: 'rgba(118, 192, 67, 0.05)', borderRadius: 2, border: '1px solid rgba(118, 192, 67, 0.3)' }}>
-                  <Chip 
-                    label="Farmer" 
-                    size="small" 
-                    sx={{ 
-                      bgcolor: '#76c043', 
-                      color: 'white',
-                      fontWeight: 700,
-                      mb: 2
-                    }} 
-                  />
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                    <Avatar 
-                      src={project.farmerImage} 
-                      sx={{ width: 56, height: 56, border: '2px solid #76c043' }}
+                <Box sx={{ display: 'flex', gap: 3, mt: 3 }}>
+                  <Box sx={{ flex: 1, p: 2, bgcolor: 'rgba(118, 192, 67, 0.05)', borderRadius: 2, border: '1px solid rgba(118, 192, 67, 0.3)' }}>
+                    <Chip
+                      label="Farmer"
+                      size="small"
+                      sx={{
+                        bgcolor: '#76c043',
+                        color: 'white',
+                        fontWeight: 700,
+                        mb: 2
+                      }}
                     />
-                    <Box>
-                      <Typography variant="h6" color="white" fontWeight={600}>
-                        {project.farmerName}
-                      </Typography>
-                      <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                        ID: {project.farmerId || 'FAR-234'}
-                      </Typography>
-                    </Box>
-                  </Box>
-                  <Typography variant="body2" color="rgba(255,255,255,0.7)" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <LocationOn sx={{ fontSize: 16 }} /> {project.location}
-                  </Typography>
-                </Box>
-
-                <Box sx={{ flex: 1, p: 2, bgcolor: 'rgba(33, 150, 243, 0.05)', borderRadius: 2, border: '1px solid rgba(33, 150, 243, 0.3)' }}>
-                  <Chip 
-                    label="Investor" 
-                    size="small" 
-                    sx={{ 
-                      bgcolor: '#2196f3', 
-                      color: 'white',
-                      fontWeight: 700,
-                      mb: 2
-                    }} 
-                  />
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                    <Avatar 
-                      src="https://media.licdn.com/dms/image/v2/D5603AQF7Qr6f1Gapug/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1704052697627?e=2147483647&v=beta&t=5lFwZUSaC8-lmnuNau2_IiprSNOENhJuVwTbRH6Q5mU"
-                      sx={{ width: 56, height: 56, border: '2px solid #2196f3' }}
-                    />
-                    <Box>
-                      <Typography variant="h6" color="white" fontWeight={600}>
-                        {user?.fullName || user?.firstName || 'You'}
-                      </Typography>
-                      <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                        ID: {user?._id ? `INV-${user._id.slice(-6).toUpperCase()}` : 'INV-USER'}
-                      </Typography>
-                    </Box>
-                  </Box>
-                  <Typography variant="body2" color="rgba(255,255,255,0.7)" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <BusinessCenter sx={{ fontSize: 16 }} /> Primary Investor
-                  </Typography>
-                </Box>
-
-                <Box sx={{ flex: 1, p: 2, bgcolor: 'rgba(255, 152, 0, 0.05)', borderRadius: 2, border: '1px solid rgba(255, 152, 0, 0.3)' }}>
-                  <Chip 
-                    label="Landowner" 
-                    size="small" 
-                    sx={{ 
-                      bgcolor: '#ff9800', 
-                      color: 'white',
-                      fontWeight: 700,
-                      mb: 2
-                    }} 
-                  />
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                    <Avatar 
-                      sx={{ width: 56, height: 56, bgcolor: '#ff9800', border: '2px solid #ff9800' }}
-                    >
-                      <Person />
-                    </Avatar>
-                    <Box>
-                      <Typography variant="h6" color="white" fontWeight={600}>
-                        {project.landownerName || 'N/A'}
-                      </Typography>
-                      <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                        ID: {project.landownerId || 'N/A'}
-                      </Typography>
-                    </Box>
-                  </Box>
-                  <Typography variant="body2" color="rgba(255,255,255,0.7)">
-                    🏞️ Land Provider
-                  </Typography>
-                </Box>
-              </Box>
-            </Box>
-
-            <Box sx={{ display: 'flex', gap: 3 }}>
-              <Box sx={{ flex: 1, p: 3, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
-                <Typography variant="h6" color="white" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <LocationOn /> Location Details
-                </Typography>
-                <Box sx={{ mt: 2, display: 'flex', gap: 3 }}>
-                  {/* Left side - Location text details */}
-                  <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <Box>
-                      <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                        DISTRICT
-                      </Typography>
-                      <Typography variant="body1" color="white" fontWeight={600}>
-                        {project.district || project.location}
-                      </Typography>
-                    </Box>
-                    <Box>
-                      <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                        PROVINCE
-                      </Typography>
-                      <Typography variant="body1" color="white" fontWeight={600}>
-                        {project.province || 'Central'}
-                      </Typography>
-                    </Box>
-                    {project.coordinates && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                      <Avatar
+                        src={project.farmerImage}
+                        sx={{ width: 56, height: 56, border: '2px solid #76c043' }}
+                      />
                       <Box>
-                        <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                          GPS COORDINATES
+                        <Typography variant="h6" color="white" fontWeight={600}>
+                          {project.farmerName}
                         </Typography>
-                        <Typography variant="body2" color="rgba(255,255,255,0.8)" fontFamily="monospace">
-                          {project.coordinates}
+                        <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                          ID: {project.farmerId || 'FAR-234'}
                         </Typography>
                       </Box>
-                    )}
+                    </Box>
+                    <Typography variant="body2" color="rgba(255,255,255,0.7)" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <LocationOn sx={{ fontSize: 16 }} /> {project.location}
+                    </Typography>
                   </Box>
 
-                  {/* Right side - Embedded Map */}
-                  {project.coordinates && isLoaded && (
-                    <Box
+                  <Box sx={{ flex: 1, p: 2, bgcolor: 'rgba(33, 150, 243, 0.05)', borderRadius: 2, border: '1px solid rgba(33, 150, 243, 0.3)' }}>
+                    <Chip
+                      label="Investor"
+                      size="small"
                       sx={{
-                        flex: 1,
-                        height: 220,
-                        borderRadius: 2,
-                        overflow: 'hidden',
-                        border: '2px solid rgba(118, 192, 67, 0.3)',
+                        bgcolor: '#2196f3',
+                        color: 'white',
+                        fontWeight: 700,
+                        mb: 2
                       }}
-                    >
-                      <GoogleMap
-                        mapContainerStyle={{ width: '100%', height: '100%' }}
-                        center={{
-                          lat: parseFloat(project.coordinates.split(',')[0]),
-                          lng: parseFloat(project.coordinates.split(',')[1]),
-                        }}
-                        zoom={13}
-                        options={{
-                          styles: [
-                            { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
-                            { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
-                            { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
-                            {
-                              featureType: 'administrative.locality',
-                              elementType: 'labels.text.fill',
-                              stylers: [{ color: '#d59563' }],
-                            },
-                            {
-                              featureType: 'poi',
-                              elementType: 'labels.text.fill',
-                              stylers: [{ color: '#d59563' }],
-                            },
-                            {
-                              featureType: 'poi.park',
-                              elementType: 'geometry',
-                              stylers: [{ color: '#263c3f' }],
-                            },
-                            {
-                              featureType: 'poi.park',
-                              elementType: 'labels.text.fill',
-                              stylers: [{ color: '#6b9a76' }],
-                            },
-                            {
-                              featureType: 'road',
-                              elementType: 'geometry',
-                              stylers: [{ color: '#38414e' }],
-                            },
-                            {
-                              featureType: 'road',
-                              elementType: 'geometry.stroke',
-                              stylers: [{ color: '#212a37' }],
-                            },
-                            {
-                              featureType: 'road',
-                              elementType: 'labels.text.fill',
-                              stylers: [{ color: '#9ca5b3' }],
-                            },
-                            {
-                              featureType: 'road.highway',
-                              elementType: 'geometry',
-                              stylers: [{ color: '#746855' }],
-                            },
-                            {
-                              featureType: 'road.highway',
-                              elementType: 'geometry.stroke',
-                              stylers: [{ color: '#1f2835' }],
-                            },
-                            {
-                              featureType: 'road.highway',
-                              elementType: 'labels.text.fill',
-                              stylers: [{ color: '#f3d19c' }],
-                            },
-                            {
-                              featureType: 'transit',
-                              elementType: 'geometry',
-                              stylers: [{ color: '#2f3948' }],
-                            },
-                            {
-                              featureType: 'transit.station',
-                              elementType: 'labels.text.fill',
-                              stylers: [{ color: '#d59563' }],
-                            },
-                            {
-                              featureType: 'water',
-                              elementType: 'geometry',
-                              stylers: [{ color: '#17263c' }],
-                            },
-                            {
-                              featureType: 'water',
-                              elementType: 'labels.text.fill',
-                              stylers: [{ color: '#515c6d' }],
-                            },
-                            {
-                              featureType: 'water',
-                              elementType: 'labels.text.stroke',
-                              stylers: [{ color: '#17263c' }],
-                            },
-                          ],
-                          disableDefaultUI: false,
-                          zoomControl: true,
-                          mapTypeControl: false,
-                          streetViewControl: false,
-                          fullscreenControl: true,
+                    />
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                      <Avatar
+                        src="https://media.licdn.com/dms/image/v2/D5603AQF7Qr6f1Gapug/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1704052697627?e=2147483647&v=beta&t=5lFwZUSaC8-lmnuNau2_IiprSNOENhJuVwTbRH6Q5mU"
+                        sx={{ width: 56, height: 56, border: '2px solid #2196f3' }}
+                      />
+                      <Box>
+                        <Typography variant="h6" color="white" fontWeight={600}>
+                          {user?.fullName || user?.firstName || 'You'}
+                        </Typography>
+                        <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                          ID: {user?._id ? `INV-${user._id.slice(-6).toUpperCase()}` : 'INV-USER'}
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <Typography variant="body2" color="rgba(255,255,255,0.7)" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <BusinessCenter sx={{ fontSize: 16 }} /> Primary Investor
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ flex: 1, p: 2, bgcolor: 'rgba(255, 152, 0, 0.05)', borderRadius: 2, border: '1px solid rgba(255, 152, 0, 0.3)' }}>
+                    <Chip
+                      label="Landowner"
+                      size="small"
+                      sx={{
+                        bgcolor: '#ff9800',
+                        color: 'white',
+                        fontWeight: 700,
+                        mb: 2
+                      }}
+                    />
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                      <Avatar
+                        sx={{ width: 56, height: 56, bgcolor: '#ff9800', border: '2px solid #ff9800' }}
+                      >
+                        <Person />
+                      </Avatar>
+                      <Box>
+                        <Typography variant="h6" color="white" fontWeight={600}>
+                          {project.landownerName || 'N/A'}
+                        </Typography>
+                        <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                          ID: {project.landownerId || 'N/A'}
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <Typography variant="body2" color="rgba(255,255,255,0.7)">
+                      🏞️ Land Provider
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+
+              <Box sx={{ display: 'flex', gap: 3 }}>
+                <Box sx={{ flex: 1, p: 3, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
+                  <Typography variant="h6" color="white" gutterBottom fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <LocationOn /> Location Details
+                  </Typography>
+                  <Box sx={{ mt: 2, display: 'flex', gap: 3 }}>
+                    {/* Left side - Location text details */}
+                    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      <Box>
+                        <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                          DISTRICT
+                        </Typography>
+                        <Typography variant="body1" color="white" fontWeight={600}>
+                          {project.district || project.location}
+                        </Typography>
+                      </Box>
+                      <Box>
+                        <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                          PROVINCE
+                        </Typography>
+                        <Typography variant="body1" color="white" fontWeight={600}>
+                          {project.province || 'Central'}
+                        </Typography>
+                      </Box>
+                      {project.coordinates && (
+                        <Box>
+                          <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                            GPS COORDINATES
+                          </Typography>
+                          <Typography variant="body2" color="rgba(255,255,255,0.8)" fontFamily="monospace">
+                            {project.coordinates}
+                          </Typography>
+                        </Box>
+                      )}
+                    </Box>
+
+                    {/* Right side - Embedded Map */}
+                    {project.coordinates && isLoaded && (
+                      <Box
+                        sx={{
+                          flex: 1,
+                          height: 220,
+                          borderRadius: 2,
+                          overflow: 'hidden',
+                          border: '2px solid rgba(118, 192, 67, 0.3)',
                         }}
                       >
-                        <Marker
-                          position={{
+                        <GoogleMap
+                          mapContainerStyle={{ width: '100%', height: '100%' }}
+                          center={{
                             lat: parseFloat(project.coordinates.split(',')[0]),
                             lng: parseFloat(project.coordinates.split(',')[1]),
                           }}
-                          icon={{
-                            path: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z',
-                            fillColor: '#76c043',
-                            fillOpacity: 1,
-                            strokeWeight: 2,
-                            strokeColor: '#ffffff',
-                            scale: 2,
+                          zoom={13}
+                          options={{
+                            styles: [
+                              { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
+                              { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
+                              { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
+                              {
+                                featureType: 'administrative.locality',
+                                elementType: 'labels.text.fill',
+                                stylers: [{ color: '#d59563' }],
+                              },
+                              {
+                                featureType: 'poi',
+                                elementType: 'labels.text.fill',
+                                stylers: [{ color: '#d59563' }],
+                              },
+                              {
+                                featureType: 'poi.park',
+                                elementType: 'geometry',
+                                stylers: [{ color: '#263c3f' }],
+                              },
+                              {
+                                featureType: 'poi.park',
+                                elementType: 'labels.text.fill',
+                                stylers: [{ color: '#6b9a76' }],
+                              },
+                              {
+                                featureType: 'road',
+                                elementType: 'geometry',
+                                stylers: [{ color: '#38414e' }],
+                              },
+                              {
+                                featureType: 'road',
+                                elementType: 'geometry.stroke',
+                                stylers: [{ color: '#212a37' }],
+                              },
+                              {
+                                featureType: 'road',
+                                elementType: 'labels.text.fill',
+                                stylers: [{ color: '#9ca5b3' }],
+                              },
+                              {
+                                featureType: 'road.highway',
+                                elementType: 'geometry',
+                                stylers: [{ color: '#746855' }],
+                              },
+                              {
+                                featureType: 'road.highway',
+                                elementType: 'geometry.stroke',
+                                stylers: [{ color: '#1f2835' }],
+                              },
+                              {
+                                featureType: 'road.highway',
+                                elementType: 'labels.text.fill',
+                                stylers: [{ color: '#f3d19c' }],
+                              },
+                              {
+                                featureType: 'transit',
+                                elementType: 'geometry',
+                                stylers: [{ color: '#2f3948' }],
+                              },
+                              {
+                                featureType: 'transit.station',
+                                elementType: 'labels.text.fill',
+                                stylers: [{ color: '#d59563' }],
+                              },
+                              {
+                                featureType: 'water',
+                                elementType: 'geometry',
+                                stylers: [{ color: '#17263c' }],
+                              },
+                              {
+                                featureType: 'water',
+                                elementType: 'labels.text.fill',
+                                stylers: [{ color: '#515c6d' }],
+                              },
+                              {
+                                featureType: 'water',
+                                elementType: 'labels.text.stroke',
+                                stylers: [{ color: '#17263c' }],
+                              },
+                            ],
+                            disableDefaultUI: false,
+                            zoomControl: true,
+                            mapTypeControl: false,
+                            streetViewControl: false,
+                            fullscreenControl: true,
                           }}
-                        />
-                      </GoogleMap>
-                    </Box>
-                  )}
-                </Box>
-                
-                {/* Button below both sections */}
-                {project.coordinates && (
-                  <Button
-                    variant="outlined"
-                    fullWidth
-                    startIcon={<LocationOn />}
-                    onClick={() => setMapDialogOpen(true)}
-                    sx={{
-                      mt: 2,
-                      borderColor: '#76c043',
-                      color: '#76c043',
-                      textTransform: 'none',
-                      fontWeight: 600,
-                      py: 1.5,
-                      '&:hover': {
-                        borderColor: '#6ba83c',
-                        bgcolor: 'rgba(118, 192, 67, 0.1)',
-                      },
-                    }}
-                  >
-                    View All Party Locations
-                  </Button>
-                )}
-              </Box>
-
-              {/* Risk Assessment */}
-              <Box sx={{ flex: 1, p: 3, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
-                <Typography variant="h6" color="white" gutterBottom fontWeight={600}>
-                  ⚠️ Risk Assessment
-                </Typography>
-                <Box sx={{ mt: 2 }}>
-                  <Chip 
-                    label={`Risk Level: ${project.riskLevel || 'LOW'}`}
-                    sx={{ 
-                      bgcolor: getRiskColor(),
-                      color: 'white',
-                      fontWeight: 700,
-                      fontSize: '0.9rem',
-                      px: 2,
-                      py: 2.5
-                    }}
-                  />
-                  <Box sx={{ mt: 2 }}>
-                    {(project.riskStatus || 'No Issues') === 'No Issues' ? (
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <CheckCircle sx={{ color: '#76c043', fontSize: 24 }} />
-                        <Typography variant="body1" color="#76c043" fontWeight={600}>
-                          No Issues Detected
-                        </Typography>
-                      </Box>
-                    ) : (
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <WarningAmber sx={{ color: '#ffa726', fontSize: 24 }} />
-                        <Typography variant="body1" color="#ffa726" fontWeight={600}>
-                          {project.riskStatus}
-                        </Typography>
+                        >
+                          <Marker
+                            position={{
+                              lat: parseFloat(project.coordinates.split(',')[0]),
+                              lng: parseFloat(project.coordinates.split(',')[1]),
+                            }}
+                            icon={{
+                              path: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z',
+                              fillColor: '#76c043',
+                              fillOpacity: 1,
+                              strokeWeight: 2,
+                              strokeColor: '#ffffff',
+                              scale: 2,
+                            }}
+                          />
+                        </GoogleMap>
                       </Box>
                     )}
+                  </Box>
+
+                  {/* Button below both sections */}
+                  {project.coordinates && (
+                    <Button
+                      variant="outlined"
+                      fullWidth
+                      startIcon={<LocationOn />}
+                      onClick={() => setMapDialogOpen(true)}
+                      sx={{
+                        mt: 2,
+                        borderColor: '#76c043',
+                        color: '#76c043',
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        py: 1.5,
+                        '&:hover': {
+                          borderColor: '#6ba83c',
+                          bgcolor: 'rgba(118, 192, 67, 0.1)',
+                        },
+                      }}
+                    >
+                      View All Party Locations
+                    </Button>
+                  )}
+                </Box>
+
+                {/* Risk Assessment */}
+                <Box sx={{ flex: 1, p: 3, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
+                  <Typography variant="h6" color="white" gutterBottom fontWeight={600}>
+                    ⚠️ Risk Assessment
+                  </Typography>
+                  <Box sx={{ mt: 2 }}>
+                    <Chip
+                      label={`Risk Level: ${project.riskLevel || 'LOW'}`}
+                      sx={{
+                        bgcolor: getRiskColor(),
+                        color: 'white',
+                        fontWeight: 700,
+                        fontSize: '0.9rem',
+                        px: 2,
+                        py: 2.5
+                      }}
+                    />
+                    <Box sx={{ mt: 2 }}>
+                      {(project.riskStatus || 'No Issues') === 'No Issues' ? (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <CheckCircle sx={{ color: '#76c043', fontSize: 24 }} />
+                          <Typography variant="body1" color="#76c043" fontWeight={600}>
+                            No Issues Detected
+                          </Typography>
+                        </Box>
+                      ) : (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <WarningAmber sx={{ color: '#ffa726', fontSize: 24 }} />
+                          <Typography variant="body1" color="#ffa726" fontWeight={600}>
+                            {project.riskStatus}
+                          </Typography>
+                        </Box>
+                      )}
+                    </Box>
                   </Box>
                 </Box>
               </Box>
             </Box>
-          </Box>
-        )}
+          )}
 
-        {/* Milestones Tab */}
-        {activeTab === 1 && (
-          <Box>
-            <Typography variant="h5" color="white" gutterBottom fontWeight={600} sx={{ mb: 3 }}>
-              Project Milestones & Progress Tracking
-            </Typography>
-            {project.milestones && project.milestones.length > 0 ? (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                {project.milestones.map((milestone, index) => (
-                  <Box 
-                    key={milestone.id}
-                    sx={{ 
-                      p: 3, 
-                      bgcolor: 'rgba(255,255,255,0.02)', 
-                      borderRadius: 2, 
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderLeft: `4px solid ${getMilestoneStatusColor(milestone.status)}`
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
-                      <Box sx={{ flex: 1 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                          <Typography variant="h6" color="white" fontWeight={600}>
-                            {index + 1}. {milestone.title}
-                          </Typography>
-                          <Chip 
-                            label={milestone.status.replace('-', ' ').toUpperCase()} 
-                            size="small"
-                            sx={{ 
-                              bgcolor: getMilestoneStatusColor(milestone.status),
-                              color: 'white',
-                              fontWeight: 600
-                            }}
-                          />
-                        </Box>
-                        <Typography variant="body2" color="rgba(255,255,255,0.7)" sx={{ mb: 2 }}>
-                          {milestone.description}
-                        </Typography>
-                        <Box sx={{ display: 'flex', gap: 3, mb: 2 }}>
-                          <Box>
-                            <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                              START DATE
-                            </Typography>
-                            <Typography variant="body2" color="white">
-                              {formatDate(milestone.startDate)}
-                            </Typography>
-                          </Box>
-                          <Box>
-                            <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                              END DATE
-                            </Typography>
-                            <Typography variant="body2" color="white">
-                              {formatDate(milestone.endDate)}
-                            </Typography>
-                          </Box>
-                          {milestone.completedDate && (
-                            <Box>
-                              <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                                COMPLETED
-                              </Typography>
-                              <Typography variant="body2" color="#76c043" fontWeight={600}>
-                                {formatDate(milestone.completedDate)}
-                              </Typography>
-                            </Box>
-                          )}
-                          <Box>
-                            <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                              PAYMENT
-                            </Typography>
-                            <Typography variant="body2" color="#76c043" fontWeight={600}>
-                              {formatCurrency(milestone.payment)}
-                            </Typography>
-                          </Box>
-                        </Box>
-                      </Box>
-                    </Box>
-                    <Box>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Typography variant="body2" color="rgba(255,255,255,0.7)">
-                          Progress: {milestone.tasks.completed}/{milestone.tasks.total} tasks completed
-                        </Typography>
-                        <Typography variant="body2" color="white" fontWeight={600}>
-                          {milestone.progress}%
-                        </Typography>
-                      </Box>
-                      <LinearProgress 
-                        variant="determinate" 
-                        value={milestone.progress} 
-                        sx={{
-                          height: 10,
-                          borderRadius: 5,
-                          backgroundColor: 'rgba(255,255,255,0.1)',
-                          '& .MuiLinearProgress-bar': {
-                            borderRadius: 5,
-                            backgroundColor: getMilestoneStatusColor(milestone.status),
-                          }
-                        }}
-                      />
-                    </Box>
-                  </Box>
-                ))}
-              </Box>
-            ) : (
-              <Typography variant="body1" color="rgba(255,255,255,0.5)">
-                No milestone data available
+          {/* Milestones Tab */}
+          {activeTab === 1 && (
+            <Box>
+              <Typography variant="h5" color="white" gutterBottom fontWeight={600} sx={{ mb: 3 }}>
+                Project Milestones & Progress Tracking
               </Typography>
-            )}
-          </Box>
-        )}
-
-        {/* Payments Tab */}
-        {activeTab === 2 && (
-          <Box>
-            <Typography variant="h5" color="white" gutterBottom fontWeight={600} sx={{ mb: 3 }}>
-              Payment Schedule & Financial Breakdown
-            </Typography>
-            
-            {/* Financial Breakdown - Auto-Calculated */}
-            {calculatedBudgetBreakdown.length > 0 && (
-              <Box sx={{ mb: 4, p: 3, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                  <Typography variant="h6" color="white" fontWeight={600}>
-                    💵 Budget Breakdown by Category
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                      Total Budget: {formatCurrency(calculatedBudgetBreakdown[0]?.calculatedTotal || 0)}
-                    </Typography>
-                    {calculatedBudgetBreakdown.length > 4 && (
-                      <Button
-                        size="small"
-                        endIcon={budgetExpanded ? <ExpandLess /> : <ExpandMore />}
-                        onClick={() => setBudgetExpanded(!budgetExpanded)}
-                        sx={{ 
-                          color: '#76c043',
-                          textTransform: 'none',
-                          fontWeight: 600
-                        }}
-                      >
-                        {budgetExpanded ? 'View Less' : `View All (${calculatedBudgetBreakdown.length})`}
-                      </Button>
-                    )}
-                  </Box>
-                </Box>
-                <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-                  {(budgetExpanded ? calculatedBudgetBreakdown : calculatedBudgetBreakdown.slice(0, 4)).map((item, index) => (
-                    <Box 
-                      key={index}
+              {project.milestones && project.milestones.length > 0 ? (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  {project.milestones.map((milestone, index) => (
+                    <Box
+                      key={milestone.id}
                       sx={{
-                        transition: 'all 0.3s ease',
-                        '&:hover': {
-                          transform: 'translateX(4px)'
-                        }
+                        p: 3,
+                        bgcolor: 'rgba(255,255,255,0.02)',
+                        borderRadius: 2,
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderLeft: `4px solid ${getMilestoneStatusColor(milestone.status)}`
                       }}
                     >
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Typography variant="body1" color="white" fontWeight={500}>
-                          {item.category}
-                        </Typography>
-                        <Box sx={{ textAlign: 'right' }}>
-                          <Typography variant="body1" color="white" fontWeight={700}>
-                            {formatCurrency(item.amount)}
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
+                        <Box sx={{ flex: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                            <Typography variant="h6" color="white" fontWeight={600}>
+                              {index + 1}. {milestone.title}
+                            </Typography>
+                            <Chip
+                              label={milestone.status.replace('-', ' ').toUpperCase()}
+                              size="small"
+                              sx={{
+                                bgcolor: getMilestoneStatusColor(milestone.status),
+                                color: 'white',
+                                fontWeight: 600
+                              }}
+                            />
+                          </Box>
+                          <Typography variant="body2" color="rgba(255,255,255,0.7)" sx={{ mb: 2 }}>
+                            {milestone.description}
                           </Typography>
-                          <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                            {item.percentage}% of total
-                          </Typography>
+                          <Box sx={{ display: 'flex', gap: 3, mb: 2 }}>
+                            <Box>
+                              <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                                START DATE
+                              </Typography>
+                              <Typography variant="body2" color="white">
+                                {formatDate(milestone.startDate)}
+                              </Typography>
+                            </Box>
+                            <Box>
+                              <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                                END DATE
+                              </Typography>
+                              <Typography variant="body2" color="white">
+                                {formatDate(milestone.endDate)}
+                              </Typography>
+                            </Box>
+                            {milestone.completedDate && (
+                              <Box>
+                                <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                                  COMPLETED
+                                </Typography>
+                                <Typography variant="body2" color="#76c043" fontWeight={600}>
+                                  {formatDate(milestone.completedDate)}
+                                </Typography>
+                              </Box>
+                            )}
+                            <Box>
+                              <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                                PAYMENT
+                              </Typography>
+                              <Typography variant="body2" color="#76c043" fontWeight={600}>
+                                {formatCurrency(milestone.payment)}
+                              </Typography>
+                            </Box>
+                          </Box>
                         </Box>
                       </Box>
-                      <Box sx={{ position: 'relative' }}>
-                        <LinearProgress 
-                          variant="determinate" 
-                          value={item.percentage} 
+                      <Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                          <Typography variant="body2" color="rgba(255,255,255,0.7)">
+                            Progress: {milestone.tasks.completed}/{milestone.tasks.total} tasks completed
+                          </Typography>
+                          <Typography variant="body2" color="white" fontWeight={600}>
+                            {milestone.progress}%
+                          </Typography>
+                        </Box>
+                        <LinearProgress
+                          variant="determinate"
+                          value={milestone.progress}
                           sx={{
                             height: 10,
                             borderRadius: 5,
                             backgroundColor: 'rgba(255,255,255,0.1)',
                             '& .MuiLinearProgress-bar': {
                               borderRadius: 5,
-                              backgroundColor: getCategoryColor(index, item.percentage),
-                              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                              backgroundColor: getMilestoneStatusColor(milestone.status),
                             }
                           }}
                         />
-                        {item.percentage >= 15 && (
-                          <Typography 
-                            variant="caption" 
-                            sx={{ 
-                              position: 'absolute',
-                              right: 8,
-                              top: '50%',
-                              transform: 'translateY(-50%)',
-                              color: 'white',
-                              fontWeight: 700,
-                              fontSize: '0.7rem',
-                              textShadow: '0 1px 2px rgba(0,0,0,0.5)'
-                            }}
-                          >
-                            {item.percentage}%
-                          </Typography>
-                        )}
                       </Box>
                     </Box>
                   ))}
                 </Box>
-                {!budgetExpanded && calculatedBudgetBreakdown.length > 4 && (
-                  <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>
-                    <Typography variant="caption" color="rgba(255,255,255,0.5)">
-                      Showing top 4 categories • {calculatedBudgetBreakdown.length - 4} more categories available
-                    </Typography>
-                  </Box>
-                )}
-              </Box>
-            )}
-
-            {/* Payment Schedule */}
-            {project.payments && project.payments.length > 0 ? (
-              <Box>
-                <Typography variant="h6" color="white" gutterBottom fontWeight={600} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Payment /> Payment Installments
+              ) : (
+                <Typography variant="body1" color="rgba(255,255,255,0.5)">
+                  No milestone data available
                 </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  {project.payments.map((payment) => {
-                    const daysRemaining = getDaysRemaining(payment.dueDate);
-                    // Determine actual display status: if pending and overdue, show as overdue
-                    const displayStatus = payment.status === 'pending' && daysRemaining < 0 ? 'overdue' : payment.status;
-                    
-                    return (
-                      <Box 
-                        key={payment.id}
-                        sx={{ 
-                          p: 2.5, 
-                          bgcolor: 'rgba(255,255,255,0.02)', 
-                          borderRadius: 2, 
-                          border: '1px solid rgba(255,255,255,0.1)',
-                          borderLeft: `4px solid ${getPaymentStatusColor(displayStatus)}`
-                        }}
-                      >
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <Box sx={{ flex: 1 }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                              <Typography variant="body1" color="white" fontWeight={600}>
-                                {payment.description}
-                              </Typography>
-                              <Chip 
-                                label={displayStatus.toUpperCase()} 
-                                size="small"
-                                sx={{ 
-                                  bgcolor: getPaymentStatusColor(displayStatus),
-                                  color: 'white',
-                                  fontWeight: 600,
-                                  fontSize: '0.75rem'
-                                }}
-                              />
-                            </Box>
-                            <Box sx={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                              <Typography variant="body2" color="rgba(255,255,255,0.7)">
-                                <CalendarToday sx={{ fontSize: 14, mr: 0.5, verticalAlign: 'middle' }} />
-                                Due: {formatDate(payment.dueDate)}
-                              </Typography>
-                              {payment.paidDate && (
-                                <Typography variant="body2" color="#76c043">
-                                  <CheckCircle sx={{ fontSize: 14, mr: 0.5, verticalAlign: 'middle' }} />
-                                  Paid: {formatDate(payment.paidDate)}
-                                </Typography>
-                              )}
-                              {payment.status === 'pending' && daysRemaining >= 0 && (
-                                <Typography variant="body2" color="#ffa726">
-                                  <AccessTime sx={{ fontSize: 14, mr: 0.5, verticalAlign: 'middle' }} />
-                                  {daysRemaining} days remaining
-                                </Typography>
-                              )}
-                              {displayStatus === 'overdue' && (
-                                <Typography variant="body2" color="#ef5350">
-                                  <WarningAmber sx={{ fontSize: 14, mr: 0.5, verticalAlign: 'middle' }} />
-                                  {Math.abs(daysRemaining)} days overdue
-                                </Typography>
-                              )}
-                            </Box>
-                          </Box>
-                          <Typography variant="h6" color="white" fontWeight={700}>
-                            {formatCurrency(payment.amount)}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    );
-                  })}
-                </Box>
-                
-                {/* Total Income Summary for Commission-Based Projects */}
-                {project.investmentType === 'commission' && project.investorAmount && project.earnedCommission !== undefined && (
-                  <Box 
-                    sx={{ 
-                      p: 2.5, 
-                      bgcolor: 'rgba(255,255,255,0.02)', 
-                      borderRadius: 2, 
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderLeft: `4px solid #76c043`,
-                      mt: 2
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Box sx={{ flex: 1 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                          <Typography variant="body1" color="white" fontWeight={600}>
-                            <AttachMoney sx={{ fontSize: 18, verticalAlign: 'middle', mr: 0.5 }} /> Total Income (Commission + Investment Return)
-                          </Typography>
-                          <Chip 
-                            label={`${project.commissionRate}% COMMISSION`}
-                            size="small"
-                            sx={{ 
-                              bgcolor: '#76c043',
-                              color: 'white',
-                              fontWeight: 600
-                            }}
-                          />
-                        </Box>
-                        <Box sx={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                          <Typography variant="body2" color="rgba(255,255,255,0.7)">
-                            Commission Earned: {formatCurrency(project.earnedCommission)}
-                          </Typography>
-                          <Typography variant="body2" color="rgba(255,255,255,0.7)">
-                            + Investment Return: {formatCurrency(project.investorAmount)}
-                          </Typography>
-                          <Typography variant="body2" color="#76c043">
-                            = Total: {formatCurrency(project.earnedCommission + project.investorAmount)}
-                          </Typography>
-                        </Box>
-                      </Box>
-                      <Typography variant="h6" color="#76c043" fontWeight={700}>
-                        {formatCurrency(project.earnedCommission + project.investorAmount)}
-                      </Typography>
-                    </Box>
-                  </Box>
-                )}
-              </Box>
-            ) : (
-              <Typography variant="body1" color="rgba(255,255,255,0.5)">
-                No payment data available
-              </Typography>
-            )}
-          </Box>
-        )}
-
-        {activeTab === 3 && (
-          <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-              <Typography variant="h5" color="white" gutterBottom fontWeight={600}>
-                Project Team Members
-              </Typography>
-              {project.coordinates && (
-                <Button
-                  variant="contained"
-                  startIcon={<LocationOn />}
-                  onClick={() => setMapDialogOpen(true)}
-                  sx={{ 
-                    bgcolor: '#76c043',
-                    color: 'white',
-                    textTransform: 'none',
-                    fontWeight: 600,
-                    '&:hover': {
-                      bgcolor: '#6ba83c'
-                    }
-                  }}
-                >
-                  View Location Map
-                </Button>
               )}
             </Box>
-            {project.partyMembers && project.partyMembers.length > 0 ? (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                <Box 
-                  sx={{ 
-                    p: 3, 
-                    bgcolor: 'rgba(33, 150, 243, 0.05)', 
-                    borderRadius: 2, 
-                    border: '2px solid rgba(33, 150, 243, 0.3)'
-                  }}
-                >
-                  <Box sx={{ display: 'flex', gap: 3 }}>
-                    <Avatar 
-                      src="https://media.licdn.com/dms/image/v2/D5603AQF7Qr6f1Gapug/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1704052697627?e=2147483647&v=beta&t=5lFwZUSaC8-lmnuNau2_IiprSNOENhJuVwTbRH6Q5mU"
-                      sx={{ width: 80, height: 80, border: '3px solid #2196f3' }}
-                    />
-                    <Box sx={{ flex: 1 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                        <Typography variant="h6" color="white" fontWeight={600}>
-                          {user?.fullName || user?.firstName || 'You'}
-                        </Typography>
-                        <Chip 
-                          label="INVESTOR (YOU)" 
+          )}
+
+          {/* Payments Tab */}
+          {activeTab === 2 && (
+            <Box>
+              <Typography variant="h5" color="white" gutterBottom fontWeight={600} sx={{ mb: 3 }}>
+                Payment Schedule & Financial Breakdown
+              </Typography>
+
+              {/* Financial Breakdown - Auto-Calculated */}
+              {calculatedBudgetBreakdown.length > 0 && (
+                <Box sx={{ mb: 4, p: 3, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h6" color="white" fontWeight={600}>
+                      💵 Budget Breakdown by Category
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                        Total Budget: {formatCurrency(calculatedBudgetBreakdown[0]?.calculatedTotal || 0)}
+                      </Typography>
+                      {calculatedBudgetBreakdown.length > 4 && (
+                        <Button
                           size="small"
-                          sx={{ 
-                            bgcolor: '#2196f3',
-                            color: 'white',
+                          endIcon={budgetExpanded ? <ExpandLess /> : <ExpandMore />}
+                          onClick={() => setBudgetExpanded(!budgetExpanded)}
+                          sx={{
+                            color: '#76c043',
+                            textTransform: 'none',
                             fontWeight: 600
                           }}
-                        />
-                      </Box>
-                      <Typography variant="body2" color="rgba(255,255,255,0.7)" sx={{ mb: 2 }}>
-                        ID: {user?._id ? `INV-${user._id.slice(-6).toUpperCase()}` : 'INV-USER'}
-                      </Typography>
-                      <Box sx={{ display: 'flex', gap: 4, mb: 2 }}>
-                        {user?.email && (
-                          <Box>
-                            <Typography variant="caption" color="rgba(255,255,255,0.6)" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                              <Email sx={{ fontSize: 14 }} /> EMAIL
+                        >
+                          {budgetExpanded ? 'View Less' : `View All (${calculatedBudgetBreakdown.length})`}
+                        </Button>
+                      )}
+                    </Box>
+                  </Box>
+                  <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                    {(budgetExpanded ? calculatedBudgetBreakdown : calculatedBudgetBreakdown.slice(0, 4)).map((item, index) => (
+                      <Box
+                        key={index}
+                        sx={{
+                          transition: 'all 0.3s ease',
+                          '&:hover': {
+                            transform: 'translateX(4px)'
+                          }
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                          <Typography variant="body1" color="white" fontWeight={500}>
+                            {item.category}
+                          </Typography>
+                          <Box sx={{ textAlign: 'right' }}>
+                            <Typography variant="body1" color="white" fontWeight={700}>
+                              {formatCurrency(item.amount)}
                             </Typography>
-                            <Typography variant="body2" color="white">
-                              {user.email}
-                            </Typography>
-                          </Box>
-                        )}
-                        {user?.phoneNumber && (
-                          <Box>
-                            <Typography variant="caption" color="rgba(255,255,255,0.6)" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                              <Phone sx={{ fontSize: 14 }} /> PHONE
-                            </Typography>
-                            <Typography variant="body2" color="white">
-                              {user.phoneNumber}
-                            </Typography>
-                          </Box>
-                        )}
-                        {user?.address && (
-                          <Box>
                             <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                              LOCATION
-                            </Typography>
-                            <Typography variant="body2" color="white">
-                              {user.address}
+                              {item.percentage}% of total
                             </Typography>
                           </Box>
-                        )}
+                        </Box>
+                        <Box sx={{ position: 'relative' }}>
+                          <LinearProgress
+                            variant="determinate"
+                            value={item.percentage}
+                            sx={{
+                              height: 10,
+                              borderRadius: 5,
+                              backgroundColor: 'rgba(255,255,255,0.1)',
+                              '& .MuiLinearProgress-bar': {
+                                borderRadius: 5,
+                                backgroundColor: getCategoryColor(index, item.percentage),
+                                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                              }
+                            }}
+                          />
+                          {item.percentage >= 15 && (
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                position: 'absolute',
+                                right: 8,
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                color: 'white',
+                                fontWeight: 700,
+                                fontSize: '0.7rem',
+                                textShadow: '0 1px 2px rgba(0,0,0,0.5)'
+                              }}
+                            >
+                              {item.percentage}%
+                            </Typography>
+                          )}
+                        </Box>
                       </Box>
-                      <Box>
-                        <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                          ROLE
-                        </Typography>
-                        <Typography variant="body2" color="white">
-                          Primary Investor - Agricultural Investment Portfolio
+                    ))}
+                  </Box>
+                  {!budgetExpanded && calculatedBudgetBreakdown.length > 4 && (
+                    <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>
+                      <Typography variant="caption" color="rgba(255,255,255,0.5)">
+                        Showing top 4 categories • {calculatedBudgetBreakdown.length - 4} more categories available
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+              )}
+
+              {/* Payment Schedule */}
+              {project.payments && project.payments.length > 0 ? (
+                <Box>
+                  <Typography variant="h6" color="white" gutterBottom fontWeight={600} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Payment /> Payment Installments
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {project.payments.map((payment) => {
+                      const daysRemaining = getDaysRemaining(payment.dueDate);
+                      // Determine actual display status: if pending and overdue, show as overdue
+                      const displayStatus = payment.status === 'pending' && daysRemaining < 0 ? 'overdue' : payment.status;
+
+                      return (
+                        <Box
+                          key={payment.id}
+                          sx={{
+                            p: 2.5,
+                            bgcolor: 'rgba(255,255,255,0.02)',
+                            borderRadius: 2,
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            borderLeft: `4px solid ${getPaymentStatusColor(displayStatus)}`
+                          }}
+                        >
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Box sx={{ flex: 1 }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                                <Typography variant="body1" color="white" fontWeight={600}>
+                                  {payment.description}
+                                </Typography>
+                                <Chip
+                                  label={displayStatus.toUpperCase()}
+                                  size="small"
+                                  sx={{
+                                    bgcolor: getPaymentStatusColor(displayStatus),
+                                    color: 'white',
+                                    fontWeight: 600,
+                                    fontSize: '0.75rem'
+                                  }}
+                                />
+                              </Box>
+                              <Box sx={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                                <Typography variant="body2" color="rgba(255,255,255,0.7)">
+                                  <CalendarToday sx={{ fontSize: 14, mr: 0.5, verticalAlign: 'middle' }} />
+                                  Due: {formatDate(payment.dueDate)}
+                                </Typography>
+                                {payment.paidDate && (
+                                  <Typography variant="body2" color="#76c043">
+                                    <CheckCircle sx={{ fontSize: 14, mr: 0.5, verticalAlign: 'middle' }} />
+                                    Paid: {formatDate(payment.paidDate)}
+                                  </Typography>
+                                )}
+                                {payment.status === 'pending' && daysRemaining >= 0 && (
+                                  <Typography variant="body2" color="#ffa726">
+                                    <AccessTime sx={{ fontSize: 14, mr: 0.5, verticalAlign: 'middle' }} />
+                                    {daysRemaining} days remaining
+                                  </Typography>
+                                )}
+                                {displayStatus === 'overdue' && (
+                                  <Typography variant="body2" color="#ef5350">
+                                    <WarningAmber sx={{ fontSize: 14, mr: 0.5, verticalAlign: 'middle' }} />
+                                    {Math.abs(daysRemaining)} days overdue
+                                  </Typography>
+                                )}
+                              </Box>
+                            </Box>
+                            <Typography variant="h6" color="white" fontWeight={700}>
+                              {formatCurrency(payment.amount)}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+
+                  {/* Commission Earnings Summary for Commission-Based Projects */}
+                  {project.investmentType === 'commission' && project.earnedCommission !== undefined && project.earnedCommission > 0 && (
+                    <Box
+                      sx={{
+                        p: 2.5,
+                        bgcolor: 'rgba(255,255,255,0.02)',
+                        borderRadius: 2,
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderLeft: `4px solid #76c043`,
+                        mt: 2
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Box sx={{ flex: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                            <Typography variant="body1" color="white" fontWeight={600}>
+                              Commission Earned
+                            </Typography>
+                            <Chip
+                              label={`${project.commissionRate}% RATE`}
+                              size="small"
+                              sx={{
+                                bgcolor: '#76c043',
+                                color: 'white',
+                                fontWeight: 600,
+                                fontSize: '0.75rem'
+                              }}
+                            />
+                            <Chip
+                              label="INVESTOR INCOME"
+                              size="small"
+                              sx={{
+                                bgcolor: '#76c043',
+                                color: 'white',
+                                fontWeight: 600,
+                                fontSize: '0.75rem'
+                              }}
+                            />
+                          </Box>
+                          <Typography variant="body2" color="rgba(255,255,255,0.7)">
+                            Based on {project.commissionRate}% of harvest revenue • {project.status === 'completed' ? 'Final amount' : 'Projected earnings'}
+                          </Typography>
+                        </Box>
+                        <Typography variant="h6" color="#76c043" fontWeight={700}>
+                          {formatCurrency(project.earnedCommission)}
                         </Typography>
                       </Box>
                     </Box>
-                  </Box>
+                  )}
                 </Box>
+              ) : (
+                <Typography variant="body1" color="rgba(255,255,255,0.5)">
+                  No payment data available
+                </Typography>
+              )}
+            </Box>
+          )}
 
-                {/* Other Team Members */}
-                {project.partyMembers.map((member) => (
-                  <Box 
-                    key={member.id}
-                    sx={{ 
-                      p: 3, 
-                      bgcolor: 'rgba(255,255,255,0.02)', 
-                      borderRadius: 2, 
-                      border: '1px solid rgba(255,255,255,0.1)'
+          {activeTab === 3 && (
+            <Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                <Typography variant="h5" color="white" gutterBottom fontWeight={600}>
+                  Project Team Members
+                </Typography>
+                {project.coordinates && (
+                  <Button
+                    variant="contained"
+                    startIcon={<LocationOn />}
+                    onClick={() => setMapDialogOpen(true)}
+                    sx={{
+                      bgcolor: '#76c043',
+                      color: 'white',
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      '&:hover': {
+                        bgcolor: '#6ba83c'
+                      }
+                    }}
+                  >
+                    View Location Map
+                  </Button>
+                )}
+              </Box>
+              {project.partyMembers && project.partyMembers.length > 0 ? (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  <Box
+                    sx={{
+                      p: 3,
+                      bgcolor: 'rgba(33, 150, 243, 0.05)',
+                      borderRadius: 2,
+                      border: '2px solid rgba(33, 150, 243, 0.3)'
                     }}
                   >
                     <Box sx={{ display: 'flex', gap: 3 }}>
-                      <Avatar 
-                        src={member.image} 
-                        sx={{ width: 80, height: 80, border: '3px solid rgba(118, 192, 67, 0.5)' }}
+                      <Avatar
+                        src="https://media.licdn.com/dms/image/v2/D5603AQF7Qr6f1Gapug/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1704052697627?e=2147483647&v=beta&t=5lFwZUSaC8-lmnuNau2_IiprSNOENhJuVwTbRH6Q5mU"
+                        sx={{ width: 80, height: 80, border: '3px solid #2196f3' }}
                       />
                       <Box sx={{ flex: 1 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
                           <Typography variant="h6" color="white" fontWeight={600}>
-                            {member.name}
+                            {user?.fullName || user?.firstName || 'You'}
                           </Typography>
-                          <Chip 
-                            label={member.role.toUpperCase()} 
+                          <Chip
+                            label="INVESTOR (YOU)"
                             size="small"
-                            sx={{ 
-                              bgcolor: member.role === 'farmer' ? '#76c043' : member.role === 'investor' ? '#2196f3' : '#ff9800',
+                            sx={{
+                              bgcolor: '#2196f3',
                               color: 'white',
                               fontWeight: 600
                             }}
                           />
-                          {member.rating && (
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                              <Star sx={{ fontSize: 16, color: '#ffc107' }} />
-                              <Typography variant="body2" color="#ffa726">
-                                {member.rating.toFixed(1)}
+                        </Box>
+                        <Typography variant="body2" color="rgba(255,255,255,0.7)" sx={{ mb: 2 }}>
+                          ID: {user?._id ? `INV-${user._id.slice(-6).toUpperCase()}` : 'INV-USER'}
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 4, mb: 2 }}>
+                          {user?.email && (
+                            <Box>
+                              <Typography variant="caption" color="rgba(255,255,255,0.6)" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <Email sx={{ fontSize: 14 }} /> EMAIL
+                              </Typography>
+                              <Typography variant="body2" color="white">
+                                {user.email}
                               </Typography>
                             </Box>
                           )}
-                        </Box>
-                        <Typography variant="body2" color="rgba(255,255,255,0.7)" sx={{ mb: 2 }}>
-                          ID: {member.id}
-                        </Typography>
-                        <Box sx={{ display: 'flex', gap: 4, mb: 2 }}>
-                          <Box>
-                            <Typography variant="caption" color="rgba(255,255,255,0.6)" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                              <Email sx={{ fontSize: 14 }} /> EMAIL
-                            </Typography>
-                            <Typography variant="body2" color="white">
-                              {member.email}
-                            </Typography>
-                          </Box>
-                          <Box>
-                            <Typography variant="caption" color="rgba(255,255,255,0.6)" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                              <Phone sx={{ fontSize: 14 }} /> PHONE
-                            </Typography>
-                            <Typography variant="body2" color="white">
-                              {member.phone}
-                            </Typography>
-                          </Box>
-                          {member.location && (
+                          {user?.phoneNumber && (
+                            <Box>
+                              <Typography variant="caption" color="rgba(255,255,255,0.6)" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <Phone sx={{ fontSize: 14 }} /> PHONE
+                              </Typography>
+                              <Typography variant="body2" color="white">
+                                {user.phoneNumber}
+                              </Typography>
+                            </Box>
+                          )}
+                          {user?.address && (
                             <Box>
                               <Typography variant="caption" color="rgba(255,255,255,0.6)">
                                 LOCATION
                               </Typography>
                               <Typography variant="body2" color="white">
-                                {member.location}
+                                {user.address}
                               </Typography>
                             </Box>
                           )}
                         </Box>
-                        {member.specialization && (
-                          <Box>
-                            <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                              SPECIALIZATION
-                            </Typography>
-                            <Typography variant="body2" color="white">
-                              {member.specialization}
-                            </Typography>
-                          </Box>
-                        )}
-                        {member.experience && (
-                          <Box sx={{ mt: 1 }}>
-                            <Typography variant="caption" color="rgba(255,255,255,0.6)">
-                              EXPERIENCE
-                            </Typography>
-                            <Typography variant="body2" color="white">
-                              {member.experience}
-                            </Typography>
-                          </Box>
-                        )}
+                        <Box>
+                          <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                            ROLE
+                          </Typography>
+                          <Typography variant="body2" color="white">
+                            Primary Investor - Agricultural Investment Portfolio
+                          </Typography>
+                        </Box>
                       </Box>
                     </Box>
                   </Box>
-                ))}
-              </Box>
-            ) : (
-              <Typography variant="body1" color="rgba(255,255,255,0.5)">
-                No team member data available
-              </Typography>
-            )}
-          </Box>
-        )}
-      </DialogContent>
 
-      <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)' }} />
+                  {/* Other Team Members */}
+                  {project.partyMembers.map((member) => (
+                    <Box
+                      key={member.id}
+                      sx={{
+                        p: 3,
+                        bgcolor: 'rgba(255,255,255,0.02)',
+                        borderRadius: 2,
+                        border: '1px solid rgba(255,255,255,0.1)'
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', gap: 3 }}>
+                        <Avatar
+                          src={member.image}
+                          sx={{ width: 80, height: 80, border: '3px solid rgba(118, 192, 67, 0.5)' }}
+                        />
+                        <Box sx={{ flex: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                            <Typography variant="h6" color="white" fontWeight={600}>
+                              {member.name}
+                            </Typography>
+                            <Chip
+                              label={member.role.toUpperCase()}
+                              size="small"
+                              sx={{
+                                bgcolor: member.role === 'farmer' ? '#76c043' : member.role === 'investor' ? '#2196f3' : '#ff9800',
+                                color: 'white',
+                                fontWeight: 600
+                              }}
+                            />
+                            {member.rating && (
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <Star sx={{ fontSize: 16, color: '#ffc107' }} />
+                                <Typography variant="body2" color="#ffa726">
+                                  {member.rating.toFixed(1)}
+                                </Typography>
+                              </Box>
+                            )}
+                          </Box>
+                          <Typography variant="body2" color="rgba(255,255,255,0.7)" sx={{ mb: 2 }}>
+                            ID: {member.id}
+                          </Typography>
+                          <Box sx={{ display: 'flex', gap: 4, mb: 2 }}>
+                            <Box>
+                              <Typography variant="caption" color="rgba(255,255,255,0.6)" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <Email sx={{ fontSize: 14 }} /> EMAIL
+                              </Typography>
+                              <Typography variant="body2" color="white">
+                                {member.email}
+                              </Typography>
+                            </Box>
+                            <Box>
+                              <Typography variant="caption" color="rgba(255,255,255,0.6)" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <Phone sx={{ fontSize: 14 }} /> PHONE
+                              </Typography>
+                              <Typography variant="body2" color="white">
+                                {member.phone}
+                              </Typography>
+                            </Box>
+                            {member.location && (
+                              <Box>
+                                <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                                  LOCATION
+                                </Typography>
+                                <Typography variant="body2" color="white">
+                                  {member.location}
+                                </Typography>
+                              </Box>
+                            )}
+                          </Box>
+                          {member.specialization && (
+                            <Box>
+                              <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                                SPECIALIZATION
+                              </Typography>
+                              <Typography variant="body2" color="white">
+                                {member.specialization}
+                              </Typography>
+                            </Box>
+                          )}
+                          {member.experience && (
+                            <Box sx={{ mt: 1 }}>
+                              <Typography variant="caption" color="rgba(255,255,255,0.6)">
+                                EXPERIENCE
+                              </Typography>
+                              <Typography variant="body2" color="white">
+                                {member.experience}
+                              </Typography>
+                            </Box>
+                          )}
+                        </Box>
+                      </Box>
+                    </Box>
+                  ))}
+                </Box>
+              ) : (
+                <Typography variant="body1" color="rgba(255,255,255,0.5)">
+                  No team member data available
+                </Typography>
+              )}
+            </Box>
+          )}
+        </DialogContent>
 
-      <DialogActions sx={{ p: 3, justifyContent: 'space-between' }}>
-        <Button 
-          onClick={onClose}
-          variant="outlined"
-          sx={{ 
-            color: 'white',
-            borderColor: 'rgba(255,255,255,0.3)',
-            textTransform: 'none',
-            px: 3,
-            '&:hover': {
-              borderColor: 'rgba(255,255,255,0.5)',
-              bgcolor: 'rgba(255,255,255,0.05)'
-            }
-          }}
-        >
-          Close
-        </Button>
-        <Button 
-          variant="contained"
-          sx={{ 
-            bgcolor: '#76c043',
-            color: 'white',
-            textTransform: 'none',
-            px: 4,
-            fontWeight: 600,
-            '&:hover': {
-              bgcolor: '#6ba83c'
-            }
-          }}
-        >
-          Download Full Report
-        </Button>
-      </DialogActions>
-    </Dialog>
+        <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)' }} />
 
-    {/* Location Map Dialog - Separate from main dialog */}
-    {project.partyMembers && project.coordinates && (
-      <LocationMapDialog
-        open={mapDialogOpen}
-        onClose={() => setMapDialogOpen(false)}
-        partyMembers={project.partyMembers}
-        projectLocation={project.location}
-        coordinates={project.coordinates}
-        district={project.district || ''}
-        province={project.province || ''}
-      />
-    )}
+        <DialogActions sx={{ p: 3, justifyContent: 'space-between' }}>
+          <Button
+            onClick={onClose}
+            variant="outlined"
+            sx={{
+              color: 'white',
+              borderColor: 'rgba(255,255,255,0.3)',
+              textTransform: 'none',
+              px: 3,
+              '&:hover': {
+                borderColor: 'rgba(255,255,255,0.5)',
+                bgcolor: 'rgba(255,255,255,0.05)'
+              }
+            }}
+          >
+            Close
+          </Button>
+          <Button
+            variant="contained"
+            sx={{
+              bgcolor: '#76c043',
+              color: 'white',
+              textTransform: 'none',
+              px: 4,
+              fontWeight: 600,
+              '&:hover': {
+                bgcolor: '#6ba83c'
+              }
+            }}
+          >
+            Download Full Report
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Location Map Dialog - Separate from main dialog */}
+      {project.partyMembers && project.coordinates && (
+        <LocationMapDialog
+          open={mapDialogOpen}
+          onClose={() => setMapDialogOpen(false)}
+          partyMembers={project.partyMembers}
+          projectLocation={project.location}
+          coordinates={project.coordinates}
+          district={project.district || ''}
+          province={project.province || ''}
+        />
+      )}
     </>
   );
 };

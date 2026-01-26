@@ -36,7 +36,10 @@
         "endDate": "2025-11-25",
         "completedDate": "2025-11-24",
         "payment": 25000,
-        "tasks": { "total": 8, "completed": 8 }
+        "tasks": {
+          "total": 8,
+          "completed": 8
+        }
       },
       {
         "id": "M2",
@@ -48,7 +51,10 @@
         "endDate": "2025-11-30",
         "completedDate": "2025-11-29",
         "payment": 18000,
-        "tasks": { "total": 5, "completed": 5 }
+        "tasks": {
+          "total": 5,
+          "completed": 5
+        }
       },
       {
         "id": "M3",
@@ -60,7 +66,10 @@
         "endDate": "2025-12-10",
         "completedDate": "2025-12-09",
         "payment": 32000,
-        "tasks": { "total": 12, "completed": 12 }
+        "tasks": {
+          "total": 12,
+          "completed": 12
+        }
       },
       {
         "id": "M4",
@@ -72,7 +81,10 @@
         "endDate": "2025-12-25",
         "completedDate": "2025-12-24",
         "payment": 28000,
-        "tasks": { "total": 10, "completed": 10 }
+        "tasks": {
+          "total": 10,
+          "completed": 10
+        }
       },
       {
         "id": "M5",
@@ -84,7 +96,10 @@
         "endDate": "2026-02-15",
         "completedDate": "2026-02-14",
         "payment": 35000,
-        "tasks": { "total": 15, "completed": 15 }
+        "tasks": {
+          "total": 15,
+          "completed": 15
+        }
       },
       {
         "id": "M6",
@@ -95,7 +110,10 @@
         "startDate": "2026-02-16",
         "endDate": "2026-03-15",
         "payment": 22000,
-        "tasks": { "total": 10, "completed": 7 }
+        "tasks": {
+          "total": 10,
+          "completed": 7
+        }
       },
       {
         "id": "M7",
@@ -106,7 +124,10 @@
         "startDate": "2026-03-16",
         "endDate": "2026-04-10",
         "payment": 45000,
-        "tasks": { "total": 20, "completed": 4 }
+        "tasks": {
+          "total": 20,
+          "completed": 4
+        }
       },
       {
         "id": "M8",
@@ -117,7 +138,10 @@
         "startDate": "2026-04-11",
         "endDate": "2026-04-30",
         "payment": 45500,
-        "tasks": { "total": 12, "completed": 0 }
+        "tasks": {
+          "total": 12,
+          "completed": 0
+        }
       }
     ],
     "payments": [
@@ -192,13 +216,34 @@
       }
     ],
     "financialBreakdown": [
-      { "category": "Seeds & Planting Materials", "amount": 35000 },
-      { "category": "Fertilizers & Nutrients", "amount": 42500 },
-      { "category": "Irrigation & Water Management", "amount": 37500 },
-      { "category": "Pest & Disease Control", "amount": 30000 },
-      { "category": "Labor & Workforce", "amount": 62500 },
-      { "category": "Equipment & Machinery", "amount": 25000 },
-      { "category": "Post-Harvest Processing", "amount": 17500 }
+      {
+        "category": "Seeds & Planting Materials",
+        "amount": 35000
+      },
+      {
+        "category": "Fertilizers & Nutrients",
+        "amount": 42500
+      },
+      {
+        "category": "Irrigation & Water Management",
+        "amount": 37500
+      },
+      {
+        "category": "Pest & Disease Control",
+        "amount": 30000
+      },
+      {
+        "category": "Labor & Workforce",
+        "amount": 62500
+      },
+      {
+        "category": "Equipment & Machinery",
+        "amount": 25000
+      },
+      {
+        "category": "Post-Harvest Processing",
+        "amount": 17500
+      }
     ],
     "partyMembers": [
       {
@@ -268,7 +313,10 @@
         "endDate": "2025-12-10",
         "completedDate": "2025-12-09",
         "payment": 25000,
-        "tasks": { "total": 6, "completed": 6 }
+        "tasks": {
+          "total": 6,
+          "completed": 6
+        }
       },
       {
         "id": "VM2",
@@ -280,7 +328,10 @@
         "endDate": "2025-12-20",
         "completedDate": "2025-12-19",
         "payment": 22000,
-        "tasks": { "total": 8, "completed": 8 }
+        "tasks": {
+          "total": 8,
+          "completed": 8
+        }
       },
       {
         "id": "VM3",
@@ -291,7 +342,10 @@
         "startDate": "2025-12-21",
         "endDate": "2026-01-31",
         "payment": 35000,
-        "tasks": { "total": 15, "completed": 9 }
+        "tasks": {
+          "total": 15,
+          "completed": 9
+        }
       },
       {
         "id": "VM4",
@@ -302,7 +356,10 @@
         "startDate": "2026-02-01",
         "endDate": "2026-02-15",
         "payment": 38000,
-        "tasks": { "total": 12, "completed": 2 }
+        "tasks": {
+          "total": 12,
+          "completed": 2
+        }
       },
       {
         "id": "VM5",
@@ -313,7 +370,10 @@
         "startDate": "2026-02-16",
         "endDate": "2026-03-05",
         "payment": 35000,
-        "tasks": { "total": 12, "completed": 0 }
+        "tasks": {
+          "total": 12,
+          "completed": 0
+        }
       },
       {
         "id": "VM6",
@@ -324,7 +384,10 @@
         "startDate": "2026-03-06",
         "endDate": "2026-03-15",
         "payment": 25000,
-        "tasks": { "total": 10, "completed": 0 }
+        "tasks": {
+          "total": 10,
+          "completed": 0
+        }
       }
     ],
     "payments": [
@@ -380,14 +443,46 @@
       }
     ],
     "financialBreakdown": [
-      { "category": "Organic Seeds & Seedlings", "amount": 32400 },
-      { "category": "Organic Fertilizers & Compost", "amount": 27000 },
-      { "category": "Natural Pest Control", "amount": 18000 },
-      { "category": "Irrigation System", "amount": 25200 },
-      { "category": "Labor & Skilled Workers", "amount": 54000 },
-      { "category": "Organic Certification", "amount": 10800 },
-      { "category": "Packaging & Transport", "amount": 12600 },
-      { "category": "💰 Commission Income (15% Rate)", "amount": 27000 }
+      {
+        "category": "Organic Seeds & Seedlings",
+        "amount": 32400,
+        "type": "expense"
+      },
+      {
+        "category": "Organic Fertilizers & Compost",
+        "amount": 27000,
+        "type": "expense"
+      },
+      {
+        "category": "Natural Pest Control",
+        "amount": 18000,
+        "type": "expense"
+      },
+      {
+        "category": "Irrigation System",
+        "amount": 25200,
+        "type": "expense"
+      },
+      {
+        "category": "Labor & Skilled Workers",
+        "amount": 54000,
+        "type": "expense"
+      },
+      {
+        "category": "Organic Certification",
+        "amount": 10800,
+        "type": "expense"
+      },
+      {
+        "category": "Packaging & Transport",
+        "amount": 12600,
+        "type": "expense"
+      },
+      {
+        "category": "Commission Income (15% Rate)",
+        "amount": 27000,
+        "type": "commission"
+      }
     ],
     "partyMembers": [
       {
@@ -457,7 +552,10 @@
         "endDate": "2025-06-15",
         "completedDate": "2025-06-14",
         "payment": 40000,
-        "tasks": { "total": 10, "completed": 10 }
+        "tasks": {
+          "total": 10,
+          "completed": 10
+        }
       },
       {
         "id": "M2",
@@ -469,7 +567,10 @@
         "endDate": "2025-07-15",
         "completedDate": "2025-07-14",
         "payment": 60000,
-        "tasks": { "total": 15, "completed": 15 }
+        "tasks": {
+          "total": 15,
+          "completed": 15
+        }
       },
       {
         "id": "M3",
@@ -481,7 +582,10 @@
         "endDate": "2025-08-10",
         "completedDate": "2025-08-09",
         "payment": 45000,
-        "tasks": { "total": 12, "completed": 12 }
+        "tasks": {
+          "total": 12,
+          "completed": 12
+        }
       },
       {
         "id": "M4",
@@ -493,7 +597,10 @@
         "endDate": "2025-09-10",
         "completedDate": "2025-09-08",
         "payment": 35000,
-        "tasks": { "total": 8, "completed": 8 }
+        "tasks": {
+          "total": 8,
+          "completed": 8
+        }
       },
       {
         "id": "M5",
@@ -505,7 +612,10 @@
         "endDate": "2025-10-20",
         "completedDate": "2025-10-19",
         "payment": 40000,
-        "tasks": { "total": 14, "completed": 14 }
+        "tasks": {
+          "total": 14,
+          "completed": 14
+        }
       },
       {
         "id": "M6",
@@ -517,7 +627,10 @@
         "endDate": "2025-11-30",
         "completedDate": "2025-11-28",
         "payment": 100000,
-        "tasks": { "total": 10, "completed": 10 }
+        "tasks": {
+          "total": 10,
+          "completed": 10
+        }
       }
     ],
     "payments": [
@@ -577,14 +690,46 @@
       }
     ],
     "financialBreakdown": [
-      { "category": "Land Preparation & Survey", "amount": 50000 },
-      { "category": "Seedlings & Planting Materials", "amount": 65000 },
-      { "category": "Irrigation Infrastructure", "amount": 55000 },
-      { "category": "Fertilizers & Nutrients", "amount": 45000 },
-      { "category": "Pest & Disease Management", "amount": 35000 },
-      { "category": "Labor & Workforce", "amount": 55000 },
-      { "category": "Equipment & Tools", "amount": 15000 },
-      { "category": "💰 Commission Income (12% Rate)", "amount": 38400 }
+      {
+        "category": "Land Preparation & Survey",
+        "amount": 50000,
+        "type": "expense"
+      },
+      {
+        "category": "Seedlings & Planting Materials",
+        "amount": 65000,
+        "type": "expense"
+      },
+      {
+        "category": "Irrigation Infrastructure",
+        "amount": 55000,
+        "type": "expense"
+      },
+      {
+        "category": "Fertilizers & Nutrients",
+        "amount": 45000,
+        "type": "expense"
+      },
+      {
+        "category": "Pest & Disease Management",
+        "amount": 35000,
+        "type": "expense"
+      },
+      {
+        "category": "Labor & Workforce",
+        "amount": 55000,
+        "type": "expense"
+      },
+      {
+        "category": "Equipment & Tools",
+        "amount": 15000,
+        "type": "expense"
+      },
+      {
+        "category": "💰 Commission Income (12% Rate)",
+        "amount": 38400,
+        "type": "commission"
+      }
     ],
     "partyMembers": [
       {
@@ -652,7 +797,10 @@
         "endDate": "2025-04-20",
         "completedDate": "2025-04-18",
         "payment": 35000,
-        "tasks": { "total": 12, "completed": 12 }
+        "tasks": {
+          "total": 12,
+          "completed": 12
+        }
       },
       {
         "id": "M2",
@@ -664,7 +812,10 @@
         "endDate": "2025-05-15",
         "completedDate": "2025-05-14",
         "payment": 45000,
-        "tasks": { "total": 15, "completed": 15 }
+        "tasks": {
+          "total": 15,
+          "completed": 15
+        }
       },
       {
         "id": "M3",
@@ -676,7 +827,10 @@
         "endDate": "2025-06-10",
         "completedDate": "2025-06-09",
         "payment": 40000,
-        "tasks": { "total": 13, "completed": 13 }
+        "tasks": {
+          "total": 13,
+          "completed": 13
+        }
       },
       {
         "id": "M4",
@@ -688,7 +842,10 @@
         "endDate": "2025-07-05",
         "completedDate": "2025-07-04",
         "payment": 38000,
-        "tasks": { "total": 10, "completed": 10 }
+        "tasks": {
+          "total": 10,
+          "completed": 10
+        }
       },
       {
         "id": "M5",
@@ -700,7 +857,10 @@
         "endDate": "2025-09-15",
         "completedDate": "2025-09-14",
         "payment": 42000,
-        "tasks": { "total": 18, "completed": 18 }
+        "tasks": {
+          "total": 18,
+          "completed": 18
+        }
       },
       {
         "id": "M6",
@@ -712,7 +872,10 @@
         "endDate": "2025-10-31",
         "completedDate": "2025-10-30",
         "payment": 80000,
-        "tasks": { "total": 14, "completed": 14 }
+        "tasks": {
+          "total": 14,
+          "completed": 14
+        }
       }
     ],
     "payments": [
@@ -772,13 +935,34 @@
       }
     ],
     "financialBreakdown": [
-      { "category": "Land Preparation & Clearing", "amount": 40000 },
-      { "category": "Cinnamon Saplings & Materials", "amount": 55000 },
-      { "category": "Pepper Vines & Support Structures", "amount": 48000 },
-      { "category": "Irrigation & Shade Systems", "amount": 45000 },
-      { "category": "Organic Fertilizers & Nutrients", "amount": 32000 },
-      { "category": "Pest Control & Disease Management", "amount": 22000 },
-      { "category": "Labor & Workforce", "amount": 38000 }
+      {
+        "category": "Land Preparation & Clearing",
+        "amount": 40000
+      },
+      {
+        "category": "Cinnamon Saplings & Materials",
+        "amount": 55000
+      },
+      {
+        "category": "Pepper Vines & Support Structures",
+        "amount": 48000
+      },
+      {
+        "category": "Irrigation & Shade Systems",
+        "amount": 45000
+      },
+      {
+        "category": "Organic Fertilizers & Nutrients",
+        "amount": 32000
+      },
+      {
+        "category": "Pest Control & Disease Management",
+        "amount": 22000
+      },
+      {
+        "category": "Labor & Workforce",
+        "amount": 38000
+      }
     ],
     "partyMembers": [
       {
