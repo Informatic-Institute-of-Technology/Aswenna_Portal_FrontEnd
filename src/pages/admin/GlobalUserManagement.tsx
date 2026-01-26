@@ -3,39 +3,39 @@ import DashboardLayout from '@/layouts/DashboardLayout';
 import { adminService, type ApiUser } from '@/services/admin.service';
 import type { GlobalUser } from '@/types/admin.types';
 import {
-    CheckCircle,
-    Error,
-    Pending,
-    Person,
-    Search,
-    Visibility,
-    Warning
+  CheckCircle,
+  Close,
+  Error,
+  Pending,
+  Person,
+  Search,
+  Visibility,
+  Warning
 } from '@mui/icons-material';
 import {
-    Avatar,
-    Box,
-    Button,
-    Card,
-    CardContent,
-    Chip,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle, Grid, IconButton,
-    InputAdornment,
-    Paper,
-    Tab,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TablePagination,
-    TableRow,
-    Tabs,
-    TextField,
-    Tooltip,
-    Typography
+  Avatar,
+  Box,
+  Card,
+  CardContent,
+  Chip,
+  Dialog,
+  DialogContent,
+  Grid,
+  IconButton,
+  InputAdornment,
+  Paper,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
+  Tabs,
+  TextField,
+  Tooltip,
+  Typography
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 
@@ -312,8 +312,8 @@ const GlobalUserManagement = () => {
                         {user.totalInvested
                           ? formatCurrency(user.totalInvested)
                           : user.totalEarnings
-                          ? formatCurrency(user.totalEarnings)
-                          : '-'}
+                            ? formatCurrency(user.totalEarnings)
+                            : '-'}
                       </Typography>
                     </TableCell>
                     <TableCell>
@@ -408,164 +408,307 @@ const GlobalUserManagement = () => {
         onClose={handleCloseDialog}
         maxWidth="md"
         fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+          }
+        }}
       >
         {selectedUser && (
           <>
-            <DialogTitle>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Avatar src={selectedUser.avatar} sx={{ width: 56, height: 56 }} />
-                <Box>
-                  <Typography variant="h6">{selectedUser.fullName}</Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {selectedUser.id} • {selectedUser.role}
+            <Box
+              sx={{
+                background: 'rgba(255, 255, 255, 0.05)',
+                backdropFilter: 'blur(20px)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                p: 3,
+                position: 'relative',
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, position: 'relative', zIndex: 1 }}>
+                <Avatar
+                  src={selectedUser.avatar}
+                  sx={{
+                    width: 70,
+                    height: 70,
+                    border: '2px solid rgba(255,255,255,0.2)',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                  }}
+                />
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: 'white', mb: 0.5 }}>
+                    {selectedUser.fullName}
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
+                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.875rem' }}>
+                      {selectedUser.id}
+                    </Typography>
+                    <Chip
+                      label={selectedUser.role}
+                      size="small"
+                      sx={{
+                        bgcolor: 'rgba(255,255,255,0.15)',
+                        color: 'white',
+                        fontWeight: 600,
+                        backdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                      }}
+                    />
+                  </Box>
+                </Box>
+                <IconButton
+                  onClick={handleCloseDialog}
+                  sx={{
+                    color: 'rgba(255,255,255,0.9)',
+                    bgcolor: 'rgba(255,255,255,0.1)',
+                    '&:hover': {
+                      bgcolor: 'rgba(255,255,255,0.2)',
+                    },
+                  }}
+                >
+                  <Close />
+                </IconButton>
+              </Box>
+            </Box>
+
+
+
+            <DialogContent sx={{ p: 0, bgcolor: 'transparent' }}>
+              {/* Stats Row - Instagram/Facebook style */}
+              <Box sx={{
+                display: 'flex',
+                justifyContent: 'space-around',
+                p: 3,
+                borderBottom: '1px solid rgba(255,255,255,0.1)',
+                bgcolor: 'rgba(255,255,255,0.02)',
+              }}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography variant="h5" sx={{ fontWeight: 700, color: 'white' }}>
+                    {selectedUser.totalProjects}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)' }}>
+                    Projects
+                  </Typography>
+                </Box>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography variant="h5" sx={{ fontWeight: 700, color: '#4CAF50' }}>
+                    {selectedUser.activeProjects}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)' }}>
+                    Active
+                  </Typography>
+                </Box>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography variant="h5" sx={{ fontWeight: 700, color: 'white' }}>
+                    {selectedUser.completedProjects}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)' }}>
+                    Completed
+                  </Typography>
+                </Box>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Chip
+                    label={selectedUser.trustScore}
+                    size="small"
+                    color={getTrustScoreColor(selectedUser.trustScore) as "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning"}
+                    sx={{ fontWeight: 700, fontSize: '1rem', height: 32, minWidth: 50 }}
+                  />
+                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', display: 'block', mt: 0.5 }}>
+                    Trust Score
                   </Typography>
                 </Box>
               </Box>
-            </DialogTitle>
-            <DialogContent dividers>
-              <Grid container spacing={3}>
 
-                <Grid size={{ xs: 12 }}>
-                  <Typography variant="subtitle2" fontWeight={700} gutterBottom>
-                    Contact Information
-                  </Typography>
-                  <Box sx={{ pl: 2 }}>
-                    <Typography variant="body2">Email: {selectedUser.email}</Typography>
-                    <Typography variant="body2">Phone: {selectedUser.phoneNumber}</Typography>
-                    <Typography variant="body2">Address: {selectedUser.address}</Typography>
-                  </Box>
-                </Grid>
-
-
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <Typography variant="subtitle2" fontWeight={700} gutterBottom>
-                    Account Status
-                  </Typography>
-                  <Box sx={{ pl: 2 }}>
-                    <Typography variant="body2">
-                      Registered: {formatDate(selectedUser.registrationDate)}
-                    </Typography>
-                    <Typography variant="body2">
-                      Last Login: {formatDateTime(selectedUser.lastLogin)}
-                    </Typography>
-                    <Typography variant="body2">
-                      Status: {selectedUser.isActive ? 'Active' : 'Inactive'}
-                    </Typography>
-                    <Typography variant="body2">
-                      Trust Score: <Chip label={selectedUser.trustScore} size="small" color={getTrustScoreColor(selectedUser.trustScore) as "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning"} />
-                    </Typography>
-                  </Box>
-                </Grid>
-
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <Typography variant="subtitle2" fontWeight={700} gutterBottom>
-                    Activity Metrics
-                  </Typography>
-                  <Box sx={{ pl: 2 }}>
-                    <Typography variant="body2">
-                      Total Projects: {selectedUser.totalProjects}
-                    </Typography>
-                    <Typography variant="body2">
-                      Active Projects: {selectedUser.activeProjects}
-                    </Typography>
-                    <Typography variant="body2">
-                      Completed: {selectedUser.completedProjects}
-                    </Typography>
-                    <Typography variant="body2">
-                      Transactions: {selectedUser.totalTransactions}
-                    </Typography>
-                  </Box>
-                </Grid>
-
-
-                <Grid size={{ xs: 12 }}>
-                  <Typography variant="subtitle2" fontWeight={700} gutterBottom>
-                    Financial Summary
-                  </Typography>
-                  <Box sx={{ pl: 2 }}>
-                    {selectedUser.totalInvested && (
-                      <Typography variant="body2">
-                        Total Invested: {formatCurrency(selectedUser.totalInvested)}
+              {/* About Section */}
+              <Box sx={{ p: 3 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'white', mb: 2, letterSpacing: 0.5 }}>
+                  ABOUT
+                </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                    <Box sx={{ minWidth: 100 }}>
+                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
+                        Email
                       </Typography>
+                    </Box>
+                    <Typography variant="body2" sx={{ color: 'white', fontWeight: 500 }}>
+                      {selectedUser.email}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                    <Box sx={{ minWidth: 100 }}>
+                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
+                        Phone
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" sx={{ color: 'white', fontWeight: 500 }}>
+                      {selectedUser.phoneNumber}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                    <Box sx={{ minWidth: 100 }}>
+                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
+                        Address
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" sx={{ color: 'white', fontWeight: 500 }}>
+                      {selectedUser.address}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                    <Box sx={{ minWidth: 100 }}>
+                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
+                        Joined
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" sx={{ color: 'white', fontWeight: 500 }}>
+                      {formatDate(selectedUser.registrationDate)}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                    <Box sx={{ minWidth: 100 }}>
+                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
+                        Last Active
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" sx={{ color: 'white', fontWeight: 500 }}>
+                      {formatDateTime(selectedUser.lastLogin)}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                    <Box sx={{ minWidth: 100 }}>
+                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
+                        Status
+                      </Typography>
+                    </Box>
+                    <Chip
+                      label={selectedUser.isActive ? 'Active' : 'Inactive'}
+                      size="small"
+                      color={selectedUser.isActive ? 'success' : 'error'}
+                      sx={{ fontWeight: 600, height: 24 }}
+                    />
+                  </Box>
+                </Box>
+              </Box>
+
+              {/* Verification Section */}
+              <Box sx={{ px: 3, pb: 3, borderTop: '1px solid rgba(255,255,255,0.1)', pt: 3 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'white', mb: 2, letterSpacing: 0.5 }}>
+                  VERIFICATION
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  <Chip
+                    label={`Identity: ${selectedUser.verificationStatus.identity}`}
+                    size="small"
+                    icon={getVerificationIcon(selectedUser.verificationStatus.identity)!}
+                    sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: 'white' }}
+                  />
+                  <Chip
+                    label={`Email: ${selectedUser.verificationStatus.email}`}
+                    size="small"
+                    icon={getVerificationIcon(selectedUser.verificationStatus.email)!}
+                    color={selectedUser.verificationStatus.email === 'verified' ? 'success' : 'warning'}
+                  />
+                  <Chip
+                    label={`Phone: ${selectedUser.verificationStatus.phone}`}
+                    size="small"
+                    icon={getVerificationIcon(selectedUser.verificationStatus.phone)!}
+                    color={selectedUser.verificationStatus.phone === 'verified' ? 'success' : 'warning'}
+                  />
+                  {selectedUser.verificationStatus.bankAccount && (
+                    <Chip
+                      label={`Bank: ${selectedUser.verificationStatus.bankAccount}`}
+                      size="small"
+                      icon={getVerificationIcon(selectedUser.verificationStatus.bankAccount)!}
+                      sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: 'white' }}
+                    />
+                  )}
+                </Box>
+              </Box>
+
+              {/* Financial Section */}
+              {(selectedUser.totalInvested || selectedUser.totalEarnings || selectedUser.overduePayments > 0) && (
+                <Box sx={{ px: 3, pb: 3, borderTop: '1px solid rgba(255,255,255,0.1)', pt: 3 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'white', mb: 2, letterSpacing: 0.5 }}>
+                    FINANCIALS
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {selectedUser.totalInvested && (
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                          Total Invested
+                        </Typography>
+                        <Typography variant="h6" sx={{ color: '#4CAF50', fontWeight: 700 }}>
+                          {formatCurrency(selectedUser.totalInvested)}
+                        </Typography>
+                      </Box>
                     )}
                     {selectedUser.totalEarnings && (
-                      <Typography variant="body2">
-                        Total Earnings: {formatCurrency(selectedUser.totalEarnings)}
-                      </Typography>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                          Total Earnings
+                        </Typography>
+                        <Typography variant="h6" sx={{ color: '#4CAF50', fontWeight: 700 }}>
+                          {formatCurrency(selectedUser.totalEarnings)}
+                        </Typography>
+                      </Box>
                     )}
-                    <Typography variant="body2">
-                      Overdue Payments: {selectedUser.overduePayments}
-                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                        Overdue Payments
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: selectedUser.overduePayments > 0 ? '#f44336' : 'white', fontWeight: 600 }}>
+                        {selectedUser.overduePayments}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                        Transactions
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: 'white', fontWeight: 600 }}>
+                        {selectedUser.totalTransactions}
+                      </Typography>
+                    </Box>
                   </Box>
-                </Grid>
+                </Box>
+              )}
 
-
-                <Grid size={{ xs: 12 }}>
-                  <Typography variant="subtitle2" fontWeight={700} gutterBottom>
-                    Verification Status
+              {/* Risk Indicators Section */}
+              {(selectedUser.overduePayments > 0 || selectedUser.disputesInvolved > 0) && (
+                <Box sx={{
+                  px: 3,
+                  pb: 3,
+                  borderTop: '1px solid rgba(244, 67, 54, 0.3)',
+                  pt: 3,
+                  bgcolor: 'rgba(244, 67, 54, 0.05)',
+                }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#f44336', mb: 2, letterSpacing: 0.5 }}>
+                    ⚠️ ALERTS
                   </Typography>
-                  <Box sx={{ pl: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                    <Chip
-                      label={`Identity: ${selectedUser.verificationStatus.identity}`}
-                      size="small"
-                      icon={getVerificationIcon(selectedUser.verificationStatus.identity)!}
-                    />
-                    <Chip
-                      label={`Email: ${selectedUser.verificationStatus.email}`}
-                      size="small"
-                      icon={getVerificationIcon(selectedUser.verificationStatus.email)!}
-                    />
-                    <Chip
-                      label={`Phone: ${selectedUser.verificationStatus.phone}`}
-                      size="small"
-                      icon={getVerificationIcon(selectedUser.verificationStatus.phone)!}
-                    />
-                    {selectedUser.verificationStatus.bankAccount && (
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    {selectedUser.overduePayments > 0 && (
                       <Chip
-                        label={`Bank: ${selectedUser.verificationStatus.bankAccount}`}
+                        label={`${selectedUser.overduePayments} Overdue Payment(s)`}
                         size="small"
-                        icon={getVerificationIcon(selectedUser.verificationStatus.bankAccount)!}
+                        color="error"
+                        icon={<Warning />}
+                      />
+                    )}
+                    {selectedUser.disputesInvolved > 0 && (
+                      <Chip
+                        label={`${selectedUser.disputesInvolved} Dispute(s)`}
+                        size="small"
+                        color="warning"
+                        icon={<Error />}
                       />
                     )}
                   </Box>
-                </Grid>
-
-                {/* Risk Indicators */}
-                {(selectedUser.overduePayments > 0 || selectedUser.disputesInvolved > 0) && (
-                  <Grid size={{ xs: 12 }}>
-                    <Typography variant="subtitle2" fontWeight={700} gutterBottom color="error">
-                      Risk Indicators
-                    </Typography>
-                    <Box sx={{ pl: 2 }}>
-                      {selectedUser.overduePayments > 0 && (
-                        <Chip
-                          label={`${selectedUser.overduePayments} Overdue Payment(s)`}
-                          size="small"
-                          color="error"
-                          icon={<Warning />}
-                          sx={{ mr: 1, mb: 1 }}
-                        />
-                      )}
-                      {selectedUser.disputesInvolved > 0 && (
-                        <Chip
-                          label={`${selectedUser.disputesInvolved} Dispute(s)`}
-                          size="small"
-                          color="warning"
-                          icon={<Error />}
-                          sx={{ mr: 1, mb: 1 }}
-                        />
-                      )}
-                    </Box>
-                  </Grid>
-                )}
-              </Grid>
+                </Box>
+              )}
             </DialogContent>
-            <DialogActions>
-              <Button onClick={handleCloseDialog}>Close</Button>
-              <Button variant="contained" color="primary">
-                View Full Profile
-              </Button>
-            </DialogActions>
           </>
         )}
       </Dialog>
