@@ -35,12 +35,12 @@ interface ProfileFormData {
 }
 
 const AccountPage = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
-  
+
   const [formData, setFormData] = useState<ProfileFormData>({
     firstName: '',
     lastName: '',
@@ -74,26 +74,27 @@ const AccountPage = () => {
     setSuccess(false);
 
     try {
-      // Simulate 5 second loading for demo
       await new Promise(resolve => setTimeout(resolve, 5000));
 
       if (!user?._id) {
         throw new Error('User ID not found');
       }
 
-      // Use userService to update profile
       const updatedUser = await userService.updateUserProfile(user._id, formData);
 
       console.log('Profile updated successfully:', updatedUser);
-      
-      // Update local context with new data
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+
+      const completeUserData = {
+        ...updatedUser,
+        role: user.role,
+      };
+
+      updateUser(completeUserData);
 
       setLoading(false);
       setSuccess(true);
       setIsEditing(false);
 
-      // Auto-dismiss success message after 3 seconds
       setTimeout(() => {
         setSuccess(false);
       }, 3000);
@@ -134,9 +135,9 @@ const AccountPage = () => {
         </Typography>
 
         {success && (
-          <Alert 
-            severity="success" 
-            sx={{ 
+          <Alert
+            severity="success"
+            sx={{
               mb: 3,
               animation: 'slideIn 0.3s ease-out',
               '@keyframes slideIn': {
@@ -149,7 +150,7 @@ const AccountPage = () => {
                   transform: 'translateY(0)',
                 },
               },
-            }} 
+            }}
             onClose={() => setSuccess(false)}
           >
             Profile updated successfully!
@@ -171,13 +172,13 @@ const AccountPage = () => {
                   <ProfileAvatar
                     fullName={user?.fullName || null}
                     avatarUrl={
-                      user?.role === 'farmer' 
+                      user?.role === 'farmer'
                         ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJP8vN8tGwjdGdBoNRb3S7qP1VA0Q1F-SfWg&s'
                         : user?.role === 'investor'
-                        ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWHUQslqLEawVVIzUcGFkYYRm30cguWYwuhg&s'
-                        : user?.role === 'landowner'
-                        ? 'https://businesstoday.lk/wp-content/uploads/2024/11/Ishara-Nanayakkara-Executive-Chairman-1.png'
-                        : undefined
+                          ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWHUQslqLEawVVIzUcGFkYYRm30cguWYwuhg&s'
+                          : user?.role === 'landowner'
+                            ? 'https://businesstoday.lk/wp-content/uploads/2024/11/Ishara-Nanayakkara-Executive-Chairman-1.png'
+                            : undefined
                     }
                     size={140}
                     editable={true}
@@ -188,7 +189,7 @@ const AccountPage = () => {
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                     {user?.email || ''}
                   </Typography>
-                  
+
                   <Stack direction="row" spacing={1} justifyContent="center" sx={{ mb: 2 }}>
                     <InfoChip label={user?.role || 'User'} type="role" />
                   </Stack>
@@ -198,16 +199,16 @@ const AccountPage = () => {
                   <Stack spacing={1.5}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Email fontSize="small" color="action" />
-                      <InfoChip 
-                        label={user?.emailVerified ? 'Email Verified' : 'Email Not Verified'} 
+                      <InfoChip
+                        label={user?.emailVerified ? 'Email Verified' : 'Email Not Verified'}
                         verified={user?.emailVerified}
                         type="verified"
                       />
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Phone fontSize="small" color="action" />
-                      <InfoChip 
-                        label={user?.phoneNumberVerified ? 'Phone Verified' : 'Phone Not Verified'} 
+                      <InfoChip
+                        label={user?.phoneNumberVerified ? 'Phone Verified' : 'Phone Not Verified'}
                         verified={user?.phoneNumberVerified}
                         type="verified"
                       />
@@ -277,7 +278,6 @@ const AccountPage = () => {
 
                 <form onSubmit={handleSubmit}>
                   <Grid container spacing={3}>
-                    {/* First Name */}
                     <Grid size={{ xs: 12, sm: 6 }}>
                       <FormField
                         label="First Name"
@@ -289,7 +289,6 @@ const AccountPage = () => {
                       />
                     </Grid>
 
-                    {/* Last Name */}
                     <Grid size={{ xs: 12, sm: 6 }}>
                       <FormField
                         label="Last Name"
@@ -307,7 +306,7 @@ const AccountPage = () => {
                         label="Email Address"
                         name="email"
                         value={user?.email || ''}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         disabled
                         InputProps={{
                           endAdornment: (
@@ -358,7 +357,7 @@ const AccountPage = () => {
                         label="Role"
                         name="role"
                         value={user?.role || ''}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         disabled
                       />
                     </Grid>
@@ -369,7 +368,7 @@ const AccountPage = () => {
                         label="Created By"
                         name="createdBy"
                         value={user?.createdBy || ''}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         disabled
                       />
                     </Grid>

@@ -143,7 +143,6 @@ class AdminService {
         const { province } = this.parseLocation(user.address);
         const roleKey = roleMap[user.role];
 
-        // Ensure province is a valid string, use 'Unknown' as fallback
         const provinceKey = province || 'Unknown';
 
         if (!distribution[provinceKey]) {
@@ -159,6 +158,25 @@ class AdminService {
       return distribution;
     } catch (error) {
       console.error('Failed to fetch province distribution:', error);
+      throw error;
+    }
+  }
+
+  async updateUser(userId: string, updates: {
+    firstName?: string;
+    lastName?: string;
+    address?: string;
+    phoneNumber?: string;
+  }): Promise<ApiUser> {
+    try {
+      const response = await httpClient.patch<ApiUser>(
+        `/v1/user/${userId}`,
+        updates
+      );
+      console.log('Updated user:', response);
+      return response;
+    } catch (error) {
+      console.error('Failed to update user:', error);
       throw error;
     }
   }

@@ -46,7 +46,7 @@ class UserService {
    * Update user profile
    */
   async updateUserProfile(userId: string, data: UpdateUserProfileDTO): Promise<User> {
-    const response = await httpClient.put<UserApiResponse>(`/v1/user/${userId}`, data);
+    const response = await httpClient.patch<UserApiResponse>(`/v1/user/${userId}`, data);
     return this.mapUserResponse(response);
   }
 

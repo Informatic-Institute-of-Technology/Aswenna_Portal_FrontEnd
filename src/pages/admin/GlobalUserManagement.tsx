@@ -3,11 +3,14 @@ import DashboardLayout from '@/layouts/DashboardLayout';
 import { adminService, type ApiUser } from '@/services/admin.service';
 import type { GlobalUser } from '@/types/admin.types';
 import {
+  Cancel,
   CheckCircle,
   Close,
+  Edit,
   Error,
   Pending,
   Person,
+  Save,
   Search,
   Visibility,
   Warning
@@ -138,6 +141,14 @@ const GlobalUserManagement = () => {
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage] = useState(10);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+    address: '',
+  });
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -174,6 +185,51 @@ const GlobalUserManagement = () => {
   const handleCloseDialog = () => {
     setDetailDialogOpen(false);
     setSelectedUser(null);
+    setIsEditMode(false);
+  };
+
+  const handleEditClick = () => {
+    if (selectedUser) {
+      const nameParts = selectedUser.fullName.split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+
+      setEditFormData({
+        firstName,
+        lastName,
+        phoneNumber: selectedUser.phoneNumber || '',
+        address: selectedUser.address || '',
+      });
+      setIsEditMode(true);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditMode(false);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!selectedUser) return;
+
+    try {
+      setSaving(true);
+      await adminService.updateUser(selectedUser.id, editFormData);
+
+      const apiUsers = await adminService.getAllUsersPaginated();
+      setUsers(apiUsers.map(mapApiUserToGlobalUser));
+
+      const updatedUser = apiUsers.find(u => u._id === selectedUser.id);
+      if (updatedUser) {
+        setSelectedUser(mapApiUserToGlobalUser(updatedUser));
+      }
+
+      setIsEditMode(false);
+    } catch (error) {
+      console.error('Failed to update user:', error);
+      alert('Failed to update user. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const getRoleStats = () => {
@@ -459,25 +515,69 @@ const GlobalUserManagement = () => {
                     />
                   </Box>
                 </Box>
-                <IconButton
-                  onClick={handleCloseDialog}
-                  sx={{
-                    color: 'rgba(255,255,255,0.9)',
-                    bgcolor: 'rgba(255,255,255,0.1)',
-                    '&:hover': {
-                      bgcolor: 'rgba(255,255,255,0.2)',
-                    },
-                  }}
-                >
-                  <Close />
-                </IconButton>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  {isEditMode ? (
+                    <>
+                      <IconButton
+                        onClick={handleSaveEdit}
+                        disabled={saving}
+                        sx={{
+                          color: '#4CAF50',
+                          bgcolor: 'rgba(76, 175, 80, 0.1)',
+                          '&:hover': {
+                            bgcolor: 'rgba(76, 175, 80, 0.2)',
+                          },
+                        }}
+                      >
+                        <Save />
+                      </IconButton>
+                      <IconButton
+                        onClick={handleCancelEdit}
+                        disabled={saving}
+                        sx={{
+                          color: 'rgba(255,255,255,0.7)',
+                          bgcolor: 'rgba(255,255,255,0.1)',
+                          '&:hover': {
+                            bgcolor: 'rgba(255,255,255,0.2)',
+                          },
+                        }}
+                      >
+                        <Cancel />
+                      </IconButton>
+                    </>
+                  ) : (
+                    <IconButton
+                      onClick={handleEditClick}
+                      sx={{
+                        color: 'rgba(255,255,255,0.9)',
+                        bgcolor: 'rgba(255,255,255,0.1)',
+                        '&:hover': {
+                          bgcolor: 'rgba(255,255,255,0.2)',
+                        },
+                      }}
+                    >
+                      <Edit />
+                    </IconButton>
+                  )}
+                  <IconButton
+                    onClick={handleCloseDialog}
+                    sx={{
+                      color: 'rgba(255,255,255,0.9)',
+                      bgcolor: 'rgba(255,255,255,0.1)',
+                      '&:hover': {
+                        bgcolor: 'rgba(255,255,255,0.2)',
+                      },
+                    }}
+                  >
+                    <Close />
+                  </IconButton>
+                </Box>
               </Box>
             </Box>
 
 
 
             <DialogContent sx={{ p: 0, bgcolor: 'transparent' }}>
-              {/* Stats Row - Instagram/Facebook style */}
               <Box sx={{
                 display: 'flex',
                 justifyContent: 'space-around',
@@ -522,12 +622,57 @@ const GlobalUserManagement = () => {
                 </Box>
               </Box>
 
-              {/* About Section */}
               <Box sx={{ p: 3 }}>
                 <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'white', mb: 2, letterSpacing: 0.5 }}>
                   ABOUT
                 </Typography>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {isEditMode && (
+                    <>
+                      <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                        <Box sx={{ minWidth: 100 }}>
+                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
+                            First Name
+                          </Typography>
+                        </Box>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          value={editFormData.firstName}
+                          onChange={(e) => setEditFormData({ ...editFormData, firstName: e.target.value })}
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              color: 'white',
+                              '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                              '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
+                              '&.Mui-focused fieldset': { borderColor: '#4CAF50' },
+                            },
+                          }}
+                        />
+                      </Box>
+                      <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                        <Box sx={{ minWidth: 100 }}>
+                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
+                            Last Name
+                          </Typography>
+                        </Box>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          value={editFormData.lastName}
+                          onChange={(e) => setEditFormData({ ...editFormData, lastName: e.target.value })}
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              color: 'white',
+                              '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                              '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
+                              '&.Mui-focused fieldset': { borderColor: '#4CAF50' },
+                            },
+                          }}
+                        />
+                      </Box>
+                    </>
+                  )}
                   <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
                     <Box sx={{ minWidth: 100 }}>
                       <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
@@ -544,9 +689,26 @@ const GlobalUserManagement = () => {
                         Phone
                       </Typography>
                     </Box>
-                    <Typography variant="body2" sx={{ color: 'white', fontWeight: 500 }}>
-                      {selectedUser.phoneNumber}
-                    </Typography>
+                    {isEditMode ? (
+                      <TextField
+                        fullWidth
+                        size="small"
+                        value={editFormData.phoneNumber}
+                        onChange={(e) => setEditFormData({ ...editFormData, phoneNumber: e.target.value })}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            color: 'white',
+                            '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                            '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
+                            '&.Mui-focused fieldset': { borderColor: '#4CAF50' },
+                          },
+                        }}
+                      />
+                    ) : (
+                      <Typography variant="body2" sx={{ color: 'white', fontWeight: 500 }}>
+                        {selectedUser.phoneNumber}
+                      </Typography>
+                    )}
                   </Box>
                   <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
                     <Box sx={{ minWidth: 100 }}>
@@ -554,9 +716,28 @@ const GlobalUserManagement = () => {
                         Address
                       </Typography>
                     </Box>
-                    <Typography variant="body2" sx={{ color: 'white', fontWeight: 500 }}>
-                      {selectedUser.address}
-                    </Typography>
+                    {isEditMode ? (
+                      <TextField
+                        fullWidth
+                        size="small"
+                        multiline
+                        rows={2}
+                        value={editFormData.address}
+                        onChange={(e) => setEditFormData({ ...editFormData, address: e.target.value })}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            color: 'white',
+                            '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                            '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
+                            '&.Mui-focused fieldset': { borderColor: '#4CAF50' },
+                          },
+                        }}
+                      />
+                    ) : (
+                      <Typography variant="body2" sx={{ color: 'white', fontWeight: 500 }}>
+                        {selectedUser.address}
+                      </Typography>
+                    )}
                   </Box>
                   <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
                     <Box sx={{ minWidth: 100 }}>

@@ -24,13 +24,13 @@ const MyOffersPage = () => {
     return projects.filter(p => p.investorId === user?._id);
   }, [user?._id]);
 
-  const activeProjects = useMemo(() => 
-    allProjects.filter(p => p.status === 'active'), 
+  const activeProjects = useMemo(() =>
+    allProjects.filter(p => p.status === 'active'),
     [allProjects]
   );
 
-  const pastProjects = useMemo(() => 
-    allProjects.filter(p => p.status === 'completed'), 
+  const pastProjects = useMemo(() =>
+    allProjects.filter(p => p.status === 'completed'),
     [allProjects]
   );
 
