@@ -158,7 +158,7 @@ const InvestmentRequestCard = ({ request, onViewDetails }: InvestmentRequestCard
             <Typography variant="caption" sx={{ color: '#999', mb: 0.5, display: 'block', fontSize: '0.7rem' }}>
               TOTAL INVESTMENT
             </Typography>
-            <Typography variant="h6" fontWeight={700} sx={{ color: '#76c043', fontSize: '1.3rem' }}>
+            <Typography variant="h6" fontWeight={700} sx={{ color: '#ffa726', fontSize: '1.3rem' }}>
               {formatCurrency(request.totalInvestmentRequired)}
             </Typography>
           </Box>
@@ -167,13 +167,12 @@ const InvestmentRequestCard = ({ request, onViewDetails }: InvestmentRequestCard
             <Typography variant="caption" sx={{ color: '#999', mb: 0.5, display: 'block', fontSize: '0.7rem' }}>
               EXPECTED ROI
             </Typography>
-            <Typography variant="h6" fontWeight={700} sx={{ color: '#76c043', fontSize: '1.3rem' }}>
+            <Typography variant="h6" fontWeight={700} sx={{ color: '#2196f3', fontSize: '1.3rem' }}>
               {request.expectedROI}%
             </Typography>
           </Box>
         </Box>
 
-        {/* Project Details */}
         <Box sx={{ mb: 2 }}>
           <Typography 
             variant="body2" 
@@ -237,24 +236,6 @@ const InvestmentRequestCard = ({ request, onViewDetails }: InvestmentRequestCard
           </Button>
         </Box>
       </CardContent>
-
-      {/* Footer Note */}
-      <Box sx={{ px: 2, py: 1.5, borderTop: '1px solid #3a3a3a', bgcolor: '#1f1f1f' }}>
-        <Typography
-          variant="caption"
-          sx={{
-            color: '#999',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '0.7rem',
-            gap: 0.5
-          }}
-        >
-          <Box component="span" sx={{ color: '#ff9800' }}>⚡</Box>
-          Only ONE investor can fund this project
-        </Typography>
-      </Box>
     </Card>
   );
 };
