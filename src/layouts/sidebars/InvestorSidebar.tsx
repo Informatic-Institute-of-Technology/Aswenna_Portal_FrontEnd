@@ -3,11 +3,11 @@ import {
     AccountCircle,
     AttachMoney,
     BarChart as BarChartIcon,
+    BusinessCenter,
     Description,
     Home,
     Landscape,
     Mail,
-    People,
     Settings,
     TrendingUp,
 } from '@mui/icons-material';
@@ -31,8 +31,8 @@ const InvestorSidebar = () => {
 
   const menuItems = [
     { text: 'Dashboard', icon: <Home />, path: '/dashboard' },
+    { text: 'Opportunities', icon: <BusinessCenter />, path: '/dashboard/opportunities' },
     { text: 'My Offers', icon: <AttachMoney />, path: '/dashboard/my-offers' },
-    { text: 'Farmer Search', icon: <People />, path: '/dashboard/farmer-search' },
     { text: 'Land Search', icon: <Landscape />, path: '/dashboard/land-search' },
     { text: 'Requests', icon: <Description />, path: '/dashboard/requests' },
     { text: 'ROI / Market Analysis', icon: <TrendingUp />, path: '/dashboard/roi-analysis' },

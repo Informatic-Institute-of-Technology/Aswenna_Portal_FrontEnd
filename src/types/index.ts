@@ -15,5 +15,6 @@ export interface AuthCredentials {
   password: string;  
 }  
   
+export * from './farmer.types';
 export * from './investor.types';
 

@@ -25,7 +25,7 @@ import {
     Paper,
     Select,
     TextField,
-    Typography,
+    Typography
 } from '@mui/material';
 import { useState } from 'react';
 

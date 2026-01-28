@@ -67,7 +67,6 @@ function TabPanel(props: TabPanelProps) {
 
 const SuperAdminDashboard = () => {
   const [tabValue, setTabValue] = useState(0);
-  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [users, setUsers] = useState<ApiUser[]>([]);
   const [userStats, setUserStats] = useState({
@@ -105,7 +104,6 @@ const SuperAdminDashboard = () => {
       setError(message);
       console.error('Dashboard error:', err);
     } finally {
-      setLoading(false);
       setRefreshing(false);
     }
   };
@@ -258,31 +256,6 @@ const SuperAdminDashboard = () => {
       </CardContent>
     </Card>
   );
-
-  if (loading) {
-    return (
-      <DashboardLayout>
-        <Box
-          sx={{
-            height: '80vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Box sx={{ textAlign: 'center' }}>
-            <CircularProgress size={60} thickness={4} />
-            <Typography variant="h6" sx={{ mt: 3 }}>
-              Loading Dashboard...
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Fetching real-time data from the platform
-            </Typography>
-          </Box>
-        </Box>
-      </DashboardLayout>
-    );
-  }
 
   return (
     <DashboardLayout>
