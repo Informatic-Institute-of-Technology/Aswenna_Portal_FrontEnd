@@ -1,0 +1,113 @@
+[
+  {
+    "id": "sp-1",
+    "offerType": "sponsorship",
+    "investorName": "Danitha Perera",
+    "sponsorshipTitle": "Organic Farming Sponsorship 2026",
+    "cropTypes": ["Vegetables (Mixed)", "Tomatoes", "Carrots"],
+    "preferredFarmingMethod": "organic",
+    "minimumInvestment": 100000,
+    "maximumInvestment": 300000,
+    "commissionRate": 15,
+    "currency": "LKR",
+    "supportType": ["capital", "expertise", "marketing"],
+    "minimumProjectDuration": 3,
+    "maximumProjectDuration": 6,
+    "preferredRegions": ["Nuwara Eliya", "Kandy", "Badulla"],
+    "description": "Looking to sponsor organic farmers. Will provide capital, technical expertise, and marketing support in exchange for 15% commission on harvest.",
+    "status": "active",
+    "applicationsCount": 24,
+    "selectedFarmer": {
+      "farmerId": "f2",
+      "farmerName": "Sunil Fernando",
+      "farmerImage": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
+      "location": "Kandy",
+      "experience": 12,
+      "rating": 4.8,
+      "confirmedAt": "2026-01-18T00:00:00.000Z",
+      "farmerOwnedLand": false
+    },
+    "selectedLandOwner": {
+      "landOwnerId": "l1",
+      "landOwnerName": "Ranjith Perera",
+      "landOwnerImage": "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150",
+      "landSize": 5,
+      "landLocation": "Kandy",
+      "soilType": "Loamy",
+      "irrigationType": "Drip irrigation",
+      "confirmedAt": "2026-01-18T00:00:00.000Z",
+      "rentalDuration": 6
+    },
+    "expectedHarvestValue": 500000,
+    "expectedCommission": 75000,
+    "paymentInstallments": [
+      {
+        "id": "p5",
+        "installmentNumber": 1,
+        "amount": 50000,
+        "dueDate": "2026-02-01",
+        "milestone": "Advance Payment",
+        "status": "paid",
+        "paidDate": "2026-01-25"
+      },
+      {
+        "id": "p6",
+        "installmentNumber": 2,
+        "amount": 100000,
+        "dueDate": "2026-04-01",
+        "milestone": "Mid-Season Support",
+        "status": "pending"
+      },
+      {
+        "id": "p7",
+        "installmentNumber": 3,
+        "amount": 150000,
+        "dueDate": "2026-06-15",
+        "milestone": "Harvest Season",
+        "status": "pending"
+      }
+    ],
+    "createdAt": "2026-01-12T00:00:00.000Z",
+    "updatedAt": "2026-01-18T00:00:00.000Z"
+  },
+  {
+    "id": "sp-2",
+    "offerType": "sponsorship",
+    "investorName": "Investor Group LK",
+    "sponsorshipTitle": "Tea Plantation Investment Program",
+    "cropTypes": ["Tea"],
+    "preferredFarmingMethod": "conventional",
+    "minimumInvestment": 200000,
+    "maximumInvestment": 500000,
+    "commissionRate": 12,
+    "currency": "LKR",
+    "supportType": ["capital", "equipment"],
+    "minimumProjectDuration": 6,
+    "maximumProjectDuration": 12,
+    "preferredRegions": ["Nuwara Eliya", "Kandy"],
+    "description": "Sponsoring tea farmers with capital and equipment. 12% commission on harvest sales.",
+    "status": "pending",
+    "applicationsCount": 6,
+    "expectedCommission": 120000,
+    "paymentInstallments": [
+      {
+        "id": "p8",
+        "installmentNumber": 1,
+        "amount": 200000,
+        "dueDate": "2026-03-01",
+        "milestone": "Project Start",
+        "status": "pending"
+      },
+      {
+        "id": "p9",
+        "installmentNumber": 2,
+        "amount": 300000,
+        "dueDate": "2026-08-01",
+        "milestone": "Equipment & Support",
+        "status": "pending"
+      }
+    ],
+    "createdAt": "2026-01-08T00:00:00.000Z",
+    "updatedAt": "2026-01-08T00:00:00.000Z"
+  }
+]

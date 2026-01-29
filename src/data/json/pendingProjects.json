@@ -1,0 +1,881 @@
+[
+  {
+    "id": "5",
+    "projectId": "PRJ-201",
+    "investorId": "696e6196b558abe2695480a6",
+    "projectName": "Tea Estate Development",
+    "cropType": "Ceylon Tea",
+    "cropIcon": "🍵",
+    "farmerName": "Nimal Jayasinghe",
+    "farmerId": "FAR-301",
+    "farmerImage": "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=150",
+    "location": "Nuwara Eliya",
+    "district": "Nuwara Eliya",
+    "province": "Central",
+    "coordinates": "6.9497, 80.7891",
+    "expectedROI": 42,
+    "status": "pending",
+    "investmentType": "harvest",
+    "startDate": "2026-03-01",
+    "endDate": "2026-09-30",
+    "backgroundImage": "https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?w=600",
+    "investorName": "Tea Trade Ceylon",
+    "investorAmount": 380000,
+    "landownerName": "Highland Tea Estates",
+    "landownerId": "LND-088",
+    "riskLevel": "LOW",
+    "riskStatus": "Awaiting Investment",
+    "milestones": [
+      {
+        "id": "T1",
+        "title": "Tea Bush Pruning & Soil Preparation",
+        "description": "Prune existing tea bushes and prepare soil with organic compost",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2026-03-01",
+        "endDate": "2026-03-20",
+        "payment": 45000,
+        "tasks": { "total": 15, "completed": 0 }
+      },
+      {
+        "id": "T2",
+        "title": "New Tea Planting",
+        "description": "Plant new high-quality Ceylon tea varieties",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2026-03-21",
+        "endDate": "2026-04-30",
+        "payment": 65000,
+        "tasks": { "total": 20, "completed": 0 }
+      },
+      {
+        "id": "T3",
+        "title": "Irrigation System Upgrade",
+        "description": "Install modern drip irrigation system",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2026-05-01",
+        "endDate": "2026-05-31",
+        "payment": 55000,
+        "tasks": { "total": 12, "completed": 0 }
+      },
+      {
+        "id": "T4",
+        "title": "First Flush Harvest",
+        "description": "Harvest premium first flush tea leaves",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2026-06-01",
+        "endDate": "2026-06-30",
+        "payment": 70000,
+        "tasks": { "total": 18, "completed": 0 }
+      },
+      {
+        "id": "T5",
+        "title": "Second & Third Flush Harvest",
+        "description": "Complete remaining harvest cycles",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2026-07-01",
+        "endDate": "2026-09-30",
+        "payment": 145000,
+        "tasks": { "total": 25, "completed": 0 }
+      }
+    ],
+    "payments": [
+      {
+        "id": "TP1",
+        "milestoneId": "T1",
+        "amount": 45000,
+        "dueDate": "2026-03-20",
+        "status": "pending",
+        "description": "Tea Bush Pruning Payment"
+      },
+      {
+        "id": "TP2",
+        "milestoneId": "T2",
+        "amount": 65000,
+        "dueDate": "2026-04-30",
+        "status": "pending",
+        "description": "New Tea Planting Payment"
+      },
+      {
+        "id": "TP3",
+        "milestoneId": "T3",
+        "amount": 55000,
+        "dueDate": "2026-05-31",
+        "status": "pending",
+        "description": "Irrigation Upgrade Payment"
+      },
+      {
+        "id": "TP4",
+        "milestoneId": "T4",
+        "amount": 70000,
+        "dueDate": "2026-06-30",
+        "status": "pending",
+        "description": "First Flush Harvest Payment"
+      },
+      {
+        "id": "TP5",
+        "milestoneId": "T5",
+        "amount": 145000,
+        "dueDate": "2026-09-30",
+        "status": "pending",
+        "description": "Final Harvest Payment"
+      }
+    ],
+    "financialBreakdown": [
+      { "category": "Tea Seedlings & Planting", "amount": 85000 },
+      { "category": "Organic Fertilizers", "amount": 60000 },
+      { "category": "Irrigation System", "amount": 65000 },
+      { "category": "Labor & Workforce", "amount": 95000 },
+      { "category": "Harvesting & Processing", "amount": 45000 },
+      { "category": "Quality Certification", "amount": 30000 }
+    ],
+    "partyMembers": [
+      {
+        "id": "FAR-301",
+        "name": "Nimal Jayasinghe",
+        "role": "farmer",
+        "email": "nimal.j@ceylontea.lk",
+        "phone": "+94 77 789 0123",
+        "image": "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=150",
+        "location": "Nuwara Eliya, Central Province",
+        "coordinates": "6.9497, 80.7891",
+        "specialization": "Ceylon Tea Cultivation & Processing",
+        "experience": "22 years in premium tea production",
+        "rating": 4.9
+      },
+      {
+        "id": "INV-105",
+        "name": "Tea Trade Ceylon",
+        "role": "investor",
+        "email": "invest@teatradeceylon.lk",
+        "phone": "+94 11 678 9012",
+        "image": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150",
+        "location": "Colombo, Western Province",
+        "coordinates": "6.9271, 79.8612",
+        "specialization": "Tea Estate Investment",
+        "experience": "15 years in Ceylon tea trade",
+        "rating": 4.8
+      },
+      {
+        "id": "LND-088",
+        "name": "Highland Tea Estates",
+        "role": "landowner",
+        "email": "info@highlandtea.lk",
+        "phone": "+94 77 890 1234",
+        "image": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
+        "location": "Nuwara Eliya, Central Province",
+        "coordinates": "6.9607, 80.7820",
+        "specialization": "Tea Estate Land Management",
+        "experience": "40 years managing tea estates",
+        "rating": 4.9
+      }
+    ]
+  },
+  {
+    "id": "6",
+    "projectId": "PRJ-215",
+    "investorId": "696e6196b558abe2695480a6",
+    "projectName": "Cashew Nut Plantation",
+    "cropType": "Cashew",
+    "cropIcon": "🥜",
+    "farmerName": "Rohan Fernando",
+    "farmerId": "FAR-345",
+    "farmerImage": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
+    "location": "Puttalam",
+    "district": "Puttalam",
+    "province": "North Western",
+    "coordinates": "8.0362, 79.8283",
+    "expectedROI": 38,
+    "status": "pending",
+    "investmentType": "commission",
+    "commissionRate": 18,
+    "earnedCommission": 0,
+    "startDate": "2026-04-01",
+    "endDate": "2026-11-30",
+    "backgroundImage": "https://images.unsplash.com/photo-1599909533879-b35cbc65ff02?w=600",
+    "investorName": "Nut Export International",
+    "investorAmount": 290000,
+    "landownerName": "Coastal Estates",
+    "landownerId": "LND-095",
+    "riskLevel": "MEDIUM",
+    "riskStatus": "Under Review",
+    "milestones": [
+      {
+        "id": "C1",
+        "title": "Land Clearing & Preparation",
+        "description": "Clear land and prepare for cashew plantation",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2026-04-01",
+        "endDate": "2026-04-25",
+        "payment": 38000,
+        "tasks": { "total": 10, "completed": 0 }
+      },
+      {
+        "id": "C2",
+        "title": "Cashew Seedling Plantation",
+        "description": "Plant high-yield cashew seedlings",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2026-04-26",
+        "endDate": "2026-06-15",
+        "payment": 55000,
+        "tasks": { "total": 18, "completed": 0 }
+      },
+      {
+        "id": "C3",
+        "title": "Irrigation & Fertilization",
+        "description": "Install irrigation and apply organic fertilizers",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2026-06-16",
+        "endDate": "2026-08-31",
+        "payment": 62000,
+        "tasks": { "total": 15, "completed": 0 }
+      },
+      {
+        "id": "C4",
+        "title": "Growth Monitoring",
+        "description": "Regular monitoring and pest management",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2026-09-01",
+        "endDate": "2026-10-31",
+        "payment": 45000,
+        "tasks": { "total": 12, "completed": 0 }
+      },
+      {
+        "id": "C5",
+        "title": "First Harvest & Processing",
+        "description": "Harvest cashew nuts and initial processing",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2026-11-01",
+        "endDate": "2026-11-30",
+        "payment": 90000,
+        "tasks": { "total": 20, "completed": 0 }
+      }
+    ],
+    "payments": [
+      {
+        "id": "CP1",
+        "milestoneId": "C1",
+        "amount": 38000,
+        "dueDate": "2026-04-25",
+        "status": "pending",
+        "description": "Land Preparation Payment"
+      },
+      {
+        "id": "CP2",
+        "milestoneId": "C2",
+        "amount": 55000,
+        "dueDate": "2026-06-15",
+        "status": "pending",
+        "description": "Seedling Plantation Payment"
+      },
+      {
+        "id": "CP3",
+        "milestoneId": "C3",
+        "amount": 62000,
+        "dueDate": "2026-08-31",
+        "status": "pending",
+        "description": "Irrigation & Fertilization Payment"
+      },
+      {
+        "id": "CP4",
+        "milestoneId": "C4",
+        "amount": 45000,
+        "dueDate": "2026-10-31",
+        "status": "pending",
+        "description": "Growth Monitoring Payment"
+      },
+      {
+        "id": "CP5",
+        "milestoneId": "C5",
+        "amount": 90000,
+        "dueDate": "2026-11-30",
+        "status": "pending",
+        "description": "Harvest & Processing Payment"
+      }
+    ],
+    "financialBreakdown": [
+      { "category": "Cashew Seedlings", "amount": 68000 },
+      { "category": "Land Preparation", "amount": 45000 },
+      { "category": "Irrigation Infrastructure", "amount": 52000 },
+      { "category": "Fertilizers & Nutrients", "amount": 38000 },
+      { "category": "Labor & Workforce", "amount": 55000 },
+      { "category": "Processing Equipment", "amount": 32000 }
+    ],
+    "partyMembers": [
+      {
+        "id": "FAR-345",
+        "name": "Rohan Fernando",
+        "role": "farmer",
+        "email": "rohan.f@cashewfarms.lk",
+        "phone": "+94 77 345 6789",
+        "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
+        "location": "Puttalam, North Western Province",
+        "coordinates": "8.0362, 79.8283",
+        "specialization": "Cashew Nut Cultivation",
+        "experience": "16 years in cashew farming",
+        "rating": 4.7
+      },
+      {
+        "id": "INV-112",
+        "name": "Nut Export International",
+        "role": "investor",
+        "email": "invest@nutexport.lk",
+        "phone": "+94 11 234 5678",
+        "image": "https://images.unsplash.com/photo-1556157382-97eda2d62296?w=150",
+        "location": "Colombo, Western Province",
+        "coordinates": "6.9271, 79.8612",
+        "specialization": "Cashew Export & Investment",
+        "experience": "12 years in nut export business",
+        "rating": 4.6
+      },
+      {
+        "id": "LND-095",
+        "name": "Coastal Estates",
+        "role": "landowner",
+        "email": "info@coastalestates.lk",
+        "phone": "+94 77 456 7890",
+        "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+        "location": "Puttalam, North Western Province",
+        "coordinates": "8.0401, 79.8320",
+        "specialization": "Coastal Agricultural Land",
+        "experience": "28 years managing coastal farmlands",
+        "rating": 4.8
+      }
+    ]
+  },
+  {
+    "id": "7",
+    "projectId": "PRJ-228",
+    "investorId": "696e6196b558abe2695480a6",
+    "projectName": "Banana Cultivation",
+    "cropType": "Ambul Banana",
+    "cropIcon": "🍌",
+    "farmerName": "Lakshmi Wijesinghe",
+    "farmerId": "FAR-389",
+    "farmerImage": "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150",
+    "location": "Embilipitiya",
+    "district": "Ratnapura",
+    "province": "Sabaragamuwa",
+    "coordinates": "6.3431, 80.8498",
+    "expectedROI": 45,
+    "status": "pending",
+    "investmentType": "harvest",
+    "startDate": "2026-02-15",
+    "endDate": "2026-08-31",
+    "backgroundImage": "https://images.unsplash.com/photo-1603833665858-e61d17a86224?w=600",
+    "investorName": "Fruit Traders Lanka",
+    "investorAmount": 185000,
+    "landownerName": "Sabaragamuwa Farms",
+    "landownerId": "LND-102",
+    "riskLevel": "LOW",
+    "riskStatus": "Documentation in Progress",
+    "milestones": [
+      {
+        "id": "B1",
+        "title": "Land Preparation & Sucker Selection",
+        "description": "Prepare land and select quality banana suckers",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2026-02-15",
+        "endDate": "2026-03-05",
+        "payment": 28000,
+        "tasks": { "total": 8, "completed": 0 }
+      },
+      {
+        "id": "B2",
+        "title": "Planting & Initial Care",
+        "description": "Plant banana suckers and establish initial care routine",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2026-03-06",
+        "endDate": "2026-03-31",
+        "payment": 32000,
+        "tasks": { "total": 10, "completed": 0 }
+      },
+      {
+        "id": "B3",
+        "title": "Growth Phase Management",
+        "description": "Fertilization, irrigation, and pest control",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2026-04-01",
+        "endDate": "2026-06-30",
+        "payment": 55000,
+        "tasks": { "total": 16, "completed": 0 }
+      },
+      {
+        "id": "B4",
+        "title": "Harvest Preparation",
+        "description": "Bunch propping and harvest readiness",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2026-07-01",
+        "endDate": "2026-07-31",
+        "payment": 25000,
+        "tasks": { "total": 8, "completed": 0 }
+      },
+      {
+        "id": "B5",
+        "title": "Harvesting & Distribution",
+        "description": "Harvest and market distribution",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2026-08-01",
+        "endDate": "2026-08-31",
+        "payment": 45000,
+        "tasks": { "total": 12, "completed": 0 }
+      }
+    ],
+    "payments": [
+      {
+        "id": "BP1",
+        "milestoneId": "B1",
+        "amount": 28000,
+        "dueDate": "2026-03-05",
+        "status": "pending",
+        "description": "Land Preparation Payment"
+      },
+      {
+        "id": "BP2",
+        "milestoneId": "B2",
+        "amount": 32000,
+        "dueDate": "2026-03-31",
+        "status": "pending",
+        "description": "Planting Payment"
+      },
+      {
+        "id": "BP3",
+        "milestoneId": "B3",
+        "amount": 55000,
+        "dueDate": "2026-06-30",
+        "status": "pending",
+        "description": "Growth Management Payment"
+      },
+      {
+        "id": "BP4",
+        "milestoneId": "B4",
+        "amount": 25000,
+        "dueDate": "2026-07-31",
+        "status": "pending",
+        "description": "Harvest Preparation Payment"
+      },
+      {
+        "id": "BP5",
+        "milestoneId": "B5",
+        "amount": 45000,
+        "dueDate": "2026-08-31",
+        "status": "pending",
+        "description": "Harvesting & Distribution Payment"
+      }
+    ],
+    "financialBreakdown": [
+      { "category": "Banana Suckers & Planting", "amount": 42000 },
+      { "category": "Fertilizers & Nutrients", "amount": 35000 },
+      { "category": "Irrigation & Water", "amount": 28000 },
+      { "category": "Pest Control", "amount": 22000 },
+      { "category": "Labor & Workforce", "amount": 42000 },
+      { "category": "Harvest & Transport", "amount": 16000 }
+    ],
+    "partyMembers": [
+      {
+        "id": "FAR-389",
+        "name": "Lakshmi Wijesinghe",
+        "role": "farmer",
+        "email": "lakshmi.w@bananafarms.lk",
+        "phone": "+94 77 567 8901",
+        "image": "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150",
+        "location": "Embilipitiya, Sabaragamuwa Province",
+        "coordinates": "6.3431, 80.8498",
+        "specialization": "Ambul Banana Cultivation",
+        "experience": "14 years in banana farming",
+        "rating": 4.8
+      },
+      {
+        "id": "INV-118",
+        "name": "Fruit Traders Lanka",
+        "role": "investor",
+        "email": "invest@fruittraders.lk",
+        "phone": "+94 11 345 6789",
+        "image": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150",
+        "location": "Colombo, Western Province",
+        "coordinates": "6.9271, 79.8612",
+        "specialization": "Fruit Export & Investment",
+        "experience": "9 years in fruit trade",
+        "rating": 4.7
+      },
+      {
+        "id": "LND-102",
+        "name": "Sabaragamuwa Farms",
+        "role": "landowner",
+        "email": "info@sabaragamuwafarms.lk",
+        "phone": "+94 77 678 9012",
+        "image": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
+        "location": "Ratnapura, Sabaragamuwa Province",
+        "coordinates": "6.3565, 80.8522",
+        "specialization": "Fruit Cultivation Land",
+        "experience": "18 years managing farmlands",
+        "rating": 4.6
+      }
+    ]
+  },
+  {
+    "id": "8",
+    "projectId": "PRJ-234",
+    "investorId": "696e6196b558abe2695480a6",
+    "projectName": "Rubber Plantation",
+    "cropType": "Natural Rubber",
+    "cropIcon": "🌳",
+    "farmerName": "Chandana Perera",
+    "farmerId": "FAR-412",
+    "farmerImage": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150",
+    "location": "Kalutara",
+    "district": "Kalutara",
+    "province": "Western",
+    "coordinates": "6.5854, 79.9607",
+    "expectedROI": 35,
+    "status": "pending",
+    "investmentType": "commission",
+    "commissionRate": 14,
+    "earnedCommission": 0,
+    "startDate": "2026-05-01",
+    "endDate": "2027-04-30",
+    "backgroundImage": "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=600",
+    "investorName": "Rubber Industries Lanka",
+    "investorAmount": 450000,
+    "landownerName": "Kalutara Plantations",
+    "landownerId": "LND-108",
+    "riskLevel": "LOW",
+    "riskStatus": "Environmental Approval Pending",
+    "milestones": [
+      {
+        "id": "R1",
+        "title": "Land Survey & Preparation",
+        "description": "Comprehensive land survey and soil testing",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2026-05-01",
+        "endDate": "2026-05-31",
+        "payment": 55000,
+        "tasks": { "total": 12, "completed": 0 }
+      },
+      {
+        "id": "R2",
+        "title": "Rubber Sapling Plantation",
+        "description": "Plant high-yield rubber saplings",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2026-06-01",
+        "endDate": "2026-08-31",
+        "payment": 85000,
+        "tasks": { "total": 22, "completed": 0 }
+      },
+      {
+        "id": "R3",
+        "title": "Initial Care & Maintenance",
+        "description": "Establish care routine and pest management",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2026-09-01",
+        "endDate": "2026-12-31",
+        "payment": 75000,
+        "tasks": { "total": 18, "completed": 0 }
+      },
+      {
+        "id": "R4",
+        "title": "Growth Monitoring Phase",
+        "description": "Regular monitoring and fertilization",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2027-01-01",
+        "endDate": "2027-03-31",
+        "payment": 65000,
+        "tasks": { "total": 15, "completed": 0 }
+      },
+      {
+        "id": "R5",
+        "title": "Tapping Preparation",
+        "description": "Prepare trees for latex tapping",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2027-04-01",
+        "endDate": "2027-04-30",
+        "payment": 170000,
+        "tasks": { "total": 20, "completed": 0 }
+      }
+    ],
+    "payments": [
+      {
+        "id": "RP1",
+        "milestoneId": "R1",
+        "amount": 55000,
+        "dueDate": "2026-05-31",
+        "status": "pending",
+        "description": "Land Survey Payment"
+      },
+      {
+        "id": "RP2",
+        "milestoneId": "R2",
+        "amount": 85000,
+        "dueDate": "2026-08-31",
+        "status": "pending",
+        "description": "Sapling Plantation Payment"
+      },
+      {
+        "id": "RP3",
+        "milestoneId": "R3",
+        "amount": 75000,
+        "dueDate": "2026-12-31",
+        "status": "pending",
+        "description": "Initial Care Payment"
+      },
+      {
+        "id": "RP4",
+        "milestoneId": "R4",
+        "amount": 65000,
+        "dueDate": "2027-03-31",
+        "status": "pending",
+        "description": "Growth Monitoring Payment"
+      },
+      {
+        "id": "RP5",
+        "milestoneId": "R5",
+        "amount": 170000,
+        "dueDate": "2027-04-30",
+        "status": "pending",
+        "description": "Tapping Preparation Payment"
+      }
+    ],
+    "financialBreakdown": [
+      { "category": "Rubber Saplings", "amount": 105000 },
+      { "category": "Land Preparation", "amount": 68000 },
+      { "category": "Fertilizers & Care", "amount": 72000 },
+      { "category": "Irrigation System", "amount": 58000 },
+      { "category": "Labor & Workforce", "amount": 92000 },
+      { "category": "Tapping Equipment", "amount": 55000 }
+    ],
+    "partyMembers": [
+      {
+        "id": "FAR-412",
+        "name": "Chandana Perera",
+        "role": "farmer",
+        "email": "chandana.p@rubberfarms.lk",
+        "phone": "+94 77 789 0123",
+        "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150",
+        "location": "Kalutara, Western Province",
+        "coordinates": "6.5854, 79.9607",
+        "specialization": "Rubber Cultivation & Tapping",
+        "experience": "19 years in rubber plantation",
+        "rating": 4.8
+      },
+      {
+        "id": "INV-125",
+        "name": "Rubber Industries Lanka",
+        "role": "investor",
+        "email": "invest@rubberindustries.lk",
+        "phone": "+94 11 456 7890",
+        "image": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150",
+        "location": "Colombo, Western Province",
+        "coordinates": "6.9271, 79.8612",
+        "specialization": "Rubber Production Investment",
+        "experience": "14 years in rubber industry",
+        "rating": 4.7
+      },
+      {
+        "id": "LND-108",
+        "name": "Kalutara Plantations",
+        "role": "landowner",
+        "email": "info@kalutaraplantations.lk",
+        "phone": "+94 77 890 1234",
+        "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+        "location": "Kalutara, Western Province",
+        "coordinates": "6.5892, 79.9645",
+        "specialization": "Rubber Estate Management",
+        "experience": "35 years managing plantations",
+        "rating": 4.9
+      }
+    ]
+  },
+  {
+    "id": "9",
+    "projectId": "PRJ-247",
+    "investorId": "696e6196b558abe2695480a6",
+    "projectName": "Pineapple Farm",
+    "cropType": "Mauritius Pineapple",
+    "cropIcon": "🍍",
+    "farmerName": "Tharanga Kumari",
+    "farmerId": "FAR-456",
+    "farmerImage": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150",
+    "location": "Gampaha",
+    "district": "Gampaha",
+    "province": "Western",
+    "coordinates": "7.0917, 80.0143",
+    "expectedROI": 48,
+    "status": "pending",
+    "investmentType": "harvest",
+    "startDate": "2026-03-15",
+    "endDate": "2026-12-31",
+    "backgroundImage": "https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=600",
+    "investorName": "Tropical Fruits Export",
+    "investorAmount": 220000,
+    "landownerName": "Gampaha Agricultural Lands",
+    "landownerId": "LND-115",
+    "riskLevel": "MEDIUM",
+    "riskStatus": "Market Analysis in Progress",
+    "milestones": [
+      {
+        "id": "P1",
+        "title": "Land Preparation & Planting",
+        "description": "Prepare land and plant pineapple crowns",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2026-03-15",
+        "endDate": "2026-04-30",
+        "payment": 42000,
+        "tasks": { "total": 14, "completed": 0 }
+      },
+      {
+        "id": "P2",
+        "title": "Initial Growth Phase",
+        "description": "Fertilization and weed control",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2026-05-01",
+        "endDate": "2026-07-31",
+        "payment": 48000,
+        "tasks": { "total": 16, "completed": 0 }
+      },
+      {
+        "id": "P3",
+        "title": "Flowering Induction",
+        "description": "Apply flowering hormones and monitor",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2026-08-01",
+        "endDate": "2026-09-30",
+        "payment": 38000,
+        "tasks": { "total": 12, "completed": 0 }
+      },
+      {
+        "id": "P4",
+        "title": "Fruit Development",
+        "description": "Monitor fruit growth and quality",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2026-10-01",
+        "endDate": "2026-11-30",
+        "payment": 32000,
+        "tasks": { "total": 10, "completed": 0 }
+      },
+      {
+        "id": "P5",
+        "title": "Harvest & Export Preparation",
+        "description": "Harvest pineapples and prepare for export",
+        "progress": 0,
+        "status": "pending",
+        "startDate": "2026-12-01",
+        "endDate": "2026-12-31",
+        "payment": 60000,
+        "tasks": { "total": 18, "completed": 0 }
+      }
+    ],
+    "payments": [
+      {
+        "id": "PP1",
+        "milestoneId": "P1",
+        "amount": 42000,
+        "dueDate": "2026-04-30",
+        "status": "pending",
+        "description": "Land Preparation & Planting Payment"
+      },
+      {
+        "id": "PP2",
+        "milestoneId": "P2",
+        "amount": 48000,
+        "dueDate": "2026-07-31",
+        "status": "pending",
+        "description": "Initial Growth Payment"
+      },
+      {
+        "id": "PP3",
+        "milestoneId": "P3",
+        "amount": 38000,
+        "dueDate": "2026-09-30",
+        "status": "pending",
+        "description": "Flowering Induction Payment"
+      },
+      {
+        "id": "PP4",
+        "milestoneId": "P4",
+        "amount": 32000,
+        "dueDate": "2026-11-30",
+        "status": "pending",
+        "description": "Fruit Development Payment"
+      },
+      {
+        "id": "PP5",
+        "milestoneId": "P5",
+        "amount": 60000,
+        "dueDate": "2026-12-31",
+        "status": "pending",
+        "description": "Harvest & Export Payment"
+      }
+    ],
+    "financialBreakdown": [
+      { "category": "Pineapple Crowns & Planting", "amount": 52000 },
+      { "category": "Fertilizers & Hormones", "amount": 42000 },
+      { "category": "Pest & Weed Control", "amount": 32000 },
+      { "category": "Irrigation & Water", "amount": 28000 },
+      { "category": "Labor & Workforce", "amount": 46000 },
+      { "category": "Harvest & Export Prep", "amount": 20000 }
+    ],
+    "partyMembers": [
+      {
+        "id": "FAR-456",
+        "name": "Tharanga Kumari",
+        "role": "farmer",
+        "email": "tharanga.k@pineapplefarms.lk",
+        "phone": "+94 77 901 2345",
+        "image": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150",
+        "location": "Gampaha, Western Province",
+        "coordinates": "7.0917, 80.0143",
+        "specialization": "Pineapple Cultivation & Export",
+        "experience": "11 years in pineapple farming",
+        "rating": 4.7
+      },
+      {
+        "id": "INV-132",
+        "name": "Tropical Fruits Export",
+        "role": "investor",
+        "email": "invest@tropicalfruits.lk",
+        "phone": "+94 11 567 8901",
+        "image": "https://images.unsplash.com/photo-1556157382-97eda2d62296?w=150",
+        "location": "Colombo, Western Province",
+        "coordinates": "6.9271, 79.8612",
+        "specialization": "Tropical Fruit Export Investment",
+        "experience": "10 years in fruit export business",
+        "rating": 4.6
+      },
+      {
+        "id": "LND-115",
+        "name": "Gampaha Agricultural Lands",
+        "role": "landowner",
+        "email": "info@gampahaagri.lk",
+        "phone": "+94 77 012 3456",
+        "image": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
+        "location": "Gampaha, Western Province",
+        "coordinates": "7.0955, 80.0181",
+        "specialization": "Fruit Cultivation Land Management",
+        "experience": "22 years managing agricultural lands",
+        "rating": 4.8
+      }
+    ]
+  }
+]

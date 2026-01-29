@@ -3,39 +3,42 @@ import DashboardLayout from '@/layouts/DashboardLayout';
 import { adminService, type ApiUser } from '@/services/admin.service';
 import type { GlobalUser } from '@/types/admin.types';
 import {
-    CheckCircle,
-    Error,
-    Pending,
-    Person,
-    Search,
-    Visibility,
-    Warning
+  Cancel,
+  CheckCircle,
+  Close,
+  Edit,
+  Error,
+  Pending,
+  Person,
+  Save,
+  Search,
+  Visibility,
+  Warning
 } from '@mui/icons-material';
 import {
-    Avatar,
-    Box,
-    Button,
-    Card,
-    CardContent,
-    Chip,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle, Grid, IconButton,
-    InputAdornment,
-    Paper,
-    Tab,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TablePagination,
-    TableRow,
-    Tabs,
-    TextField,
-    Tooltip,
-    Typography
+  Avatar,
+  Box,
+  Card,
+  CardContent,
+  Chip,
+  Dialog,
+  DialogContent,
+  Grid,
+  IconButton,
+  InputAdornment,
+  Paper,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
+  Tabs,
+  TextField,
+  Tooltip,
+  Typography
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 
@@ -138,6 +141,14 @@ const GlobalUserManagement = () => {
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage] = useState(10);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+    address: '',
+  });
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -174,6 +185,51 @@ const GlobalUserManagement = () => {
   const handleCloseDialog = () => {
     setDetailDialogOpen(false);
     setSelectedUser(null);
+    setIsEditMode(false);
+  };
+
+  const handleEditClick = () => {
+    if (selectedUser) {
+      const nameParts = selectedUser.fullName.split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+
+      setEditFormData({
+        firstName,
+        lastName,
+        phoneNumber: selectedUser.phoneNumber || '',
+        address: selectedUser.address || '',
+      });
+      setIsEditMode(true);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditMode(false);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!selectedUser) return;
+
+    try {
+      setSaving(true);
+      await adminService.updateUser(selectedUser.id, editFormData);
+
+      const apiUsers = await adminService.getAllUsersPaginated();
+      setUsers(apiUsers.map(mapApiUserToGlobalUser));
+
+      const updatedUser = apiUsers.find(u => u._id === selectedUser.id);
+      if (updatedUser) {
+        setSelectedUser(mapApiUserToGlobalUser(updatedUser));
+      }
+
+      setIsEditMode(false);
+    } catch (error) {
+      console.error('Failed to update user:', error);
+      alert('Failed to update user. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const getRoleStats = () => {
@@ -312,8 +368,8 @@ const GlobalUserManagement = () => {
                         {user.totalInvested
                           ? formatCurrency(user.totalInvested)
                           : user.totalEarnings
-                          ? formatCurrency(user.totalEarnings)
-                          : '-'}
+                            ? formatCurrency(user.totalEarnings)
+                            : '-'}
                       </Typography>
                     </TableCell>
                     <TableCell>
@@ -408,164 +464,432 @@ const GlobalUserManagement = () => {
         onClose={handleCloseDialog}
         maxWidth="md"
         fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+          }
+        }}
       >
         {selectedUser && (
           <>
-            <DialogTitle>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Avatar src={selectedUser.avatar} sx={{ width: 56, height: 56 }} />
-                <Box>
-                  <Typography variant="h6">{selectedUser.fullName}</Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {selectedUser.id} • {selectedUser.role}
+            <Box
+              sx={{
+                background: 'rgba(255, 255, 255, 0.05)',
+                backdropFilter: 'blur(20px)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                p: 3,
+                position: 'relative',
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, position: 'relative', zIndex: 1 }}>
+                <Avatar
+                  src={selectedUser.avatar}
+                  sx={{
+                    width: 70,
+                    height: 70,
+                    border: '2px solid rgba(255,255,255,0.2)',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                  }}
+                />
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: 'white', mb: 0.5 }}>
+                    {selectedUser.fullName}
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
+                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.875rem' }}>
+                      {selectedUser.id}
+                    </Typography>
+                    <Chip
+                      label={selectedUser.role}
+                      size="small"
+                      sx={{
+                        bgcolor: 'rgba(255,255,255,0.15)',
+                        color: 'white',
+                        fontWeight: 600,
+                        backdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                      }}
+                    />
+                  </Box>
+                </Box>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  {isEditMode ? (
+                    <>
+                      <IconButton
+                        onClick={handleSaveEdit}
+                        disabled={saving}
+                        sx={{
+                          color: '#4CAF50',
+                          bgcolor: 'rgba(76, 175, 80, 0.1)',
+                          '&:hover': {
+                            bgcolor: 'rgba(76, 175, 80, 0.2)',
+                          },
+                        }}
+                      >
+                        <Save />
+                      </IconButton>
+                      <IconButton
+                        onClick={handleCancelEdit}
+                        disabled={saving}
+                        sx={{
+                          color: 'rgba(255,255,255,0.7)',
+                          bgcolor: 'rgba(255,255,255,0.1)',
+                          '&:hover': {
+                            bgcolor: 'rgba(255,255,255,0.2)',
+                          },
+                        }}
+                      >
+                        <Cancel />
+                      </IconButton>
+                    </>
+                  ) : (
+                    <IconButton
+                      onClick={handleEditClick}
+                      sx={{
+                        color: 'rgba(255,255,255,0.9)',
+                        bgcolor: 'rgba(255,255,255,0.1)',
+                        '&:hover': {
+                          bgcolor: 'rgba(255,255,255,0.2)',
+                        },
+                      }}
+                    >
+                      <Edit />
+                    </IconButton>
+                  )}
+                  <IconButton
+                    onClick={handleCloseDialog}
+                    sx={{
+                      color: 'rgba(255,255,255,0.9)',
+                      bgcolor: 'rgba(255,255,255,0.1)',
+                      '&:hover': {
+                        bgcolor: 'rgba(255,255,255,0.2)',
+                      },
+                    }}
+                  >
+                    <Close />
+                  </IconButton>
+                </Box>
+              </Box>
+            </Box>
+
+
+
+            <DialogContent sx={{ p: 0, bgcolor: 'transparent' }}>
+              <Box sx={{
+                display: 'flex',
+                justifyContent: 'space-around',
+                p: 3,
+                borderBottom: '1px solid rgba(255,255,255,0.1)',
+                bgcolor: 'rgba(255,255,255,0.02)',
+              }}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography variant="h5" sx={{ fontWeight: 700, color: 'white' }}>
+                    {selectedUser.totalProjects}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)' }}>
+                    Projects
+                  </Typography>
+                </Box>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography variant="h5" sx={{ fontWeight: 700, color: '#4CAF50' }}>
+                    {selectedUser.activeProjects}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)' }}>
+                    Active
+                  </Typography>
+                </Box>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography variant="h5" sx={{ fontWeight: 700, color: 'white' }}>
+                    {selectedUser.completedProjects}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)' }}>
+                    Completed
+                  </Typography>
+                </Box>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Chip
+                    label={selectedUser.trustScore}
+                    size="small"
+                    color={getTrustScoreColor(selectedUser.trustScore) as "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning"}
+                    sx={{ fontWeight: 700, fontSize: '1rem', height: 32, minWidth: 50 }}
+                  />
+                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', display: 'block', mt: 0.5 }}>
+                    Trust Score
                   </Typography>
                 </Box>
               </Box>
-            </DialogTitle>
-            <DialogContent dividers>
-              <Grid container spacing={3}>
 
-                <Grid size={{ xs: 12 }}>
-                  <Typography variant="subtitle2" fontWeight={700} gutterBottom>
-                    Contact Information
-                  </Typography>
-                  <Box sx={{ pl: 2 }}>
-                    <Typography variant="body2">Email: {selectedUser.email}</Typography>
-                    <Typography variant="body2">Phone: {selectedUser.phoneNumber}</Typography>
-                    <Typography variant="body2">Address: {selectedUser.address}</Typography>
-                  </Box>
-                </Grid>
-
-
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <Typography variant="subtitle2" fontWeight={700} gutterBottom>
-                    Account Status
-                  </Typography>
-                  <Box sx={{ pl: 2 }}>
-                    <Typography variant="body2">
-                      Registered: {formatDate(selectedUser.registrationDate)}
-                    </Typography>
-                    <Typography variant="body2">
-                      Last Login: {formatDateTime(selectedUser.lastLogin)}
-                    </Typography>
-                    <Typography variant="body2">
-                      Status: {selectedUser.isActive ? 'Active' : 'Inactive'}
-                    </Typography>
-                    <Typography variant="body2">
-                      Trust Score: <Chip label={selectedUser.trustScore} size="small" color={getTrustScoreColor(selectedUser.trustScore) as "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning"} />
-                    </Typography>
-                  </Box>
-                </Grid>
-
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <Typography variant="subtitle2" fontWeight={700} gutterBottom>
-                    Activity Metrics
-                  </Typography>
-                  <Box sx={{ pl: 2 }}>
-                    <Typography variant="body2">
-                      Total Projects: {selectedUser.totalProjects}
-                    </Typography>
-                    <Typography variant="body2">
-                      Active Projects: {selectedUser.activeProjects}
-                    </Typography>
-                    <Typography variant="body2">
-                      Completed: {selectedUser.completedProjects}
-                    </Typography>
-                    <Typography variant="body2">
-                      Transactions: {selectedUser.totalTransactions}
-                    </Typography>
-                  </Box>
-                </Grid>
-
-
-                <Grid size={{ xs: 12 }}>
-                  <Typography variant="subtitle2" fontWeight={700} gutterBottom>
-                    Financial Summary
-                  </Typography>
-                  <Box sx={{ pl: 2 }}>
-                    {selectedUser.totalInvested && (
-                      <Typography variant="body2">
-                        Total Invested: {formatCurrency(selectedUser.totalInvested)}
+              <Box sx={{ p: 3 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'white', mb: 2, letterSpacing: 0.5 }}>
+                  ABOUT
+                </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {isEditMode && (
+                    <>
+                      <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                        <Box sx={{ minWidth: 100 }}>
+                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
+                            First Name
+                          </Typography>
+                        </Box>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          value={editFormData.firstName}
+                          onChange={(e) => setEditFormData({ ...editFormData, firstName: e.target.value })}
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              color: 'white',
+                              '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                              '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
+                              '&.Mui-focused fieldset': { borderColor: '#4CAF50' },
+                            },
+                          }}
+                        />
+                      </Box>
+                      <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                        <Box sx={{ minWidth: 100 }}>
+                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
+                            Last Name
+                          </Typography>
+                        </Box>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          value={editFormData.lastName}
+                          onChange={(e) => setEditFormData({ ...editFormData, lastName: e.target.value })}
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              color: 'white',
+                              '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                              '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
+                              '&.Mui-focused fieldset': { borderColor: '#4CAF50' },
+                            },
+                          }}
+                        />
+                      </Box>
+                    </>
+                  )}
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                    <Box sx={{ minWidth: 100 }}>
+                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
+                        Email
                       </Typography>
+                    </Box>
+                    <Typography variant="body2" sx={{ color: 'white', fontWeight: 500 }}>
+                      {selectedUser.email}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                    <Box sx={{ minWidth: 100 }}>
+                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
+                        Phone
+                      </Typography>
+                    </Box>
+                    {isEditMode ? (
+                      <TextField
+                        fullWidth
+                        size="small"
+                        value={editFormData.phoneNumber}
+                        onChange={(e) => setEditFormData({ ...editFormData, phoneNumber: e.target.value })}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            color: 'white',
+                            '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                            '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
+                            '&.Mui-focused fieldset': { borderColor: '#4CAF50' },
+                          },
+                        }}
+                      />
+                    ) : (
+                      <Typography variant="body2" sx={{ color: 'white', fontWeight: 500 }}>
+                        {selectedUser.phoneNumber}
+                      </Typography>
+                    )}
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                    <Box sx={{ minWidth: 100 }}>
+                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
+                        Address
+                      </Typography>
+                    </Box>
+                    {isEditMode ? (
+                      <TextField
+                        fullWidth
+                        size="small"
+                        multiline
+                        rows={2}
+                        value={editFormData.address}
+                        onChange={(e) => setEditFormData({ ...editFormData, address: e.target.value })}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            color: 'white',
+                            '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                            '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
+                            '&.Mui-focused fieldset': { borderColor: '#4CAF50' },
+                          },
+                        }}
+                      />
+                    ) : (
+                      <Typography variant="body2" sx={{ color: 'white', fontWeight: 500 }}>
+                        {selectedUser.address}
+                      </Typography>
+                    )}
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                    <Box sx={{ minWidth: 100 }}>
+                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
+                        Joined
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" sx={{ color: 'white', fontWeight: 500 }}>
+                      {formatDate(selectedUser.registrationDate)}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                    <Box sx={{ minWidth: 100 }}>
+                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
+                        Last Active
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" sx={{ color: 'white', fontWeight: 500 }}>
+                      {formatDateTime(selectedUser.lastLogin)}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                    <Box sx={{ minWidth: 100 }}>
+                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
+                        Status
+                      </Typography>
+                    </Box>
+                    <Chip
+                      label={selectedUser.isActive ? 'Active' : 'Inactive'}
+                      size="small"
+                      color={selectedUser.isActive ? 'success' : 'error'}
+                      sx={{ fontWeight: 600, height: 24 }}
+                    />
+                  </Box>
+                </Box>
+              </Box>
+
+              {/* Verification Section */}
+              <Box sx={{ px: 3, pb: 3, borderTop: '1px solid rgba(255,255,255,0.1)', pt: 3 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'white', mb: 2, letterSpacing: 0.5 }}>
+                  VERIFICATION
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  <Chip
+                    label={`Identity: ${selectedUser.verificationStatus.identity}`}
+                    size="small"
+                    icon={getVerificationIcon(selectedUser.verificationStatus.identity)!}
+                    sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: 'white' }}
+                  />
+                  <Chip
+                    label={`Email: ${selectedUser.verificationStatus.email}`}
+                    size="small"
+                    icon={getVerificationIcon(selectedUser.verificationStatus.email)!}
+                    color={selectedUser.verificationStatus.email === 'verified' ? 'success' : 'warning'}
+                  />
+                  <Chip
+                    label={`Phone: ${selectedUser.verificationStatus.phone}`}
+                    size="small"
+                    icon={getVerificationIcon(selectedUser.verificationStatus.phone)!}
+                    color={selectedUser.verificationStatus.phone === 'verified' ? 'success' : 'warning'}
+                  />
+                  {selectedUser.verificationStatus.bankAccount && (
+                    <Chip
+                      label={`Bank: ${selectedUser.verificationStatus.bankAccount}`}
+                      size="small"
+                      icon={getVerificationIcon(selectedUser.verificationStatus.bankAccount)!}
+                      sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: 'white' }}
+                    />
+                  )}
+                </Box>
+              </Box>
+
+              {/* Financial Section */}
+              {(selectedUser.totalInvested || selectedUser.totalEarnings || selectedUser.overduePayments > 0) && (
+                <Box sx={{ px: 3, pb: 3, borderTop: '1px solid rgba(255,255,255,0.1)', pt: 3 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'white', mb: 2, letterSpacing: 0.5 }}>
+                    FINANCIALS
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {selectedUser.totalInvested && (
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                          Total Invested
+                        </Typography>
+                        <Typography variant="h6" sx={{ color: '#4CAF50', fontWeight: 700 }}>
+                          {formatCurrency(selectedUser.totalInvested)}
+                        </Typography>
+                      </Box>
                     )}
                     {selectedUser.totalEarnings && (
-                      <Typography variant="body2">
-                        Total Earnings: {formatCurrency(selectedUser.totalEarnings)}
-                      </Typography>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                          Total Earnings
+                        </Typography>
+                        <Typography variant="h6" sx={{ color: '#4CAF50', fontWeight: 700 }}>
+                          {formatCurrency(selectedUser.totalEarnings)}
+                        </Typography>
+                      </Box>
                     )}
-                    <Typography variant="body2">
-                      Overdue Payments: {selectedUser.overduePayments}
-                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                        Overdue Payments
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: selectedUser.overduePayments > 0 ? '#f44336' : 'white', fontWeight: 600 }}>
+                        {selectedUser.overduePayments}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                        Transactions
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: 'white', fontWeight: 600 }}>
+                        {selectedUser.totalTransactions}
+                      </Typography>
+                    </Box>
                   </Box>
-                </Grid>
+                </Box>
+              )}
 
-
-                <Grid size={{ xs: 12 }}>
-                  <Typography variant="subtitle2" fontWeight={700} gutterBottom>
-                    Verification Status
+              {/* Risk Indicators Section */}
+              {(selectedUser.overduePayments > 0 || selectedUser.disputesInvolved > 0) && (
+                <Box sx={{
+                  px: 3,
+                  pb: 3,
+                  borderTop: '1px solid rgba(244, 67, 54, 0.3)',
+                  pt: 3,
+                  bgcolor: 'rgba(244, 67, 54, 0.05)',
+                }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#f44336', mb: 2, letterSpacing: 0.5 }}>
+                    ⚠️ ALERTS
                   </Typography>
-                  <Box sx={{ pl: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                    <Chip
-                      label={`Identity: ${selectedUser.verificationStatus.identity}`}
-                      size="small"
-                      icon={getVerificationIcon(selectedUser.verificationStatus.identity)!}
-                    />
-                    <Chip
-                      label={`Email: ${selectedUser.verificationStatus.email}`}
-                      size="small"
-                      icon={getVerificationIcon(selectedUser.verificationStatus.email)!}
-                    />
-                    <Chip
-                      label={`Phone: ${selectedUser.verificationStatus.phone}`}
-                      size="small"
-                      icon={getVerificationIcon(selectedUser.verificationStatus.phone)!}
-                    />
-                    {selectedUser.verificationStatus.bankAccount && (
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    {selectedUser.overduePayments > 0 && (
                       <Chip
-                        label={`Bank: ${selectedUser.verificationStatus.bankAccount}`}
+                        label={`${selectedUser.overduePayments} Overdue Payment(s)`}
                         size="small"
-                        icon={getVerificationIcon(selectedUser.verificationStatus.bankAccount)!}
+                        color="error"
+                        icon={<Warning />}
+                      />
+                    )}
+                    {selectedUser.disputesInvolved > 0 && (
+                      <Chip
+                        label={`${selectedUser.disputesInvolved} Dispute(s)`}
+                        size="small"
+                        color="warning"
+                        icon={<Error />}
                       />
                     )}
                   </Box>
-                </Grid>
-
-                {/* Risk Indicators */}
-                {(selectedUser.overduePayments > 0 || selectedUser.disputesInvolved > 0) && (
-                  <Grid size={{ xs: 12 }}>
-                    <Typography variant="subtitle2" fontWeight={700} gutterBottom color="error">
-                      Risk Indicators
-                    </Typography>
-                    <Box sx={{ pl: 2 }}>
-                      {selectedUser.overduePayments > 0 && (
-                        <Chip
-                          label={`${selectedUser.overduePayments} Overdue Payment(s)`}
-                          size="small"
-                          color="error"
-                          icon={<Warning />}
-                          sx={{ mr: 1, mb: 1 }}
-                        />
-                      )}
-                      {selectedUser.disputesInvolved > 0 && (
-                        <Chip
-                          label={`${selectedUser.disputesInvolved} Dispute(s)`}
-                          size="small"
-                          color="warning"
-                          icon={<Error />}
-                          sx={{ mr: 1, mb: 1 }}
-                        />
-                      )}
-                    </Box>
-                  </Grid>
-                )}
-              </Grid>
+                </Box>
+              )}
             </DialogContent>
-            <DialogActions>
-              <Button onClick={handleCloseDialog}>Close</Button>
-              <Button variant="contained" color="primary">
-                View Full Profile
-              </Button>
-            </DialogActions>
           </>
         )}
       </Dialog>
