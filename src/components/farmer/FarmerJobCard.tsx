@@ -1,3 +1,4 @@
+import { LocationOn, Star } from '@mui/icons-material';
 import {
   Avatar,
   Box,
@@ -41,6 +42,249 @@ const FarmerJobCard: React.FC<FarmerJobCardProps> = ({ job, onViewMore, onConnec
     ? (harvestJob.investmentSecured / harvestJob.totalInvestmentRequired) * 100
     : 0;
 
+  // For Commission Jobs - render modern card design
+  if (!isHarvestCapital && commissionJob) {
+    return (
+      <Box
+        sx={{
+          position: 'relative',
+          height: '100%',
+          pt: 8,
+        }}
+      >
+        {/* Avatar positioned above card - PLACEHOLDER STYLE */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 2,
+          }}
+        >
+          <Box
+            sx={{
+              position: 'relative',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: -6,
+                left: -6,
+                right: -6,
+                bottom: -6,
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, rgba(150,160,170,0.4) 0%, rgba(120,130,140,0.3) 100%)',
+                zIndex: 0,
+              }
+            }}
+          >
+            {/* Avatar with Image Support */}
+            <Avatar
+              src={job.farmerImage}
+              alt={job.farmerName}
+              sx={{
+                width: 110,
+                height: 110,
+                position: 'relative',
+                zIndex: 1,
+                border: '5px solid #1e2a35',
+                bgcolor: '#6b7c84',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+                fontSize: '2.5rem',
+                fontWeight: 600,
+                color: '#2d3e44',
+              }}
+            >
+              {job.farmerName.charAt(0)}
+            </Avatar>
+          </Box>
+        </Box>
+
+        {/* Card - SAME BACKGROUND AS INVESTMENT CARD */}
+        <Card
+          sx={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            background: 'linear-gradient(135deg, #1e2a35 0%, #1a1f28 100%)',
+            border: '1px solid rgba(255,255,255,0.05)',
+            borderRadius: 3,
+            transition: 'all 0.3s ease',
+            overflow: 'visible',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.6)',
+            '&:hover': {
+              transform: 'translateY(-6px)',
+              boxShadow: '0 8px 20px rgba(0,0,0,0.7)',
+              border: '1px solid rgba(118, 192, 67, 0.3)',
+            },
+          }}
+        >
+          <CardContent sx={{ p: 2.5, pt: 7, pb: 2.5, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+            {/* Name */}
+            <Typography variant="h6" sx={{ color: '#fff', fontWeight: 700, mb: 0.8, fontSize: '1.25rem', letterSpacing: '-0.3px' }}>
+              {job.farmerName}
+            </Typography>
+
+            {/* Rating */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6, mb: 0.3 }}>
+              <Star sx={{ fontSize: 16, color: '#FFA726' }} />
+              <Typography variant="body2" sx={{ color: '#fff', fontWeight: 700, fontSize: '0.85rem' }}>
+                4.8
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem' }}>
+                (24 reviews)
+              </Typography>
+            </Box>
+
+            {/* Location */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 2 }}>
+              <LocationOn sx={{ fontSize: 14, color: 'rgba(255,255,255,0.5)' }} />
+              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem' }}>
+                {job.district}
+              </Typography>
+            </Box>
+
+            {/* Stats Grid - RATE IS PROMINENT */}
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: 0,
+                width: '100%',
+                mb: 2,
+                pb: 2,
+                borderBottom: '1px solid rgba(255,255,255,0.1)',
+              }}
+            >
+              <Box sx={{ px: 1 }}>
+                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', display: 'block', mb: 0.3, fontSize: '0.6rem', fontWeight: 400 }}>
+                  Experience:
+                </Typography>
+                <Typography variant="body1" sx={{ color: '#fff', fontWeight: 600, fontSize: '0.9rem' }}>
+                  {commissionJob.yearsOfExperience} Yrs
+                </Typography>
+              </Box>
+              <Box sx={{ px: 1, borderLeft: '1px solid rgba(255,255,255,0.1)', borderRight: '1px solid rgba(255,255,255,0.1)' }}>
+                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', display: 'block', mb: 0.3, fontSize: '0.6rem', fontWeight: 400 }}>
+                  Rate:
+                </Typography>
+                <Typography variant="body1" sx={{ color: '#fff', fontWeight: 600, fontSize: '0.9rem', lineHeight: 1.2 }}>
+                  LKR {(commissionJob.rate / 1000).toFixed(0)},{(commissionJob.rate % 1000).toString().padStart(3, '0')}/{commissionJob.rateType === 'PER_ACRE' ? 'acre' : 'day'}
+                </Typography>
+              </Box>
+              <Box sx={{ px: 1 }}>
+                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', display: 'block', mb: 0.3, fontSize: '0.6rem', fontWeight: 400 }}>
+                  Success:
+                </Typography>
+                <Typography variant="body1" sx={{ color: '#fff', fontWeight: 600, fontSize: '0.9rem' }}>
+                  98%
+                </Typography>
+              </Box>
+            </Box>
+
+            {/* Skills - UPDATED CONTENT */}
+            <Box sx={{ width: '100%', mb: 2.5 }}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8, justifyContent: 'center' }}>
+                <Chip
+                  label="Combine Harvesting"
+                  size="small"
+                  sx={{
+                    fontSize: '0.7rem',
+                    height: 26,
+                    px: 1.2,
+                    bgcolor: 'rgba(118, 192, 67, 0.12)',
+                    color: '#76c043',
+                    border: '1px solid rgba(118, 192, 67, 0.25)',
+                    fontWeight: 500,
+                    '&:hover': {
+                      bgcolor: 'rgba(118, 192, 67, 0.2)',
+                    }
+                  }}
+                />
+                <Chip
+                  label="Manual Harvesting"
+                  size="small"
+                  sx={{
+                    fontSize: '0.7rem',
+                    height: 26,
+                    px: 1.2,
+                    bgcolor: 'rgba(118, 192, 67, 0.12)',
+                    color: '#76c043',
+                    border: '1px solid rgba(118, 192, 67, 0.25)',
+                    fontWeight: 500,
+                    '&:hover': {
+                      bgcolor: 'rgba(118, 192, 67, 0.2)',
+                    }
+                  }}
+                />
+                <Chip
+                  label="Threshing"
+                  size="small"
+                  sx={{
+                    fontSize: '0.7rem',
+                    height: 26,
+                    px: 1.2,
+                    bgcolor: 'rgba(118, 192, 67, 0.12)',
+                    color: '#76c043',
+                    border: '1px solid rgba(118, 192, 67, 0.25)',
+                    fontWeight: 500,
+                    '&:hover': {
+                      bgcolor: 'rgba(118, 192, 67, 0.2)',
+                    }
+                  }}
+                />
+                <Chip
+                  label="Grain Cleaning"
+                  size="small"
+                  sx={{
+                    fontSize: '0.7rem',
+                    height: 26,
+                    px: 1.2,
+                    bgcolor: 'rgba(118, 192, 67, 0.12)',
+                    color: '#76c043',
+                    border: '1px solid rgba(118, 192, 67, 0.25)',
+                    fontWeight: 500,
+                    '&:hover': {
+                      bgcolor: 'rgba(118, 192, 67, 0.2)',
+                    }
+                  }}
+                />
+              </Box>
+            </Box>
+
+            {/* View Profile Button - DEFINED SHADOWS */}
+            <Button
+              fullWidth
+              variant="contained"
+              size="large"
+              onClick={() => onConnect && job.status === 'OPEN' ? onConnect(job) : onViewMore(job)}
+              sx={{
+                bgcolor: '#76c043',
+                color: '#1a2d32',
+                textTransform: 'none',
+                fontWeight: 700,
+                fontSize: '0.9rem',
+                py: 1.5,
+                borderRadius: 1.5,
+                boxShadow: '0 3px 8px rgba(0,0,0,0.4)',
+                border: 'none',
+                '&:hover': {
+                  bgcolor: '#68a83a',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                  transform: 'translateY(-2px)',
+                },
+                transition: 'all 0.3s ease',
+              }}
+            >
+              View Profile
+            </Button>
+          </CardContent>
+        </Card>
+      </Box>
+    );
+  }
+
+  // For Harvest Capital Jobs - keep existing design
   return (
     <Card
       sx={{

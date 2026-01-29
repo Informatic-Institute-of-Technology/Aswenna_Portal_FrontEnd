@@ -1,7 +1,9 @@
 import DashboardLayout from '@/layouts/DashboardLayout';
 import type { FarmerJob, InvestmentRequest } from '@/types/farmer.types';
-import { Box, Tab, Tabs, Typography } from '@mui/material';
+import { AccountBalanceWallet, Handshake } from '@mui/icons-material';
+import { Box, Typography } from '@mui/material';
 import { useState } from 'react';
+import { SectionHeader, TabNavigation, type TabItem } from '../../components/common';
 import FarmerJobCard from '../../components/farmer/FarmerJobCard';
 import InvestmentRequestCard from '../../components/investor/InvestmentRequestCard';
 import InvestmentRequestDialog from '../../components/investor/InvestmentRequestDialog';
@@ -37,8 +39,22 @@ const OpportunitiesPage = () => {
 
   const handleInvest = (id: string) => {
     console.log('Invest in request:', id);
-    // TODO: Open dialog to add commission rate and confirm investment
   };
+
+  const tabs: TabItem[] = [
+    {
+      value: 'investments',
+      label: 'Investment Opportunities',
+      icon: <AccountBalanceWallet sx={{ fontSize: 20 }} />,
+      count: investmentRequests.length,
+    },
+    {
+      value: 'hire',
+      label: 'Hire Farmers',
+      icon: <Handshake sx={{ fontSize: 20 }} />,
+      count: farmerJobs.length,
+    },
+  ];
 
   return (
     <DashboardLayout>
@@ -53,43 +69,22 @@ const OpportunitiesPage = () => {
           </Typography>
         </Box>
 
-        {/* Tabs: Investments / Hire Farmers */}
-        <Tabs
-          value={activeTab}
-          onChange={(_, newValue) => setActiveTab(newValue)}
-          sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }}
-        >
-          <Tab 
-            label={
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <span>💰</span>
-                <span>Investment Opportunities ({investmentRequests.length})</span>
-              </Box>
-            } 
-            value="investments" 
-          />
-          <Tab 
-            label={
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <span>🤝</span>
-                <span>Hire Farmers ({farmerJobs.length})</span>
-              </Box>
-            } 
-            value="hire" 
-          />
-        </Tabs>
+        {/* Tabs Navigation */}
+        <TabNavigation
+          activeTab={activeTab}
+          tabs={tabs}
+          onChange={(value) => setActiveTab(value as 'investments' | 'hire')}
+          variant="dark"
+        />
 
-        {/* Investment Opportunities Tab */}
         {activeTab === 'investments' && (
           <Box>
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>
-                💰 Investment Opportunities
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Fund farmers' cultivation projects with detailed cost breakdowns and payment schedules
-              </Typography>
-            </Box>
+            <SectionHeader
+              title="Investment Opportunities"
+              description="Fund farmers' cultivation projects with detailed cost breakdowns and payment schedules"
+              accentColor="#F7931E"
+              showLeftBorder={true}
+            />
 
             {investmentRequests.length > 0 ? (
               <Box sx={{ 
@@ -127,14 +122,12 @@ const OpportunitiesPage = () => {
         {/* Hire Farmers Tab */}
         {activeTab === 'hire' && (
           <Box>
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>
-                🤝 Hire Farmers
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Hire skilled farmers for various agricultural services
-              </Typography>
-            </Box>
+            <SectionHeader
+              title="Hire Farmers"
+              description="Hire skilled farmers for various agricultural services"
+              accentColor="#F7931E"
+              showLeftBorder={true}
+            />
 
             {farmerJobs.length > 0 ? (
               <Box sx={{ 

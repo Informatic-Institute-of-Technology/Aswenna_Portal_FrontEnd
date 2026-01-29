@@ -1,26 +1,26 @@
 import { useAuth } from '@/Context/useAuth';
 import {
-    AccountCircle,
-    AttachMoney,
-    BarChart as BarChartIcon,
-    BusinessCenter,
-    Description,
-    Home,
-    Landscape,
-    Mail,
-    Settings,
-    TrendingUp,
+  AccountCircle,
+  AttachMoney,
+  BarChart as BarChartIcon,
+  BusinessCenter,
+  Description,
+  Home,
+  Landscape,
+  Mail,
+  Settings,
+  TrendingUp,
 } from '@mui/icons-material';
 import {
-    Avatar,
-    Box,
-    Button,
-    Divider,
-    List,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-    Typography,
+  Avatar,
+  Box,
+  Button,
+  Divider,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Typography,
 } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -31,8 +31,8 @@ const InvestorSidebar = () => {
 
   const menuItems = [
     { text: 'Dashboard', icon: <Home />, path: '/dashboard' },
-    { text: 'Opportunities', icon: <BusinessCenter />, path: '/dashboard/opportunities' },
     { text: 'My Offers', icon: <AttachMoney />, path: '/dashboard/my-offers' },
+    { text: 'Opportunities', icon: <BusinessCenter />, path: '/dashboard/opportunities' },
     { text: 'Land Search', icon: <Landscape />, path: '/dashboard/land-search' },
     { text: 'Requests', icon: <Description />, path: '/dashboard/requests' },
     { text: 'ROI / Market Analysis', icon: <TrendingUp />, path: '/dashboard/roi-analysis' },
