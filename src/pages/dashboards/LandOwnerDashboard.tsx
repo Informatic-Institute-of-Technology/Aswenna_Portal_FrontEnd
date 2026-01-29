@@ -1,15 +1,15 @@
 import {
-  CardHeaderWithIcon,
-  PlaceholderWidget,
-  StatCard,
+    CardHeaderWithIcon,
+    PlaceholderWidget,
+    StatCard,
 } from '@/components';
 import DashboardLayout from '@/layouts/DashboardLayout';
 import {
-  AttachMoney,
-  BarChart as BarChartIcon,
-  Cloud,
-  Home,
-  LocationOn,
+    AttachMoney,
+    BarChart as BarChartIcon,
+    Cloud,
+    Home,
+    LocationOn,
 } from '@mui/icons-material';
 import { Card, CardContent, Chip } from '@mui/material';
 

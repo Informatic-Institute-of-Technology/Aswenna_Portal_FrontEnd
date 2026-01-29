@@ -54,15 +54,15 @@ const OfferCard = ({ offer, onViewDetails }: OfferCardProps) => {
     const getOfferTypeInfo = () => {
         if (offer.offerType === 'direct-harvest') {
             return {
-                icon: '🌾',
-                label: 'Direct Harvest Order',
+                icon: '💰',
+                label: 'Invest in Direct Harvest',
                 color: '#FF9800',
                 gradient: 'linear-gradient(135deg, #FF9800 0%, #FFB74D 100%)'
             };
         } else {
             return {
                 icon: '💰',
-                label: 'Sponsorship',
+                label: 'Invest in Sponsorship',
                 color: '#2196F3',
                 gradient: 'linear-gradient(135deg, #2196F3 0%, #64B5F6 100%)'
             };
@@ -231,7 +231,7 @@ const OfferCard = ({ offer, onViewDetails }: OfferCardProps) => {
                                     <Typography variant="caption" sx={{ color: '#808080', textTransform: 'uppercase' }}>
                                         Total Budget
                                     </Typography>
-                                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#6B8E23', fontSize: '1rem' }}>
+                                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#FF9800', fontSize: '1rem' }}>
                                         {formatCurrency(offer.totalBudget)}
                                     </Typography>
                                 </Box>
@@ -294,7 +294,7 @@ const OfferCard = ({ offer, onViewDetails }: OfferCardProps) => {
                                     <Typography variant="caption" sx={{ color: '#808080', textTransform: 'uppercase' }}>
                                         Investment Range
                                     </Typography>
-                                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#6B8E23', fontSize: '0.9rem' }}>
+                                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#FF9800', fontSize: '0.9rem' }}>
                                         {offer.minimumInvestment && offer.maximumInvestment ? (
                                             <>{formatCurrency(offer.minimumInvestment)} - {formatCurrency(offer.maximumInvestment)}</>
                                         ) : 'TBD'}

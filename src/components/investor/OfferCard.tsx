@@ -125,17 +125,13 @@ const OfferCard = ({
     investorAmount,
     onViewDetails,
 }: OfferCardProps) => {
-    // Auto-calculate ROI based on investment type
     const calculatedROI = useMemo(() => {
-        // For commission-based projects: ROI = (earnedCommission / investorAmount) × 100
         if (investmentType === 'commission' && investorAmount && earnedCommission !== undefined) {
             return Math.round((earnedCommission / investorAmount) * 100);
         }
-        // For harvest-based or if no calculation possible, use provided expectedROI
         return expectedROI;
     }, [investmentType, earnedCommission, investorAmount, expectedROI]);
 
-    // Auto-calculate progress if not provided
     const calculatedProgress = useMemo(() => {
         if (progress !== undefined) return progress;
         if (!milestones || milestones.length === 0) return 0;
@@ -255,7 +251,6 @@ const OfferCard = ({
                 },
             }}
         >
-            {/* Header with Background Image */}
             <Box
                 sx={{
                     position: 'relative',

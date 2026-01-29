@@ -1,0 +1,290 @@
+[
+  {
+    "id": "inv-req-1",
+    "farmerId": "f001",
+    "farmerName": "Kamal Perera",
+    "farmerImage": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+    "farmerExperience": 8,
+    "farmerRating": 4.5,
+    "projectTitle": "Organic Tomato Cultivation - 2 Acres",
+    "description": "Planning to cultivate organic cherry tomatoes on 2 acres of certified organic land. Expected harvest in 4 months with high-quality produce suitable for export market.",
+    "cropType": "Tomatoes",
+    "cropVariety": "Cherry Tomatoes",
+    "landSize": 2,
+    "landSizeUnit": "acres",
+    "location": "Nuwara Eliya",
+    "district": "Nuwara Eliya",
+    "province": "Central Province",
+    "costBreakdown": [
+      {
+        "id": "cost-1",
+        "category": "Seeds & Seedlings",
+        "description": "Organic certified tomato seeds",
+        "estimatedCost": 15000
+      },
+      {
+        "id": "cost-2",
+        "category": "Fertilizers & Pesticides",
+        "description": "Organic compost and natural pesticides",
+        "estimatedCost": 25000
+      },
+      {
+        "id": "cost-3",
+        "category": "Irrigation System",
+        "description": "Drip irrigation setup",
+        "estimatedCost": 40000
+      },
+      {
+        "id": "cost-4",
+        "category": "Labor Costs",
+        "description": "Planting, maintenance, and harvesting labor",
+        "estimatedCost": 50000
+      },
+      {
+        "id": "cost-5",
+        "category": "Equipment & Tools",
+        "description": "Farming tools and equipment rental",
+        "estimatedCost": 20000
+      }
+    ],
+    "totalInvestmentRequired": 150000,
+    "fundingDeadline": "2026-02-15T23:59:59.000Z",
+    "installmentSchedule": [
+      {
+        "id": "inst-1",
+        "installmentNumber": 1,
+        "amount": 50000,
+        "dueDate": "2026-02-20",
+        "milestone": "Project Start - Land Preparation",
+        "status": "pending"
+      },
+      {
+        "id": "inst-2",
+        "installmentNumber": 2,
+        "amount": 40000,
+        "dueDate": "2026-03-20",
+        "milestone": "Mid-Season - Irrigation & Maintenance",
+        "status": "pending"
+      },
+      {
+        "id": "inst-3",
+        "installmentNumber": 3,
+        "amount": 30000,
+        "dueDate": "2026-04-20",
+        "milestone": "Pre-Harvest - Labor & Equipment",
+        "status": "pending"
+      },
+      {
+        "id": "inst-4",
+        "installmentNumber": 4,
+        "amount": 30000,
+        "dueDate": "2026-05-20",
+        "milestone": "Harvest & Delivery",
+        "status": "pending"
+      }
+    ],
+    "expectedDuration": 4,
+    "expectedYield": "2000 KG",
+    "expectedROI": 35,
+    "status": "open",
+    "farmingMethod": "organic",
+    "certifications": ["Organic Certified", "GAP Certified"],
+    "previousExperience": "Successfully cultivated tomatoes for 3 seasons with 90% yield success rate",
+    "createdAt": "2026-01-15T10:00:00.000Z",
+    "updatedAt": "2026-01-15T10:00:00.000Z"
+  },
+  {
+    "id": "inv-req-2",
+    "farmerId": "f002",
+    "farmerName": "Nimal Silva",
+    "farmerImage": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150",
+    "farmerExperience": 12,
+    "farmerRating": 4.8,
+    "projectTitle": "Rice Cultivation - 5 Acres Premium Variety",
+    "description": "Large-scale rice cultivation using modern farming techniques. Premium Basmati variety with high market demand. Experienced farmer with proven track record.",
+    "cropType": "Rice",
+    "cropVariety": "Basmati",
+    "landSize": 5,
+    "landSizeUnit": "acres",
+    "location": "Polonnaruwa",
+    "district": "Polonnaruwa",
+    "province": "North Central Province",
+    "costBreakdown": [
+      {
+        "id": "cost-1",
+        "category": "Seeds",
+        "description": "Premium Basmati rice seeds",
+        "estimatedCost": 30000
+      },
+      {
+        "id": "cost-2",
+        "category": "Fertilizers",
+        "description": "Organic and chemical fertilizers",
+        "estimatedCost": 60000
+      },
+      {
+        "id": "cost-3",
+        "category": "Irrigation",
+        "description": "Water management and irrigation",
+        "estimatedCost": 45000
+      },
+      {
+        "id": "cost-4",
+        "category": "Labor",
+        "description": "Seasonal labor for planting and harvesting",
+        "estimatedCost": 80000
+      },
+      {
+        "id": "cost-5",
+        "category": "Machinery",
+        "description": "Tractor rental and harvesting equipment",
+        "estimatedCost": 35000
+      },
+      {
+        "id": "cost-6",
+        "category": "Pest Control",
+        "description": "Pest management and monitoring",
+        "estimatedCost": 20000
+      }
+    ],
+    "totalInvestmentRequired": 270000,
+    "fundingDeadline": "2026-02-28T23:59:59.000Z",
+    "installmentSchedule": [
+      {
+        "id": "inst-1",
+        "installmentNumber": 1,
+        "amount": 70000,
+        "dueDate": "2026-03-05",
+        "milestone": "Land Preparation & Seeding",
+        "status": "pending"
+      },
+      {
+        "id": "inst-2",
+        "installmentNumber": 2,
+        "amount": 50000,
+        "dueDate": "2026-04-05",
+        "milestone": "Fertilizer Application",
+        "status": "pending"
+      },
+      {
+        "id": "inst-3",
+        "installmentNumber": 3,
+        "amount": 50000,
+        "dueDate": "2026-05-05",
+        "milestone": "Irrigation & Pest Control",
+        "status": "pending"
+      },
+      {
+        "id": "inst-4",
+        "installmentNumber": 4,
+        "amount": 50000,
+        "dueDate": "2026-06-05",
+        "milestone": "Pre-Harvest Labor",
+        "status": "pending"
+      },
+      {
+        "id": "inst-5",
+        "installmentNumber": 5,
+        "amount": 50000,
+        "dueDate": "2026-07-05",
+        "milestone": "Harvesting & Processing",
+        "status": "pending"
+      }
+    ],
+    "expectedDuration": 5,
+    "expectedYield": "6000 KG",
+    "expectedROI": 45,
+    "status": "open",
+    "farmingMethod": "conventional",
+    "certifications": ["ISO 22000", "HACCP"],
+    "previousExperience": "15 years of rice cultivation with consistent high yields. Won district best farmer award in 2024.",
+    "collateral": "Land ownership documents available",
+    "createdAt": "2026-01-18T09:00:00.000Z",
+    "updatedAt": "2026-01-18T09:00:00.000Z"
+  },
+  {
+    "id": "inv-req-3",
+    "farmerId": "f003",
+    "farmerName": "Chaminda Bandara",
+    "farmerImage": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
+    "farmerExperience": 6,
+    "farmerRating": 4.3,
+    "projectTitle": "Green Chili Cultivation - 1.5 Acres",
+    "description": "High-demand green chili cultivation for local market. Fast-growing variety with 3-month harvest cycle. Good profit margins expected.",
+    "cropType": "Vegetables",
+    "cropVariety": "Green Chili",
+    "landSize": 1.5,
+    "landSizeUnit": "acres",
+    "location": "Anuradhapura",
+    "district": "Anuradhapura",
+    "province": "North Central Province",
+    "costBreakdown": [
+      {
+        "id": "cost-1",
+        "category": "Seeds",
+        "description": "High-yield green chili seeds",
+        "estimatedCost": 10000
+      },
+      {
+        "id": "cost-2",
+        "category": "Fertilizers & Compost",
+        "description": "Organic compost and NPK fertilizers",
+        "estimatedCost": 20000
+      },
+      {
+        "id": "cost-3",
+        "category": "Irrigation",
+        "description": "Drip irrigation and water supply",
+        "estimatedCost": 25000
+      },
+      {
+        "id": "cost-4",
+        "category": "Labor",
+        "description": "Planting and maintenance labor",
+        "estimatedCost": 30000
+      },
+      {
+        "id": "cost-5",
+        "category": "Pest Management",
+        "description": "Natural pest control solutions",
+        "estimatedCost": 15000
+      }
+    ],
+    "totalInvestmentRequired": 100000,
+    "fundingDeadline": "2026-02-10T23:59:59.000Z",
+    "installmentSchedule": [
+      {
+        "id": "inst-1",
+        "installmentNumber": 1,
+        "amount": 35000,
+        "dueDate": "2026-02-15",
+        "milestone": "Land Preparation & Planting",
+        "status": "pending"
+      },
+      {
+        "id": "inst-2",
+        "installmentNumber": 2,
+        "amount": 30000,
+        "dueDate": "2026-03-15",
+        "milestone": "Fertilizer & Irrigation Setup",
+        "status": "pending"
+      },
+      {
+        "id": "inst-3",
+        "installmentNumber": 3,
+        "amount": 35000,
+        "dueDate": "2026-04-15",
+        "milestone": "Harvest & Marketing",
+        "status": "pending"
+      }
+    ],
+    "expectedDuration": 3,
+    "expectedYield": "1500 KG",
+    "expectedROI": 40,
+    "status": "open",
+    "farmingMethod": "mixed",
+    "previousExperience": "Successfully completed 2 chili cultivation cycles with good market prices",
+    "createdAt": "2026-01-20T11:30:00.000Z",
+    "updatedAt": "2026-01-20T11:30:00.000Z"
+  }
+]

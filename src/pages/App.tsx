@@ -8,11 +8,10 @@ import InvestorsPage from './common/InvestorsPage';
 import LandOwnersPage from './common/LandOwnersPage';
 import MatchMakingPage from './common/MatchMakingPage';
 import MyProjectsPage from './common/MyProjectsPage';
-import OpportunitiesPage from './common/OpportunitiesPage';
 import SettingsPage from './common/SettingsPage';
 import Dashboard from './Dashboard';
-import FarmerSearchPage from './investor/FarmerSearchPage';
 import MyOffersPage from './investor/MyOffersPage';
+import OpportunitiesPage from './investor/OpportunitiesPage';
 import RequestsPage from './investor/RequestsPage';
 import LandAnalysisPage from './landowner/LandAnalysisPage';
 import MyLandAdsPage from './landowner/MyLandAdsPage';
@@ -128,14 +127,6 @@ function AppRoutes() {
             element={
               <ProtectedRoute>
                 <MyOffersPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/dashboard/farmer-search"
-            element={
-              <ProtectedRoute>
-                <FarmerSearchPage />
               </ProtectedRoute>
             }
           />

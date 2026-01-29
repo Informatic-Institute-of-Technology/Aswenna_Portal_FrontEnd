@@ -18,7 +18,6 @@ const MyOffersPage = () => {
   const [selectedProject, setSelectedProject] = useState<OfferCardProps | null>(null);
   const { notification, showError, showSuccess, hideNotification } = useNotification();
 
-  // Filter projects by logged-in user's investor ID
   const allProjects = useMemo(() => {
     const projects = comprehensiveProjectsData as (OfferCardProps & { investorId?: string })[];
     return projects.filter(p => p.investorId === user?._id);
@@ -50,7 +49,6 @@ const MyOffersPage = () => {
   const handleOfferSubmit = (offerData: Partial<DirectHarvestOffer> | Partial<SponsorshipOffer>) => {
     try {
       console.log('New offer created:', offerData);
-      // TODO: Send to backend API
       showSuccess('Offer created successfully! Farmers will be notified.');
       setCreateDialogOpen(false);
     } catch {
@@ -68,7 +66,6 @@ const MyOffersPage = () => {
 
   return (
     <DashboardLayout>
-      {/* Page Header using Bootstrap and MUI */}
       <Box className="container-fluid" sx={{ mb: 4 }}>
         <div className="row align-items-start">
           <div className="col-12 col-lg-8">
