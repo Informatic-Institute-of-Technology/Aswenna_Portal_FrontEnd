@@ -16,12 +16,10 @@ const OpportunitiesPage = () => {
   const [selectedRequest, setSelectedRequest] = useState<InvestmentRequest | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  // Investment opportunities - Farmers requesting funding for cultivation
   const investmentRequests = (investmentRequestsData as InvestmentRequest[]).filter(
     req => req.status === 'open'
   );
 
-  // Farmer services available for hire (Commission jobs only)
   const allFarmerJobs = farmerJobsData as FarmerJob[];
   const farmerJobs = allFarmerJobs.filter(
     job => job.jobType === FarmerJobType.COMMISSION && job.status === 'OPEN'
@@ -69,7 +67,6 @@ const OpportunitiesPage = () => {
           </Typography>
         </Box>
 
-        {/* Tabs Navigation */}
         <TabNavigation
           activeTab={activeTab}
           tabs={tabs}
@@ -119,7 +116,6 @@ const OpportunitiesPage = () => {
           </Box>
         )}
 
-        {/* Hire Farmers Tab */}
         {activeTab === 'hire' && (
           <Box>
             <SectionHeader
