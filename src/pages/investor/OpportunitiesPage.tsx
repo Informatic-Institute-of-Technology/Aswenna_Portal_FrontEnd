@@ -7,8 +7,7 @@ import { SectionHeader, TabNavigation, type TabItem } from '../../components/com
 import FarmerJobCard from '../../components/farmer/FarmerJobCard';
 import InvestmentRequestCard from '../../components/investor/InvestmentRequestCard';
 import InvestmentRequestDialog from '../../components/investor/InvestmentRequestDialog';
-import farmerJobsData from '../../data/json/farmerJobs.json';
-import investmentRequestsData from '../../data/json/investmentRequests.json';
+import { farmerJobsData, investmentRequestsData } from '../../data/json';
 import { FarmerJobType } from '../../types/farmer.types';
 
 const OpportunitiesPage = () => {
