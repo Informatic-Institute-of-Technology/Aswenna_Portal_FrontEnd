@@ -6,8 +6,7 @@ import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import type { OfferCardProps } from '../../components/investor';
 import { CreateOfferButton, CreateOfferDialog, OfferCard, ProjectDetailsDialog } from '../../components/investor';
-import comprehensiveProjectsData from '../../data/json/comprehensiveProjects.json';
-import pendingProjectsData from '../../data/json/pendingProjects.json';
+import { comprehensiveProjectsData, pendingProjectsData } from '../../data/json';
 import Notification from '../../shared/components/Notification';
 import { useNotification } from '../../shared/hooks/useNotification';
 

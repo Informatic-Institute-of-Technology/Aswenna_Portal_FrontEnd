@@ -1,5 +1,5 @@
 import type { OfferCardProps } from '../components/investor/OfferCard';
-import comprehensiveProjectsData from './json/comprehensiveProjects.json';
+import { comprehensiveProjectsData } from './json';
 
 const [comprehensiveProjectData, comprehensiveVegetableProjectData] = comprehensiveProjectsData as OfferCardProps[];
 

@@ -14,7 +14,7 @@ import {
   CardHeader,
   Typography,
 } from '@mui/material';
-import farmerProjectsData from '../../data/json/farmerProjects.json';
+import { farmerProjectsData } from '../../data/json';
 
 // Import mock projects from JSON
 const mockProjects = farmerProjectsData;

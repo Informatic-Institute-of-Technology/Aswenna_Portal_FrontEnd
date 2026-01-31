@@ -4,9 +4,7 @@ import { FilterList, Settings } from '@mui/icons-material';
 import { Box, Button, IconButton, Tab, Tabs, Tooltip, Typography } from '@mui/material';
 import { useState } from 'react';
 import { CreateOfferButton, CreateOfferDialog, OfferCardNew as OfferCard } from '../../components/investor';
-import completedOffersData from '../../data/json/completedOffers.json';
-import directHarvestOffersData from '../../data/json/directHarvestOffers.json';
-import sponsorshipOffersData from '../../data/json/sponsorshipOffers.json';
+import { completedOffersData, directHarvestOffersData, sponsorshipOffersData } from '../../data/json';
 
 // Import mock data from JSON files
 const mockDirectHarvestOffers: DirectHarvestOffer[] = directHarvestOffersData as DirectHarvestOffer[];
