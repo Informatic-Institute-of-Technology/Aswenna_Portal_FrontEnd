@@ -1,7 +1,7 @@
 import AswendLogo from "@/assets/Aswenna Logo.png";
 import "@/styles/RoleSelection.css";
+import { Agriculture, ArrowBack, East, TrendingUp, Villa } from "@mui/icons-material";
 import { Box, Button, Container, IconButton, Step, StepLabel, Stepper, Typography } from "@mui/material";
-import { ArrowBack, Agriculture, TrendingUp, Villa, East } from "@mui/icons-material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Notification from "../shared/components/Notification";
@@ -40,7 +40,11 @@ const RoleSelection = () => {
         showSuccess(`Role selected: ${role.charAt(0).toUpperCase() + role.slice(1)}`);
 
         setTimeout(() => {
-            navigate("/login");
+            if (role === 'farmer') {
+                navigate("/farmer-profile-setup");
+            } else {
+                navigate("/login");
+            }
         }, 800);
     };
 

@@ -10,6 +10,8 @@ import MatchMakingPage from './common/MatchMakingPage';
 import MyProjectsPage from './common/MyProjectsPage';
 import SettingsPage from './common/SettingsPage';
 import Dashboard from './Dashboard';
+import EmailVerification from './EmailVerification';
+import FarmerProfileSetup from './farmer/FarmerProfileSetup';
 import MyOffersPage from './investor/MyOffersPage';
 import OpportunitiesPage from './investor/OpportunitiesPage';
 import RequestsPage from './investor/RequestsPage';
@@ -18,9 +20,8 @@ import MyLandAdsPage from './landowner/MyLandAdsPage';
 import ReceivedRequestsPage from './landowner/ReceivedRequestsPage';
 import TenantSearchPage from './landowner/TenantSearchPage';
 import Login from './Login';
-import Signup from './Signup';
-import EmailVerification from './EmailVerification';
 import RoleSelection from './RoleSelection';
+import Signup from './Signup';
 // Super Admin Pages
 import ActiveProjectsMonitoring from './admin/ActiveProjectsMonitoring';
 import GlobalPaymentLedger from './admin/GlobalPaymentLedger';
@@ -64,6 +65,15 @@ function AppRoutes() {
         element={
           <PublicRoute>
             <RoleSelection />
+          </PublicRoute>
+        }
+      />
+
+      <Route
+        path="/farmer-profile-setup"
+        element={
+          <PublicRoute>
+            <FarmerProfileSetup />
           </PublicRoute>
         }
       />
