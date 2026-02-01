@@ -10,6 +10,7 @@ import {
     CloudUpload,
     InsertDriveFile as FileIcon,
     Info as InfoIcon,
+    MyLocation,
     Person,
     VerifiedUser,
     WbSunny
@@ -18,6 +19,7 @@ import {
     Box,
     Button,
     Chip,
+    CircularProgress,
     Container,
     Dialog,
     DialogActions,
@@ -215,6 +217,9 @@ const FarmerProfileSetup = () => {
 
   const [dsDivision, setDsDivision] = useState('');
   const [dsDivisionsList, setDsDivisionsList] = useState<string[]>([]);
+  
+  // Ref to hold pending auto-filled values that need to be set after async lists load
+  const pendingLocationUpdate = useRef<{ ds?: string, gn?: string, gnNumber?: string } | null>(null);
 
   useEffect(() => {
     const fetchDSDivisions = async () => {
@@ -222,14 +227,29 @@ const FarmerProfileSetup = () => {
         try {
           const divisions = await LocationService.getDSDivisionsByDistrict(district);
           setDsDivisionsList(divisions);
+          
+          // Check if we have a pending DS Division to set from auto-location
+          if (pendingLocationUpdate.current?.ds) {
+              // Simple check: exists in list? (Case insensitive check might be safer but lists should match)
+              const match = divisions.find(d => d.toLowerCase() === pendingLocationUpdate.current?.ds?.toLowerCase());
+              if (match) {
+                  setDsDivision(match);
+              } else {
+                  setDsDivision('');
+              }
+              // Don't clear pending GN yet, passes to next effect
+          } else {
+             setDsDivision('');
+          }
         } catch (error) {
           console.error("Failed to load DS Divisions", error);
           setDsDivisionsList([]);
+          setDsDivision('');
         }
       } else {
         setDsDivisionsList([]);
+        setDsDivision('');
       }
-      setDsDivision('');
     };
 
     fetchDSDivisions();
@@ -244,18 +264,101 @@ const FarmerProfileSetup = () => {
         try {
           const gns = await LocationService.getGNDivisionsByDSDivision(dsDivision);
           setGnDivisionsList(gns);
+
+          // Check if we have a pending GN Division to set
+          if (pendingLocationUpdate.current?.gn) {
+              // Try to find match by Name
+              // The API usually returns exact names from the same source, but let's be safe
+              const match = gns.find(g => g.name === pendingLocationUpdate.current?.gn);
+              if (match) {
+                  setGnDivision(match.name);
+              } else {
+                  setGnDivision('');
+              }
+              // Clear the pending update
+              pendingLocationUpdate.current = null;
+          } else {
+            setGnDivision('');
+          }
+
         } catch (error) {
           console.error("Failed to load GN Divisions", error);
           setGnDivisionsList([]);
+          setGnDivision('');
         }
       } else {
         setGnDivisionsList([]);
+        setGnDivision('');
       }
-      setGnDivision('');
     };
 
     fetchGNDivisions();
   }, [dsDivision]);
+
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [city, setCity] = useState('');
+  const [address, setAddress] = useState('');
+  const [postalCode, setPostalCode] = useState('');
+
+  useEffect(() => {
+    const fetchPostalCode = async () => {
+        if (city && !postalCode) {
+            try {
+                const code = await LocationService.getPostalCodeByAddress(city, district);
+                if (code) setPostalCode(code);
+            } catch (e) {
+                console.error("Failed to auto-fetch postal code", e);
+            }
+        }
+    };
+    
+    const timeoutId = setTimeout(fetchPostalCode, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [city, district, postalCode]);
+
+  const handleUseMyLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
+
+    setIsLoadingLocation(true);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          const details = await LocationService.getLocationDetails(latitude, longitude);
+
+          if (details.province) setProvince(details.province);
+          if (details.dsDivision || details.gnDivision) {
+              pendingLocationUpdate.current = {
+                  ds: details.dsDivision,
+                  gn: details.gnDivision,
+                  gnNumber: details.gnNumber
+              };
+          }
+
+          if (details.district) setDistrict(details.district); 
+          
+          if (details.city) setCity(details.city);
+          if (details.address) setAddress(details.address);
+          if (details.postalCode) setPostalCode(details.postalCode);
+          
+        } catch (error) {
+          console.error("Error getting location details:", error);
+          alert("Failed to fetch location details.");
+        } finally {
+          setIsLoadingLocation(false);
+        }
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+        setIsLoadingLocation(false);
+        alert("Unable to retrieve your location.");
+      }
+    );
+  };
 
   const [passbookFiles, setPassbookFiles] = useState<File[]>([]);
   const [gnFiles, setGnFiles] = useState<File[]>([]);
@@ -398,10 +501,42 @@ const FarmerProfileSetup = () => {
                   <TextField fullWidth label="National ID Number" placeholder="19XXXXXXXXXX" variant="outlined" InputLabelProps={{ shrink: true }} />
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
-                  <TextField fullWidth label="Street Address (No / Lane)" placeholder="123 Green Lane" variant="outlined" InputLabelProps={{ shrink: true }} />
+                  <TextField 
+                    fullWidth 
+                    label="Street Address (No / Lane)" 
+                    placeholder="123 Green Lane" 
+                    variant="outlined" 
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    InputLabelProps={{ shrink: true }} 
+                  />
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
-                  <TextField fullWidth label="City / Town" placeholder="Enter City" variant="outlined" InputLabelProps={{ shrink: true }} />
+                  <TextField 
+                    fullWidth 
+                    label="City / Town" 
+                    placeholder="Enter City" 
+                    variant="outlined" 
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    InputLabelProps={{ shrink: true }} 
+                    slotProps={{
+                        input: {
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton 
+                                        onClick={handleUseMyLocation} 
+                                        disabled={isLoadingLocation}
+                                        title="Use My Location"
+                                        color="primary"
+                                    >
+                                        {isLoadingLocation ? <CircularProgress size={24} /> : <MyLocation />}
+                                    </IconButton>
+                                </InputAdornment>
+                            )
+                        }
+                    }}
+                  />
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
                   <FormControl fullWidth>
@@ -421,7 +556,15 @@ const FarmerProfileSetup = () => {
                   </FormControl>
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
-                  <TextField fullWidth label="Postal Code" placeholder="XXXXX" variant="outlined" InputLabelProps={{ shrink: true }} />
+                  <TextField 
+                    fullWidth 
+                    label="Postal Code" 
+                    placeholder="XXXXX" 
+                    variant="outlined" 
+                    value={postalCode}
+                    onChange={(e) => setPostalCode(e.target.value)}
+                    InputLabelProps={{ shrink: true }} 
+                  />
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
                   <TextField 
