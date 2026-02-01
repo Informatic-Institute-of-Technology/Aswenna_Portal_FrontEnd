@@ -168,7 +168,6 @@ interface FileUploaderProps {
     );
   };
 
-// Custom Step Connector styled to match the dark theme thin lines
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
     top: 22,
@@ -197,7 +196,6 @@ const FarmerProfileSetup = () => {
   const [selectedCrops, setSelectedCrops] = useState<string[]>(['Paddy']);
   const [nicFiles, setNicFiles] = useState<File[]>([]);
 
-  // Sri Lanka Provinces and Districts Data
   const sriLankaLocations: Record<string, string[]> = {
     "Central": ["Kandy", "Matale", "Nuwara Eliya"],
     "Eastern": ["Ampara", "Batticaloa", "Trincomalee"],
@@ -212,7 +210,7 @@ const FarmerProfileSetup = () => {
   
   const handleProvinceChange = (event: SelectChangeEvent<string>) => {
     setProvince(event.target.value);
-    setDistrict(''); // Reset district when province changes
+    setDistrict('');
   };
 
   const [dsDivision, setDsDivision] = useState('');
@@ -221,7 +219,6 @@ const FarmerProfileSetup = () => {
   useEffect(() => {
     const fetchDSDivisions = async () => {
       if (district) {
-        // Optionally show loading state here
         try {
           const divisions = await LocationService.getDSDivisionsByDistrict(district);
           setDsDivisionsList(divisions);
@@ -262,8 +259,6 @@ const FarmerProfileSetup = () => {
 
   const [passbookFiles, setPassbookFiles] = useState<File[]>([]);
   const [gnFiles, setGnFiles] = useState<File[]>([]);
-  
-  // Phone Verification State
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
   const [verificationDialogOpen, setVerificationDialogOpen] = useState(false);
@@ -272,7 +267,6 @@ const FarmerProfileSetup = () => {
   const crops = ['Paddy', 'Corn', 'Tea', 'Cinnamon', 'Vegetables'];
 
   const handleSendVerification = () => {
-    // Simulate API call to send SMS
     setVerificationDialogOpen(true);
   };
 
@@ -363,7 +357,6 @@ const FarmerProfileSetup = () => {
             </Box>
         </Box>
         
-        {/* Phone Verification Dialog */}
         <Dialog open={verificationDialogOpen} onClose={() => setVerificationDialogOpen(false)}>
             <DialogTitle>Verify Phone Number</DialogTitle>
             <DialogContent>
@@ -389,10 +382,8 @@ const FarmerProfileSetup = () => {
         </Dialog>
 
         <Grid container spacing={3}>
-          {/* Main Form Fields - Left Column */}
           <Grid size={{ xs: 12, lg: 8 }}>
             
-            {/* Personal & Address Details */}
             <Paper elevation={0} sx={{ p: 3, mb: 3, bgcolor: 'background.paper', borderRadius: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                 <Person sx={{ color: 'primary.main', mr: 1.5 }} />
@@ -618,7 +609,6 @@ const FarmerProfileSetup = () => {
             </Paper>
           </Grid>
 
-          {/* Verification & Actions - Right Column */}
           <Grid size={{ xs: 12, lg: 4 }}>
             
             {/* Verification */}
@@ -708,7 +698,6 @@ const FarmerProfileSetup = () => {
                 </Button>
             </Paper>
 
-            {/* Floating Action Button for theme toggle (optional, just mimicking screenshot bottom right icon) */}
             <Box sx={{ position: 'fixed', bottom: 32, right: 32}}>
                 <IconButton sx={{ bgcolor: '#333', color: '#fbbf24', '&:hover': { bgcolor: '#444' } }}>
                     <WbSunny />
@@ -723,7 +712,6 @@ const FarmerProfileSetup = () => {
                 “Empowering Sri Lankan agriculture through transparent partnerships.”
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.7 }}>
-                 {/* Placeholder for small Aswenna Verified logo/text */}
                 <Box component="img" src={AswendLogo} sx={{ width: 16, height: 16, mr: 1, filter: 'grayscale(100%)' }} />
                 <Typography variant="caption" sx={{ fontWeight: 'bold', color: 'text.secondary', letterSpacing: 1, fontSize: '0.65rem' }}>
                     ASWENNA VERIFIED
