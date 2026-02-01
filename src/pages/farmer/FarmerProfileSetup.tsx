@@ -1,14 +1,14 @@
-import AswendLogo from "@/assets/Aswenna Logo.png"; // Assuming logo path is consistent
+import AswendLogo from "@/assets/Aswenna Logo.png";
+import { FileUploader, ProfileStepper } from '@/components';
 import { LocationService } from '@/services';
+import { validateNIC } from '@/utils';
 import {
     AccountBalance,
     Add as AddIcon,
     Agriculture,
     ArrowBack,
-    Check as CheckIcon,
-    Close as CloseIcon,
-    CloudUpload,
-    InsertDriveFile as FileIcon,
+    Cancel as CancelIcon,
+    CheckCircle as CheckCircleIcon,
     Info as InfoIcon,
     MyLocation,
     Person,
@@ -36,160 +36,12 @@ import {
     Select,
     type SelectChangeEvent,
     Stack,
-    Step,
-    StepConnector,
-    stepConnectorClasses,
-    StepLabel,
-    Stepper,
-    styled,
     TextField,
+    Tooltip,
     Typography
 } from '@mui/material';
-import type { ChangeEvent, DragEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-// File Uploader Compone
-interface FileUploaderProps {
-    label: string;
-    helperText: string;
-    files: File[];
-    onFilesSelected: (newFiles: File[]) => void;
-    onFileDelete: (index: number) => void;
-  }
-  
-  const FileUploader = ({ label, helperText, files, onFilesSelected, onFileDelete }: FileUploaderProps) => {
-    const fileInputRef = useRef<HTMLInputElement>(null);
-  
-    const handleBoxClick = () => {
-      fileInputRef.current?.click();
-    };
-  
-    const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-      if (event.target.files && event.target.files.length > 0) {
-        onFilesSelected(Array.from(event.target.files));
-      }
-    };
-  
-    const handleDrop = (e: DragEvent) => {
-      e.preventDefault();
-      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        onFilesSelected(Array.from(e.dataTransfer.files));
-      }
-    };
-    
-    const handleDragOver = (e: DragEvent) => {
-      e.preventDefault();
-    };
-  
-    return (
-      <Box sx={{ mb: 3 }}>
-          <Typography variant="body2" sx={{ mb: 1 }}>{label}</Typography>
-          
-          <Box 
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              onClick={handleBoxClick}
-              sx={{ 
-                  border: '1px dashed #444', 
-                  borderRadius: 2, 
-                  p: 4, 
-                  textAlign: 'center',
-                  cursor: 'pointer',
-                  bgcolor: 'transparent',
-                  transition: 'all 0.2s',
-                  '&:hover': { 
-                      borderColor: 'primary.main', 
-                      bgcolor: 'rgba(107, 142, 35, 0.05)' 
-                  }
-              }}
-          >
-              <input 
-                  type="file" 
-                  multiple 
-                  hidden 
-                  ref={fileInputRef} 
-                  onChange={handleFileChange} 
-                  accept="image/*,application/pdf"
-              />
-              <CloudUpload sx={{ color: 'primary.main', fontSize: 32, mb: 1 }} />
-              <Typography variant="caption" display="block" color="text.secondary">
-                  {helperText}
-              </Typography>
-          </Box>
-  
-          {/* File Preview List */}
-          {files.length > 0 && (
-              <Box sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                  {files.map((file, index) => (
-                      <Box 
-                          key={index}
-                          sx={{
-                              position: 'relative',
-                              width: 60,
-                              height: 60,
-                              borderRadius: 2,
-                              overflow: 'hidden',
-                              border: '1px solid #444',
-                              bgcolor: '#222',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center'
-                          }}
-                      >
-                          {file.type.startsWith('image/') ? (
-                               <img 
-                                  src={URL.createObjectURL(file)} 
-                                  alt="preview" 
-                                  style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.7 }} 
-                               />
-                          ) : (
-                              <FileIcon sx={{ color: 'text.secondary' }} />
-                          )}
-                          
-                          <IconButton
-                              size="small"
-                              onClick={() => onFileDelete(index)}
-                              sx={{
-                                  position: 'absolute',
-                                  top: 2,
-                                  right: 2,
-                                  bgcolor: 'rgba(0,0,0,0.6)',
-                                  color: 'white',
-                                  p: 0.5,
-                                  '&:hover': { bgcolor: 'rgba(255,0,0,0.7)' }
-                              }}
-                          >
-                              <CloseIcon fontSize="small" sx={{ fontSize: 14 }} />
-                          </IconButton>
-                      </Box>
-                  ))}
-              </Box>
-          )}
-      </Box>
-    );
-  };
-
-const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
-  [`&.${stepConnectorClasses.alternativeLabel}`]: {
-    top: 22,
-  },
-  [`&.${stepConnectorClasses.active}`]: {
-    [`& .${stepConnectorClasses.line}`]: {
-      borderColor: theme.palette.primary.main,
-    },
-  },
-  [`&.${stepConnectorClasses.completed}`]: {
-    [`& .${stepConnectorClasses.line}`]: {
-      borderColor: theme.palette.primary.main,
-    },
-  },
-  [`& .${stepConnectorClasses.line}`]: {
-    borderColor: theme.palette.mode === 'dark' ? '#444' : '#eaeaf0',
-    borderTopWidth: 2,
-    borderRadius: 1,
-  },
-}));
 
 const FarmerProfileSetup = () => {
   const navigate = useNavigate();
@@ -197,6 +49,13 @@ const FarmerProfileSetup = () => {
   const [district, setDistrict] = useState('');
   const [selectedCrops, setSelectedCrops] = useState<string[]>(['Paddy']);
   const [nicFiles, setNicFiles] = useState<File[]>([]);
+  
+  // NIC Validation States
+  const [nicNumber, setNicNumber] = useState('');
+  const [nicError, setNicError] = useState('');
+  const [birthday, setBirthday] = useState('');
+  const [gender, setGender] = useState<'Male' | 'Female' | ''>('');
+  const [age, setAge] = useState<number | null>(null);
 
   const sriLankaLocations: Record<string, string[]> = {
     "Central": ["Kandy", "Matale", "Nuwara Eliya"],
@@ -218,7 +77,6 @@ const FarmerProfileSetup = () => {
   const [dsDivision, setDsDivision] = useState('');
   const [dsDivisionsList, setDsDivisionsList] = useState<string[]>([]);
   
-  // Ref to hold pending auto-filled values that need to be set after async lists load
   const pendingLocationUpdate = useRef<{ ds?: string, gn?: string, gnNumber?: string } | null>(null);
 
   useEffect(() => {
@@ -228,16 +86,13 @@ const FarmerProfileSetup = () => {
           const divisions = await LocationService.getDSDivisionsByDistrict(district);
           setDsDivisionsList(divisions);
           
-          // Check if we have a pending DS Division to set from auto-location
           if (pendingLocationUpdate.current?.ds) {
-              // Simple check: exists in list? (Case insensitive check might be safer but lists should match)
               const match = divisions.find(d => d.toLowerCase() === pendingLocationUpdate.current?.ds?.toLowerCase());
               if (match) {
                   setDsDivision(match);
               } else {
                   setDsDivision('');
               }
-              // Don't clear pending GN yet, passes to next effect
           } else {
              setDsDivision('');
           }
@@ -264,18 +119,13 @@ const FarmerProfileSetup = () => {
         try {
           const gns = await LocationService.getGNDivisionsByDSDivision(dsDivision);
           setGnDivisionsList(gns);
-
-          // Check if we have a pending GN Division to set
           if (pendingLocationUpdate.current?.gn) {
-              // Try to find match by Name
-              // The API usually returns exact names from the same source, but let's be safe
               const match = gns.find(g => g.name === pendingLocationUpdate.current?.gn);
               if (match) {
                   setGnDivision(match.name);
               } else {
                   setGnDivision('');
               }
-              // Clear the pending update
               pendingLocationUpdate.current = null;
           } else {
             setGnDivision('');
@@ -395,6 +245,35 @@ const FarmerProfileSetup = () => {
     navigate('/role-selection');
   };
 
+  const handleNICChange = (value: string) => {
+    setNicNumber(value);
+    setNicError('');
+    
+    if (value.trim() === '') {
+      setBirthday('');
+      setGender('');
+      setAge(null);
+      return;
+    }
+    
+    // Validate NIC when user types (debounced effect)
+    if (value.length === 10 || value.length === 12) {
+      const result = validateNIC(value);
+      
+      if (result.isValid) {
+        setBirthday(result.birthday || '');
+        setGender(result.gender || '');
+        setAge(result.age || null);
+        setNicError('');
+      } else {
+        setBirthday('');
+        setGender('');
+        setAge(null);
+        setNicError(result.error || 'Invalid NIC');
+      }
+    }
+  };
+
   const steps = ['Account', 'Details', 'Verification'];
 
   return (
@@ -418,45 +297,7 @@ const FarmerProfileSetup = () => {
                     </Typography>
                 </Box>
 
-                {/* Stepper */}
-                <Box sx={{ width: '100%', maxWidth: 400 }}>
-                    <Stepper activeStep={1} alternativeLabel connector={<ColorlibConnector />}>
-                        {steps.map((label, index) => {
-                             const completed = index < 1;
-                             const active = index === 1;
-                             
-                             return (
-                                <Step key={label} completed={completed}>
-                                    <StepLabel 
-                                        StepIconComponent={() => (
-                                            <Box sx={{ 
-                                                width: 32, 
-                                                height: 32, 
-                                                borderRadius: '50%', 
-                                                display: 'flex', 
-                                                alignItems: 'center', 
-                                                justifyContent: 'center',
-                                                bgcolor: completed ? 'primary.main' : 'transparent',
-                                                border: completed ? 'none' : (active ? '2px solid #6B8E23' : '2px solid #555'),
-                                                color: completed || active ? 'white' : '#777',
-                                                fontWeight: 'bold'
-                                            }}>
-                                                {completed ? <CheckIcon fontSize="small" /> : index + 1}
-                                            </Box>
-                                        )}
-                                    >
-                                        <Typography variant="caption" sx={{ 
-                                            color: completed || active ? 'text.primary' : 'text.secondary',
-                                            fontWeight: active ? 'bold' : 'normal'
-                                        }}>
-                                            {label}
-                                        </Typography>
-                                    </StepLabel>
-                                </Step>
-                             );
-                        })}
-                    </Stepper>
-                </Box>
+                <ProfileStepper activeStep={1} steps={steps} />
             </Box>
         </Box>
         
@@ -498,8 +339,91 @@ const FarmerProfileSetup = () => {
                   <TextField fullWidth label="Full Name" placeholder="Enter Full Name" variant="outlined" InputLabelProps={{ shrink: true }} />
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
-                  <TextField fullWidth label="National ID Number" placeholder="19XXXXXXXXXX" variant="outlined" InputLabelProps={{ shrink: true }} />
+                  <TextField 
+                    fullWidth 
+                    label="National ID Number" 
+                    placeholder="Enter National ID Number" 
+                    variant="outlined" 
+                    value={nicNumber}
+                    onChange={(e) => handleNICChange(e.target.value.toUpperCase())}
+                    error={!!nicError}
+                    InputLabelProps={{ shrink: true }}
+                    slotProps={{
+                      input: {
+                        endAdornment: nicNumber && (
+                          <InputAdornment position="end">
+                            {nicError ? (
+                              <Tooltip title={nicError} arrow placement="top">
+                                <CancelIcon sx={{ color: 'error.main', fontSize: 24 }} />
+                              </Tooltip>
+                            ) : birthday ? (
+                              <CheckCircleIcon sx={{ color: 'success.main', fontSize: 24 }} />
+                            ) : null}
+                          </InputAdornment>
+                        )
+                      }
+                    }}
+                  />
                 </Grid>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <TextField 
+                    fullWidth 
+                    label="Gender" 
+                    placeholder="Gender" 
+                    variant="outlined" 
+                    value={gender}
+                    disabled
+                    InputLabelProps={{ shrink: true }}
+                    sx={{
+                      '& .MuiInputBase-input.Mui-disabled': {
+                        WebkitTextFillColor: gender ? 'rgba(255, 255, 255, 0.87)' : 'rgba(255, 255, 255, 0.38)',
+                        fontWeight: gender ? 600 : 400
+                      }
+                    }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <TextField 
+                    fullWidth 
+                    label="Date of Birth" 
+                    placeholder="Date of Birth" 
+                    variant="outlined" 
+                    value={birthday ? new Date(birthday).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}
+                    disabled
+                    InputLabelProps={{ shrink: true }}
+                    sx={{
+                      '& .MuiInputBase-input.Mui-disabled': {
+                        WebkitTextFillColor: birthday ? 'rgba(255, 255, 255, 0.87)' : 'rgba(255, 255, 255, 0.38)',
+                        fontWeight: birthday ? 600 : 400
+                      }
+                    }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <TextField 
+                    fullWidth 
+                    label="Age" 
+                    placeholder="Age"
+                    variant="outlined" 
+                    value={age !== null ? `${age} years` : ''}
+                    disabled
+                    InputLabelProps={{ shrink: true }}
+                    sx={{
+                      '& .MuiInputBase-input.Mui-disabled': {
+                        WebkitTextFillColor: age !== null ? 'rgba(255, 255, 255, 0.87)' : 'rgba(255, 255, 255, 0.38)',
+                        fontWeight: age !== null ? 600 : 400
+                      }
+                    }}
+                  />
+                </Grid>
+
+                {/* Address Subheading */}
+                <Grid size={{ xs: 12 }}>
+                  <Typography variant="subtitle1" sx={{ mt: 2, mb: 1, fontWeight: 600, color: 'text.secondary' }}>
+                    Address
+                  </Typography>
+                </Grid>
+
                 <Grid size={{ xs: 12, md: 6 }}>
                   <TextField 
                     fullWidth 

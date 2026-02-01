@@ -16,6 +16,7 @@ import MyOffersPage from './investor/MyOffersPage';
 import OpportunitiesPage from './investor/OpportunitiesPage';
 import RequestsPage from './investor/RequestsPage';
 import LandAnalysisPage from './landowner/LandAnalysisPage';
+import LandownerProfileSetup from './landowner/LandownerProfileSetup';
 import MyLandAdsPage from './landowner/MyLandAdsPage';
 import ReceivedRequestsPage from './landowner/ReceivedRequestsPage';
 import TenantSearchPage from './landowner/TenantSearchPage';
@@ -74,6 +75,15 @@ function AppRoutes() {
         element={
           <PublicRoute>
             <FarmerProfileSetup />
+          </PublicRoute>
+        }
+      />
+
+      <Route
+        path="/landowner-profile-setup"
+        element={
+          <PublicRoute>
+            <LandownerProfileSetup />
           </PublicRoute>
         }
       />
