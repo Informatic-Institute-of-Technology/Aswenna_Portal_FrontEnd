@@ -18,7 +18,6 @@ import MyLandAdsPage from './landowner/MyLandAdsPage';
 import ReceivedRequestsPage from './landowner/ReceivedRequestsPage';
 import TenantSearchPage from './landowner/TenantSearchPage';
 import Login from './Login';
-import SignUp from './SignUp';
 // Super Admin Pages
 import ActiveProjectsMonitoring from './admin/ActiveProjectsMonitoring';
 import GlobalPaymentLedger from './admin/GlobalPaymentLedger';
@@ -35,14 +34,6 @@ function AppRoutes() {
             element={
               <PublicRoute>
                 <Login />
-              </PublicRoute>
-            }
-          />
-          <Route
-            path="/signup"
-            element={
-              <PublicRoute>
-                <SignUp />
               </PublicRoute>
             }
           />
