@@ -20,6 +20,7 @@ import TenantSearchPage from './landowner/TenantSearchPage';
 import Login from './Login';
 import Signup from './Signup';
 import EmailVerification from './EmailVerification';
+import RoleSelection from './RoleSelection';
 // Super Admin Pages
 import ActiveProjectsMonitoring from './admin/ActiveProjectsMonitoring';
 import GlobalPaymentLedger from './admin/GlobalPaymentLedger';
@@ -54,6 +55,15 @@ function AppRoutes() {
         element={
           <PublicRoute>
             <EmailVerification />
+          </PublicRoute>
+        }
+      />
+
+      <Route
+        path="/role-selection"
+        element={
+          <PublicRoute>
+            <RoleSelection />
           </PublicRoute>
         }
       />

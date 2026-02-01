@@ -137,7 +137,7 @@ const EmailVerification = () => {
 
             showSuccess("Email verified successfully!");
             setTimeout(() => {
-                navigate("/login");
+                navigate("/role-selection");
             }, 2000);
         } catch (err) {
             const errorMsg = err instanceof Error && err.message
