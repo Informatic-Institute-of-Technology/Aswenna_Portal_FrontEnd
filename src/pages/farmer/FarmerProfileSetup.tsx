@@ -1,4 +1,5 @@
 import AswendLogo from "@/assets/Aswenna Logo.png"; // Assuming logo path is consistent
+import { LocationService } from '@/services';
 import {
     AccountBalance,
     Add as AddIcon,
@@ -31,6 +32,7 @@ import {
     MenuItem,
     Paper,
     Select,
+    type SelectChangeEvent,
     Stack,
     Step,
     StepConnector,
@@ -42,7 +44,7 @@ import {
     Typography
 } from '@mui/material';
 import type { ChangeEvent, DragEvent } from 'react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // File Uploader Compone
@@ -191,8 +193,73 @@ const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
 const FarmerProfileSetup = () => {
   const navigate = useNavigate();
   const [province, setProvince] = useState('');
+  const [district, setDistrict] = useState('');
   const [selectedCrops, setSelectedCrops] = useState<string[]>(['Paddy']);
   const [nicFiles, setNicFiles] = useState<File[]>([]);
+
+  // Sri Lanka Provinces and Districts Data
+  const sriLankaLocations: Record<string, string[]> = {
+    "Central": ["Kandy", "Matale", "Nuwara Eliya"],
+    "Eastern": ["Ampara", "Batticaloa", "Trincomalee"],
+    "North Central": ["Anuradhapura", "Polonnaruwa"],
+    "Northern": ["Jaffna", "Kilinochchi", "Mannar", "Mullaitivu", "Vavuniya"],
+    "North Western": ["Kurunegala", "Puttalam"],
+    "Sabaragamuwa": ["Kegalle", "Ratnapura"],
+    "Southern": ["Galle", "Hambantota", "Matara"],
+    "Uva": ["Badulla", "Monaragala"],
+    "Western": ["Colombo", "Gampaha", "Kalutara"]
+  };
+  
+  const handleProvinceChange = (event: SelectChangeEvent<string>) => {
+    setProvince(event.target.value);
+    setDistrict(''); // Reset district when province changes
+  };
+
+  const [dsDivision, setDsDivision] = useState('');
+  const [dsDivisionsList, setDsDivisionsList] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchDSDivisions = async () => {
+      if (district) {
+        // Optionally show loading state here
+        try {
+          const divisions = await LocationService.getDSDivisionsByDistrict(district);
+          setDsDivisionsList(divisions);
+        } catch (error) {
+          console.error("Failed to load DS Divisions", error);
+          setDsDivisionsList([]);
+        }
+      } else {
+        setDsDivisionsList([]);
+      }
+      setDsDivision('');
+    };
+
+    fetchDSDivisions();
+  }, [district]);
+
+  const [gnDivision, setGnDivision] = useState('');
+  const [gnDivisionsList, setGnDivisionsList] = useState<{name: string, number: string}[]>([]);
+
+  useEffect(() => {
+    const fetchGNDivisions = async () => {
+      if (dsDivision) {
+        try {
+          const gns = await LocationService.getGNDivisionsByDSDivision(dsDivision);
+          setGnDivisionsList(gns);
+        } catch (error) {
+          console.error("Failed to load GN Divisions", error);
+          setGnDivisionsList([]);
+        }
+      } else {
+        setGnDivisionsList([]);
+      }
+      setGnDivision('');
+    };
+
+    fetchGNDivisions();
+  }, [dsDivision]);
+
   const [passbookFiles, setPassbookFiles] = useState<File[]>([]);
   const [gnFiles, setGnFiles] = useState<File[]>([]);
   
@@ -210,8 +277,7 @@ const FarmerProfileSetup = () => {
   };
 
   const handleVerifyCode = () => {
-    // Simulate verification
-    if (verificationCode === '1234') { // Mock code
+    if (verificationCode === '1234') { 
         setIsPhoneVerified(true);
         setVerificationDialogOpen(false);
         setVerificationCode('');
@@ -237,7 +303,6 @@ const FarmerProfileSetup = () => {
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', pb: 4, pt: 2 }}>
       <Container maxWidth="xl">
-        {/* Header Section */}
         <Box sx={{ mb: 4 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, cursor: 'pointer' }} onClick={handleBack}>
                 <ArrowBack sx={{ color: 'text.secondary', mr: 1, fontSize: '1rem' }} />
@@ -352,16 +417,15 @@ const FarmerProfileSetup = () => {
                     <InputLabel shrink>Province</InputLabel>
                     <Select
                       value={province}
-                      onChange={(e) => setProvince(e.target.value)}
+                      onChange={handleProvinceChange}
                       displayEmpty
                       label="Province"
                       notched
                     >
                       <MenuItem value="" disabled>Select Province</MenuItem>
-                      <MenuItem value="Western">Western</MenuItem>
-                      <MenuItem value="Central">Central</MenuItem>
-                      <MenuItem value="Southern">Southern</MenuItem>
-                      {/* Add other provinces */}
+                      {Object.keys(sriLankaLocations).map((prov) => (
+                        <MenuItem key={prov} value={prov}>{prov}</MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                 </Grid>
@@ -412,12 +476,24 @@ const FarmerProfileSetup = () => {
                   />
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
-                  <TextField fullWidth label="District" placeholder="Enter District" variant="outlined" InputLabelProps={{ shrink: true }} />
+                  <FormControl fullWidth disabled={!province}>
+                    <InputLabel shrink>District</InputLabel>
+                    <Select
+                      value={district}
+                      onChange={(e) => setDistrict(e.target.value)}
+                      displayEmpty
+                      label="District"
+                      notched
+                    >
+                      <MenuItem value="" disabled>Select District</MenuItem>
+                      {province && sriLankaLocations[province]?.map((dist) => (
+                         <MenuItem key={dist} value={dist}>{dist}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </Grid>
               </Grid>
             </Paper>
-
-            {/* Administrative Details */}
             <Paper elevation={0} sx={{ p: 3, mb: 3, bgcolor: 'background.paper', borderRadius: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                 <AccountBalance sx={{ color: 'primary.main', mr: 1.5 }} />
@@ -426,10 +502,38 @@ const FarmerProfileSetup = () => {
 
               <Grid container spacing={2}>
                 <Grid size={{ xs: 12, md: 4 }}>
-                  <TextField fullWidth label="DS Division" placeholder="Enter DS Division" variant="outlined" InputLabelProps={{ shrink: true }} />
+                  <FormControl fullWidth disabled={!district}>
+                    <InputLabel shrink>District Secretariat Division</InputLabel>
+                    <Select
+                      value={dsDivision}
+                      onChange={(e) => setDsDivision(e.target.value)}
+                      displayEmpty
+                      label="District Secretariat Division"
+                      notched
+                    >
+                      <MenuItem value="" disabled>Select Division</MenuItem>
+                      {dsDivisionsList.map((div) => (
+                        <MenuItem key={div} value={div}>{div}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
-                  <TextField fullWidth label="GN Division" placeholder="Enter GN Division" variant="outlined" InputLabelProps={{ shrink: true }} />
+                  <FormControl fullWidth disabled={!dsDivision}>
+                    <InputLabel shrink>Grama Niladhari Division</InputLabel>
+                    <Select
+                      value={gnDivision}
+                      onChange={(e) => setGnDivision(e.target.value)}
+                      displayEmpty
+                      label="Grama Niladhari Division"
+                      notched
+                    >
+                      <MenuItem value="" disabled>Select GN Division</MenuItem>
+                      {gnDivisionsList.map((gn) => (
+                        <MenuItem key={gn.number} value={gn.name}>{gn.name} ({gn.number})</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
                   <TextField fullWidth label="Govijana Sewa ID" placeholder="ID-0000-00" variant="outlined" InputLabelProps={{ shrink: true }} />
@@ -437,7 +541,6 @@ const FarmerProfileSetup = () => {
               </Grid>
             </Paper>
 
-            {/* Farming Experience */}
             <Paper elevation={0} sx={{ p: 3, mb: 3, bgcolor: 'background.paper', borderRadius: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                 <Agriculture sx={{ color: 'primary.main', mr: 1.5 }} />

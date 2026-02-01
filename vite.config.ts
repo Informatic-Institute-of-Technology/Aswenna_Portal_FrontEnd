@@ -23,4 +23,13 @@ export default defineConfig({
       '@/styles': path.resolve(__dirname, './src/styles'),
     },
   },
+  server: {
+    proxy: {
+      '/nsdi-api': {
+        target: 'https://gisapps.nsdi.gov.lk',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/nsdi-api/, ''),
+      },
+    },
+  },
 })
