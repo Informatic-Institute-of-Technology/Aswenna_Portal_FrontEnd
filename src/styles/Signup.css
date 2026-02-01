@@ -1,4 +1,4 @@
-/* Login and Authentication Pages Styles */
+/* Signup Page Styles */
 
 /* Accessibility */
 .visually-hidden {
@@ -13,7 +13,7 @@
   border-width: 0;
 }
 
-.login-container {
+.signup-container {
   min-height: 100vh;
   max-height: 100vh;
   display: flex;
@@ -21,7 +21,7 @@
   overflow: hidden;
 }
 
-.login-content {
+.signup-content {
   display: flex;
   width: 100%;
   height: 100vh;
@@ -29,19 +29,44 @@
   overflow: hidden;
 }
 
-.login-form-section {
+/* Left side - Image */
+.left-container {
+  width: 60%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+.illustration-image {
+  width: 100%;
+  height: 100%;
+  object-position: center center;
+  object-fit: cover;
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+/* Right side - Form */
+.signup-form-section {
   width: 40%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 2rem;
-  background-color: #1a1a1a;
+  background-color: #2a2a2a;
   overflow-y: auto;
 }
 
 .logo-container {
-  margin-bottom: 40px;
+  margin-bottom: 30px;
   text-align: center;
   display: flex;
   justify-content: center;
@@ -58,7 +83,7 @@
   max-width: 420px;
 }
 
-.login-title {
+.signup-title {
   font-size: 32px;
   font-weight: 700;
   color: #ffffff;
@@ -67,7 +92,7 @@
   margin-top: 0;
 }
 
-.login-subtitle {
+.signup-subtitle {
   font-size: 1rem;
   color: #9ca3af;
   margin-bottom: 2rem;
@@ -83,7 +108,7 @@
   font-size: 0.9rem;
 }
 
-.login-form {
+.signup-form {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -92,6 +117,14 @@
 .form-group {
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-size: 0.9rem;
+  color: #ffffff;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
 }
 
 .form-input {
@@ -113,6 +146,17 @@
 
 .form-input:focus {
   border-bottom-color: #70824d;
+}
+
+.form-input.error {
+  border-bottom-color: #ff4444;
+}
+
+.field-error {
+  color: #ff6b6b;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  display: block;
 }
 
 .password-input-wrapper {
@@ -148,25 +192,38 @@
   color: #ffffff;
 }
 
-.forgot-password-container {
-  text-align: right;
-  margin-top: -0.5rem;
-  width: 100%;
+.password-strength {
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.forgot-password-link {
-  color: #9ca3af;
-  text-decoration: none;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
+.strength-indicator {
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.forgot-password-link:hover {
-  color: #6b8e6f;
-  text-decoration: underline;
+.strength-indicator.weak {
+  background-color: rgba(255, 68, 68, 0.2);
+  color: #ff6b6b;
 }
 
-.login-button {
+.strength-indicator.medium {
+  background-color: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+
+.strength-indicator.strong {
+  background-color: rgba(107, 142, 35, 0.2);
+  color: #8bc34a;
+}
+
+.signup-button {
   width: 100%;
   padding: 0.875rem 1.5rem;
   font-size: 1rem;
@@ -179,36 +236,40 @@
   transition: all 0.3s ease;
   margin-top: 1rem;
   box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.login-button:hover {
+.signup-button:hover {
   background-color: #658147;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(107, 142, 35, 0.3);
 }
 
-.login-button:active {
+.signup-button:active {
   transform: translateY(0);
   box-shadow: 0 2px 6px rgba(107, 142, 35, 0.2);
 }
 
-.login-button:disabled {
+.signup-button:disabled {
   background-color: #4a4a4a;
   cursor: not-allowed;
   opacity: 0.6;
+  transform: none;
 }
 
-.signup-link-container {
+.login-link-container {
   text-align: center;
   margin-top: 1.5rem;
   font-size: 0.95rem;
 }
 
-.signup-text {
+.login-text {
   color: #9ca3af;
 }
 
-.signup-link {
+.login-link {
   color: #6b8e23;
   text-decoration: none;
   font-weight: 600;
@@ -216,86 +277,51 @@
   margin-left: 0.25rem;
 }
 
-.signup-link:hover {
+.login-link:hover {
   color: #8bc34a;
   text-decoration: underline;
 }
 
-.illustration-section {
-  width: 60%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  margin: 0;
-  background: transparent;
-  height: 100vh;
-  overflow: hidden;
-  position: relative;
-}
-
-.illustration-wrapper {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  padding: 0;
-  margin: 0;
-}
-
-.illustration-image,
-.login-illustration {
-  width: 100%;
-  height: 100%;
-  object-position: center center;
-  object-fit: cover;
-  display: block;
-  margin: 0;
-  padding: 0;
-}
-
+/* Responsive Design */
 @media (max-width: 1024px) {
-  .login-container {
+  .signup-container {
     max-height: none;
     overflow-y: auto;
   }
 
-  .login-content {
-    flex-direction: column;
+  .signup-content {
+    flex-direction: column-reverse;
     height: auto;
     min-height: 100vh;
   }
 
-  .login-form-section {
+  .signup-form-section {
     width: 100%;
     padding: 3rem 2rem;
   }
 
-  .illustration-section {
+  .left-container {
     width: 100%;
     min-height: 35vh;
     height: 35vh;
   }
 
-  .illustration-image,
-  .login-illustration {
+  .illustration-image {
     height: 35vh;
   }
 }
 
 @media (max-width: 768px) {
-  .login-container {
+  .signup-container {
     overflow-y: auto;
   }
 
-  .login-content {
+  .signup-content {
     height: auto;
     min-height: 100vh;
   }
 
-  .login-form-section {
+  .signup-form-section {
     width: 100%;
     padding: 2rem 1.5rem;
     min-height: 100vh;
@@ -305,7 +331,7 @@
     max-width: 100%;
   }
 
-  .login-title {
+  .signup-title {
     font-size: 2rem;
   }
 
@@ -314,25 +340,20 @@
   }
 
   .logo-container {
-    margin-bottom: 30px;
+    margin-bottom: 20px;
   }
 
-  .illustration-section {
+  .left-container {
     display: none !important;
   }
 
-  .illustration-wrapper {
-    display: none !important;
-  }
-
-  .illustration-image,
-  .login-illustration {
+  .illustration-image {
     display: none !important;
   }
 }
 
 @media (max-width: 480px) {
-  .login-form-section {
+  .signup-form-section {
     padding: 1.5rem 1rem;
   }
 
@@ -341,14 +362,14 @@
   }
 
   .logo-container {
-    margin-bottom: 24px;
+    margin-bottom: 20px;
   }
 
-  .login-title {
+  .signup-title {
     font-size: 1.75rem;
   }
 
-  .login-subtitle {
+  .signup-subtitle {
     font-size: 0.9rem;
   }
 
@@ -357,8 +378,12 @@
     font-size: 0.95rem;
   }
 
-  .login-button {
+  .signup-button {
     padding: 0.75rem 1.25rem;
     font-size: 0.95rem;
+  }
+
+  .login-link-container {
+    font-size: 0.9rem;
   }
 }
