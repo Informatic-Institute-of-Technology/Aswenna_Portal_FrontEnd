@@ -538,13 +538,13 @@ const LandownerProfileSetup = () => {
             if (address) {
               const parts = address.split(",").map((p) => p.trim());
               if (parts.length > 0) setLandStreet(parts[0]);
-              if (parts.length > 1) setLandCity(parts[1]);
             }
 
             const details = await LocationService.getLocationDetails(
               latitude,
               longitude,
             );
+            if (details.city) setLandCity(details.city);
             if (details.province) setLandProvince(details.province);
             if (details.postalCode) setLandPostalCode(details.postalCode);
 
@@ -619,12 +619,12 @@ const LandownerProfileSetup = () => {
         if (address) {
           const parts = address.split(",").map((p) => p.trim());
           if (parts.length > 0) setLandStreet(parts[0]);
-          if (parts.length > 1) setLandCity(parts[1]);
         }
 
         const details = await LocationService.getLocationDetails(lat, lng);
         console.log("Location details received:", details);
 
+        if (details.city) setLandCity(details.city);
         if (details.province) setLandProvince(details.province);
         if (details.postalCode) setLandPostalCode(details.postalCode);
 
@@ -667,12 +667,12 @@ const LandownerProfileSetup = () => {
         if (address) {
           const parts = address.split(",").map((p) => p.trim());
           if (parts.length > 0) setLandStreet(parts[0]);
-          if (parts.length > 1) setLandCity(parts[1]);
         }
 
         const details = await LocationService.getLocationDetails(lat, lng);
         console.log("Location details received (drag):", details);
 
+        if (details.city) setLandCity(details.city);
         if (details.province) setLandProvince(details.province);
         if (details.postalCode) setLandPostalCode(details.postalCode);
 
@@ -1113,6 +1113,46 @@ const LandownerProfileSetup = () => {
                 onMarkerDragEnd={handleMarkerDragEnd}
                 height="300px"
               />
+              <Grid container spacing={2} sx={{ mt: 1 }}>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="Latitude"
+                    variant="outlined"
+                    value={pinLocation ? pinLocation.lat.toFixed(6) : ""}
+                    disabled
+                    InputLabelProps={{ shrink: true }}
+                    placeholder="Click map to get coordinates"
+                    sx={{
+                      "& .MuiInputBase-input.Mui-disabled": {
+                        WebkitTextFillColor: pinLocation
+                          ? "rgba(255, 255, 255, 0.87)"
+                          : "rgba(255, 255, 255, 0.38)",
+                        fontWeight: pinLocation ? 600 : 400,
+                      },
+                    }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="Longitude"
+                    variant="outlined"
+                    value={pinLocation ? pinLocation.lng.toFixed(6) : ""}
+                    disabled
+                    InputLabelProps={{ shrink: true }}
+                    placeholder="Click map to get coordinates"
+                    sx={{
+                      "& .MuiInputBase-input.Mui-disabled": {
+                        WebkitTextFillColor: pinLocation
+                          ? "rgba(255, 255, 255, 0.87)"
+                          : "rgba(255, 255, 255, 0.38)",
+                        fontWeight: pinLocation ? 600 : 400,
+                      },
+                    }}
+                  />
+                </Grid>
+              </Grid>
             </FormSection>
 
             <FormSection

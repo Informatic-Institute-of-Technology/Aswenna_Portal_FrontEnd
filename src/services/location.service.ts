@@ -110,11 +110,14 @@ export const LocationService = {
 
   getGNDivisionsByDSDivision: async (dsDivisionName: string): Promise<{name: string, number: string}[]> => {
     try {
+      // Try both uppercase and title case formats to handle case sensitivity
       const upperCaseDSName = dsDivisionName.toUpperCase();
       
+      console.log('Fetching GN divisions for DS Division:', dsDivisionName);
+      
       const params = new URLSearchParams({
-        where: `ds_division_name = '${upperCaseDSName}'`,
-        outFields: 'gnd_name,gnd_number',
+        where: `UPPER(ds_division_name) = '${upperCaseDSName}'`,
+        outFields: 'gnd_name,gnd_number,ds_division_name',
         f: 'json',
         returnGeometry: 'false'
       });
@@ -132,13 +135,18 @@ export const LocationService = {
 
       const data: GNDivisionResponse = await response.json();
       
+      console.log(`Found ${data.features?.length || 0} GN divisions for ${dsDivisionName}`);
+      
       if (data.features && Array.isArray(data.features)) {
-        return data.features
+        const gnDivisions = data.features
             .map(feature => ({
               name: feature.attributes.gnd_name,
               number: feature.attributes.gnd_number
             }))
             .sort((a, b) => a.name.localeCompare(b.name));
+        
+        console.log('GN Divisions:', gnDivisions.slice(0, 5).map(g => g.name));
+        return gnDivisions;
       }
       
       return [];
@@ -164,8 +172,16 @@ export const LocationService = {
       const nsdiResponse = await fetch(`${NSDI_GN_URL}?${params.toString()}`);
       if (nsdiResponse.ok) {
         const data = await nsdiResponse.json();
+        console.log('NSDI Response features count:', data.features?.length || 0);
         if (data.features && data.features.length > 0) {
           const attrs = data.features[0].attributes;
+          console.log('NSDI Attributes:', {
+            province: attrs.province_name,
+            district: attrs.district_name,
+            dsDivision: attrs.ds_division_name,
+            gnDivision: attrs.gnd_name,
+            gnNumber: attrs.gnd_number
+          });
           
           const toTitleCase = (str: string) => 
             str ? str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()) : '';
@@ -175,11 +191,24 @@ export const LocationService = {
           details.dsDivision = toTitleCase(attrs.ds_division_name);
           details.gnDivision = attrs.gnd_name;
           details.gnNumber = attrs.gnd_number;
+          
+          console.log('Parsed location details:', details);
+        } else {
+          console.warn('No NSDI features found for coordinates:', lat, lon);
         }
+      } else {
+        console.error('NSDI API request failed:', nsdiResponse.status, nsdiResponse.statusText);
       }
     } catch (error) {
       console.error('Error fetching admin boundaries:', error);
     }
+    
+    // Filter function to exclude country names - must be available globally
+    const isValidCity = (cityName: string | undefined) => {
+      if (!cityName) return false;
+      const invalid = ['Sri Lanka', 'SRI LANKA', 'Sri lanka', 'sri lanka'];
+      return !invalid.includes(cityName);
+    };
     
     const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
     if (googleApiKey) {
@@ -196,8 +225,25 @@ export const LocationService = {
           
           const locality = getComponent(primaryComponents, 'locality');
           const sublocality = getComponent(primaryComponents, 'sublocality');
+          const sublocalityLevel1 = getComponent(primaryComponents, 'sublocality_level_1');
+          const sublocalityLevel2 = getComponent(primaryComponents, 'sublocality_level_2');
+          const administrativeAreaLevel2 = getComponent(primaryComponents, 'administrative_area_level_2');
+          const administrativeAreaLevel3 = getComponent(primaryComponents, 'administrative_area_level_3');
+          const neighborhood = getComponent(primaryComponents, 'neighborhood');
+          const political = getComponent(primaryComponents, 'political');
           const route = getComponent(primaryComponents, 'route');
           const streetNumber = getComponent(primaryComponents, 'street_number');
+          
+          console.log('Google Maps address components:', {
+            locality,
+            sublocality,
+            sublocalityLevel1,
+            sublocalityLevel2,
+            administrativeAreaLevel2,
+            administrativeAreaLevel3,
+            neighborhood,
+            political
+          });
           
           let postalCode = '';
           for (const result of googleData.results) {
@@ -209,7 +255,38 @@ export const LocationService = {
             }
           }
           
-          details.city = locality || sublocality;
+          // Priority order: locality > sublocality variants > neighborhood > administrative areas
+          // Filter out any that are "Sri Lanka" (country name)
+          const candidates = [
+            locality,
+            sublocality,
+            sublocalityLevel1,
+            sublocalityLevel2,
+            neighborhood,
+            administrativeAreaLevel3,
+            administrativeAreaLevel2
+          ];
+          
+          details.city = candidates.find(c => isValidCity(c)) || '';
+          
+          // If still no city, try to extract from formatted address
+          if (!details.city && googleData.results[0].formatted_address) {
+            const addressParts = googleData.results[0].formatted_address.split(',');
+            // Try to get the first part that's not a route/street
+            for (const part of addressParts) {
+              const trimmed = part.trim();
+              if (trimmed && 
+                  isValidCity(trimmed) && 
+                  !trimmed.match(/^\d/) && // Not starting with number
+                  trimmed !== route) {
+                details.city = trimmed;
+                console.log('Extracted city from formatted address:', trimmed);
+                break;
+              }
+            }
+          }
+          
+          console.log('Selected city:', details.city);
           details.postalCode = postalCode;
           
           if (route) {
@@ -237,13 +314,27 @@ export const LocationService = {
                details.postalCode = nomData.address.postcode;
            }
            if (!details.city && (nomData.address.city || nomData.address.town || nomData.address.village)) {
-               details.city = nomData.address.city || nomData.address.town || nomData.address.village;
+               const nomCity = nomData.address.city || nomData.address.town || nomData.address.village;
+               if (isValidCity(nomCity)) {
+                 details.city = nomCity;
+                 console.log('Got city from Nominatim:', nomCity);
+               }
            }
         }
       } catch (e) {
          console.warn("Nominatim fallback failed", e);
       }
     }
+    
+    // Final fallback: If city is still empty or invalid (e.g., "Sri Lanka"), use DS Division
+    if (!isValidCity(details.city)) {
+      if (details.dsDivision) {
+        details.city = details.dsDivision;
+        console.log('Using DS Division as city fallback:', details.dsDivision);
+      }
+    }
+    
+    console.log('Final city value:', details.city);
     
     if (!details.postalCode && details.city && details.district) {
       try {
