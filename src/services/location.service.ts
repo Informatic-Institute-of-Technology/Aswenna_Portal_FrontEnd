@@ -204,6 +204,7 @@ export const LocationService = {
             const pc = getComponent(result.address_components, 'postal_code');
             if (pc) {
               postalCode = pc;
+              console.log('Found postal code from Google Maps:', postalCode);
               break;
             }
           }
@@ -214,6 +215,12 @@ export const LocationService = {
           if (route) {
             details.address = streetNumber ? `${streetNumber}, ${route}` : route;
           }
+          
+          if (!postalCode) {
+            console.log('No postal code found in Google Maps results for coordinates:', lat, lon);
+          }
+        } else {
+          console.log('Google Maps geocoding status:', googleData.status);
         }
       } catch (error) {
         console.error('Error fetching Google Maps data:', error);
@@ -235,6 +242,19 @@ export const LocationService = {
         }
       } catch (e) {
          console.warn("Nominatim fallback failed", e);
+      }
+    }
+    
+    if (!details.postalCode && details.city && details.district) {
+      try {
+        console.log('Trying postal code lookup by address:', details.city, details.district);
+        const postalCode = await LocationService.getPostalCodeByAddress(details.city, details.district);
+        if (postalCode) {
+          details.postalCode = postalCode;
+          console.log('Found postal code from address lookup:', postalCode);
+        }
+      } catch (e) {
+        console.warn("Postal code address lookup failed", e);
       }
     }
 
@@ -260,5 +280,41 @@ export const LocationService = {
        console.error("Error searching postal code:", error);
        return '';
     }
+  },
+
+  geocodeAddress: async (street: string, city: string, district?: string, province?: string): Promise<{ lat: number; lng: number } | null> => {
+    try {
+      const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      if (!googleApiKey) {
+        console.error('Google Maps API key not found');
+        return null;
+      }
+
+      const addressParts = [street, city, district, province, 'Sri Lanka'].filter(Boolean);
+      const address = addressParts.join(', ');
+      
+      if (!address || address === 'Sri Lanka') {
+        return null;
+      }
+
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${googleApiKey}`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.status === 'OK' && data.results.length > 0) {
+        const location = data.results[0].geometry.location;
+        return {
+          lat: location.lat,
+          lng: location.lng
+        };
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error geocoding address:', error);
+      return null;
+    }
   }
 };
+
+export default LocationService;

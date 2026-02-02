@@ -68,7 +68,6 @@ const LandownerProfileSetup = () => {
     const [gender, setGender] = useState<'Male' | 'Female' | ''>('');
     const [age, setAge] = useState<number | null>(null);
 
-    // Location and Administrative Divisions
     const [province, setProvince] = useState('');
     const [district, setDistrict] = useState('');
     const [dsDivision, setDsDivision] = useState('');
@@ -77,6 +76,7 @@ const LandownerProfileSetup = () => {
     const [gnDivisionsList, setGnDivisionsList] = useState<{name: string, number: string}[]>([]);
     const [isLoadingLocation, setIsLoadingLocation] = useState(false);
     const pendingLocationUpdate = useRef<{ ds?: string, gn?: string, gnNumber?: string } | null>(null);
+    const pendingLandLocationUpdate = useRef<{ ds?: string, gn?: string, gnNumber?: string } | null>(null);
 
     const sriLankaLocations: Record<string, string[]> = {
         "Central": ["Kandy", "Matale", "Nuwara Eliya"],
@@ -177,7 +177,19 @@ const LandownerProfileSetup = () => {
                 try {
                     const divisions = await LocationService.getDSDivisionsByDistrict(landDistrict);
                     setLandDsDivisionsList(divisions);
-                    setLandDsDivision('');
+                    
+                    // Check if we have a pending DS division to set from map interaction
+                    if (pendingLandLocationUpdate.current?.ds) {
+                        const match = divisions.find(d => d.toLowerCase() === pendingLandLocationUpdate.current?.ds?.toLowerCase());
+                        if (match) {
+                            setLandDsDivision(match);
+                        } else {
+                            console.warn('Pending DS Division not found in list:', pendingLandLocationUpdate.current?.ds);
+                            setLandDsDivision('');
+                        }
+                    } else {
+                        setLandDsDivision('');
+                    }
                 } catch (error) {
                     console.error("Failed to load Land DS Divisions", error);
                     setLandDsDivisionsList([]);
@@ -198,7 +210,21 @@ const LandownerProfileSetup = () => {
                 try {
                     const gns = await LocationService.getGNDivisionsByDSDivision(landDsDivision);
                     setLandGnDivisionsList(gns);
-                    setLandGnDivision('');
+                    
+                    // Check if we have a pending GN division to set from map interaction
+                    if (pendingLandLocationUpdate.current?.gn) {
+                        const match = gns.find(g => g.name.toLowerCase() === pendingLandLocationUpdate.current?.gn?.toLowerCase());
+                        if (match) {
+                            setLandGnDivision(match.name);
+                        } else {
+                            console.warn('Pending GN Division not found in list:', pendingLandLocationUpdate.current?.gn);
+                            setLandGnDivision('');
+                        }
+                        // Clear the pending update after processing
+                        pendingLandLocationUpdate.current = null;
+                    } else {
+                        setLandGnDivision('');
+                    }
                 } catch (error) {
                     console.error("Failed to load Land GN Divisions", error);
                     setLandGnDivisionsList([]);
@@ -228,6 +254,74 @@ const LandownerProfileSetup = () => {
         const timeoutId = setTimeout(fetchPostalCode, 1000);
         return () => clearTimeout(timeoutId);
     }, [city, district, postalCode]);
+
+    // Geocode land address and update map pin when manually entered
+    useEffect(() => {
+        const geocodeLandAddress = async () => {
+            // Only geocode if we have at least street and city
+            if (!landStreet || !landCity) {
+                return;
+            }
+
+            try {
+                console.log('Geocoding land address:', { landStreet, landCity, landDistrict, landProvince });
+                
+                const coordinates = await LocationService.geocodeAddress(
+                    landStreet,
+                    landCity,
+                    landDistrict,
+                    landProvince
+                );
+
+                if (coordinates) {
+                    console.log('Geocoded coordinates:', coordinates);
+                    setPinLocation(coordinates);
+                    
+                    if (map) {
+                        map.panTo(coordinates);
+                    }
+
+                    try {
+                        const locationDetails = await LocationService.getLocationDetails(
+                            coordinates.lat,
+                            coordinates.lng
+                        );
+
+                        if (locationDetails) {
+                            if (locationDetails.dsDivision) {
+                                const divisions = await LocationService.getDSDivisionsByDistrict(landDistrict);
+                                const matchingDs = divisions.find(
+                                    d => d.toLowerCase() === locationDetails.dsDivision?.toLowerCase()
+                                );
+                                if (matchingDs) {
+                                    setLandDsDivision(matchingDs);
+                                
+                                    if (locationDetails.gnDivision) {
+                                        const gns = await LocationService.getGNDivisionsByDSDivision(matchingDs);
+                                        const matchingGn = gns.find(
+                                            g => g.name === locationDetails.gnDivision
+                                        );
+                                        if (matchingGn) {
+                                            setLandGnDivision(matchingGn.name);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error fetching location details for geocoded address:', error);
+                    }
+                } else {
+                    console.log('Could not geocode the address');
+                }
+            } catch (error) {
+                console.error('Error geocoding land address:', error);
+            }
+        };
+
+        const timeoutId = setTimeout(geocodeLandAddress, 1500);
+        return () => clearTimeout(timeoutId);
+    }, [landStreet, landCity, landDistrict, landProvince, map]);
 
     const handleBack = () => {
         navigate('/role-selection');
@@ -438,55 +532,18 @@ const LandownerProfileSetup = () => {
                 if (details.postalCode) setLandPostalCode(details.postalCode);
                 
                 if (details.district) {
-                    setLandDistrict(details.district);
-                    
-                    try {
-                        const dsDivisions = await LocationService.getDSDivisionsByDistrict(details.district);
-                        console.log('DS Divisions fetched:', dsDivisions.length);
-                        setLandDsDivisionsList(dsDivisions);
-                        
-                        if (details.dsDivision) {
-                            if (dsDivisions.length > 0) {
-                                const matchingDs = dsDivisions.find(ds => 
-                                    ds.toLowerCase() === details.dsDivision?.toLowerCase()
-                                );
-                                if (matchingDs) {
-                                    console.log('Setting DS Division:', matchingDs);
-                                    setLandDsDivision(matchingDs);
-                                    
-                                    try {
-                                        const gnDivisions = await LocationService.getGNDivisionsByDSDivision(matchingDs);
-                                        console.log('GN Divisions fetched:', gnDivisions.length);
-                                        setLandGnDivisionsList(gnDivisions);
-                                        
-                                        if (details.gnDivision && gnDivisions.length > 0) {
-                                            const matchingGn = gnDivisions.find(gn => 
-                                                gn.name.toLowerCase() === details.gnDivision?.toLowerCase()
-                                            );
-                                            if (matchingGn) {
-                                                console.log('Setting GN Division:', matchingGn.name);
-                                                setLandGnDivision(matchingGn.name);
-                                            } else {
-                                                console.warn('GN Division not found in list:', details.gnDivision);
-                                            }
-                                        }
-                                    } catch (gnError) {
-                                        console.error("Failed to load Land GN Divisions", gnError);
-                                        setLandGnDivisionsList([]);
-                                    }
-                                } else {
-                                    console.warn('DS Division not found in list:', details.dsDivision);
-                                }
-                            } else {
-                                console.warn('No DS Divisions found for district:', details.district);
-                            }
-                        } else {
-                            console.warn('No DS Division in location details');
-                        }
-                    } catch (dsError) {
-                        console.error("Failed to load Land DS Divisions", dsError);
-                        setLandDsDivisionsList([]);
+                    // Store DS/GN divisions in ref for the useEffect to handle
+                    if (details.dsDivision || details.gnDivision) {
+                        pendingLandLocationUpdate.current = {
+                            ds: details.dsDivision,
+                            gn: details.gnDivision,
+                            gnNumber: details.gnNumber
+                        };
+                        console.log('Stored pending land location update:', pendingLandLocationUpdate.current);
                     }
+                    
+                    // Setting district will trigger the useEffect to fetch DS divisions
+                    setLandDistrict(details.district);
                 } else {
                     console.warn('No district in location details');
                 }
@@ -522,55 +579,18 @@ const LandownerProfileSetup = () => {
                 if (details.postalCode) setLandPostalCode(details.postalCode);
                 
                 if (details.district) {
-                    setLandDistrict(details.district);
-                    
-                    try {
-                        const dsDivisions = await LocationService.getDSDivisionsByDistrict(details.district);
-                        console.log('DS Divisions fetched (drag):', dsDivisions.length);
-                        setLandDsDivisionsList(dsDivisions);
-                        
-                        if (details.dsDivision) {
-                            if (dsDivisions.length > 0) {
-                                const matchingDs = dsDivisions.find(ds => 
-                                    ds.toLowerCase() === details.dsDivision?.toLowerCase()
-                                );
-                                if (matchingDs) {
-                                    console.log('Setting DS Division (drag):', matchingDs);
-                                    setLandDsDivision(matchingDs);
-                                    
-                                    try {
-                                        const gnDivisions = await LocationService.getGNDivisionsByDSDivision(matchingDs);
-                                        console.log('GN Divisions fetched (drag):', gnDivisions.length);
-                                        setLandGnDivisionsList(gnDivisions);
-                                        
-                                        if (details.gnDivision && gnDivisions.length > 0) {
-                                            const matchingGn = gnDivisions.find(gn => 
-                                                gn.name.toLowerCase() === details.gnDivision?.toLowerCase()
-                                            );
-                                            if (matchingGn) {
-                                                console.log('Setting GN Division (drag):', matchingGn.name);
-                                                setLandGnDivision(matchingGn.name);
-                                            } else {
-                                                console.warn('GN Division not found in list (drag):', details.gnDivision);
-                                            }
-                                        }
-                                    } catch (gnError) {
-                                        console.error("Failed to load Land GN Divisions (drag)", gnError);
-                                        setLandGnDivisionsList([]);
-                                    }
-                                } else {
-                                    console.warn('DS Division not found in list (drag):', details.dsDivision);
-                                }
-                            } else {
-                                console.warn('No DS Divisions found for district (drag):', details.district);
-                            }
-                        } else {
-                            console.warn('No DS Division in location details (drag)');
-                        }
-                    } catch (dsError) {
-                        console.error("Failed to load Land DS Divisions (drag)", dsError);
-                        setLandDsDivisionsList([]);
+                    // Store DS/GN divisions in ref for the useEffect to handle
+                    if (details.dsDivision || details.gnDivision) {
+                        pendingLandLocationUpdate.current = {
+                            ds: details.dsDivision,
+                            gn: details.gnDivision,
+                            gnNumber: details.gnNumber
+                        };
+                        console.log('Stored pending land location update (drag):', pendingLandLocationUpdate.current);
                     }
+                    
+                    // Setting district will trigger the useEffect to fetch DS divisions
+                    setLandDistrict(details.district);
                 } else {
                     console.warn('No district in location details (drag)');
                 }
@@ -896,7 +916,7 @@ const LandownerProfileSetup = () => {
                             <Grid container spacing={2}>
                                 <Grid size={{ xs: 12 }}>
                                     <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary' }}>
-                                        Land Address (Auto-filled from map)
+                                        Land Address
                                     </Typography>
                                 </Grid>
                                 <Grid size={{ xs: 12, sm: 6 }}>
