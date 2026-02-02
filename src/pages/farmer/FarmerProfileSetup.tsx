@@ -3,42 +3,42 @@ import { FileUploader, ProfileStepper } from '@/components';
 import { LocationService } from '@/services';
 import { validateNIC } from '@/utils';
 import {
-    AccountBalance,
-    Add as AddIcon,
-    Agriculture,
-    ArrowBack,
-    Cancel as CancelIcon,
-    CheckCircle as CheckCircleIcon,
-    Info as InfoIcon,
-    MyLocation,
-    Person,
-    VerifiedUser,
-    WbSunny
+  AccountBalance,
+  Add as AddIcon,
+  Agriculture,
+  ArrowBack,
+  Cancel as CancelIcon,
+  CheckCircle as CheckCircleIcon,
+  Info as InfoIcon,
+  MyLocation,
+  Person,
+  VerifiedUser,
+  WbSunny
 } from '@mui/icons-material';
 import {
-    Box,
-    Button,
-    Chip,
-    CircularProgress,
-    Container,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    FormControl,
-    Grid,
-    IconButton,
-    InputAdornment,
-    InputLabel,
-    MenuItem,
-    Paper,
-    Select,
-    type SelectChangeEvent,
-    Stack,
-    TextField,
-    Tooltip,
-    Typography
+  Box,
+  Button,
+  Chip,
+  CircularProgress,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  FormControl,
+  Grid,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  type SelectChangeEvent,
+  Stack,
+  TextField,
+  Tooltip,
+  Typography
 } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -50,7 +50,6 @@ const FarmerProfileSetup = () => {
   const [selectedCrops, setSelectedCrops] = useState<string[]>(['Paddy']);
   const [nicFiles, setNicFiles] = useState<File[]>([]);
   
-  // NIC Validation States
   const [nicNumber, setNicNumber] = useState('');
   const [nicError, setNicError] = useState('');
   const [birthday, setBirthday] = useState('');
@@ -256,7 +255,6 @@ const FarmerProfileSetup = () => {
       return;
     }
     
-    // Validate NIC when user types (debounced effect)
     if (value.length === 10 || value.length === 12) {
       const result = validateNIC(value);
       
@@ -311,7 +309,7 @@ const FarmerProfileSetup = () => {
                     autoFocus
                     margin="dense"
                     id="code"
-                    label="Verification Code (Try 1234)"
+                    label="Verification Code"
                     type="text"
                     fullWidth
                     variant="outlined"
@@ -417,7 +415,6 @@ const FarmerProfileSetup = () => {
                   />
                 </Grid>
 
-                {/* Address Subheading */}
                 <Grid size={{ xs: 12 }}>
                   <Typography variant="subtitle1" sx={{ mt: 2, mb: 1, fontWeight: 600, color: 'text.secondary' }}>
                     Address
@@ -428,7 +425,7 @@ const FarmerProfileSetup = () => {
                   <TextField 
                     fullWidth 
                     label="Street Address (No / Lane)" 
-                    placeholder="123 Green Lane" 
+                    placeholder="57, Ramakrishna Road" 
                     variant="outlined" 
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}

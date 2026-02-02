@@ -47,7 +47,6 @@ const LandownerProfileSetup = () => {
     const navigate = useNavigate();
     const steps = ['Step 1', 'Step 2', 'Step 3'];
 
-    // Google Maps Configuration
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
         googleMapsApiKey: LocationService.getGoogleMapsApiKey()
@@ -178,7 +177,6 @@ const LandownerProfileSetup = () => {
                     const divisions = await LocationService.getDSDivisionsByDistrict(landDistrict);
                     setLandDsDivisionsList(divisions);
                     
-                    // Check if we have a pending DS division to set from map interaction
                     if (pendingLandLocationUpdate.current?.ds) {
                         const match = divisions.find(d => d.toLowerCase() === pendingLandLocationUpdate.current?.ds?.toLowerCase());
                         if (match) {
@@ -211,7 +209,6 @@ const LandownerProfileSetup = () => {
                     const gns = await LocationService.getGNDivisionsByDSDivision(landDsDivision);
                     setLandGnDivisionsList(gns);
                     
-                    // Check if we have a pending GN division to set from map interaction
                     if (pendingLandLocationUpdate.current?.gn) {
                         const match = gns.find(g => g.name.toLowerCase() === pendingLandLocationUpdate.current?.gn?.toLowerCase());
                         if (match) {
@@ -220,7 +217,6 @@ const LandownerProfileSetup = () => {
                             console.warn('Pending GN Division not found in list:', pendingLandLocationUpdate.current?.gn);
                             setLandGnDivision('');
                         }
-                        // Clear the pending update after processing
                         pendingLandLocationUpdate.current = null;
                     } else {
                         setLandGnDivision('');
@@ -255,10 +251,8 @@ const LandownerProfileSetup = () => {
         return () => clearTimeout(timeoutId);
     }, [city, district, postalCode]);
 
-    // Geocode land address and update map pin when manually entered
     useEffect(() => {
         const geocodeLandAddress = async () => {
-            // Only geocode if we have at least street and city
             if (!landStreet || !landCity) {
                 return;
             }
@@ -532,7 +526,6 @@ const LandownerProfileSetup = () => {
                 if (details.postalCode) setLandPostalCode(details.postalCode);
                 
                 if (details.district) {
-                    // Store DS/GN divisions in ref for the useEffect to handle
                     if (details.dsDivision || details.gnDivision) {
                         pendingLandLocationUpdate.current = {
                             ds: details.dsDivision,
@@ -542,7 +535,6 @@ const LandownerProfileSetup = () => {
                         console.log('Stored pending land location update:', pendingLandLocationUpdate.current);
                     }
                     
-                    // Setting district will trigger the useEffect to fetch DS divisions
                     setLandDistrict(details.district);
                 } else {
                     console.warn('No district in location details');
@@ -579,7 +571,6 @@ const LandownerProfileSetup = () => {
                 if (details.postalCode) setLandPostalCode(details.postalCode);
                 
                 if (details.district) {
-                    // Store DS/GN divisions in ref for the useEffect to handle
                     if (details.dsDivision || details.gnDivision) {
                         pendingLandLocationUpdate.current = {
                             ds: details.dsDivision,
@@ -588,8 +579,6 @@ const LandownerProfileSetup = () => {
                         };
                         console.log('Stored pending land location update (drag):', pendingLandLocationUpdate.current);
                     }
-                    
-                    // Setting district will trigger the useEffect to fetch DS divisions
                     setLandDistrict(details.district);
                 } else {
                     console.warn('No district in location details (drag)');
