@@ -1,33 +1,34 @@
-import { ProtectedRoute, PublicRoute } from '@/components';
-import { AuthProvider } from '@/Context/AuthContext';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import { usePageTitle } from '../hooks/usePageTitle';
-import AccountPage from './common/AccountPage';
-import InboxPage from './common/InboxPage';
-import InvestorsPage from './common/InvestorsPage';
-import LandOwnersPage from './common/LandOwnersPage';
-import MatchMakingPage from './common/MatchMakingPage';
-import MyProjectsPage from './common/MyProjectsPage';
-import SettingsPage from './common/SettingsPage';
-import Dashboard from './Dashboard';
-import EmailVerification from './EmailVerification';
-import FarmerProfileSetup from './farmer/FarmerProfileSetup';
-import MyOffersPage from './investor/MyOffersPage';
-import OpportunitiesPage from './investor/OpportunitiesPage';
-import RequestsPage from './investor/RequestsPage';
-import LandAnalysisPage from './landowner/LandAnalysisPage';
-import LandownerProfileSetup from './landowner/LandownerProfileSetup';
-import MyLandAdsPage from './landowner/MyLandAdsPage';
-import ReceivedRequestsPage from './landowner/ReceivedRequestsPage';
-import TenantSearchPage from './landowner/TenantSearchPage';
-import Login from './Login';
-import RoleSelection from './RoleSelection';
-import Signup from './Signup';
+import { ProtectedRoute, PublicRoute } from "@/components";
+import { AuthProvider } from "@/Context/AuthContext";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { usePageTitle } from "../hooks/usePageTitle";
+import AccountPage from "./common/AccountPage";
+import InboxPage from "./common/InboxPage";
+import InvestorsPage from "./common/InvestorsPage";
+import LandOwnersPage from "./common/LandOwnersPage";
+import MatchMakingPage from "./common/MatchMakingPage";
+import MyProjectsPage from "./common/MyProjectsPage";
+import SettingsPage from "./common/SettingsPage";
+import Dashboard from "./Dashboard";
+import EmailVerification from "./EmailVerification";
+import FarmerProfileSetup from "./farmer/FarmerProfileSetup";
+import { InvestorProfileSetup } from "./investor";
+import MyOffersPage from "./investor/MyOffersPage";
+import OpportunitiesPage from "./investor/OpportunitiesPage";
+import RequestsPage from "./investor/RequestsPage";
+import LandAnalysisPage from "./landowner/LandAnalysisPage";
+import LandownerProfileSetup from "./landowner/LandownerProfileSetup";
+import MyLandAdsPage from "./landowner/MyLandAdsPage";
+import ReceivedRequestsPage from "./landowner/ReceivedRequestsPage";
+import TenantSearchPage from "./landowner/TenantSearchPage";
+import Login from "./Login";
+import RoleSelection from "./RoleSelection";
+import Signup from "./Signup";
 // Super Admin Pages
-import ActiveProjectsMonitoring from './admin/ActiveProjectsMonitoring';
-import GlobalPaymentLedger from './admin/GlobalPaymentLedger';
-import GlobalUserManagement from './admin/GlobalUserManagement';
-import SystemActivityLog from './admin/SystemActivityLog';
+import ActiveProjectsMonitoring from "./admin/ActiveProjectsMonitoring";
+import GlobalPaymentLedger from "./admin/GlobalPaymentLedger";
+import GlobalUserManagement from "./admin/GlobalUserManagement";
+import SystemActivityLog from "./admin/SystemActivityLog";
 
 function AppRoutes() {
   usePageTitle();
@@ -84,6 +85,15 @@ function AppRoutes() {
         element={
           <PublicRoute>
             <LandownerProfileSetup />
+          </PublicRoute>
+        }
+      />
+
+      <Route
+        path="/investor-profile-setup"
+        element={
+          <PublicRoute>
+            <InvestorProfileSetup />
           </PublicRoute>
         }
       />
