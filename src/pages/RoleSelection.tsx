@@ -42,6 +42,8 @@ const RoleSelection = () => {
         setTimeout(() => {
             if (role === 'farmer') {
                 navigate("/farmer-profile-setup");
+            } else if (role === 'landowner') {
+                navigate("/landowner-profile-setup");
             } else {
                 navigate("/login");
             }

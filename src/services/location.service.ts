@@ -43,6 +43,36 @@ const NSDI_DS_URL = '/nsdi-api/server/rest/services/Srilanka/Archeology/MapServe
 const NSDI_GN_URL = '/nsdi-api/server/rest/services/Srilanka/Boundaries/MapServer/1/query';
 
 export const LocationService = {
+  getGoogleMapsApiKey: (): string => {
+    return import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
+  },
+
+  getDefaultMapCenter: () => {
+    return { lat: 7.8731, lng: 80.7718 };
+  },
+
+  reverseGeocode: async (lat: number, lng: number): Promise<string> => {
+    const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+    if (!googleApiKey) {
+      console.error('Google Maps API key not found');
+      return '';
+    }
+
+    try {
+      const googleUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${googleApiKey}`;
+      const response = await fetch(googleUrl);
+      const data = await response.json();
+
+      if (data.status === 'OK' && data.results.length > 0) {
+        return data.results[0].formatted_address;
+      }
+      return '';
+    } catch (error) {
+      console.error('Error reverse geocoding:', error);
+      return '';
+    }
+  },
+
   getDSDivisionsByDistrict: async (districtName: string): Promise<string[]> => {
     try {
       const params = new URLSearchParams({
