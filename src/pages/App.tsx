@@ -9,6 +9,7 @@ import LandOwnersPage from "./common/LandOwnersPage";
 import MatchMakingPage from "./common/MatchMakingPage";
 import MyProjectsPage from "./common/MyProjectsPage";
 import SettingsPage from "./common/SettingsPage";
+import TermsAndConditions from "./common/TermsAndConditions";
 import Dashboard from "./Dashboard";
 import EmailVerification from "./EmailVerification";
 import FarmerProfileSetup from "./farmer/FarmerProfileSetup";
@@ -94,6 +95,15 @@ function AppRoutes() {
         element={
           <PublicRoute>
             <InvestorProfileSetup />
+          </PublicRoute>
+        }
+      />
+
+      <Route
+        path="/terms-and-conditions"
+        element={
+          <PublicRoute>
+            <TermsAndConditions />
           </PublicRoute>
         }
       />

@@ -984,6 +984,7 @@ const FarmerProfileSetup = () => {
                 variant="contained"
                 color="primary"
                 size="large"
+                onClick={() => navigate("/terms-and-conditions")}
                 sx={{
                   mb: 2,
                   py: 1.5,

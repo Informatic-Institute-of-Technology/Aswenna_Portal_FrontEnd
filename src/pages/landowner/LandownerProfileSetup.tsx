@@ -215,25 +215,28 @@ const LandownerProfileSetup = () => {
           setLandDsDivisionsList(divisions);
 
           if (pendingLandLocationUpdate.current?.ds) {
+            const pendingDs = pendingLandLocationUpdate.current.ds;
             const match = divisions.find(
-              (d) =>
-                d.toLowerCase() ===
-                pendingLandLocationUpdate.current?.ds?.toLowerCase(),
+              (d) => d.toLowerCase() === pendingDs.toLowerCase(),
             );
             if (match) {
               setLandDsDivision(match);
             } else {
               console.warn(
-                "Pending DS Division not found in list:",
-                pendingLandLocationUpdate.current?.ds,
+                "DS Division not found:",
+                pendingDs,
+                "in district:",
+                landDistrict,
+                "Available:",
+                divisions.slice(0, 5),
               );
-              setLandDsDivision("");
+              setLandDsDivision(pendingDs);
             }
           } else {
             setLandDsDivision("");
           }
         } catch (error) {
-          console.error("Failed to load Land DS Divisions", error);
+          console.error("Failed to load Land DS Divisions:", error);
           setLandDsDivisionsList([]);
           setLandDsDivision("");
         }
@@ -255,19 +258,23 @@ const LandownerProfileSetup = () => {
           setLandGnDivisionsList(gns);
 
           if (pendingLandLocationUpdate.current?.gn) {
+            const pendingGn = pendingLandLocationUpdate.current.gn;
             const match = gns.find(
-              (g) =>
-                g.name.toLowerCase() ===
-                pendingLandLocationUpdate.current?.gn?.toLowerCase(),
+              (g) => g.name.toLowerCase() === pendingGn.toLowerCase(),
             );
             if (match) {
               setLandGnDivision(match.name);
             } else {
               console.warn(
-                "Pending GN Division not found in list:",
-                pendingLandLocationUpdate.current?.gn,
+                "GN Division not found:",
+                pendingGn,
+                "in DS:",
+                landDsDivision,
+                "Available:",
+                gns.slice(0, 5).map((g) => g.name),
               );
-              setLandGnDivision("");
+              // Set it anyway - it might be valid but not in the fetched list
+              setLandGnDivision(pendingGn);
             }
             pendingLandLocationUpdate.current = null;
           } else {
@@ -313,13 +320,6 @@ const LandownerProfileSetup = () => {
       }
 
       try {
-        console.log("Geocoding land address:", {
-          landStreet,
-          landCity,
-          landDistrict,
-          landProvince,
-        });
-
         const coordinates = await LocationService.geocodeAddress(
           landStreet,
           landCity,
@@ -328,7 +328,6 @@ const LandownerProfileSetup = () => {
         );
 
         if (coordinates) {
-          console.log("Geocoded coordinates:", coordinates);
           setPinLocation(coordinates);
 
           if (map) {
@@ -631,7 +630,6 @@ const LandownerProfileSetup = () => {
         }
 
         const details = await LocationService.getLocationDetails(lat, lng);
-        console.log("Location details received:", details);
 
         if (details.city) setLandCity(details.city);
         if (details.province) setLandProvince(details.province);
@@ -644,10 +642,6 @@ const LandownerProfileSetup = () => {
               gn: details.gnDivision,
               gnNumber: details.gnNumber,
             };
-            console.log(
-              "Stored pending land location update:",
-              pendingLandLocationUpdate.current,
-            );
           }
 
           setLandDistrict(details.district);
@@ -683,7 +677,6 @@ const LandownerProfileSetup = () => {
         }
 
         const details = await LocationService.getLocationDetails(lat, lng);
-        console.log("Location details received (drag):", details);
 
         if (details.city) setLandCity(details.city);
         if (details.province) setLandProvince(details.province);
@@ -696,10 +689,6 @@ const LandownerProfileSetup = () => {
               gn: details.gnDivision,
               gnNumber: details.gnNumber,
             };
-            console.log(
-              "Stored pending land location update (drag):",
-              pendingLandLocationUpdate.current,
-            );
           }
           setLandDistrict(details.district);
         } else {
@@ -748,7 +737,7 @@ const LandownerProfileSetup = () => {
       galleryImages,
       pinLocation,
     });
-    navigate("/landowner/dashboard");
+    navigate("/terms-and-conditions");
   };
 
   return (

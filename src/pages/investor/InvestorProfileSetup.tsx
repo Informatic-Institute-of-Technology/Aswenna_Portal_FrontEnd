@@ -374,7 +374,7 @@ const InvestorProfileSetup = () => {
     });
 
     alert("Investor Registration Complete!");
-    navigate("/investor/dashboard");
+    navigate("/terms-and-conditions");
   };
 
   return (
