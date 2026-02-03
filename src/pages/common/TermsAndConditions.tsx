@@ -1,5 +1,6 @@
 import AswendLogo from "@/assets/Aswenna Logo.png";
 import { useAuth } from "@/Context";
+import { profileService } from "@/services";
 import {
   ArrowBack,
   CheckCircle,
@@ -12,7 +13,10 @@ import {
   Box,
   Button,
   Checkbox,
+  CircularProgress,
   Container,
+  Dialog,
+  DialogContent,
   FormControlLabel,
   Paper,
   Step,
@@ -28,6 +32,7 @@ const TermsAndConditions = () => {
   const { user } = useAuth();
   const [agreed, setAgreed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   const handleCompleteSignup = async () => {
     if (!agreed) {
@@ -38,20 +43,42 @@ const TermsAndConditions = () => {
     setIsSubmitting(true);
 
     try {
-      const role =
-        user?.role?.toLowerCase() || localStorage.getItem("userRole");
-      if (role === "farmer") {
-        navigate("/dashboard");
-      } else if (role === "landowner") {
-        navigate("/dashboard");
-      } else if (role === "investor") {
-        navigate("/dashboard");
-      } else {
-        navigate("/dashboard");
+      const profileData = profileService.getProfileSetupData();
+      const userRole = profileService.getUserRole();
+
+      if (!profileData) {
+        throw new Error(
+          "Profile data not found. Please complete the profile setup.",
+        );
       }
+
+      profileData.termsAccepted = true;
+
+      const payload = {
+        ...profileData,
+        role: userRole || profileData.role,
+        termsAcceptedAt: new Date().toISOString(),
+        userId: user?._id || null,
+        email: user?.email || null,
+      };
+
+      await profileService.completeProfile(payload);
+
+      profileService.clearProfileSetupData();
+
+      setShowSuccessDialog(true);
+
+      setTimeout(() => {
+        setShowSuccessDialog(false);
+        navigate("/login");
+      }, 3000);
     } catch (error) {
       console.error("Error completing signup:", error);
-      alert("An error occurred. Please try again.");
+      alert(
+        error instanceof Error
+          ? error.message
+          : "An error occurred while creating your account. Please try again.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -525,6 +552,96 @@ const TermsAndConditions = () => {
           </Typography>
         </Box>
       </Container>
+
+      {/* Loading Dialog */}
+      <Dialog
+        open={isSubmitting}
+        PaperProps={{
+          sx: {
+            bgcolor: "#1a1a1a",
+            borderRadius: 3,
+            border: "1px solid #3a3a3a",
+            p: 4,
+            textAlign: "center",
+            minWidth: 300,
+          },
+        }}
+      >
+        <DialogContent sx={{ p: 0 }}>
+          <CircularProgress size={60} sx={{ color: "#6B8E23", mb: 3 }} />
+          <Typography
+            variant="h6"
+            sx={{ color: "white", fontWeight: 600, mb: 1 }}
+          >
+            Creating Your Account
+          </Typography>
+          <Typography variant="body2" sx={{ color: "#b0b0b0" }}>
+            Please wait while we set up your Aswenna profile...
+          </Typography>
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={showSuccessDialog}
+        PaperProps={{
+          sx: {
+            bgcolor: "#1a1a1a",
+            borderRadius: 3,
+            border: "1px solid #6B8E23",
+            p: 4,
+            textAlign: "center",
+            minWidth: 350,
+          },
+        }}
+      >
+        <DialogContent sx={{ p: 0 }}>
+          <Box
+            sx={{
+              width: 80,
+              height: 80,
+              borderRadius: "50%",
+              bgcolor: "rgba(107, 142, 35, 0.2)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              mx: "auto",
+              mb: 3,
+            }}
+          >
+            <CheckCircle sx={{ color: "#6B8E23", fontSize: 50 }} />
+          </Box>
+          <Typography
+            variant="h5"
+            sx={{ color: "white", fontWeight: 700, mb: 1 }}
+          >
+            Account Created Successfully!
+          </Typography>
+          <Typography variant="body2" sx={{ color: "#b0b0b0", mb: 2 }}>
+            Your Aswenna account has been created. You will be redirected to the
+            login page shortly.
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 1,
+              mt: 2,
+            }}
+          >
+            <img
+              src={AswendLogo}
+              alt="Aswenna"
+              style={{ width: 24, height: 24 }}
+            />
+            <Typography
+              variant="body2"
+              sx={{ color: "#6B8E23", fontWeight: 600 }}
+            >
+              Welcome to Aswenna!
+            </Typography>
+          </Box>
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };

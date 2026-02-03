@@ -354,26 +354,32 @@ const InvestorProfileSetup = () => {
   };
 
   const handleCompleteRegistration = () => {
-    console.log({
-      fullName,
-      nicNumber,
-      phoneNumber,
-      street,
-      city,
-      province,
-      district,
-      postalCode,
-      dsDivision,
-      gnDivision,
-      organizationName,
-      headOfficeLocation,
-      organizationContactNo,
-      businessRegistrationNo,
-      cropFocus,
-      nicFiles,
-    });
+    const profileData = {
+      role: "investor",
+      personalInfo: {
+        fullName,
+        nicNumber,
+        phoneNumber,
+        street,
+        city,
+        province,
+        district,
+        postalCode,
+        dsDivision,
+        gnDivision,
+      },
+      organizationInfo: {
+        organizationName,
+        headOfficeLocation,
+        organizationContactNo,
+        businessRegistrationNo,
+        cropFocus,
+      },
+      termsAccepted: false,
+    };
 
-    alert("Investor Registration Complete!");
+    localStorage.setItem("profileSetupData", JSON.stringify(profileData));
+    console.log("Investor profile data saved:", profileData);
     navigate("/terms-and-conditions");
   };
 

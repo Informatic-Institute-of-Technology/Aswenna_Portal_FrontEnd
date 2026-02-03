@@ -714,29 +714,36 @@ const LandownerProfileSetup = () => {
   };
 
   const handleCompleteRegistration = () => {
-    console.log({
-      fullName,
-      street,
-      city,
-      province,
-      district,
-      postalCode,
-      dsDivision,
-      gnDivision,
-      landStreet,
-      landCity,
-      landProvince,
-      landDistrict,
-      landPostalCode,
-      landDsDivision,
-      landGnDivision,
-      landSize,
-      soilType,
-      rentalExpectation,
-      certificateFiles,
-      galleryImages,
-      pinLocation,
-    });
+    const profileData = {
+      role: "landowner",
+      personalInfo: {
+        fullName,
+        street,
+        city,
+        province,
+        district,
+        postalCode,
+        dsDivision,
+        gnDivision,
+      },
+      landInfo: {
+        landStreet,
+        landCity,
+        landProvince,
+        landDistrict,
+        landPostalCode,
+        landDsDivision,
+        landGnDivision,
+        landSize,
+        soilType,
+        rentalExpectation,
+        pinLocation,
+      },
+      termsAccepted: false,
+    };
+
+    localStorage.setItem("profileSetupData", JSON.stringify(profileData));
+    console.log("Landowner profile data saved:", profileData);
     navigate("/terms-and-conditions");
   };
 

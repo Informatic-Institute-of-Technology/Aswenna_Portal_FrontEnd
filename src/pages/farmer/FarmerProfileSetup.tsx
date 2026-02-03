@@ -984,7 +984,32 @@ const FarmerProfileSetup = () => {
                 variant="contained"
                 color="primary"
                 size="large"
-                onClick={() => navigate("/terms-and-conditions")}
+                onClick={() => {
+                  const profileData = {
+                    role: "farmer",
+                    personalInfo: {
+                      profilePicture,
+                      nicNumber,
+                      birthday,
+                      gender,
+                      age,
+                      province,
+                      district,
+                      dsDivision,
+                      gnDivision,
+                    },
+                    farmingInfo: {
+                      selectedCrops,
+                    },
+                    termsAccepted: false,
+                  };
+                  localStorage.setItem(
+                    "profileSetupData",
+                    JSON.stringify(profileData),
+                  );
+                  console.log("Farmer profile data saved:", profileData);
+                  navigate("/terms-and-conditions");
+                }}
                 sx={{
                   mb: 2,
                   py: 1.5,
