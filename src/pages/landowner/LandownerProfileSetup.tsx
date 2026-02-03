@@ -537,7 +537,11 @@ const LandownerProfileSetup = () => {
             );
             if (address) {
               const parts = address.split(",").map((p) => p.trim());
-              if (parts.length > 0) setLandStreet(parts[0]);
+              if (parts.length >= 2) {
+                setLandStreet(`${parts[0]}, ${parts[1]}`);
+              } else if (parts.length > 0) {
+                setLandStreet(parts[0]);
+              }
             }
 
             const details = await LocationService.getLocationDetails(
@@ -618,7 +622,12 @@ const LandownerProfileSetup = () => {
         const address = await LocationService.reverseGeocode(lat, lng);
         if (address) {
           const parts = address.split(",").map((p) => p.trim());
-          if (parts.length > 0) setLandStreet(parts[0]);
+          // Combine street and neighborhood for full street address
+          if (parts.length >= 2) {
+            setLandStreet(`${parts[0]}, ${parts[1]}`);
+          } else if (parts.length > 0) {
+            setLandStreet(parts[0]);
+          }
         }
 
         const details = await LocationService.getLocationDetails(lat, lng);
@@ -666,7 +675,11 @@ const LandownerProfileSetup = () => {
         const address = await LocationService.reverseGeocode(lat, lng);
         if (address) {
           const parts = address.split(",").map((p) => p.trim());
-          if (parts.length > 0) setLandStreet(parts[0]);
+          if (parts.length >= 2) {
+            setLandStreet(`${parts[0]}, ${parts[1]}`);
+          } else if (parts.length > 0) {
+            setLandStreet(parts[0]);
+          }
         }
 
         const details = await LocationService.getLocationDetails(lat, lng);
@@ -1172,7 +1185,7 @@ const LandownerProfileSetup = () => {
                   <TextField
                     fullWidth
                     label="Street/Area"
-                    placeholder="Main Street, Area Name"
+                    placeholder="Ramakrishna Road"
                     variant="outlined"
                     value={landStreet}
                     onChange={(e) => setLandStreet(e.target.value)}
@@ -1183,7 +1196,7 @@ const LandownerProfileSetup = () => {
                   <TextField
                     fullWidth
                     label="City/Town"
-                    placeholder="Anamaduwa"
+                    placeholder="Colombo 02"
                     variant="outlined"
                     value={landCity}
                     onChange={(e) => setLandCity(e.target.value)}

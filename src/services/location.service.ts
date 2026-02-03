@@ -326,7 +326,18 @@ export const LocationService = {
       }
     }
     
-    // Final fallback: If city is still empty or invalid (e.g., "Sri Lanka"), use DS Division
+    if (details.city && details.city.toLowerCase() === 'colombo' && details.postalCode) {
+      const postalCode = details.postalCode;
+      if (postalCode.length === 5 && postalCode.startsWith('00')) {
+        const remainingDigits = postalCode.substring(2);
+        const districtNum = Math.floor(parseInt(remainingDigits, 10) / 100);
+        if (districtNum > 0 && districtNum <= 15) {
+          details.city = `Colombo ${districtNum.toString().padStart(2, '0')}`;
+          console.log('Updated city with postal district:', details.city);
+        }
+      }
+    }
+    
     if (!isValidCity(details.city)) {
       if (details.dsDivision) {
         details.city = details.dsDivision;
