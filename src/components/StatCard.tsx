@@ -7,9 +7,10 @@ interface StatCardProps {
   iconColor: string;
   label: string;
   value: string | number;
+  subValue?: string; // Optional subtitle
 }
 
-const StatCard = ({ icon: Icon, iconBgColor, iconColor, label, value }: StatCardProps) => {
+const StatCard = ({ icon: Icon, iconBgColor, iconColor, label, value, subValue }: StatCardProps) => {
   return (
     <Card>
       <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -34,6 +35,11 @@ const StatCard = ({ icon: Icon, iconBgColor, iconColor, label, value }: StatCard
           <Typography variant="h3" sx={{ fontWeight: 700 }}>
             {value}
           </Typography>
+          {subValue && (
+            <Typography variant="caption" color="text.secondary">
+              {subValue}
+            </Typography>
+          )}
         </Box>
       </CardContent>
     </Card>

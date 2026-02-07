@@ -1,7 +1,9 @@
 import { useAuth } from '@/Context/useAuth';
 import { Mail, Notifications } from '@mui/icons-material';
-import { Badge, Box, Drawer, IconButton, Toolbar, Typography } from '@mui/material';
+import { Badge, Box, Container, Drawer, IconButton, Toolbar, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
+import { useEffect, useState } from 'react';
+import LoadingAnimation from '../components/common/LoadingAnimation';
 import { FarmerSidebar, InvestorSidebar, LandOwnerSidebar, SuperAdminSidebar } from './sidebars';
 
 interface DashboardLayoutProps {
@@ -12,6 +14,14 @@ const drawerWidth = 280;
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const renderSidebar = () => {
     switch (user?.role) {
@@ -93,7 +103,13 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           </Box>
         </Toolbar>
 
-        {children}
+        {loading ? (
+          <Container maxWidth="xl">
+            <LoadingAnimation message="Loading Dashboard..." />
+          </Container>
+        ) : (
+          children
+        )}
       </Box>
     </Box>
   );

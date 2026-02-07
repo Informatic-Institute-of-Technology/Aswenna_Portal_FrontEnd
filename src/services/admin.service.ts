@@ -90,6 +90,13 @@ class AdminService {
   }
 
   parseLocation(address: string): { city: string; province?: string } {
+    if (!address || typeof address !== 'string' || address.trim() === '') {
+      return {
+        city: 'Unknown',
+        province: undefined,
+      };
+    }
+
     const parts = address.split(',').map((p) => p.trim());
     return {
       city: parts[0] || 'Unknown',
@@ -117,13 +124,13 @@ class AdminService {
   async getProvinceDistribution() {
     try {
       const users = await this.getAllUsersPaginated();
-      const distribution: { 
-        [province: string]: { 
-          farmers: number; 
-          investors: number; 
-          landowners: number; 
-          total: number 
-        } 
+      const distribution: {
+        [province: string]: {
+          farmers: number;
+          investors: number;
+          landowners: number;
+          total: number
+        }
       } = {};
 
       const roleMap: { [key: string]: string } = {
@@ -135,14 +142,13 @@ class AdminService {
       users.forEach((user) => {
         const { province } = this.parseLocation(user.address);
         const roleKey = roleMap[user.role];
-        
-        // Ensure province is a valid string, use 'Unknown' as fallback
+
         const provinceKey = province || 'Unknown';
-        
+
         if (!distribution[provinceKey]) {
           distribution[provinceKey] = { farmers: 0, investors: 0, landowners: 0, total: 0 };
         }
-        
+
         if (roleKey) {
           distribution[provinceKey][roleKey as 'farmers' | 'investors' | 'landowners']++;
         }
@@ -152,6 +158,25 @@ class AdminService {
       return distribution;
     } catch (error) {
       console.error('Failed to fetch province distribution:', error);
+      throw error;
+    }
+  }
+
+  async updateUser(userId: string, updates: {
+    firstName?: string;
+    lastName?: string;
+    address?: string;
+    phoneNumber?: string;
+  }): Promise<ApiUser> {
+    try {
+      const response = await httpClient.patch<ApiUser>(
+        `/v1/user/${userId}`,
+        updates
+      );
+      console.log('Updated user:', response);
+      return response;
+    } catch (error) {
+      console.error('Failed to update user:', error);
       throw error;
     }
   }

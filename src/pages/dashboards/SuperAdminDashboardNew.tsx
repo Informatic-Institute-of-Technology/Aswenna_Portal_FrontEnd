@@ -2,45 +2,45 @@ import { SriLankaMap } from '@/components';
 import DashboardLayout from '@/layouts/DashboardLayout';
 import { adminService, type ApiUser } from '@/services/admin.service';
 import {
-    AccessTime,
-    Agriculture,
-    Assessment,
-    AssignmentOutlined,
-    BarChartOutlined,
-    Business,
-    CheckCircle,
-    GroupOutlined,
-    Landscape,
-    MapOutlined,
-    People,
-    PersonAdd,
-    RefreshOutlined,
-    TrendingDown,
-    TrendingUp,
-    Verified,
-    Warning
+  AccessTime,
+  Agriculture,
+  Assessment,
+  AssignmentOutlined,
+  BarChartOutlined,
+  Business,
+  CheckCircle,
+  GroupOutlined,
+  Landscape,
+  MapOutlined,
+  People,
+  PersonAdd,
+  RefreshOutlined,
+  TrendingDown,
+  TrendingUp,
+  Verified,
+  Warning
 } from '@mui/icons-material';
 import {
-    Alert,
-    Avatar,
-    Box,
-    Button,
-    Card,
-    CardContent,
-    Chip,
-    CircularProgress,
-    Grid,
-    LinearProgress,
-    Paper,
-    Tab,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Tabs,
-    Typography
+  Alert,
+  Avatar,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  CircularProgress,
+  Grid,
+  LinearProgress,
+  Paper,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Tabs,
+  Typography
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 
@@ -67,7 +67,6 @@ function TabPanel(props: TabPanelProps) {
 
 const SuperAdminDashboard = () => {
   const [tabValue, setTabValue] = useState(0);
-  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [users, setUsers] = useState<ApiUser[]>([]);
   const [userStats, setUserStats] = useState({
@@ -105,7 +104,6 @@ const SuperAdminDashboard = () => {
       setError(message);
       console.error('Dashboard error:', err);
     } finally {
-      setLoading(false);
       setRefreshing(false);
     }
   };
@@ -136,23 +134,25 @@ const SuperAdminDashboard = () => {
 
   const getTopDistricts = () => {
     const districtCounts = users.reduce((acc: { [key: string]: number }, user) => {
-      if (!user.address) return acc;
-      
+      if (!user.address || typeof user.address !== 'string' || user.address.trim() === '') {
+        return acc;
+      }
+
       const words = user.address.trim().split(/[,\s]+/).filter(w => w.length > 0);
-      
+
       if (words.length === 0) return acc;
-      
+
       let rawDistrict = words[words.length - 1].replace(/[^\w\s]/gi, '');
-      
+
       const isNumber = /^\d+$/.test(rawDistrict);
       const isNo = rawDistrict.toLowerCase() === 'no';
-      
+
       if ((isNumber || isNo) && words.length > 1) {
         rawDistrict = words[words.length - 2].replace(/[^\w\s]/gi, '');
       }
-      
+
       const district = rawDistrict.trim();
-      
+
       if (district && !/^\d+$/.test(district) && district.toLowerCase() !== 'no') {
         acc[district] = (acc[district] || 0) + 1;
       }
@@ -256,31 +256,6 @@ const SuperAdminDashboard = () => {
       </CardContent>
     </Card>
   );
-
-  if (loading) {
-    return (
-      <DashboardLayout>
-        <Box
-          sx={{
-            height: '80vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Box sx={{ textAlign: 'center' }}>
-            <CircularProgress size={60} thickness={4} />
-            <Typography variant="h6" sx={{ mt: 3 }}>
-              Loading Dashboard...
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Fetching real-time data from the platform
-            </Typography>
-          </Box>
-        </Box>
-      </DashboardLayout>
-    );
-  }
 
   return (
     <DashboardLayout>
@@ -433,18 +408,18 @@ const SuperAdminDashboard = () => {
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
                 Interactive map showing user concentration by province
               </Typography>
-              
+
               <Grid container spacing={3}>
                 <Grid size={{ xs: 12, lg: 6 }}>
                   <Box sx={{ position: 'relative' }}>
                     <SriLankaMap provinceDistribution={provinceDistribution} />
-                    
-                    <Paper 
-                      sx={{ 
-                        position: 'absolute', 
-                        top: 10, 
-                        right: 10, 
-                        p: 1.5, 
+
+                    <Paper
+                      sx={{
+                        position: 'absolute',
+                        top: 10,
+                        right: 10,
+                        p: 1.5,
                         bgcolor: 'rgba(0, 0, 0, 0.3)',
                         borderRadius: 1,
                         boxShadow: 3,
@@ -478,7 +453,7 @@ const SuperAdminDashboard = () => {
                     <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
                       Top 5 User Districts
                     </Typography>
-                    
+
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                       {topDistricts.map((district, index) => (
                         <Box key={district.name}>
@@ -509,14 +484,14 @@ const SuperAdminDashboard = () => {
                                 </Typography>
                               </Box>
                             </Box>
-                            <Chip 
-                              label={district.count} 
-                              size="small" 
-                              color="primary" 
+                            <Chip
+                              label={district.count}
+                              size="small"
+                              color="primary"
                               sx={{ fontWeight: 600, minWidth: 50 }}
                             />
                           </Box>
-                          
+
 
                           <Box
                             sx={{
@@ -538,7 +513,7 @@ const SuperAdminDashboard = () => {
                           </Box>
                         </Box>
                       ))}
-                    </Box>  
+                    </Box>
                   </Paper>
                 </Grid>
               </Grid>
