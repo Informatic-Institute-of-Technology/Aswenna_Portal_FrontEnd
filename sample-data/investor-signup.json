@@ -1,0 +1,53 @@
+{
+  "email": "amara.perera@greenharvest.lk",
+  "password": "Investor@2026",
+  "role": "investor",
+  "personalInfo": {
+    "fullName": "Amara Kumudini Perera",
+    "profilePicture": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
+    "nicNumber": "197534567892",
+    "birthday": "1975-12-02",
+    "gender": "Female",
+    "age": 50,
+    "phoneNumber": "+94773456789",
+    "street": "45/A, Galle Road",
+    "city": "Colombo",
+    "province": "Western",
+    "district": "Colombo",
+    "postalCode": "00300",
+    "dsDivision": "Colombo",
+    "gnDivision": "Kollupitiya"
+  },
+  "organizationInfo": {
+    "organizationName": "Green Harvest Ventures (Pvt) Ltd",
+    "headOfficeLocation": "World Trade Center, Colombo 01",
+    "organizationContactNo": "+94112456789",
+    "businessRegistrationNo": "PV00187625",
+    "cropFocus": [
+      "Rice",
+      "Tea",
+      "Vegetables",
+      "Fruits",
+      "Spices"
+    ]
+  },
+  "documents": {
+    "nicFiles": [
+      {
+        "fileName": "nic_front.jpg",
+        "fileData": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
+        "fileSize": 256000,
+        "uploadDate": "2026-02-08T11:10:00.000Z"
+      },
+      {
+        "fileName": "nic_back.jpg",
+        "fileData": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
+        "fileSize": 248000,
+        "uploadDate": "2026-02-08T11:11:00.000Z"
+      }
+    ]
+  },
+  "termsAccepted": true,
+  "termsAcceptedAt": "2026-02-08T11:15:00.000Z",
+  "userId": null
+}

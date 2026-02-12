@@ -621,7 +621,6 @@ const LandownerProfileSetup = () => {
         const address = await LocationService.reverseGeocode(lat, lng);
         if (address) {
           const parts = address.split(",").map((p) => p.trim());
-          // Combine street and neighborhood for full street address
           if (parts.length >= 2) {
             setLandStreet(`${parts[0]}, ${parts[1]}`);
           } else if (parts.length > 0) {

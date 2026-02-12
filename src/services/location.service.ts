@@ -185,7 +185,7 @@ export const LocationService = {
   },
 
   getDefaultMapCenter: () => {
-    return { lat: 7.8731, lng: 80.7718 };
+    return { lat: 7.239511, lng: 80.358374 };
   },
 
   reverseGeocode: async (lat: number, lng: number): Promise<string> => {
