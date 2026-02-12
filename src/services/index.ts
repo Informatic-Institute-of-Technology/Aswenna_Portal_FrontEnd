@@ -3,6 +3,11 @@ export { authService } from './auth.service';
 export { HttpClient, httpClient } from './httpClient';
 export { LocationService } from './location.service';
 export {
+    otpService, type OTPResendRequest, type OTPResponse,
+    type OTPSendRequest,
+    type OTPVerifyRequest
+} from './otp.service';
+export {
     profileService,
     type CompleteProfilePayload,
     type CompleteProfileResponse,
