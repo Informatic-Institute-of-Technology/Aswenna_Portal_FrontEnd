@@ -13,5 +13,9 @@ export {
     type CompleteProfileResponse,
     type ProfileSetupData
 } from './profile.service';
+export {
+    registrationService, type FarmerDetails, type FarmerRegistrationRequest, type InvestorDetails, type InvestorRegistrationRequest, type LandOwnerDetails, type LandownerRegistrationRequest, type PersonalInfo, type RegistrationRequest,
+    type RegistrationResponse
+} from './registration.service';
 export { userService, type UpdateUserProfileDTO } from './user.service';
 

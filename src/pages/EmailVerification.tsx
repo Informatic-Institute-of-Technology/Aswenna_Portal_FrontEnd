@@ -122,6 +122,8 @@ const EmailVerification = () => {
       const timerKey = `verification_timer_${email}`;
       localStorage.removeItem(timerKey);
 
+      localStorage.setItem("email_verified", "true");
+
       showSuccess("Email verified successfully!");
       setTimeout(() => {
         navigate("/role-selection");

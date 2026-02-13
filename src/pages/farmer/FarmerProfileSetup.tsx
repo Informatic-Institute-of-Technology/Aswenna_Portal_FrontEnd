@@ -1,7 +1,11 @@
 import AswendLogo from "@/assets/Aswenna Logo.png";
 import { FileUploader, ProfileStepper } from "@/components";
-import { LocationService } from "@/services";
-import { validateNIC } from "@/utils";
+import {
+  LocationService,
+  registrationService,
+  type FarmerRegistrationRequest,
+} from "@/services";
+import { getFileAsBase64, validateNIC } from "@/utils";
 import {
   AccountBalance,
   Add as AddIcon,
@@ -36,17 +40,21 @@ import {
   MenuItem,
   Paper,
   Select,
-  type SelectChangeEvent,
   Stack,
   TextField,
   Tooltip,
   Typography,
+  type SelectChangeEvent,
 } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Notification from "../../shared/components/Notification";
+import { useNotification } from "../../shared/hooks/useNotification";
 
 const FarmerProfileSetup = () => {
   const navigate = useNavigate();
+  const { notification, showError, showSuccess, hideNotification } =
+    useNotification();
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const [province, setProvince] = useState("");
   const [district, setDistrict] = useState("");
@@ -58,6 +66,13 @@ const FarmerProfileSetup = () => {
   const [birthday, setBirthday] = useState("");
   const [gender, setGender] = useState<"Male" | "Female" | "">("");
   const [age, setAge] = useState<number | null>(null);
+
+  const [fullName, setFullName] = useState("");
+  const [govijanaSevaId, setGovijanaSevaId] = useState("");
+  const [experience, setExperience] = useState("");
+  const [regions, setRegions] = useState("");
+  const [specificNeeds, setSpecificNeeds] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const sriLankaLocations: Record<string, string[]> = {
     Central: ["Kandy", "Matale", "Nuwara Eliya"],
@@ -186,7 +201,7 @@ const FarmerProfileSetup = () => {
 
   const handleUseMyLocation = () => {
     if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser");
+      showError("Geolocation is not supported by your browser");
       return;
     }
 
@@ -217,7 +232,7 @@ const FarmerProfileSetup = () => {
           if (details.postalCode) setPostalCode(details.postalCode);
         } catch (error) {
           console.error("Error getting location details:", error);
-          alert("Failed to fetch location details.");
+          showError("Failed to fetch location details.");
         } finally {
           setIsLoadingLocation(false);
         }
@@ -225,7 +240,7 @@ const FarmerProfileSetup = () => {
       (error) => {
         console.error("Geolocation error:", error);
         setIsLoadingLocation(false);
-        alert("Unable to retrieve your location.");
+        showError("Unable to retrieve your location.");
       },
     );
   };
@@ -248,8 +263,9 @@ const FarmerProfileSetup = () => {
       setIsPhoneVerified(true);
       setVerificationDialogOpen(false);
       setVerificationCode("");
+      showSuccess("Phone number verified successfully!");
     } else {
-      alert("Invalid code (Mock: use 1234)");
+      showError("Invalid verification code. Please try again.");
     }
   };
 
@@ -271,7 +287,7 @@ const FarmerProfileSetup = () => {
     const file = event.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        alert("File size should not exceed 5MB");
+        showError("File size should not exceed 5MB");
         return;
       }
       const reader = new FileReader();
@@ -462,16 +478,18 @@ const FarmerProfileSetup = () => {
                 <Grid size={{ xs: 12, md: 6 }}>
                   <TextField
                     fullWidth
-                    label="Full Name"
+                    label="Full Name *"
                     placeholder="Enter Full Name"
                     variant="outlined"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
                     InputLabelProps={{ shrink: true }}
                   />
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
                   <TextField
                     fullWidth
-                    label="National ID Number"
+                    label="National ID Number *"
                     placeholder="Enter National ID Number"
                     variant="outlined"
                     value={nicNumber}
@@ -504,7 +522,7 @@ const FarmerProfileSetup = () => {
                 <Grid size={{ xs: 12, md: 6 }}>
                   <TextField
                     fullWidth
-                    label="Gender"
+                    label="Gender *"
                     placeholder="Gender"
                     variant="outlined"
                     value={gender}
@@ -523,7 +541,7 @@ const FarmerProfileSetup = () => {
                 <Grid size={{ xs: 12, md: 6 }}>
                   <TextField
                     fullWidth
-                    label="Date of Birth"
+                    label="Date of Birth *"
                     placeholder="Date of Birth"
                     variant="outlined"
                     value={
@@ -585,7 +603,7 @@ const FarmerProfileSetup = () => {
                 <Grid size={{ xs: 12, md: 6 }}>
                   <TextField
                     fullWidth
-                    label="Street Address (No / Lane)"
+                    label="Street Address (No / Lane) *"
                     placeholder="57, Ramakrishna Road"
                     variant="outlined"
                     value={address}
@@ -596,7 +614,7 @@ const FarmerProfileSetup = () => {
                 <Grid size={{ xs: 12, md: 6 }}>
                   <TextField
                     fullWidth
-                    label="City / Town"
+                    label="City / Town *"
                     placeholder="Enter City"
                     variant="outlined"
                     value={city}
@@ -626,12 +644,12 @@ const FarmerProfileSetup = () => {
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
                   <FormControl fullWidth>
-                    <InputLabel shrink>Province</InputLabel>
+                    <InputLabel shrink>Province *</InputLabel>
                     <Select
                       value={province}
                       onChange={handleProvinceChange}
                       displayEmpty
-                      label="Province"
+                      label="Province *"
                       notched
                     >
                       <MenuItem value="" disabled>
@@ -648,7 +666,7 @@ const FarmerProfileSetup = () => {
                 <Grid size={{ xs: 12, md: 6 }}>
                   <TextField
                     fullWidth
-                    label="Postal Code"
+                    label="Postal Code *"
                     placeholder="XXXXX"
                     variant="outlined"
                     value={postalCode}
@@ -659,7 +677,7 @@ const FarmerProfileSetup = () => {
                 <Grid size={{ xs: 12, md: 6 }}>
                   <TextField
                     fullWidth
-                    label="Phone Number"
+                    label="Phone Number *"
                     placeholder="07X XXXXXXX"
                     variant="outlined"
                     InputLabelProps={{
@@ -708,12 +726,12 @@ const FarmerProfileSetup = () => {
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
                   <FormControl fullWidth disabled={!province}>
-                    <InputLabel shrink>District</InputLabel>
+                    <InputLabel shrink>District *</InputLabel>
                     <Select
                       value={district}
                       onChange={(e) => setDistrict(e.target.value)}
                       displayEmpty
-                      label="District"
+                      label="District *"
                       notched
                     >
                       <MenuItem value="" disabled>
@@ -745,13 +763,13 @@ const FarmerProfileSetup = () => {
                 <Grid size={{ xs: 12, md: 4 }}>
                   <FormControl fullWidth disabled={!district}>
                     <InputLabel shrink>
-                      District Secretariat Division
+                      District Secretariat Division *
                     </InputLabel>
                     <Select
                       value={dsDivision}
                       onChange={(e) => setDsDivision(e.target.value)}
                       displayEmpty
-                      label="District Secretariat Division"
+                      label="District Secretariat Division *"
                       notched
                     >
                       <MenuItem value="" disabled>
@@ -767,12 +785,12 @@ const FarmerProfileSetup = () => {
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
                   <FormControl fullWidth disabled={!dsDivision}>
-                    <InputLabel shrink>Grama Niladhari Division</InputLabel>
+                    <InputLabel shrink>Grama Niladhari Division *</InputLabel>
                     <Select
                       value={gnDivision}
                       onChange={(e) => setGnDivision(e.target.value)}
                       displayEmpty
-                      label="Grama Niladhari Division"
+                      label="Grama Niladhari Division *"
                       notched
                     >
                       <MenuItem value="" disabled>
@@ -792,6 +810,8 @@ const FarmerProfileSetup = () => {
                     label="Govijana Sewa ID"
                     placeholder="ID-0000-00"
                     variant="outlined"
+                    value={govijanaSevaId}
+                    onChange={(e) => setGovijanaSevaId(e.target.value)}
                     InputLabelProps={{ shrink: true }}
                   />
                 </Grid>
@@ -870,6 +890,8 @@ const FarmerProfileSetup = () => {
                     label="Experience Level"
                     placeholder="Years in farming"
                     variant="outlined"
+                    value={experience}
+                    onChange={(e) => setExperience(e.target.value)}
                     InputLabelProps={{ shrink: true }}
                   />
                 </Grid>
@@ -879,6 +901,8 @@ const FarmerProfileSetup = () => {
                     label="Preferred Region"
                     placeholder="Region where you operate"
                     variant="outlined"
+                    value={regions}
+                    onChange={(e) => setRegions(e.target.value)}
                     InputLabelProps={{ shrink: true }}
                   />
                 </Grid>
@@ -890,6 +914,8 @@ const FarmerProfileSetup = () => {
                     label="Specific Needs"
                     placeholder="What do you need? (e.g., funding, equipment, land)"
                     variant="outlined"
+                    value={specificNeeds}
+                    onChange={(e) => setSpecificNeeds(e.target.value)}
                     InputLabelProps={{ shrink: true }}
                   />
                 </Grid>
@@ -898,7 +924,6 @@ const FarmerProfileSetup = () => {
           </Grid>
 
           <Grid size={{ xs: 12, lg: 4 }}>
-            {/* Verification */}
             <Paper
               elevation={0}
               sx={{ p: 3, mb: 3, bgcolor: "background.paper", borderRadius: 2 }}
@@ -912,8 +937,8 @@ const FarmerProfileSetup = () => {
 
               <Box sx={{ mb: 3 }}>
                 <FileUploader
-                  label="National ID (NIC)"
-                  helperText="Upload Front & Back"
+                  label="National ID (NIC) *"
+                  helperText="Upload Front & Back (Required)"
                   files={nicFiles}
                   onFilesSelected={(newFiles) =>
                     setNicFiles([...nicFiles, ...newFiles])
@@ -926,8 +951,8 @@ const FarmerProfileSetup = () => {
 
               <Box sx={{ mb: 3 }}>
                 <FileUploader
-                  label="Govi Jana Sewa Passbook"
-                  helperText="Upload photo of Govi Jana Sewa passbook page"
+                  label="Govi Jana Sewa Passbook *"
+                  helperText="Upload photo of Govi Jana Sewa passbook page (Required)"
                   files={passbookFiles}
                   onFilesSelected={(newFiles) =>
                     setPassbookFiles([...passbookFiles, ...newFiles])
@@ -942,8 +967,8 @@ const FarmerProfileSetup = () => {
 
               <Box sx={{ mb: 3 }}>
                 <FileUploader
-                  label="Grama Niladhari Certified Document"
-                  helperText="Proof of Residence"
+                  label="Grama Niladhari Certified Document *"
+                  helperText="Proof of Residence (Required)"
                   files={gnFiles}
                   onFilesSelected={(newFiles) =>
                     setGnFiles([...gnFiles, ...newFiles])
@@ -974,7 +999,6 @@ const FarmerProfileSetup = () => {
               </Box>
             </Paper>
 
-            {/* Actions */}
             <Paper
               elevation={0}
               sx={{ p: 3, bgcolor: "background.paper", borderRadius: 2 }}
@@ -984,31 +1008,163 @@ const FarmerProfileSetup = () => {
                 variant="contained"
                 color="primary"
                 size="large"
-                onClick={() => {
-                  const profileData = {
-                    role: "farmer",
-                    personalInfo: {
-                      profilePicture,
+                disabled={isSubmitting}
+                onClick={async () => {
+                  try {
+                    setIsSubmitting(true);
+
+                    const email = localStorage.getItem("temp_email") || "";
+                    const password =
+                      localStorage.getItem("temp_password") || "";
+                    const emailVerified =
+                      localStorage.getItem("email_verified") === "true";
+
+                    const nicFrontImage = await getFileAsBase64(nicFiles, 0);
+                    const nicBackImage = await getFileAsBase64(nicFiles, 1);
+                    const govijanaSevaPassbookImage = await getFileAsBase64(
+                      passbookFiles,
+                      0,
+                    );
+                    const gnCertificateImage = await getFileAsBase64(
+                      gnFiles,
+                      0,
+                    );
+
+                    if (!phoneNumber) {
+                      showError("Phone number is required");
+                      return;
+                    }
+                    if (!city) {
+                      showError("City is required");
+                      return;
+                    }
+                    // if (nicFiles.length < 2) {
+                    //   showError("Please upload both NIC front and back images");
+                    //   return;
+                    // }
+                    // if (!nicFrontImage || !nicBackImage) {
+                    //   showError(
+                    //     "NIC images could not be processed. Please try again.",
+                    //   );
+                    //   return;
+                    // }
+                    // if (!govijanaSevaPassbookImage) {
+                    //   showError("Please upload Govijana Seva Passbook image");
+                    //   return;
+                    // }
+                    // if (!gnCertificateImage) {
+                    //   showError("Please upload GN Certificate image");
+                    //   return;
+                    // }
+
+                    const formattedPhone = phoneNumber.startsWith("+")
+                      ? phoneNumber
+                      : phoneNumber.startsWith("0")
+                        ? `+94${phoneNumber.substring(1)}`
+                        : `+94${phoneNumber}`;
+
+                    const personalInfo: any = {
+                      profilePicture: profilePicture || "",
                       nicNumber,
                       birthday,
-                      gender,
-                      age,
-                      province,
+                      gender: gender.toLowerCase() as "male" | "female",
+                      age: age || 0,
+                      address: address || city,
+                      city,
+                      postalCode,
                       district,
+                      province,
+                    };
+
+                    if (nicFrontImage)
+                      personalInfo.nicFrontImage = nicFrontImage;
+                    if (nicBackImage) personalInfo.nicBackImage = nicBackImage;
+
+                    const farmerDetails: any = {
                       dsDivision,
                       gnDivision,
-                    },
-                    farmingInfo: {
-                      selectedCrops,
-                    },
-                    termsAccepted: false,
-                  };
-                  localStorage.setItem(
-                    "profileSetupData",
-                    JSON.stringify(profileData),
-                  );
-                  console.log("Farmer profile data saved:", profileData);
-                  navigate("/terms-and-conditions");
+                      govijanaSevaId: govijanaSevaId || "GS-00000",
+                      crop: selectedCrops.join(", "),
+                      experience: experience || "0 years",
+                      regions: regions || district,
+                      specificNeeds: specificNeeds || "None",
+                    };
+
+                    if (govijanaSevaPassbookImage) {
+                      farmerDetails.GovijanaSevaPassbookImage =
+                        govijanaSevaPassbookImage;
+                    }
+                    if (gnCertificateImage) {
+                      farmerDetails.gnCertificateImage = gnCertificateImage;
+                    }
+
+                    const registrationData: FarmerRegistrationRequest = {
+                      fullName: fullName || "User Name",
+                      email,
+                      emailVerified,
+                      phoneNumber: formattedPhone,
+                      phoneNumberVerified: isPhoneVerified,
+                      password,
+                      personalInfo,
+                      role: "farmer",
+                      farmerDetails,
+                    };
+
+                    console.log("=== FARMER REGISTRATION PAYLOAD ===");
+                    console.log(JSON.stringify(registrationData, null, 2));
+                    console.log(
+                      "=== Payload size:",
+                      new Blob([JSON.stringify(registrationData)]).size,
+                      "bytes ===",
+                    );
+
+                    await registrationService.registerFarmer(registrationData);
+
+                    localStorage.removeItem("temp_email");
+                    localStorage.removeItem("temp_password");
+                    localStorage.removeItem("email_verified");
+
+                    console.log("Farmer registration successful!");
+                    showSuccess(
+                      "Registration successful! Redirecting to login...",
+                    );
+                    setTimeout(() => {
+                      navigate("/login");
+                    }, 2000);
+                  } catch (error) {
+                    console.error("Registration failed:", error);
+
+                    let errorMessage = "Registration failed. Please try again.";
+
+                    if (error instanceof Error) {
+                      try {
+                        const errorData = JSON.parse(error.message);
+                        if (
+                          errorData.message &&
+                          Array.isArray(errorData.message)
+                        ) {
+                          errorMessage =
+                            "Please fix the following errors:\n" +
+                            errorData.message
+                              .map(
+                                (msg: string, idx: number) =>
+                                  `${idx + 1}. ${msg}`,
+                              )
+                              .join("\n");
+                        } else if (errorData.message) {
+                          errorMessage = errorData.message;
+                        } else {
+                          errorMessage = error.message;
+                        }
+                      } catch {
+                        errorMessage = error.message;
+                      }
+                    }
+
+                    showError(errorMessage);
+                  } finally {
+                    setIsSubmitting(false);
+                  }
                 }}
                 sx={{
                   mb: 2,
@@ -1018,7 +1174,11 @@ const FarmerProfileSetup = () => {
                   boxShadow: "0 4px 14px 0 rgba(107, 142, 35, 0.39)",
                 }}
               >
-                Save & Continue →
+                {isSubmitting ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  "Complete Registration →"
+                )}
               </Button>
 
               <Button
@@ -1093,6 +1253,14 @@ const FarmerProfileSetup = () => {
           </Box>
         </Box>
       </Container>
+
+      <Notification
+        open={notification.open}
+        message={notification.message}
+        severity={notification.severity}
+        duration={5000}
+        onClose={hideNotification}
+      />
     </Box>
   );
 };

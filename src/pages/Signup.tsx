@@ -158,6 +158,9 @@ const Signup = () => {
     try {
       await otpService.sendOTP(email);
 
+      localStorage.setItem("temp_email", email);
+      localStorage.setItem("temp_password", password);
+
       showSuccess(
         "Verification code sent to your email. Please check your inbox!",
       );

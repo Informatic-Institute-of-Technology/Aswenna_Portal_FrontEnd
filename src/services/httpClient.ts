@@ -19,6 +19,9 @@ export class HttpClient {
     const data = await response.json();
 
     if (!response.ok) {
+      if (data.message && (Array.isArray(data.message) || data.error)) {
+        throw new Error(JSON.stringify(data));
+      }
       throw new Error(data.message || `HTTP ${response.status}: ${response.statusText}`);
     }
 

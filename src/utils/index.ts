@@ -51,5 +51,8 @@ export const decryptToken = (token: string): Record<string, unknown> | null => {
   }
 }
 
-// NIC Validation
 export * from './nicValidation';
+
+export * from './fileUtils';
+
+export * from './registrationHelpers';
