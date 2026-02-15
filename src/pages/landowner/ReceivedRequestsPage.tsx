@@ -34,9 +34,7 @@ interface LandRequest {
   };
   financials: {
     landowner_asking_price: number;
-    investor_offered_price: number;
     currency: string;
-    is_premium_offer: boolean;
   };
   proposal_details: {
     project_type: string;
@@ -62,9 +60,7 @@ const requestData: { requests: LandRequest[] } = {
       },
       financials: {
         landowner_asking_price: 25000.0,
-        investor_offered_price: 35000.0,
         currency: "LKR",
-        is_premium_offer: true,
       },
       proposal_details: {
         project_type: "Organic Berries",
@@ -88,9 +84,7 @@ const requestData: { requests: LandRequest[] } = {
       },
       financials: {
         landowner_asking_price: 25000.0,
-        investor_offered_price: 30000.0,
         currency: "LKR",
-        is_premium_offer: true,
       },
       proposal_details: {
         project_type: "Green Veg",
@@ -114,9 +108,7 @@ const requestData: { requests: LandRequest[] } = {
       },
       financials: {
         landowner_asking_price: 25000.0,
-        investor_offered_price: 25000.0,
         currency: "LKR",
-        is_premium_offer: false,
       },
       proposal_details: {
         project_type: "Fruits",
@@ -230,18 +222,6 @@ const ReceivedRequestsPage = () => {
                     Received from {investor_info.name} •{" "}
                     {formatTimestamp(request.timestamp)}
                   </Typography>
-
-                  {financials.is_premium_offer && (
-                    <Chip
-                      size="small"
-                      color="success"
-                      sx={{ mt: 1.2, fontWeight: 600 }}
-                      label={`Premium Offer: ${formatMoney(
-                        financials.investor_offered_price,
-                        financials.currency,
-                      )}`}
-                    />
-                  )}
                 </Box>
 
                 <Stack direction="row" spacing={1.2} alignItems="center">
@@ -374,13 +354,6 @@ const ReceivedRequestsPage = () => {
                 <Divider />
 
                 <Box>
-                  <Typography
-                    variant="subtitle2"
-                    color="text.secondary"
-                    sx={{ mb: 1 }}
-                  >
-                    Financial Comparison
-                  </Typography>
                   <Stack spacing={1}>
                     <Typography variant="body1">
                       Asking Price:{" "}
@@ -390,16 +363,6 @@ const ReceivedRequestsPage = () => {
                           selectedCurrency,
                         )}
                       </strong>
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      sx={{ color: "success.main", fontWeight: 700 }}
-                    >
-                      Investor Offer:{" "}
-                      {formatMoney(
-                        selectedRequest.financials.investor_offered_price,
-                        selectedCurrency,
-                      )}
                     </Typography>
                   </Stack>
                 </Box>
