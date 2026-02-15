@@ -55,7 +55,5 @@ export * from './nicValidation';
 
 export * from './fileUtils';
 
-export * from './formDataUtils';
-
 export * from './registrationHelpers';
 

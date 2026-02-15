@@ -7,12 +7,10 @@ export class HttpClient {
     this.baseURL = baseURL;
   }
 
-  private getAuthHeaders(includeContentType: boolean = true): HeadersInit {
-    const headers: HeadersInit = {};
-    
-    if (includeContentType) {
-      headers['Content-Type'] = 'application/json';
-    }
+  private getAuthHeaders(): HeadersInit {
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
 
     return headers;
   }
@@ -44,16 +42,6 @@ export class HttpClient {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(data),
-    });
-
-    return this.handleResponse<T>(response);
-  }
-
-  async postFormData<T>(endpoint: string, formData: FormData): Promise<T> {
-    const response = await fetch(`${this.baseURL}${endpoint}`, {
-      method: 'POST',
-      headers: this.getAuthHeaders(false), // Don't set Content-Type for FormData
-      body: formData,
     });
 
     return this.handleResponse<T>(response);
