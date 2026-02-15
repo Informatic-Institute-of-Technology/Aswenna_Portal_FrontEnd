@@ -1,11 +1,7 @@
 import AswendLogo from "@/assets/Aswenna Logo.png";
 import { FileUploader, ProfileStepper } from "@/components";
-import {
-  LocationService,
-  registrationService,
-  type FarmerRegistrationRequest,
-} from "@/services";
-import { getFileAsBase64, validateNIC } from "@/utils";
+import { LocationService, registrationService } from "@/services";
+import { validateNIC } from "@/utils";
 import {
   AccountBalance,
   Add as AddIcon,
@@ -1019,17 +1015,6 @@ const FarmerProfileSetup = () => {
                     const emailVerified =
                       localStorage.getItem("email_verified") === "true";
 
-                    const nicFrontImage = await getFileAsBase64(nicFiles, 0);
-                    const nicBackImage = await getFileAsBase64(nicFiles, 1);
-                    const govijanaSevaPassbookImage = await getFileAsBase64(
-                      passbookFiles,
-                      0,
-                    );
-                    const gnCertificateImage = await getFileAsBase64(
-                      gnFiles,
-                      0,
-                    );
-
                     if (!phoneNumber) {
                       showError("Phone number is required");
                       return;
@@ -1042,17 +1027,11 @@ const FarmerProfileSetup = () => {
                     //   showError("Please upload both NIC front and back images");
                     //   return;
                     // }
-                    // if (!nicFrontImage || !nicBackImage) {
-                    //   showError(
-                    //     "NIC images could not be processed. Please try again.",
-                    //   );
-                    //   return;
-                    // }
-                    // if (!govijanaSevaPassbookImage) {
+                    // if (passbookFiles.length === 0) {
                     //   showError("Please upload Govijana Seva Passbook image");
                     //   return;
                     // }
-                    // if (!gnCertificateImage) {
+                    // if (gnFiles.length === 0) {
                     //   showError("Please upload GN Certificate image");
                     //   return;
                     // }
@@ -1063,62 +1042,101 @@ const FarmerProfileSetup = () => {
                         ? `+94${phoneNumber.substring(1)}`
                         : `+94${phoneNumber}`;
 
-                    const personalInfo: any = {
-                      profilePicture: profilePicture || "",
-                      nicNumber,
-                      birthday,
-                      gender: gender.toLowerCase() as "male" | "female",
-                      age: age || 0,
-                      address: address || city,
-                      city,
-                      postalCode,
-                      district,
-                      province,
-                    };
+                    // Create FormData for multipart upload
+                    const formData = new FormData();
 
-                    if (nicFrontImage)
-                      personalInfo.nicFrontImage = nicFrontImage;
-                    if (nicBackImage) personalInfo.nicBackImage = nicBackImage;
+                    // Add basic registration fields
+                    formData.append("fullName", fullName || "User Name");
+                    formData.append("email", email);
+                    formData.append("emailVerified", emailVerified.toString());
+                    formData.append("phoneNumber", formattedPhone);
+                    formData.append(
+                      "phoneNumberVerified",
+                      isPhoneVerified.toString(),
+                    );
+                    formData.append("password", password);
+                    formData.append("role", "farmer");
 
-                    const farmerDetails: any = {
-                      dsDivision,
-                      gnDivision,
-                      govijanaSevaId: govijanaSevaId || "GS-00000",
-                      crop: selectedCrops.join(", "),
-                      experience: experience || "0 years",
-                      regions: regions || district,
-                      specificNeeds: specificNeeds || "None",
-                    };
+                    // Add personal info
+                    formData.append("personalInfo[nicNumber]", nicNumber);
+                    formData.append("personalInfo[birthday]", birthday);
+                    formData.append(
+                      "personalInfo[gender]",
+                      gender.toLowerCase(),
+                    );
+                    formData.append("personalInfo[age]", (age || 0).toString());
+                    formData.append("personalInfo[address]", address || city);
+                    formData.append("personalInfo[city]", city);
+                    formData.append("personalInfo[postalCode]", postalCode);
+                    formData.append("personalInfo[district]", district);
+                    formData.append("personalInfo[province]", province);
 
-                    if (govijanaSevaPassbookImage) {
-                      farmerDetails.GovijanaSevaPassbookImage =
-                        govijanaSevaPassbookImage;
+                    // Add profile picture if exists
+                    if (profilePicture) {
+                      formData.append(
+                        "personalInfo[profilePicture]",
+                        profilePicture,
+                      );
                     }
-                    if (gnCertificateImage) {
-                      farmerDetails.gnCertificateImage = gnCertificateImage;
+
+                    // Add NIC images as files
+                    if (nicFiles.length > 0) {
+                      formData.append("nicFrontImage", nicFiles[0]);
+                    }
+                    if (nicFiles.length > 1) {
+                      formData.append("nicBackImage", nicFiles[1]);
                     }
 
-                    const registrationData: FarmerRegistrationRequest = {
-                      fullName: fullName || "User Name",
-                      email,
-                      emailVerified,
-                      phoneNumber: formattedPhone,
-                      phoneNumberVerified: isPhoneVerified,
-                      password,
-                      personalInfo,
-                      role: "farmer",
-                      farmerDetails,
-                    };
-
-                    console.log("=== FARMER REGISTRATION PAYLOAD ===");
-                    console.log(JSON.stringify(registrationData, null, 2));
-                    console.log(
-                      "=== Payload size:",
-                      new Blob([JSON.stringify(registrationData)]).size,
-                      "bytes ===",
+                    // Add farmer details
+                    formData.append("farmerDetails[dsDivision]", dsDivision);
+                    formData.append("farmerDetails[gnDivision]", gnDivision);
+                    formData.append(
+                      "farmerDetails[govijanaSevaId]",
+                      govijanaSevaId || "GS-00000",
+                    );
+                    formData.append(
+                      "farmerDetails[crop]",
+                      selectedCrops.join(", "),
+                    );
+                    formData.append(
+                      "farmerDetails[experience]",
+                      experience || "0 years",
+                    );
+                    formData.append(
+                      "farmerDetails[regions]",
+                      regions || district,
+                    );
+                    formData.append(
+                      "farmerDetails[specificNeeds]",
+                      specificNeeds || "None",
                     );
 
-                    await registrationService.registerFarmer(registrationData);
+                    // Add passbook and GN certificate as files
+                    if (passbookFiles.length > 0) {
+                      formData.append(
+                        "govijanaSevaPassbookImage",
+                        passbookFiles[0],
+                      );
+                    }
+                    if (gnFiles.length > 0) {
+                      formData.append("gnCertificateImage", gnFiles[0]);
+                    }
+
+                    console.log("=== FARMER REGISTRATION (FormData) ===");
+                    console.log("FormData entries:");
+                    for (const [key, value] of formData.entries()) {
+                      if (value instanceof File) {
+                        console.log(
+                          `${key}: [File] ${value.name} (${value.size} bytes)`,
+                        );
+                      } else {
+                        console.log(`${key}: ${value}`);
+                      }
+                    }
+
+                    await registrationService.registerFarmerWithFormData(
+                      formData,
+                    );
 
                     localStorage.removeItem("temp_email");
                     localStorage.removeItem("temp_password");

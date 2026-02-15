@@ -1,6 +1,5 @@
 import { httpClient } from "./httpClient";
 
-// Base interfaces
 export interface PersonalInfo {
   profilePicture: string;
   nicNumber: string;
@@ -15,6 +14,7 @@ export interface PersonalInfo {
   nicFrontImage?: string;
   nicBackImage?: string;
 }
+
 
 export interface FarmerDetails {
   dsDivision: string;
@@ -121,6 +121,13 @@ class RegistrationService {
     return await httpClient.post<RegistrationResponse>("/v1/user", data);
   }
 
+  async registerFarmerWithFormData(
+    formData: FormData,
+  ): Promise<RegistrationResponse> {
+    console.log("[RegistrationService] POST /v1/user (FormData)");
+    return await httpClient.postFormData<RegistrationResponse>("/v1/user", formData);
+  }
+
   async registerInvestor(
     data: InvestorRegistrationRequest,
   ): Promise<RegistrationResponse> {
@@ -129,12 +136,26 @@ class RegistrationService {
     return await httpClient.post<RegistrationResponse>("/v1/user", data);
   }
 
+  async registerInvestorWithFormData(
+    formData: FormData,
+  ): Promise<RegistrationResponse> {
+    console.log("[RegistrationService] POST /v1/user (FormData)");
+    return await httpClient.postFormData<RegistrationResponse>("/v1/user", formData);
+  }
+
   async registerLandowner(
     data: LandownerRegistrationRequest,
   ): Promise<RegistrationResponse> {
     console.log("[RegistrationService] POST /v1/user");
     console.log("[RegistrationService] Landowner data:", JSON.stringify(data, null, 2));
     return await httpClient.post<RegistrationResponse>("/v1/user", data);
+  }
+
+  async registerLandownerWithFormData(
+    formData: FormData,
+  ): Promise<RegistrationResponse> {
+    console.log("[RegistrationService] POST /v1/user (FormData)");
+    return await httpClient.postFormData<RegistrationResponse>("/v1/user", formData);
   }
 
   async register(data: RegistrationRequest): Promise<RegistrationResponse> {
