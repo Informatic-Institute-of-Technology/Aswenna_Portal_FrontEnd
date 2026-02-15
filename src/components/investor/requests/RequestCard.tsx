@@ -39,7 +39,6 @@ const RequestCard = ({
   primaryAction,
   secondaryAction,
   isVerified = false,
-  highlighted = false,
   isSelected = false,
 }: RequestCardProps) => {
   const getStatusStyles = () => {
