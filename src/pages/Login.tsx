@@ -42,8 +42,8 @@ const Login = () => {
       await login(email, password);
       navigate("/dashboard");
     } catch (err) {
-      const errorMsg = err instanceof Error && err.message 
-        ? err.message 
+      const errorMsg = err instanceof Error && err.message
+        ? err.message
         : "Invalid credentials. Please try again.";
       setError(errorMsg);
       showError(errorMsg);
@@ -130,15 +130,11 @@ const Login = () => {
               </button>
             </form>
 
-            <div className="signup-prompt">
-              <span>Don't have an account? </span>
-              <button
-                type="button"
-                onClick={() => navigate("/signup")}
-                className="signup-login-button"
-              >
-                Sign up
-              </button>
+            <div className="signup-link-container">
+              <span className="signup-text">Don't have an account? </span>
+              <Link to="/signup" className="signup-link">
+                Sign Up
+              </Link>
             </div>
           </div>
         </div>

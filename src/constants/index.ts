@@ -9,7 +9,6 @@ export const API_TIMEOUT = 30000; // 30 seconds
 // Application Routes
 export const ROUTES = {
   LOGIN: '/login',
-  SIGNUP: '/signup',
   FORGOT_PASSWORD: '/forgot-password',
   DASHBOARD: '/dashboard',
   HOME: '/',
@@ -50,7 +49,6 @@ export const ERROR_MESSAGES = {
 // Success Messages
 export const SUCCESS_MESSAGES = {
   LOGIN_SUCCESS: 'Successfully logged in!',
-  SIGNUP_SUCCESS: 'Account created successfully!',
   LOGOUT_SUCCESS: 'Successfully logged out',
   PASSWORD_RESET_SENT: 'Password reset email sent',
 } as const;

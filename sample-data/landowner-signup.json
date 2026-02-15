@@ -1,0 +1,85 @@
+{
+  "email": "nimal.silva@yahoo.com",
+  "password": "Landowner@2026",
+  "role": "landowner",
+  "personalInfo": {
+    "fullName": "Gamage Don Nimal Silva",
+    "profilePicture": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
+    "nicNumber": "196824569823",
+    "birthday": "1968-06-15",
+    "gender": "Male",
+    "age": 57,
+    "street": "78/2, Kandy Road",
+    "city": "Matale",
+    "province": "Central",
+    "district": "Matale",
+    "postalCode": "21000",
+    "dsDivision": "Matale",
+    "gnDivision": "Matale Four Gravets"
+  },
+  "landInfo": {
+    "landStreet": "Agricultural Land, Walagamba Road",
+    "landCity": "Dambulla",
+    "landProvince": "Central",
+    "landDistrict": "Matale",
+    "landPostalCode": "21100",
+    "landDsDivision": "Dambulla",
+    "landGnDivision": "Dambulla",
+    "landSize": "8.5",
+    "soilType": "Loamy",
+    "rentalExpectation": "75000",
+    "pinLocation": {
+      "lat": 7.8731,
+      "lng": 80.6217
+    }
+  },
+  "documents": {
+    "certificateFiles": [
+      {
+        "fileName": "land_deed.pdf",
+        "fileData": "data:application/pdf;base64,JVBERi0xLjQK...",
+        "fileSize": 850000,
+        "uploadDate": "2026-02-08T12:35:00.000Z"
+      },
+      {
+        "fileName": "survey_plan.pdf",
+        "fileData": "data:application/pdf;base64,JVBERi0xLjQK...",
+        "fileSize": 720000,
+        "uploadDate": "2026-02-08T12:36:00.000Z"
+      }
+    ],
+    "galleryImages": [
+      {
+        "fileName": "land_overview.jpg",
+        "fileData": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
+        "fileSize": 680000,
+        "preview": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
+        "uploadDate": "2026-02-08T12:37:00.000Z"
+      },
+      {
+        "fileName": "water_source.jpg",
+        "fileData": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
+        "fileSize": 625000,
+        "preview": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
+        "uploadDate": "2026-02-08T12:38:00.000Z"
+      },
+      {
+        "fileName": "storage_shed.jpg",
+        "fileData": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
+        "fileSize": 590000,
+        "preview": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
+        "uploadDate": "2026-02-08T12:39:00.000Z"
+      },
+      {
+        "fileName": "access_road.jpg",
+        "fileData": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
+        "fileSize": 615000,
+        "preview": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
+        "uploadDate": "2026-02-08T12:40:00.000Z"
+      }
+    ]
+  },
+  "termsAccepted": true,
+  "termsAcceptedAt": "2026-02-08T12:45:00.000Z",
+  "userId": null
+}

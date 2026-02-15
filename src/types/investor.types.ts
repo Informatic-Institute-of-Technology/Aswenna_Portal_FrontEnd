@@ -36,7 +36,7 @@ export interface DirectHarvestOffer {
   currency: string;
   
   // Payment Schedule (Farmer will plan installments)
-  paymentInstallments: PaymentInstallment[];
+  paymentInstallments: InvestorPaymentInstallment[];
   
   // Status & Matching
   status: OfferStatus;
@@ -81,7 +81,7 @@ export interface SponsorshipOffer {
   preferredRegions?: string[];
   
   // Payment Schedule (Farmer will plan installments)
-  paymentInstallments: PaymentInstallment[];
+  paymentInstallments: InvestorPaymentInstallment[];
   
   // Status & Matching
   status: OfferStatus;
@@ -105,7 +105,7 @@ export type InvestorOffer = DirectHarvestOffer | SponsorshipOffer;
  * Payment Installment Structure
  * Both offer types use installments for payments
  */
-export interface PaymentInstallment {
+export interface InvestorPaymentInstallment {
   id: string;
   installmentNumber: number;
   amount: number;
@@ -193,7 +193,7 @@ export interface Agreement {
   terms: {
     projectTimeline: string;
     rentalDuration?: number; // for land rental
-    paymentSchedule: PaymentInstallment[];
+    paymentSchedule: InvestorPaymentInstallment[];
     additionalTerms?: Record<string, string | number | boolean>;
   };
   status: 'draft' | 'pending-signature' | 'signed' | 'active' | 'completed' | 'terminated';

@@ -42,7 +42,6 @@ const InvestmentRequestCard = ({ request, onViewDetails }: InvestmentRequestCard
     return diffDays;
   };
 
-  // Get crop-specific background image
   const getCropImage = (cropType: string) => {
     const cropImages: Record<string, string> = {
       'Tomatoes': 'https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=800',
@@ -75,7 +74,6 @@ const InvestmentRequestCard = ({ request, onViewDetails }: InvestmentRequestCard
         },
       }}
     >
-      {/* Header with Cover Image */}
       <Box
         sx={{
           position: 'relative',
@@ -86,7 +84,6 @@ const InvestmentRequestCard = ({ request, onViewDetails }: InvestmentRequestCard
           overflow: 'hidden',
         }}
       >
-        {/* Dark Overlay for readability */}
         <Box
           sx={{
             position: 'absolute',
