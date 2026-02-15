@@ -46,7 +46,7 @@ export const decryptToken = (token: string): Record<string, unknown> | null => {
     );
 
     return JSON.parse(jsonPayload);
-  } catch (error) {
+  } catch {
     return null;
   }
 }

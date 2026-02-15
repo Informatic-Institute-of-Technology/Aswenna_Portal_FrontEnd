@@ -3,7 +3,9 @@ import { FileUploader, ProfileStepper } from "@/components";
 import {
   LocationService,
   registrationService,
+  type FarmerDetails,
   type FarmerRegistrationRequest,
+  type PersonalInfo,
 } from "@/services";
 import { getFileAsBase64, validateNIC } from "@/utils";
 import {
@@ -1063,7 +1065,7 @@ const FarmerProfileSetup = () => {
                         ? `+94${phoneNumber.substring(1)}`
                         : `+94${phoneNumber}`;
 
-                    const personalInfo: any = {
+                    const personalInfo: PersonalInfo = {
                       profilePicture: profilePicture || "",
                       nicNumber,
                       birthday,
@@ -1080,7 +1082,7 @@ const FarmerProfileSetup = () => {
                       personalInfo.nicFrontImage = nicFrontImage;
                     if (nicBackImage) personalInfo.nicBackImage = nicBackImage;
 
-                    const farmerDetails: any = {
+                    const farmerDetails: FarmerDetails = {
                       dsDivision,
                       gnDivision,
                       govijanaSevaId: govijanaSevaId || "GS-00000",
