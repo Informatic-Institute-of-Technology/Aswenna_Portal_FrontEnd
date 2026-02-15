@@ -101,7 +101,6 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
     return Math.round(totalProgress / project.milestones.length);
   }, [project]);
 
-  // Auto-generate notifications based on project data analysis
   const notifications = useMemo(() => {
     if (!project) return [];
 
@@ -132,13 +131,11 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
       });
     };
 
-    // Analyze payments for overdue and paid status
     if (project.payments) {
       project.payments.forEach((payment) => {
         const dueDate = new Date(payment.dueDate);
         const daysDiff = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
-        // Critical: Overdue payments
         if (payment.status === 'pending' && daysDiff < 0) {
           notifs.push({
             id: `overdue-${payment.id}`,
@@ -149,7 +146,6 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
             timestamp: payment.dueDate,
           });
         }
-        // Warning: Payment due soon (within 7 days)
         else if (payment.status === 'pending' && daysDiff >= 0 && daysDiff <= 7) {
           notifs.push({
             id: `due-soon-${payment.id}`,
@@ -160,7 +156,6 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
             timestamp: payment.dueDate,
           });
         }
-        // Success: Recently paid payments (within last 7 days)
         else if (payment.status === 'paid' && payment.paidDate) {
           const paidDate = new Date(payment.paidDate);
           const daysSincePaid = Math.ceil((today.getTime() - paidDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -179,13 +174,11 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
       });
     }
 
-    // Analyze milestones for delays
     if (project.milestones) {
       project.milestones.forEach((milestone) => {
         const endDate = new Date(milestone.endDate);
         const daysDiff = Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
-        // Critical: Delayed milestones
         if (milestone.status === 'delayed') {
           notifs.push({
             id: `delayed-${milestone.id}`,
@@ -207,7 +200,6 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
             timestamp: milestone.endDate,
           });
         }
-        // Success: Recently completed milestones
         else if (milestone.status === 'completed' && milestone.completedDate) {
           const completedDate = new Date(milestone.completedDate);
           const daysSinceCompleted = Math.ceil((today.getTime() - completedDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -226,7 +218,6 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
       });
     }
 
-    // Sort by priority: critical > warning > success > info, then by date
     const priorityOrder = { critical: 0, warning: 1, success: 2, info: 3 };
     return notifs.sort((a, b) => {
       if (priorityOrder[a.type] !== priorityOrder[b.type]) {
@@ -491,7 +482,6 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                         {project.expectedROI}%
                       </Typography>
                     </Box>
-                    {/* Investment Type & Commission Info - Inline Display */}
                     {project.investmentType && (
                       <>
                         <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)', my: 1 }} />
@@ -500,7 +490,6 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                             INVESTMENT DETAILS
                           </Typography>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-                            {/* Investment Type Badge */}
                             <Chip
                               icon={project.investmentType === 'harvest' ? <Agriculture sx={{ fontSize: 18 }} /> : <BusinessCenter sx={{ fontSize: 18 }} />}
                               label={project.investmentType === 'harvest' ? 'Harvest-Based' : 'Commission-Based'}
@@ -514,7 +503,6 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                               }}
                             />
 
-                            {/* Commission Rate & Earned Amount - Inline */}
                             {project.investmentType === 'commission' && project.commissionRate && (
                               <>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -558,7 +546,6 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                                       </Box>
                                     </Box>
 
-                                    {/* Net Income Calculation for Commission-Based Projects */}
                                     {project.investorAmount && (
                                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                         <Typography variant="caption" color="rgba(255,255,255,0.5)">
@@ -658,7 +645,6 @@ const ProjectDetailsDialog = ({ open, onClose, project }: ProjectDetailsDialogPr
                 )}
               </Box>
 
-              {/* Notifications Section - Compact & Scrollable */}
               {notifications.length > 0 && (
                 <Box sx={{ mb: 3, p: 2.5, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.1)' }}>
                   <Typography variant="h6" color="white" gutterBottom fontWeight={600} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>

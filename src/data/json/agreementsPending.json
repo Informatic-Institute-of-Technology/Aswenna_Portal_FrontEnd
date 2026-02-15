@@ -1,0 +1,147 @@
+[
+  {
+    "id": "REQ-2023-894-FARMER",
+    "projectId": "PRJ-2023-894",
+    "partyType": "farmer",
+    "farmerName": "Dulan R.",
+    "farmerAvatar": null,
+    "farmerInitials": "DR",
+    "location": "Vegetable Farm • Nuwara Eliya",
+    "statusBadge": {
+      "label": "Action Required",
+      "variant": "action"
+    },
+    "tags": [
+      {
+        "label": "Farmer Agreement",
+        "variant": "primary"
+      },
+      {
+        "label": "3-Party Project",
+        "variant": "secondary"
+      }
+    ],
+    "description": "Farmer agreement pending. Waiting for signed contract from farmer to proceed with cultivation project.",
+    "timestamp": "Approved: Yesterday",
+    "journeySteps": [
+      {
+        "title": "Farmer Requested Job",
+        "description": "Farmer submitted investment request",
+        "timestamp": "Oct 24, 10:30 AM",
+        "status": "completed"
+      },
+      {
+        "title": "Investor Accepted Connection",
+        "description": "You accepted farmer's request",
+        "timestamp": "Oct 24, 11:15 AM",
+        "status": "completed"
+      },
+      {
+        "title": "Landowner Connection",
+        "description": "Requested & approved by landowner",
+        "timestamp": "Oct 24, 02:30 PM",
+        "status": "completed"
+      },
+      {
+        "title": "3-Party Connected",
+        "description": "Farmer, Investor, Landowner linked",
+        "timestamp": "Oct 24, 02:35 PM",
+        "status": "completed"
+      },
+      {
+        "title": "Farmer Agreement Upload",
+        "description": "Waiting for farmer's signed contract",
+        "status": "active",
+        "icon": "upload_file"
+      },
+      {
+        "title": "Investor Approval",
+        "description": "Pending your project start approval",
+        "status": "pending"
+      },
+      {
+        "title": "Project Started",
+        "description": "Cultivation begins",
+        "status": "pending"
+      }
+    ],
+    "insight": "Farmer has 98% success rate. Landowner agreement already submitted. Waiting for farmer's contract.",
+    "highlighted": true
+  },
+  {
+    "id": "REQ-2023-894-LANDOWNER",
+    "projectId": "PRJ-2023-894",
+    "partyType": "landowner",
+    "farmerName": "Saman Wickramasinghe (Landowner)",
+    "farmerAvatar": null,
+    "farmerInitials": "SW",
+    "location": "Land Plot #456 • Nuwara Eliya",
+    "statusBadge": {
+      "label": "Completed",
+      "variant": "pending"
+    },
+    "tags": [
+      {
+        "label": "Landowner Agreement",
+        "variant": "primary"
+      },
+      {
+        "label": "3-Party Project",
+        "variant": "secondary"
+      }
+    ],
+    "description": "Landowner agreement submitted. Documents under review. Project linked to Dulan R. (Farmer).",
+    "timestamp": "Submitted: Yesterday",
+    "journeySteps": [
+      {
+        "title": "Farmer Requested Job",
+        "description": "Initial request from Dulan R.",
+        "timestamp": "Oct 24, 10:30 AM",
+        "status": "completed"
+      },
+      {
+        "title": "Investor Accepted Farmer",
+        "description": "You accepted farmer connection",
+        "timestamp": "Oct 24, 11:15 AM",
+        "status": "completed"
+      },
+      {
+        "title": "Investor Requested Landowner",
+        "description": "You sent request to landowner",
+        "timestamp": "Oct 24, 01:00 PM",
+        "status": "completed"
+      },
+      {
+        "title": "Landowner Accepted Request",
+        "description": "Landowner approved connection",
+        "timestamp": "Oct 24, 02:30 PM",
+        "status": "completed"
+      },
+      {
+        "title": "3-Party Connected",
+        "description": "All parties successfully linked",
+        "timestamp": "Oct 24, 02:35 PM",
+        "status": "completed"
+      },
+      {
+        "title": "Landowner Agreement Submitted",
+        "description": "Contract documents uploaded",
+        "timestamp": "Oct 25, 09:00 AM",
+        "status": "completed"
+      },
+      {
+        "title": "Investor Approval",
+        "description": "Pending your project start approval",
+        "status": "active",
+        "icon": "check_circle"
+      },
+      {
+        "title": "Project Started",
+        "description": "Cultivation begins",
+        "status": "pending"
+      }
+    ],
+    "insight": "Landowner contract verified. 2.5 acres approved. Waiting for farmer agreement to proceed.",
+    "highlighted": false
+  }
+]

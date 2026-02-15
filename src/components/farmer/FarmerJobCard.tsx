@@ -42,7 +42,6 @@ const FarmerJobCard: React.FC<FarmerJobCardProps> = ({ job, onViewMore, onConnec
     ? (harvestJob.investmentSecured / harvestJob.totalInvestmentRequired) * 100
     : 0;
 
-  // For Commission Jobs - render modern card design
   if (!isHarvestCapital && commissionJob) {
     return (
       <Box
@@ -52,7 +51,6 @@ const FarmerJobCard: React.FC<FarmerJobCardProps> = ({ job, onViewMore, onConnec
           pt: 8,
         }}
       >
-        {/* Avatar positioned above card - PLACEHOLDER STYLE */}
         <Box
           sx={{
             position: 'absolute',
@@ -78,7 +76,6 @@ const FarmerJobCard: React.FC<FarmerJobCardProps> = ({ job, onViewMore, onConnec
               }
             }}
           >
-            {/* Avatar with Image Support */}
             <Avatar
               src={job.farmerImage}
               alt={job.farmerName}
@@ -100,13 +97,12 @@ const FarmerJobCard: React.FC<FarmerJobCardProps> = ({ job, onViewMore, onConnec
           </Box>
         </Box>
 
-        {/* Card - SAME BACKGROUND AS INVESTMENT CARD */}
         <Card
           sx={{
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
-            background: 'linear-gradient(135deg, #1e2a35 0%, #1a1f28 100%)',
+            background: 'linear-gradient(145deg, #2a2a2a 0%, #1f1f1f 100%)',
             border: '1px solid rgba(255,255,255,0.05)',
             borderRadius: 3,
             transition: 'all 0.3s ease',

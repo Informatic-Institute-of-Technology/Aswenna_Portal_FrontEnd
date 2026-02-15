@@ -5,6 +5,5 @@ export { default as InvestmentRequestDialog } from './InvestmentRequestDialog';
 export { default as LocationMapDialog } from './LocationMapDialog';
 export { default as OfferCard } from './OfferCard';
 export type { OfferCardProps } from './OfferCard';
-export { default as OfferCardNew } from './OfferCardNew';
 export { default as ProjectDetailsDialog } from './ProjectDetailsDialog';
 
