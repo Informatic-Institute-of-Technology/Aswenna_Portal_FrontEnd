@@ -726,7 +726,7 @@
         "type": "expense"
       },
       {
-        "category": "💰 Commission Income (12% Rate)",
+        "category": "Commission Income (12% Rate)",
         "amount": 38400,
         "type": "commission"
       }

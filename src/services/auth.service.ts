@@ -1,4 +1,4 @@
-import type { User, UserRole, SignUpData } from "@/Context/createAuthContext";
+import type { User, UserRole } from "@/Context/createAuthContext";
 import { decryptToken } from "@/utils";
 import { httpClient } from "./httpClient";
 
@@ -11,12 +11,6 @@ export interface LoginResponse {
   access_token: string;
   expires_in: number;
   token_type: string;
-}
-
-export interface SignUpResponse {
-  message: string;
-  userId?: string;
-  success: boolean;
 }
 
 export interface UserApiResponse {
@@ -122,36 +116,6 @@ class AuthService {
     localStorage.setItem("user", JSON.stringify(userData));
 
     return userData;
-  }
-
-  /**
-   * Register a new user
-   */
-  async signup(data: SignUpData): Promise<SignUpResponse> {
-    console.log("=== Authentication Service: Signup ===");
-    console.log("Request data:", { email: data.email, role: data.role });
-
-    const signupPayload = {
-      email: data.email,
-      password: data.password,
-      fullName: data.name,
-      role: data.role,
-      nationalId: data.nationalId || null,
-      address: data.address || null,
-      phoneNumber: data.contactNumber || null,
-      province: data.province || null,
-      district: data.district || null,
-    };
-
-    const response = await httpClient.post<SignUpResponse>(
-      "/auth/register",
-      signupPayload,
-    );
-
-    console.log("=== Signup API Response ===");
-    console.log("Response:", response);
-
-    return response;
   }
 
   /**

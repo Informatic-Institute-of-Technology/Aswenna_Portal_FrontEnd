@@ -3,7 +3,6 @@ import { useLocation } from 'react-router-dom';
 
 const pageTitles: Record<string, string> = {
   '/login': 'Login',
-  '/signup': 'Sign Up',
   '/dashboard': 'Dashboard',
   '/dashboard/my-projects': 'My Projects',
   '/dashboard/investors': 'Investors',
