@@ -1,0 +1,104 @@
+[
+  {
+    "id": "lp-001",
+    "status": "active",
+    "alertCount": 1,
+    "projectName": "Premium Rice Cultivation",
+    "cropType": "Rice (Nadu)",
+    "budget": 250500,
+    "roi": 28,
+    "roiLabel": "EXPECTED ROI",
+    "progress": 74,
+    "startedDate": "2025-11-15",
+    "expectedEndDate": "2026-04-30",
+    "backgroundImage": "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=1200&q=80",
+    "farmer": {
+      "name": "Kamal Perera",
+      "role": "Farmer",
+      "location": "Anuradhapura",
+      "avatar": "https://i.pravatar.cc/100?img=12"
+    },
+    "investor": {
+      "name": "D. G. Silva",
+      "role": "Investor",
+      "location": "Anuradhapura",
+      "avatar": "https://i.pravatar.cc/100?img=18"
+    }
+  },
+  {
+    "id": "lp-002",
+    "status": "active",
+    "alertCount": 2,
+    "projectName": "Organic Vegetable Farm",
+    "cropType": "Mixed Vegetables",
+    "budget": 180000,
+    "roi": 15,
+    "roiLabel": "CALCULATED ROI",
+    "progress": 46,
+    "startedDate": "2025-12-01",
+    "expectedEndDate": "2026-03-15",
+    "backgroundImage": "https://images.unsplash.com/photo-1592982537447-6f2a6a0b8f56?auto=format&fit=crop&w=1200&q=80",
+    "farmer": {
+      "name": "Sunil Fernando",
+      "role": "Farmer",
+      "location": "Nuwara Eliya",
+      "avatar": "https://i.pravatar.cc/100?img=15"
+    },
+    "investor": {
+      "name": "Wasantha Munasinghe",
+      "role": "Investor",
+      "location": "Nuwara Eliya",
+      "avatar": "https://i.pravatar.cc/100?img=20"
+    }
+  },
+  {
+    "id": "lp-003",
+    "status": "completed",
+    "projectName": "Coconut Plantation",
+    "cropType": "King Coconut",
+    "budget": 320000,
+    "roi": 21,
+    "roiLabel": "CALCULATED ROI",
+    "progress": 100,
+    "startedDate": "2025-01-08",
+    "expectedEndDate": "2025-10-22",
+    "backgroundImage": "https://images.unsplash.com/photo-1615811361523-6bd03d7748e7?auto=format&fit=crop&w=1200&q=80",
+    "farmer": {
+      "name": "Chamara Silva",
+      "role": "Farmer",
+      "location": "Kurunegala",
+      "avatar": "https://i.pravatar.cc/100?img=30"
+    },
+    "investor": {
+      "name": "Lasantha Jayarathne",
+      "role": "Investor",
+      "location": "Kurunegala",
+      "avatar": "https://i.pravatar.cc/100?img=34"
+    }
+  },
+  {
+    "id": "lp-004",
+    "status": "completed",
+    "projectName": "Spice Garden",
+    "cropType": "Cinnamon & Pepper",
+    "budget": 275000,
+    "roi": 19,
+    "roiLabel": "EXPECTED ROI",
+    "progress": 100,
+    "startedDate": "2025-02-10",
+    "expectedEndDate": "2025-11-28",
+    "backgroundImage": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=1200&q=80",
+    "farmer": {
+      "name": "Nimal Jayasinghe",
+      "role": "Farmer",
+      "location": "Matale",
+      "avatar": "https://i.pravatar.cc/100?img=41"
+    },
+    "investor": {
+      "name": "K. Karunarathne",
+      "role": "Investor",
+      "location": "Matale",
+      "avatar": "https://i.pravatar.cc/100?img=46"
+    }
+  }
+]

@@ -11,6 +11,7 @@ import {
   People,
   Search,
   Settings,
+  ShoppingBag,
 } from '@mui/icons-material';
 import {
   Avatar,
@@ -31,14 +32,47 @@ const LandOwnerSidebar = () => {
   const navigate = useNavigate();
 
   const menuItems = [
-    { text: 'Dashboard', icon: <Home />, path: '/dashboard' },
-    { text: 'My Land Ads', icon: <Landscape />, path: '/dashboard/my-land-ads' },
-    { text: 'Received Requests', icon: <Description />, path: '/dashboard/received-requests' },
-    { text: 'Tenant Search', icon: <Search />, path: '/dashboard/tenant-search' },
-    { text: 'Land Analysis', icon: <BarChartIcon />, path: '/dashboard/land-analysis' },
-    { text: 'Income Tracker', icon: <AttachMoney />, path: '/dashboard/income-tracker' },
-    { text: 'Soil & Weather', icon: <Cloud />, path: '/dashboard/soil-weather' },
-    { text: 'Tenant Management', icon: <People />, path: '/dashboard/tenant-management' },
+    { text: "Dashboard", icon: <Home />, path: "/dashboard" },
+    {
+      text: "My Land Ads",
+      icon: <Landscape />,
+      path: "/dashboard/my-land-ads",
+    },
+    {
+      text: "Received Requests",
+      icon: <Description />,
+      path: "/dashboard/received-requests",
+    },
+    {
+      text: "My Projects",
+      icon: <ShoppingBag />,
+      path: "/dashboard/my-projects",
+    },
+    {
+      text: "Tenant Search",
+      icon: <Search />,
+      path: "/dashboard/tenant-search",
+    },
+    {
+      text: "Land Analysis",
+      icon: <BarChartIcon />,
+      path: "/dashboard/land-analysis",
+    },
+    {
+      text: "Income Tracker",
+      icon: <AttachMoney />,
+      path: "/dashboard/income-tracker",
+    },
+    {
+      text: "Soil & Weather",
+      icon: <Cloud />,
+      path: "/dashboard/soil-weather",
+    },
+    {
+      text: "Tenant Management",
+      icon: <People />,
+      path: "/dashboard/tenant-management",
+    },
   ];
 
   const secondaryItems = [

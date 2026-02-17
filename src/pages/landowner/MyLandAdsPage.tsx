@@ -30,20 +30,6 @@ const fieldStyle = {
   },
 };
 
-const selectFieldStyle = {
-  ...fieldStyle,
-  "& .MuiSelect-select": {
-    padding: "8px 0",
-  },
-  // "& .MuiSelect-select.MuiSelect-select": {
-  //   color: "#e0e0e0",
-  // },
-  // "& .MuiInputBase-input::placeholder": {
-  //   color: "#888",
-  //   opacity: 1,
-  // },
-};
-
 const Label = ({ text }: { text: string }) => (
   <Box sx={{ color: "#fff", fontSize: "14px", fontWeight: 500, mb: "6px" }}>
     {text}
