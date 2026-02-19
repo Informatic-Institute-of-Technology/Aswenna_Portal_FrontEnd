@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = "https://burt-superwise-indispensably.ngrok-free.dev/api";
 
 export class HttpClient {
   private baseURL: string;
@@ -9,7 +9,8 @@ export class HttpClient {
 
   private getAuthHeaders(): HeadersInit {
     const headers: HeadersInit = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "true",
     };
 
     return headers;
@@ -22,7 +23,9 @@ export class HttpClient {
       if (data.message && (Array.isArray(data.message) || data.error)) {
         throw new Error(JSON.stringify(data));
       }
-      throw new Error(data.message || `HTTP ${response.status}: ${response.statusText}`);
+      throw new Error(
+        data.message || `HTTP ${response.status}: ${response.statusText}`,
+      );
     }
 
     return data;
@@ -30,7 +33,7 @@ export class HttpClient {
 
   async get<T>(endpoint: string): Promise<T> {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
-      method: 'GET',
+      method: "GET",
       headers: this.getAuthHeaders(),
     });
 
@@ -39,7 +42,7 @@ export class HttpClient {
 
   async post<T>(endpoint: string, data?: unknown): Promise<T> {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
-      method: 'POST',
+      method: "POST",
       headers: this.getAuthHeaders(),
       body: JSON.stringify(data),
     });
@@ -49,7 +52,7 @@ export class HttpClient {
 
   async put<T>(endpoint: string, data?: unknown): Promise<T> {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: this.getAuthHeaders(),
       body: JSON.stringify(data),
     });
@@ -59,7 +62,7 @@ export class HttpClient {
 
   async patch<T>(endpoint: string, data?: unknown): Promise<T> {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
-      method: 'PATCH',
+      method: "PATCH",
       headers: this.getAuthHeaders(),
       body: JSON.stringify(data),
     });
@@ -69,7 +72,7 @@ export class HttpClient {
 
   async delete<T>(endpoint: string): Promise<T> {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: this.getAuthHeaders(),
     });
 

@@ -30,7 +30,6 @@ import ActiveProjectsMonitoring from "./admin/ActiveProjectsMonitoring";
 import GlobalPaymentLedger from "./admin/GlobalPaymentLedger";
 import GlobalUserManagement from "./admin/GlobalUserManagement";
 import SystemActivityLog from "./admin/SystemActivityLog";
-
 function AppRoutes() {
   usePageTitle();
 
