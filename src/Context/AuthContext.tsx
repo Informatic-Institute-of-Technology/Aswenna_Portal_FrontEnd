@@ -1,30 +1,85 @@
+import { authService } from "@/services";
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { User } from "./createAuthContext";
 import { AuthContext } from "./createAuthContext";
-import { authService } from "@/services";
+
+const ACTIVITY_EVENTS: (keyof WindowEventMap)[] = [
+  "mousedown",
+  "mousemove",
+  "keydown",
+  "scroll",
+  "touchstart",
+  "click",
+];
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      try {
-        return JSON.parse(storedUser);
-      } catch (error) {
-        console.error("Failed to parse stored user:", error);
-        localStorage.removeItem("user");
-        return null;
+  const [user, setUser] = useState<User | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const expiryTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const handleActivity = useCallback(() => {
+    authService.touchIdleTimer();
+  }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    let lastTouch = 0;
+    const throttled = () => {
+      const now = Date.now();
+      if (now - lastTouch > 1000) {
+        lastTouch = now;
+        handleActivity();
       }
-    }
-    return null;
-  });
-  const [loading, setLoading] = useState(false);
+    };
+
+    ACTIVITY_EVENTS.forEach((evt) =>
+      window.addEventListener(evt, throttled, { passive: true }),
+    );
+    return () => {
+      ACTIVITY_EVENTS.forEach((evt) =>
+        window.removeEventListener(evt, throttled),
+      );
+    };
+  }, [user, handleActivity]);
+
+  useEffect(() => {
+    authService
+      .restoreSession()
+      .then((result) => {
+        if (result) {
+          setUser(result.user);
+          setSessionId(result.sessionId);
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (expiryTimerRef.current) clearInterval(expiryTimerRef.current);
+    if (!user) return;
+
+    expiryTimerRef.current = setInterval(() => {
+      if (authService.isSessionExpired()) {
+        console.log("Session expired (absolute or idle). Logging out.");
+        handleLogout();
+      }
+    }, 30_000);
+
+    return () => {
+      if (expiryTimerRef.current) clearInterval(expiryTimerRef.current);
+    };
+  }, [user]);
 
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {
       const userData = await authService.login({ email, password });
       setUser(userData);
+      setSessionId(authService.getSessionId());
     } catch (error) {
       console.error("Login error:", error);
       throw error;
@@ -33,19 +88,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const logout = () => {
+  const handleLogout = () => {
     authService.logout();
     setUser(null);
-    localStorage.removeItem("user");
+    setSessionId(null);
   };
 
-  const updateUser = (updatedUser: User) => {
+  const updateUser = async (updatedUser: User) => {
     setUser(updatedUser);
-    localStorage.setItem("user", JSON.stringify(updatedUser));
+    await authService.updateSessionUser(updatedUser);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, updateUser }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        sessionId,
+        loading,
+        login,
+        logout: handleLogout,
+        updateUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

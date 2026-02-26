@@ -1,6 +1,5 @@
-import DashboardLayout from "@/layouts/DashboardLayout";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ChatIcon from "@mui/icons-material/Chat";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
 import StarIcon from "@mui/icons-material/Star";
 import VerifiedIcon from "@mui/icons-material/Verified";
@@ -178,7 +177,7 @@ const ReceivedRequestsPage = () => {
   const selectedCurrency = selectedRequest?.financials.currency ?? "LKR";
 
   return (
-    <DashboardLayout>
+    <>
       <Box className="container-fluid" sx={{ mb: 4 }}>
         <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
           Received Requests
@@ -419,7 +418,7 @@ const ReceivedRequestsPage = () => {
           </>
         )}
       </Dialog>
-    </DashboardLayout>
+    </>
   );
 };
 

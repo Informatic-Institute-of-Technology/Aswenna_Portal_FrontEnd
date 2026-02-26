@@ -1,22 +1,17 @@
+import { CardHeaderWithIcon, PlaceholderWidget, StatCard } from "@/components";
 import {
-    CardHeaderWithIcon,
-    PlaceholderWidget,
-    StatCard,
-} from '@/components';
-import DashboardLayout from '@/layouts/DashboardLayout';
-import {
-    AttachMoney,
-    BarChart as BarChartIcon,
-    Cloud,
-    Home,
-    LocationOn,
-} from '@mui/icons-material';
-import { Card, CardContent, Chip } from '@mui/material';
+  AttachMoney,
+  BarChart as BarChartIcon,
+  Cloud,
+  Home,
+  LocationOn,
+} from "@mui/icons-material";
+import { Card, CardContent, Chip } from "@mui/material";
 
 const LandOwnerDashboard = () => {
   return (
-    <DashboardLayout>
-      <div className="row g-3" style={{ marginBottom: '1.5rem' }}>
+    <>
+      <div className="row g-3" style={{ marginBottom: "1.5rem" }}>
         <div className="col-12 col-sm-6 col-md-4">
           <StatCard
             icon={Home}
@@ -62,7 +57,10 @@ const LandOwnerDashboard = () => {
 
         <div className="col-12 col-lg-6">
           <Card>
-            <CardHeaderWithIcon icon={AttachMoney} title="Income / Rental Tracker" />
+            <CardHeaderWithIcon
+              icon={AttachMoney}
+              title="Income / Rental Tracker"
+            />
             <CardContent>
               <PlaceholderWidget
                 icon="💵"
@@ -103,7 +101,7 @@ const LandOwnerDashboard = () => {
           </Card>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

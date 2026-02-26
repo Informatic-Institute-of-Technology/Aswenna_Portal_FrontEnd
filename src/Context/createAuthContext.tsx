@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-export type UserRole = 'farmer' | 'investor' | 'landowner' | 'superadmin';
+export type UserRole = "farmer" | "investor" | "landowner" | "superadmin";
 
 export interface User {
   _id: string | null;
@@ -25,10 +25,11 @@ export interface User {
 
 export interface AuthContextType {
   user: User | null;
+  sessionId: string | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  updateUser: (user: User) => void;
+  updateUser: (user: User) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(

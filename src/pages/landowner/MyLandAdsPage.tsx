@@ -11,7 +11,6 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import DashboardLayout from "@/layouts/DashboardLayout";
 import CreateAdPopup from "../../components/landowner/CreateAdPopup";
 
 interface LandAd {
@@ -110,7 +109,7 @@ const MyLandAdsPage = () => {
   };
 
   return (
-    <DashboardLayout>
+    <>
       <Box className="container-fluid" sx={{ mb: 4 }}>
         <div className="row align-items-start">
           <div className="col-12 col-lg-8">
@@ -349,7 +348,7 @@ const MyLandAdsPage = () => {
       </section>
 
       <CreateAdPopup open={open} onClose={() => setOpen(false)} />
-    </DashboardLayout>
+    </>
   );
 };
 
