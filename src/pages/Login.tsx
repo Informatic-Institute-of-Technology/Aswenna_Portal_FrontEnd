@@ -40,11 +40,13 @@ const Login = () => {
 
     try {
       await login(email, password);
-      navigate("/dashboard");
+      const sid = localStorage.getItem("session_id");
+      navigate(`/${sid}/dashboard`);
     } catch (err) {
-      const errorMsg = err instanceof Error && err.message
-        ? err.message
-        : "Invalid credentials. Please try again.";
+      const errorMsg =
+        err instanceof Error && err.message
+          ? err.message
+          : "Invalid credentials. Please try again.";
       setError(errorMsg);
       showError(errorMsg);
     }
@@ -139,7 +141,6 @@ const Login = () => {
           </div>
         </div>
 
-        {/* Right side - Illustration */}
         <div className="right-container">
           <img
             src={loginImage}
@@ -149,7 +150,6 @@ const Login = () => {
         </div>
       </div>
 
-      {/* Notification for errors - Auto-closes after 5 seconds */}
       <Notification
         open={notification.open}
         message={notification.message}

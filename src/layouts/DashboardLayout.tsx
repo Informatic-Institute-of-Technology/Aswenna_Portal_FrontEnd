@@ -1,13 +1,27 @@
-import { useAuth } from '@/Context/useAuth';
-import { Mail, Notifications } from '@mui/icons-material';
-import { Badge, Box, Container, Drawer, IconButton, Toolbar, Typography } from '@mui/material';
-import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
-import LoadingAnimation from '../components/common/LoadingAnimation';
-import { FarmerSidebar, InvestorSidebar, LandOwnerSidebar, SuperAdminSidebar } from './sidebars';
+import { useAuth } from "@/Context/useAuth";
+import { Mail, Notifications } from "@mui/icons-material";
+import {
+  Badge,
+  Box,
+  Container,
+  Drawer,
+  IconButton,
+  Toolbar,
+  Typography,
+} from "@mui/material";
+import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
+import { Outlet } from "react-router-dom";
+import LoadingAnimation from "../components/common/LoadingAnimation";
+import {
+  FarmerSidebar,
+  InvestorSidebar,
+  LandOwnerSidebar,
+  SuperAdminSidebar,
+} from "./sidebars";
 
 interface DashboardLayoutProps {
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 const drawerWidth = 280;
@@ -25,42 +39,42 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
   const renderSidebar = () => {
     switch (user?.role) {
-      case 'farmer':
+      case "farmer":
         return <FarmerSidebar />;
-      case 'investor':
+      case "investor":
         return <InvestorSidebar />;
-      case 'landowner':
+      case "landowner":
         return <LandOwnerSidebar />;
-      case 'superadmin':
+      case "superadmin":
         return <SuperAdminSidebar />;
     }
   };
 
   const getDashboardTitle = () => {
     switch (user?.role) {
-      case 'farmer':
-        return 'Farmer Dashboard';
-      case 'investor':
-        return 'Investor Dashboard';
-      case 'landowner':
-        return 'Land Owner Dashboard';
-      case 'superadmin':
-        return 'Super Admin Dashboard';
+      case "farmer":
+        return "Farmer Dashboard";
+      case "investor":
+        return "Investor Dashboard";
+      case "landowner":
+        return "Land Owner Dashboard";
+      case "superadmin":
+        return "Super Admin Dashboard";
       default:
-        return 'Dashboard';
+        return "Dashboard";
     }
   };
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+    <Box sx={{ display: "flex", minHeight: "100vh" }}>
       <Drawer
         variant="permanent"
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          '& .MuiDrawer-paper': {
+          "& .MuiDrawer-paper": {
             width: drawerWidth,
-            boxSizing: 'border-box',
+            boxSizing: "border-box",
           },
         }}
       >
@@ -79,23 +93,29 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           sx={{
             px: { xs: 2, sm: 3 },
             mb: 3,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderBottom: '1px solid',
-            borderColor: 'divider',
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            borderBottom: "1px solid",
+            borderColor: "divider",
           }}
         >
           <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>
             {getDashboardTitle()}
           </Typography>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <IconButton color="inherit" sx={{ border: '1px solid', borderColor: 'divider' }}>
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <IconButton
+              color="inherit"
+              sx={{ border: "1px solid", borderColor: "divider" }}
+            >
               <Badge badgeContent={3} color="error">
                 <Mail />
               </Badge>
             </IconButton>
-            <IconButton color="inherit" sx={{ border: '1px solid', borderColor: 'divider' }}>
+            <IconButton
+              color="inherit"
+              sx={{ border: "1px solid", borderColor: "divider" }}
+            >
               <Badge badgeContent={5} color="error">
                 <Notifications />
               </Badge>
@@ -108,7 +128,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             <LoadingAnimation message="Loading Dashboard..." />
           </Container>
         ) : (
-          children
+          (children ?? <Outlet />)
         )}
       </Box>
     </Box>

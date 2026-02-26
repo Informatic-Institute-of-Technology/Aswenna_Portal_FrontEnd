@@ -1,3 +1,5 @@
+import { getAuthHeader, getCsrfToken } from './tokenStore';
+
 const API_BASE_URL = 'http://localhost:3000/api';
 
 export class HttpClient {
@@ -7,10 +9,24 @@ export class HttpClient {
     this.baseURL = baseURL;
   }
 
-  private getAuthHeaders(): HeadersInit {
-    const headers: HeadersInit = {
+  private getAuthHeaders(includeCsrf = false): HeadersInit {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',   
+      'Cache-Control': 'no-store',         
     };
+
+    const authHeader = getAuthHeader();
+    if (authHeader) {
+      headers['Authorization'] = authHeader;
+    }
+
+    if (includeCsrf) {
+      const csrf = getCsrfToken();
+      if (csrf) {
+        headers['X-CSRF-Token'] = csrf;
+      }
+    }
 
     return headers;
   }
@@ -32,6 +48,7 @@ export class HttpClient {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
       method: 'GET',
       headers: this.getAuthHeaders(),
+      credentials: 'same-origin',
     });
 
     return this.handleResponse<T>(response);
@@ -40,8 +57,9 @@ export class HttpClient {
   async post<T>(endpoint: string, data?: unknown): Promise<T> {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
       method: 'POST',
-      headers: this.getAuthHeaders(),
+      headers: this.getAuthHeaders(true),
       body: JSON.stringify(data),
+      credentials: 'same-origin',
     });
 
     return this.handleResponse<T>(response);
@@ -50,8 +68,9 @@ export class HttpClient {
   async put<T>(endpoint: string, data?: unknown): Promise<T> {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
       method: 'PUT',
-      headers: this.getAuthHeaders(),
+      headers: this.getAuthHeaders(true),
       body: JSON.stringify(data),
+      credentials: 'same-origin',
     });
 
     return this.handleResponse<T>(response);
@@ -60,8 +79,9 @@ export class HttpClient {
   async patch<T>(endpoint: string, data?: unknown): Promise<T> {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
       method: 'PATCH',
-      headers: this.getAuthHeaders(),
+      headers: this.getAuthHeaders(true),
       body: JSON.stringify(data),
+      credentials: 'same-origin',
     });
 
     return this.handleResponse<T>(response);
@@ -70,7 +90,8 @@ export class HttpClient {
   async delete<T>(endpoint: string): Promise<T> {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
       method: 'DELETE',
-      headers: this.getAuthHeaders(),
+      headers: this.getAuthHeaders(true),
+      credentials: 'same-origin',
     });
 
     return this.handleResponse<T>(response);

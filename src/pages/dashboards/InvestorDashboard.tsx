@@ -1,22 +1,17 @@
-import {
-  CardHeaderWithIcon,
-  PlaceholderWidget,
-  StatCard,
-} from '@/components';
-import DashboardLayout from '@/layouts/DashboardLayout';
+import { CardHeaderWithIcon, PlaceholderWidget, StatCard } from "@/components";
 import {
   AttachMoney,
   BarChart as BarChartIcon,
   Description,
   People,
   TrendingUp,
-} from '@mui/icons-material';
-import { Card, CardContent, Chip } from '@mui/material';
+} from "@mui/icons-material";
+import { Card, CardContent, Chip } from "@mui/material";
 
 const InvestorDashboard = () => {
   return (
-    <DashboardLayout>
-      <div className="row g-3" style={{ marginBottom: '1.5rem' }}>
+    <>
+      <div className="row g-3" style={{ marginBottom: "1.5rem" }}>
         <div className="col-12 col-sm-6 col-md-4">
           <StatCard
             icon={AttachMoney}
@@ -66,7 +61,10 @@ const InvestorDashboard = () => {
 
         <div className="col-12 col-lg-6">
           <Card>
-            <CardHeaderWithIcon icon={AttachMoney} title="Investment Portfolio" />
+            <CardHeaderWithIcon
+              icon={AttachMoney}
+              title="Investment Portfolio"
+            />
             <CardContent>
               <PlaceholderWidget
                 icon="💰"
@@ -79,7 +77,10 @@ const InvestorDashboard = () => {
 
         <div className="col-12 col-lg-6">
           <Card>
-            <CardHeaderWithIcon icon={TrendingUp} title="ROI & Market Analysis" />
+            <CardHeaderWithIcon
+              icon={TrendingUp}
+              title="ROI & Market Analysis"
+            />
             <CardContent>
               <PlaceholderWidget
                 icon="📈"
@@ -107,7 +108,7 @@ const InvestorDashboard = () => {
           </Card>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

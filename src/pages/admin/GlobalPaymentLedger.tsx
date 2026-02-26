@@ -1,216 +1,223 @@
-import { CardHeaderWithIcon } from '@/components';
-import DashboardLayout from '@/layouts/DashboardLayout';
-import type { Transaction } from '@/types/admin.types';
+import { CardHeaderWithIcon } from "@/components";
+import type { Transaction } from "@/types/admin.types";
 import {
-    AttachMoney,
-    CheckCircle,
-    Download,
-    Search,
-    Sync,
-    TrendingUp
-} from '@mui/icons-material';
+  AttachMoney,
+  CheckCircle,
+  Download,
+  Search,
+  Sync,
+  TrendingUp,
+} from "@mui/icons-material";
 import {
-    Box,
-    Button,
-    Card,
-    CardContent,
-    Chip,
-    FormControl, Grid, InputAdornment,
-    InputLabel,
-    MenuItem,
-    Paper,
-    Select,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TablePagination,
-    TableRow,
-    TextField,
-    Typography
-} from '@mui/material';
-import { useState } from 'react';
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  FormControl,
+  Grid,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { useState } from "react";
 
 const mockTransactions: Transaction[] = [
   {
-    id: '1',
-    transactionId: 'TXN-2026-00234',
-    type: 'payment',
-    payer: { id: 'INV-012', name: 'Green Future Investments', role: 'investor' },
-    payee: { id: 'FAR-089', name: 'Nimal Fernando', role: 'farmer' },
-    projectId: 'PRJ-045',
-    projectName: 'Rice Cultivation - Polonnaruwa',
+    id: "1",
+    transactionId: "TXN-2026-00234",
+    type: "payment",
+    payer: {
+      id: "INV-012",
+      name: "Green Future Investments",
+      role: "investor",
+    },
+    payee: { id: "FAR-089", name: "Nimal Fernando", role: "farmer" },
+    projectId: "PRJ-045",
+    projectName: "Rice Cultivation - Polonnaruwa",
     amount: 250000,
-    currency: 'LKR',
-    date: '2026-01-20T08:30:00',
-    status: 'completed',
-    paymentMethod: 'Bank Transfer',
-    description: 'Milestone 2 Payment - Land Preparation',
-    milestoneId: 'MIL-045-02',
-    milestoneName: 'Land Preparation',
+    currency: "LKR",
+    date: "2026-01-20T08:30:00",
+    status: "completed",
+    paymentMethod: "Bank Transfer",
+    description: "Milestone 2 Payment - Land Preparation",
+    milestoneId: "MIL-045-02",
+    milestoneName: "Land Preparation",
   },
   {
-    id: '2',
-    transactionId: 'TXN-2026-00233',
-    type: 'payment',
-    payer: { id: 'INV-034', name: 'Agri Ventures PLC', role: 'investor' },
-    payee: { id: 'FAR-102', name: 'Kamal Perera', role: 'farmer' },
-    projectId: 'PRJ-102',
-    projectName: 'Fruit Orchard - Matale',
+    id: "2",
+    transactionId: "TXN-2026-00233",
+    type: "payment",
+    payer: { id: "INV-034", name: "Agri Ventures PLC", role: "investor" },
+    payee: { id: "FAR-102", name: "Kamal Perera", role: "farmer" },
+    projectId: "PRJ-102",
+    projectName: "Fruit Orchard - Matale",
     amount: 500000,
-    currency: 'LKR',
-    date: '2026-01-19T14:15:00',
-    status: 'completed',
-    paymentMethod: 'Bank Transfer',
-    description: 'Initial Project Investment Payment',
+    currency: "LKR",
+    date: "2026-01-19T14:15:00",
+    status: "completed",
+    paymentMethod: "Bank Transfer",
+    description: "Initial Project Investment Payment",
   },
   {
-    id: '3',
-    transactionId: 'TXN-2026-00232',
-    type: 'payment',
-    payer: { id: 'FAR-156', name: 'Sunita Jayawardena', role: 'farmer' },
-    payee: { id: 'LND-042', name: 'Rathnayake Properties', role: 'landowner' },
-    projectId: 'PRJ-078',
-    projectName: 'Vegetable Farm - Kurunegala',
+    id: "3",
+    transactionId: "TXN-2026-00232",
+    type: "payment",
+    payer: { id: "FAR-156", name: "Sunita Jayawardena", role: "farmer" },
+    payee: { id: "LND-042", name: "Rathnayake Properties", role: "landowner" },
+    projectId: "PRJ-078",
+    projectName: "Vegetable Farm - Kurunegala",
     amount: 35000,
-    currency: 'LKR',
-    date: '2026-01-19T11:45:00',
-    status: 'completed',
-    paymentMethod: 'Mobile Payment',
-    description: 'Monthly Rent Payment',
+    currency: "LKR",
+    date: "2026-01-19T11:45:00",
+    status: "completed",
+    paymentMethod: "Mobile Payment",
+    description: "Monthly Rent Payment",
   },
   {
-    id: '4',
-    transactionId: 'TXN-2026-00231',
-    type: 'payment',
-    payer: { id: 'INV-089', name: 'AgroTech Investors', role: 'investor' },
-    payee: { id: 'FAR-089', name: 'Nimal Fernando', role: 'farmer' },
-    projectId: 'PRJ-045',
-    projectName: 'Rice Cultivation - Polonnaruwa',
+    id: "4",
+    transactionId: "TXN-2026-00231",
+    type: "payment",
+    payer: { id: "INV-089", name: "AgroTech Investors", role: "investor" },
+    payee: { id: "FAR-089", name: "Nimal Fernando", role: "farmer" },
+    projectId: "PRJ-045",
+    projectName: "Rice Cultivation - Polonnaruwa",
     amount: 200000,
-    currency: 'LKR',
-    date: '2026-01-18T16:20:00',
-    status: 'completed',
-    paymentMethod: 'Bank Transfer',
-    description: 'Milestone 1 Completion Payment',
-    milestoneId: 'MIL-045-01',
-    milestoneName: 'Site Survey',
+    currency: "LKR",
+    date: "2026-01-18T16:20:00",
+    status: "completed",
+    paymentMethod: "Bank Transfer",
+    description: "Milestone 1 Completion Payment",
+    milestoneId: "MIL-045-01",
+    milestoneName: "Site Survey",
   },
   {
-    id: '5',
-    transactionId: 'TXN-2026-00230',
-    type: 'platform_fee',
-    payer: { id: 'INV-012', name: 'Green Future Investments', role: 'investor' },
-    payee: { id: 'PLATFORM', name: 'Aswenna Platform', role: 'superadmin' },
-    projectId: 'PRJ-045',
-    projectName: 'Rice Cultivation - Polonnaruwa',
+    id: "5",
+    transactionId: "TXN-2026-00230",
+    type: "platform_fee",
+    payer: {
+      id: "INV-012",
+      name: "Green Future Investments",
+      role: "investor",
+    },
+    payee: { id: "PLATFORM", name: "Aswenna Platform", role: "superadmin" },
+    projectId: "PRJ-045",
+    projectName: "Rice Cultivation - Polonnaruwa",
     amount: 12500,
-    currency: 'LKR',
-    date: '2026-01-18T16:22:00',
-    status: 'completed',
-    description: 'Platform Service Fee (5%)',
+    currency: "LKR",
+    date: "2026-01-18T16:22:00",
+    status: "completed",
+    description: "Platform Service Fee (5%)",
   },
   {
-    id: '6',
-    transactionId: 'TXN-2026-00229',
-    type: 'payment',
-    payer: { id: 'INV-067', name: 'Smart Agri Investments', role: 'investor' },
-    payee: { id: 'FAR-234', name: 'Prasanna Silva', role: 'farmer' },
-    projectId: 'PRJ-133',
-    projectName: 'Coconut Plantation - Gampaha',
+    id: "6",
+    transactionId: "TXN-2026-00229",
+    type: "payment",
+    payer: { id: "INV-067", name: "Smart Agri Investments", role: "investor" },
+    payee: { id: "FAR-234", name: "Prasanna Silva", role: "farmer" },
+    projectId: "PRJ-133",
+    projectName: "Coconut Plantation - Gampaha",
     amount: 180000,
-    currency: 'LKR',
-    date: '2026-01-18T10:30:00',
-    status: 'pending',
-    paymentMethod: 'Bank Transfer',
-    description: 'Milestone 3 Payment - Planting',
+    currency: "LKR",
+    date: "2026-01-18T10:30:00",
+    status: "pending",
+    paymentMethod: "Bank Transfer",
+    description: "Milestone 3 Payment - Planting",
   },
   {
-    id: '7',
-    transactionId: 'TXN-2026-00228',
-    type: 'refund',
-    payer: { id: 'PLATFORM', name: 'Aswenna Platform', role: 'superadmin' },
-    payee: { id: 'INV-045', name: 'Investor Corp Ltd', role: 'investor' },
-    projectId: 'PRJ-067',
-    projectName: 'Tea Plantation - Nuwara Eliya',
+    id: "7",
+    transactionId: "TXN-2026-00228",
+    type: "refund",
+    payer: { id: "PLATFORM", name: "Aswenna Platform", role: "superadmin" },
+    payee: { id: "INV-045", name: "Investor Corp Ltd", role: "investor" },
+    projectId: "PRJ-067",
+    projectName: "Tea Plantation - Nuwara Eliya",
     amount: 75000,
-    currency: 'LKR',
-    date: '2026-01-17T09:15:00',
-    status: 'completed',
-    paymentMethod: 'Bank Transfer',
-    description: 'Partial Refund - Project Cancellation',
+    currency: "LKR",
+    date: "2026-01-17T09:15:00",
+    status: "completed",
+    paymentMethod: "Bank Transfer",
+    description: "Partial Refund - Project Cancellation",
   },
   {
-    id: '8',
-    transactionId: 'TXN-2026-00227',
-    type: 'payment',
-    payer: { id: 'FAR-089', name: 'Nimal Fernando', role: 'farmer' },
-    payee: { id: 'LND-023', name: 'Silva Estates', role: 'landowner' },
-    projectId: 'PRJ-045',
-    projectName: 'Rice Cultivation - Polonnaruwa',
+    id: "8",
+    transactionId: "TXN-2026-00227",
+    type: "payment",
+    payer: { id: "FAR-089", name: "Nimal Fernando", role: "farmer" },
+    payee: { id: "LND-023", name: "Silva Estates", role: "landowner" },
+    projectId: "PRJ-045",
+    projectName: "Rice Cultivation - Polonnaruwa",
     amount: 50000,
-    currency: 'LKR',
-    date: '2026-01-17T08:00:00',
-    status: 'failed',
-    paymentMethod: 'Bank Transfer',
-    description: 'Monthly Rent Payment - Failed',
+    currency: "LKR",
+    date: "2026-01-17T08:00:00",
+    status: "failed",
+    paymentMethod: "Bank Transfer",
+    description: "Monthly Rent Payment - Failed",
   },
 ];
 
-
-
 const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('en-LK', {
-    style: 'currency',
-    currency: 'LKR',
+  return new Intl.NumberFormat("en-LK", {
+    style: "currency",
+    currency: "LKR",
     minimumFractionDigits: 0,
   }).format(amount);
 };
 
 const formatDateTime = (dateString: string) => {
-  return new Date(dateString).toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+  return new Date(dateString).toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 };
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case 'completed':
-      return { backgroundColor: '#1b5e20', color: '#ffffff' };
-    case 'pending':
-      return { backgroundColor: '#f57c00', color: '#ffffff' };
-    case 'failed':
-      return { backgroundColor: '#c62828', color: '#ffffff' };
-    case 'disputed':
-      return { backgroundColor: '#c62828', color: '#ffffff' };
+    case "completed":
+      return { backgroundColor: "#1b5e20", color: "#ffffff" };
+    case "pending":
+      return { backgroundColor: "#f57c00", color: "#ffffff" };
+    case "failed":
+      return { backgroundColor: "#c62828", color: "#ffffff" };
+    case "disputed":
+      return { backgroundColor: "#c62828", color: "#ffffff" };
     default:
-      return { backgroundColor: '#757575', color: '#ffffff' };
+      return { backgroundColor: "#757575", color: "#ffffff" };
   }
 };
 
 const getTypeColor = (type: string) => {
   switch (type) {
-    case 'payment':
-      return { backgroundColor: '#1976d2', color: '#ffffff' };
-    case 'refund':
-      return { backgroundColor: '#ed6c02', color: '#ffffff' };
-    case 'platform_fee':
-      return { backgroundColor: '#9c27b0', color: '#ffffff' };
+    case "payment":
+      return { backgroundColor: "#1976d2", color: "#ffffff" };
+    case "refund":
+      return { backgroundColor: "#ed6c02", color: "#ffffff" };
+    case "platform_fee":
+      return { backgroundColor: "#9c27b0", color: "#ffffff" };
     default:
-      return { backgroundColor: '#757575', color: '#ffffff' };
+      return { backgroundColor: "#757575", color: "#ffffff" };
   }
 };
 
 const GlobalPaymentLedger = () => {
   const [transactions] = useState<Transaction[]>(mockTransactions);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [platformPage, setPlatformPage] = useState(0);
@@ -223,44 +230,46 @@ const GlobalPaymentLedger = () => {
       txn.payee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       txn.projectName?.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesStatus = statusFilter === 'all' || txn.status === statusFilter;
-    const matchesType = typeFilter === 'all' || txn.type === typeFilter;
+    const matchesStatus = statusFilter === "all" || txn.status === statusFilter;
+    const matchesType = typeFilter === "all" || txn.type === typeFilter;
 
     return matchesSearch && matchesStatus && matchesType;
   });
 
   const totalPayments = transactions.reduce(
-    (sum, txn) => (txn.type === 'payment' ? sum + txn.amount : sum),
-    0
+    (sum, txn) => (txn.type === "payment" ? sum + txn.amount : sum),
+    0,
   );
   const totalRefunds = transactions.reduce(
-    (sum, txn) => (txn.type === 'refund' ? sum + txn.amount : sum),
-    0
+    (sum, txn) => (txn.type === "refund" ? sum + txn.amount : sum),
+    0,
   );
   const totalProcessed = transactions.reduce(
-    (sum, txn) => (txn.status === 'completed' ? sum + txn.amount : sum),
-    0
+    (sum, txn) => (txn.status === "completed" ? sum + txn.amount : sum),
+    0,
   );
   const pendingTransactions = transactions.filter(
-    (txn) => txn.status === 'pending'
+    (txn) => txn.status === "pending",
   ).length;
 
   const platformTransactions = transactions.filter(
-    (txn) => txn.type === 'platform_fee' || txn.payee.id === 'PLATFORM'
+    (txn) => txn.type === "platform_fee" || txn.payee.id === "PLATFORM",
   );
 
   const totalPlatformEarnings = platformTransactions.reduce(
     (sum, txn) => sum + txn.amount,
-    0
+    0,
   );
 
   return (
-    <DashboardLayout>
+    <>
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
+              >
                 <AttachMoney color="primary" />
                 <Typography variant="body2" color="text.secondary">
                   Total Payments
@@ -275,7 +284,9 @@ const GlobalPaymentLedger = () => {
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
+              >
                 <Sync color="info" />
                 <Typography variant="body2" color="text.secondary">
                   Total Refunds
@@ -290,7 +301,9 @@ const GlobalPaymentLedger = () => {
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
+              >
                 <CheckCircle color="success" />
                 <Typography variant="body2" color="text.secondary">
                   Total Completed
@@ -305,7 +318,9 @@ const GlobalPaymentLedger = () => {
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
+              >
                 <TrendingUp color="warning" />
                 <Typography variant="body2" color="text.secondary">
                   Pending Transactions
@@ -321,41 +336,57 @@ const GlobalPaymentLedger = () => {
 
       {/* Platform Payments Overview */}
       <Card sx={{ mb: 3 }}>
-        <CardHeaderWithIcon
-          icon={AttachMoney}
-          title="Platform Payments"
-        />
+        <CardHeaderWithIcon icon={AttachMoney} title="Platform Payments" />
         <CardContent>
           <Grid container spacing={3}>
-
             <Grid size={{ xs: 12, md: 4 }}>
               <Card
                 sx={{
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  color: 'white',
-                  height: '100%',
+                  background:
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  color: "white",
+                  height: "100%",
                   minHeight: 280,
-                  position: 'relative',
-                  overflow: 'hidden',
+                  position: "relative",
+                  overflow: "hidden",
                   borderRadius: 3,
                 }}
               >
-                <CardContent sx={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <CardContent
+                  sx={{
+                    position: "relative",
+                    zIndex: 1,
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                  }}
+                >
                   {/* Card Header */}
                   <Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-                      <Typography variant="overline" sx={{ opacity: 0.9, letterSpacing: 1.5 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        mb: 4,
+                      }}
+                    >
+                      <Typography
+                        variant="overline"
+                        sx={{ opacity: 0.9, letterSpacing: 1.5 }}
+                      >
                         Aswenna
                       </Typography>
                       <Box
                         sx={{
                           width: 40,
                           height: 40,
-                          borderRadius: '50%',
-                          background: 'rgba(255, 255, 255, 0.2)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
+                          borderRadius: "50%",
+                          background: "rgba(255, 255, 255, 0.2)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
                         }}
                       >
                         <AttachMoney />
@@ -364,10 +395,17 @@ const GlobalPaymentLedger = () => {
 
                     {/* Total Amount */}
                     <Box sx={{ mb: 3 }}>
-                      <Typography variant="caption" sx={{ opacity: 0.8, display: 'block', mb: 1 }}>
+                      <Typography
+                        variant="caption"
+                        sx={{ opacity: 0.8, display: "block", mb: 1 }}
+                      >
                         Total Platform Earnings
                       </Typography>
-                      <Typography variant="h3" fontWeight={700} sx={{ letterSpacing: 1 }}>
+                      <Typography
+                        variant="h3"
+                        fontWeight={700}
+                        sx={{ letterSpacing: 1 }}
+                      >
                         {formatCurrency(totalPlatformEarnings)}
                       </Typography>
                     </Box>
@@ -375,21 +413,37 @@ const GlobalPaymentLedger = () => {
 
                   {/* Card Footer */}
                   <Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
                       <Box>
-                        <Typography variant="caption" sx={{ opacity: 0.7, display: 'block' }}>
+                        <Typography
+                          variant="caption"
+                          sx={{ opacity: 0.7, display: "block" }}
+                        >
                           Total Transactions
                         </Typography>
                         <Typography variant="h6" fontWeight={600}>
                           {platformTransactions.length}
                         </Typography>
                       </Box>
-                      <Box sx={{ textAlign: 'right' }}>
-                        <Typography variant="caption" sx={{ opacity: 0.7, display: 'block' }}>
+                      <Box sx={{ textAlign: "right" }}>
+                        <Typography
+                          variant="caption"
+                          sx={{ opacity: 0.7, display: "block" }}
+                        >
                           Completed
                         </Typography>
                         <Typography variant="h6" fontWeight={600}>
-                          {platformTransactions.filter((t) => t.status === 'completed').length}
+                          {
+                            platformTransactions.filter(
+                              (t) => t.status === "completed",
+                            ).length
+                          }
                         </Typography>
                       </Box>
                     </Box>
@@ -399,37 +453,36 @@ const GlobalPaymentLedger = () => {
                 {/* Decorative Background Elements */}
                 <Box
                   sx={{
-                    position: 'absolute',
+                    position: "absolute",
                     top: -50,
                     right: -50,
                     width: 200,
                     height: 200,
-                    borderRadius: '50%',
-                    background: 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: "50%",
+                    background: "rgba(255, 255, 255, 0.1)",
                   }}
                 />
                 <Box
                   sx={{
-                    position: 'absolute',
+                    position: "absolute",
                     bottom: -80,
                     left: -80,
                     width: 250,
                     height: 250,
-                    borderRadius: '50%',
-                    background: 'rgba(255, 255, 255, 0.05)',
+                    borderRadius: "50%",
+                    background: "rgba(255, 255, 255, 0.05)",
                   }}
                 />
               </Card>
             </Grid>
 
-
             <Grid size={{ xs: 12, md: 8 }}>
-              <Card variant="outlined" sx={{ height: '100%' }}>
+              <Card variant="outlined" sx={{ height: "100%" }}>
                 <CardContent>
                   <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
                     Transaction History
                   </Typography>
-                  
+
                   {platformTransactions.length > 0 ? (
                     <>
                       <TableContainer>
@@ -447,31 +500,51 @@ const GlobalPaymentLedger = () => {
                             {platformTransactions
                               .slice(
                                 platformPage * platformRowsPerPage,
-                                platformPage * platformRowsPerPage + platformRowsPerPage
+                                platformPage * platformRowsPerPage +
+                                  platformRowsPerPage,
                               )
                               .map((txn) => (
                                 <TableRow key={txn.id} hover>
                                   <TableCell>
-                                    <Typography variant="body2" fontWeight={600}>
+                                    <Typography
+                                      variant="body2"
+                                      fontWeight={600}
+                                    >
                                       {txn.transactionId}
                                     </Typography>
-                                    <Typography variant="caption" color="text.secondary">
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                    >
                                       {formatDateTime(txn.date)}
                                     </Typography>
                                   </TableCell>
                                   <TableCell>
-                                    <Typography variant="body2">{txn.payer.name}</Typography>
-                                    <Typography variant="caption" color="text.secondary">
+                                    <Typography variant="body2">
+                                      {txn.payer.name}
+                                    </Typography>
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                    >
                                       {txn.payer.role}
                                     </Typography>
                                   </TableCell>
                                   <TableCell>
-                                    <Typography variant="body2" noWrap sx={{ maxWidth: 150 }}>
-                                      {txn.projectName || '-'}
+                                    <Typography
+                                      variant="body2"
+                                      noWrap
+                                      sx={{ maxWidth: 150 }}
+                                    >
+                                      {txn.projectName || "-"}
                                     </Typography>
                                   </TableCell>
                                   <TableCell align="right">
-                                    <Typography variant="body2" fontWeight={700} color="primary">
+                                    <Typography
+                                      variant="body2"
+                                      fontWeight={700}
+                                      color="primary"
+                                    >
                                       {formatCurrency(txn.amount)}
                                     </Typography>
                                   </TableCell>
@@ -502,7 +575,7 @@ const GlobalPaymentLedger = () => {
                       />
                     </>
                   ) : (
-                    <Box sx={{ textAlign: 'center', py: 4 }}>
+                    <Box sx={{ textAlign: "center", py: 4 }}>
                       <Typography variant="body2" color="text.secondary">
                         No platform payment transactions found
                       </Typography>
@@ -601,31 +674,39 @@ const GlobalPaymentLedger = () => {
                           {txn.transactionId}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          {txn.paymentMethod || '-'}
+                          {txn.paymentMethod || "-"}
                         </Typography>
                       </TableCell>
                       <TableCell>
                         <Chip
-                          label={txn.type.replace(/_/g, ' ')}
+                          label={txn.type.replace(/_/g, " ")}
                           size="small"
                           sx={getTypeColor(txn.type)}
                         />
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2">{txn.payer.name}</Typography>
+                        <Typography variant="body2">
+                          {txn.payer.name}
+                        </Typography>
                         <Typography variant="caption" color="text.secondary">
                           {txn.payer.role}
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2">{txn.payee.name}</Typography>
+                        <Typography variant="body2">
+                          {txn.payee.name}
+                        </Typography>
                         <Typography variant="caption" color="text.secondary">
                           {txn.payee.role}
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2" noWrap sx={{ maxWidth: 200 }}>
-                          {txn.projectName || '-'}
+                        <Typography
+                          variant="body2"
+                          noWrap
+                          sx={{ maxWidth: 200 }}
+                        >
+                          {txn.projectName || "-"}
                         </Typography>
                         {txn.milestoneName && (
                           <Typography variant="caption" color="text.secondary">
@@ -670,7 +751,7 @@ const GlobalPaymentLedger = () => {
           />
         </CardContent>
       </Card>
-    </DashboardLayout>
+    </>
   );
 };
 

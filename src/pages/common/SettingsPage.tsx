@@ -1,9 +1,8 @@
-import DashboardLayout from '@/layouts/DashboardLayout';
-import { Settings } from 'lucide-react';
+import { Settings } from "lucide-react";
 
 const SettingsPage = () => {
   return (
-    <DashboardLayout>
+    <>
       <div className="widget-card">
         <div className="widget-card-header">
           <h2 className="widget-card-title">
@@ -13,12 +12,12 @@ const SettingsPage = () => {
         </div>
         <div className="widget-card-content">
           <p>Configure application preferences and settings.</p>
-          <div className="chart-placeholder" style={{ marginTop: '2rem' }}>
+          <div className="chart-placeholder" style={{ marginTop: "2rem" }}>
             ⚙️ Application settings and preferences
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

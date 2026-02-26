@@ -1,40 +1,57 @@
-import { useAuth } from '@/Context/useAuth';
-import DashboardLayout from '@/layouts/DashboardLayout';
-import type { DirectHarvestOffer, SponsorshipOffer } from '@/types/investor.types';
-import { BarChart, Folder, Settings } from '@mui/icons-material';
-import { Box, IconButton, Tooltip, Typography } from '@mui/material';
-import { useMemo, useState } from 'react';
-import type { OfferCardProps } from '../../components/investor';
-import { CreateOfferButton, CreateOfferDialog, OfferCard, ProjectDetailsDialog } from '../../components/investor';
-import { comprehensiveProjectsData, pendingProjectsData } from '../../data/json';
-import Notification from '../../shared/components/Notification';
-import { useNotification } from '../../shared/hooks/useNotification';
+import { useAuth } from "@/Context/useAuth";
+import type {
+  DirectHarvestOffer,
+  SponsorshipOffer,
+} from "@/types/investor.types";
+import { BarChart, Folder, Settings } from "@mui/icons-material";
+import { Box, IconButton, Tooltip, Typography } from "@mui/material";
+import { useMemo, useState } from "react";
+import type { OfferCardProps } from "../../components/investor";
+import {
+  CreateOfferButton,
+  CreateOfferDialog,
+  OfferCard,
+  ProjectDetailsDialog,
+} from "../../components/investor";
+import {
+  comprehensiveProjectsData,
+  pendingProjectsData,
+} from "../../data/json";
+import Notification from "../../shared/components/Notification";
+import { useNotification } from "../../shared/hooks/useNotification";
 
 const MyOffersPage = () => {
   const { user } = useAuth();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useState<OfferCardProps | null>(null);
-  const { notification, showError, showSuccess, hideNotification } = useNotification();
+  const [selectedProject, setSelectedProject] = useState<OfferCardProps | null>(
+    null,
+  );
+  const { notification, showError, showSuccess, hideNotification } =
+    useNotification();
 
   const allProjects = useMemo(() => {
-    const projects = comprehensiveProjectsData as (OfferCardProps & { investorId?: string })[];
-    return projects.filter(p => p.investorId === user?._id);
+    const projects = comprehensiveProjectsData as (OfferCardProps & {
+      investorId?: string;
+    })[];
+    return projects.filter((p) => p.investorId === user?._id);
   }, [user?._id]);
 
-  const activeProjects = useMemo(() =>
-    allProjects.filter(p => p.status === 'active'),
-    [allProjects]
+  const activeProjects = useMemo(
+    () => allProjects.filter((p) => p.status === "active"),
+    [allProjects],
   );
 
-  const pastProjects = useMemo(() =>
-    allProjects.filter(p => p.status === 'completed'),
-    [allProjects]
+  const pastProjects = useMemo(
+    () => allProjects.filter((p) => p.status === "completed"),
+    [allProjects],
   );
 
   const pendingProjects = useMemo(() => {
-    const projects = pendingProjectsData as (OfferCardProps & { investorId?: string })[];
-    return projects.filter(p => p.investorId === user?._id);
+    const projects = pendingProjectsData as (OfferCardProps & {
+      investorId?: string;
+    })[];
+    return projects.filter((p) => p.investorId === user?._id);
   }, [user?._id]);
 
   const handleCreateOffer = () => {
@@ -45,18 +62,24 @@ const MyOffersPage = () => {
     setCreateDialogOpen(false);
   };
 
-  const handleOfferSubmit = (offerData: Partial<DirectHarvestOffer> | Partial<SponsorshipOffer>) => {
+  const handleOfferSubmit = (
+    offerData: Partial<DirectHarvestOffer> | Partial<SponsorshipOffer>,
+  ) => {
     try {
-      console.log('New offer created:', offerData);
-      showSuccess('Offer created successfully! Farmers will be notified.');
+      console.log("New offer created:", offerData);
+      showSuccess("Offer created successfully! Farmers will be notified.");
       setCreateDialogOpen(false);
     } catch {
-      showError('Failed to create offer. Please try again.');
+      showError("Failed to create offer. Please try again.");
     }
   };
 
   const handleViewDetails = (id: string) => {
-    const project = [...activeProjects, ...pendingProjects, ...pastProjects].find(p => p.id === id);
+    const project = [
+      ...activeProjects,
+      ...pendingProjects,
+      ...pastProjects,
+    ].find((p) => p.id === id);
     if (project) {
       setSelectedProject(project);
       setDetailsDialogOpen(true);
@@ -64,7 +87,7 @@ const MyOffersPage = () => {
   };
 
   return (
-    <DashboardLayout>
+    <>
       <Box className="container-fluid" sx={{ mb: 4 }}>
         <div className="row align-items-start">
           <div className="col-12 col-lg-8">
@@ -72,7 +95,8 @@ const MyOffersPage = () => {
               My Offers
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Create Investment Offers including crop interest, budget, and profit-sharing models.
+              Create Investment Offers including crop interest, budget, and
+              profit-sharing models.
             </Typography>
           </div>
           <div className="col-12 col-lg-4 d-flex justify-content-lg-end align-items-center gap-2 mt-3 mt-lg-0">
@@ -80,8 +104,8 @@ const MyOffersPage = () => {
             <Tooltip title="Settings">
               <IconButton
                 sx={{
-                  border: '1px solid',
-                  borderColor: 'divider',
+                  border: "1px solid",
+                  borderColor: "divider",
                   borderRadius: 2,
                 }}
               >
@@ -99,14 +123,14 @@ const MyOffersPage = () => {
           sx={{
             fontWeight: 700,
             mb: 3,
-            display: 'flex',
-            alignItems: 'center',
+            display: "flex",
+            alignItems: "center",
             gap: 1,
-            '&::before': {
+            "&::before": {
               content: '""',
               width: 4,
               height: 24,
-              background: 'linear-gradient(180deg, #6B8E23 0%, #8FA887 100%)',
+              background: "linear-gradient(180deg, #6B8E23 0%, #8FA887 100%)",
               borderRadius: 1,
             },
           }}
@@ -124,12 +148,12 @@ const MyOffersPage = () => {
         ) : (
           <Box
             sx={{
-              textAlign: 'center',
+              textAlign: "center",
               p: 6,
-              background: 'rgba(255, 255, 255, 0.02)',
+              background: "rgba(255, 255, 255, 0.02)",
               borderRadius: 2,
-              border: '2px dashed',
-              borderColor: 'divider',
+              border: "2px dashed",
+              borderColor: "divider",
             }}
           >
             <Typography variant="h4" sx={{ mb: 1, opacity: 0.5 }}>
@@ -148,10 +172,11 @@ const MyOffersPage = () => {
       {/* Divider */}
       <hr
         style={{
-          margin: '3rem 0',
-          border: 'none',
+          margin: "3rem 0",
+          border: "none",
           height: 1,
-          background: 'linear-gradient(90deg, transparent, #3a3a3a, transparent)',
+          background:
+            "linear-gradient(90deg, transparent, #3a3a3a, transparent)",
         }}
       />
 
@@ -162,14 +187,14 @@ const MyOffersPage = () => {
           sx={{
             fontWeight: 700,
             mb: 3,
-            display: 'flex',
-            alignItems: 'center',
+            display: "flex",
+            alignItems: "center",
             gap: 1,
-            '&::before': {
+            "&::before": {
               content: '""',
               width: 4,
               height: 24,
-              background: 'linear-gradient(180deg, #6B8E23 0%, #8FA887 100%)',
+              background: "linear-gradient(180deg, #6B8E23 0%, #8FA887 100%)",
               borderRadius: 1,
             },
           }}
@@ -187,12 +212,12 @@ const MyOffersPage = () => {
         ) : (
           <Box
             sx={{
-              textAlign: 'center',
+              textAlign: "center",
               p: 6,
-              background: 'rgba(255, 255, 255, 0.02)',
+              background: "rgba(255, 255, 255, 0.02)",
               borderRadius: 2,
-              border: '2px dashed',
-              borderColor: 'divider',
+              border: "2px dashed",
+              borderColor: "divider",
             }}
           >
             <Typography variant="h4" sx={{ mb: 1, opacity: 0.5 }}>
@@ -230,7 +255,7 @@ const MyOffersPage = () => {
         onClose={() => setDetailsDialogOpen(false)}
         project={selectedProject}
       />
-    </DashboardLayout>
+    </>
   );
 };
 

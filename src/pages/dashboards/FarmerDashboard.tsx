@@ -1,20 +1,18 @@
-import { CalendarMonth, PlaceholderWidget, ProjectLegendItem, StatCard } from '@/components';
-import DashboardLayout from '@/layouts/DashboardLayout';
+import {
+  CalendarMonth,
+  PlaceholderWidget,
+  ProjectLegendItem,
+  StatCard,
+} from "@/components";
 import {
   AttachMoney,
   CalendarMonth as CalendarIcon,
   CheckCircle,
   Description,
   TrendingUp,
-} from '@mui/icons-material';
-import {
-  Box,
-  Card,
-  CardContent,
-  CardHeader,
-  Typography,
-} from '@mui/material';
-import { farmerProjectsData } from '../../data/json';
+} from "@mui/icons-material";
+import { Box, Card, CardContent, CardHeader, Typography } from "@mui/material";
+import { farmerProjectsData } from "../../data/json";
 
 // Import mock projects from JSON
 const mockProjects = farmerProjectsData;
@@ -26,46 +24,54 @@ const getDaysInMonth = (year: number, month: number) => {
 const isDateInRange = (date: Date, startDate: string, endDate: string) => {
   const current = new Date(date);
   current.setHours(0, 0, 0, 0);
-  
+
   const start = new Date(startDate);
   start.setHours(0, 0, 0, 0);
-  
+
   const end = new Date(endDate);
   end.setHours(0, 0, 0, 0);
-  
+
   return current >= start && current <= end;
 };
 
 const FarmerDashboard = () => {
   const getProjectDateRange = () => {
     const monthsWithData = new Set<string>();
-    
-    mockProjects.forEach(project => {
+
+    mockProjects.forEach((project) => {
       const start = new Date(project.startDate);
       const end = new Date(project.endDate);
-      
+
       const current = new Date(start.getFullYear(), start.getMonth(), 1);
       const endMonth = new Date(end.getFullYear(), end.getMonth(), 1);
-      
+
       while (current <= endMonth) {
         const monthKey = `${current.getFullYear()}-${current.getMonth()}`;
-        const monthStart = new Date(current.getFullYear(), current.getMonth(), 1);
-        const monthEnd = new Date(current.getFullYear(), current.getMonth() + 1, 0);
-        
+        const monthStart = new Date(
+          current.getFullYear(),
+          current.getMonth(),
+          1,
+        );
+        const monthEnd = new Date(
+          current.getFullYear(),
+          current.getMonth() + 1,
+          0,
+        );
+
         const projectStart = new Date(project.startDate);
         const projectEnd = new Date(project.endDate);
-        
+
         if (projectEnd >= monthStart && projectStart <= monthEnd) {
           monthsWithData.add(monthKey);
         }
-        
+
         current.setMonth(current.getMonth() + 1);
       }
     });
-    
+
     const months = Array.from(monthsWithData)
-      .map(key => {
-        const [year, month] = key.split('-').map(Number);
+      .map((key) => {
+        const [year, month] = key.split("-").map(Number);
         return { year, month, key };
       })
       .sort((a, b) => {
@@ -77,14 +83,14 @@ const FarmerDashboard = () => {
         month: m.month,
         offset: index,
       }));
-    
+
     return months;
   };
 
   const monthsToDisplay = getProjectDateRange();
 
   return (
-    <DashboardLayout>
+    <>
       <div className="row g-3 mb-3">
         <div className="col-12 col-sm-6 col-md-4">
           <StatCard
@@ -120,7 +126,7 @@ const FarmerDashboard = () => {
           <Card>
             <CardHeader
               title={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <AttachMoney />
                   <Typography variant="h6" component="span">
                     Funding Status by Project
@@ -143,7 +149,7 @@ const FarmerDashboard = () => {
           <Card>
             <CardHeader
               title={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <CalendarIcon />
                   <Typography variant="h6" component="span">
                     Master Schedule - Project Timeline
@@ -154,15 +160,15 @@ const FarmerDashboard = () => {
             <CardContent>
               <Box
                 sx={{
-                  backgroundColor: '#1e1e1e',
+                  backgroundColor: "#1e1e1e",
                   borderRadius: 2,
                   p: 3,
                 }}
               >
                 <Box
                   sx={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(4, 1fr)',
+                    display: "grid",
+                    gridTemplateColumns: "repeat(4, 1fr)",
                     gap: 2,
                     mb: 3,
                   }}
@@ -181,12 +187,12 @@ const FarmerDashboard = () => {
 
                 <Box
                   sx={{
-                    display: 'flex',
+                    display: "flex",
                     gap: 3,
-                    flexWrap: 'wrap',
-                    justifyContent: 'center',
+                    flexWrap: "wrap",
+                    justifyContent: "center",
                     pt: 2,
-                    borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderTop: "1px solid rgba(255, 255, 255, 0.1)",
                   }}
                 >
                   {mockProjects.map((project) => (
@@ -209,7 +215,7 @@ const FarmerDashboard = () => {
           <Card>
             <CardHeader
               title={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <TrendingUp />
                   <Typography variant="h6" component="span">
                     Crop Prices & Market Trends
@@ -227,7 +233,7 @@ const FarmerDashboard = () => {
           </Card>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

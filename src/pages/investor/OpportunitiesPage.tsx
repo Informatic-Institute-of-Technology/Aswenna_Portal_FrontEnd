@@ -1,27 +1,33 @@
-import DashboardLayout from '@/layouts/DashboardLayout';
-import type { FarmerJob, InvestmentRequest } from '@/types/farmer.types';
-import { AccountBalanceWallet, Handshake } from '@mui/icons-material';
-import { Box, Typography } from '@mui/material';
-import { useState } from 'react';
-import { SectionHeader, TabNavigation, type TabItem } from '../../components/common';
-import FarmerJobCard from '../../components/farmer/FarmerJobCard';
-import InvestmentRequestCard from '../../components/investor/InvestmentRequestCard';
-import InvestmentRequestDialog from '../../components/investor/InvestmentRequestDialog';
-import { farmerJobsData, investmentRequestsData } from '../../data/json';
-import { FarmerJobType } from '../../types/farmer.types';
+import type { FarmerJob, InvestmentRequest } from "@/types/farmer.types";
+import { AccountBalanceWallet, Handshake } from "@mui/icons-material";
+import { Box, Typography } from "@mui/material";
+import { useState } from "react";
+import {
+  SectionHeader,
+  TabNavigation,
+  type TabItem,
+} from "../../components/common";
+import FarmerJobCard from "../../components/farmer/FarmerJobCard";
+import InvestmentRequestCard from "../../components/investor/InvestmentRequestCard";
+import InvestmentRequestDialog from "../../components/investor/InvestmentRequestDialog";
+import { farmerJobsData, investmentRequestsData } from "../../data/json";
+import { FarmerJobType } from "../../types/farmer.types";
 
 const OpportunitiesPage = () => {
-  const [activeTab, setActiveTab] = useState<'investments' | 'hire'>('investments');
-  const [selectedRequest, setSelectedRequest] = useState<InvestmentRequest | null>(null);
+  const [activeTab, setActiveTab] = useState<"investments" | "hire">(
+    "investments",
+  );
+  const [selectedRequest, setSelectedRequest] =
+    useState<InvestmentRequest | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const investmentRequests = (investmentRequestsData as InvestmentRequest[]).filter(
-    req => req.status === 'open'
-  );
+  const investmentRequests = (
+    investmentRequestsData as InvestmentRequest[]
+  ).filter((req) => req.status === "open");
 
   const allFarmerJobs = farmerJobsData as FarmerJob[];
   const farmerJobs = allFarmerJobs.filter(
-    job => job.jobType === FarmerJobType.COMMISSION && job.status === 'OPEN'
+    (job) => job.jobType === FarmerJobType.COMMISSION && job.status === "OPEN",
   );
 
   const handleViewDetails = (request: InvestmentRequest) => {
@@ -35,26 +41,26 @@ const OpportunitiesPage = () => {
   };
 
   const handleInvest = (id: string) => {
-    console.log('Invest in request:', id);
+    console.log("Invest in request:", id);
   };
 
   const tabs: TabItem[] = [
     {
-      value: 'investments',
-      label: 'Investment Opportunities',
+      value: "investments",
+      label: "Investment Opportunities",
       icon: <AccountBalanceWallet sx={{ fontSize: 20 }} />,
       count: investmentRequests.length,
     },
     {
-      value: 'hire',
-      label: 'Hire Farmers',
+      value: "hire",
+      label: "Hire Farmers",
       icon: <Handshake sx={{ fontSize: 20 }} />,
       count: farmerJobs.length,
     },
   ];
 
   return (
-    <DashboardLayout>
+    <>
       <Box sx={{ p: 3 }}>
         {/* Header */}
         <Box sx={{ mb: 3 }}>
@@ -69,11 +75,11 @@ const OpportunitiesPage = () => {
         <TabNavigation
           activeTab={activeTab}
           tabs={tabs}
-          onChange={(value) => setActiveTab(value as 'investments' | 'hire')}
+          onChange={(value) => setActiveTab(value as "investments" | "hire")}
           variant="dark"
         />
 
-        {activeTab === 'investments' && (
+        {activeTab === "investments" && (
           <Box>
             <SectionHeader
               title="Investment Opportunities"
@@ -83,27 +89,31 @@ const OpportunitiesPage = () => {
             />
 
             {investmentRequests.length > 0 ? (
-              <Box sx={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
-                gap: 3 
-              }}>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr))",
+                  gap: 3,
+                }}
+              >
                 {investmentRequests.map((request) => (
-                  <InvestmentRequestCard 
-                    key={request.id} 
+                  <InvestmentRequestCard
+                    key={request.id}
                     request={request}
                     onViewDetails={handleViewDetails}
                   />
                 ))}
               </Box>
             ) : (
-              <Box sx={{ 
-                textAlign: 'center', 
-                py: 8,
-                bgcolor: 'rgba(255,255,255,0.02)',
-                borderRadius: 2,
-                color: 'text.secondary'
-              }}>
+              <Box
+                sx={{
+                  textAlign: "center",
+                  py: 8,
+                  bgcolor: "rgba(255,255,255,0.02)",
+                  borderRadius: 2,
+                  color: "text.secondary",
+                }}
+              >
                 <Typography variant="h6" gutterBottom>
                   No investment opportunities available
                 </Typography>
@@ -115,7 +125,7 @@ const OpportunitiesPage = () => {
           </Box>
         )}
 
-        {activeTab === 'hire' && (
+        {activeTab === "hire" && (
           <Box>
             <SectionHeader
               title="Hire Farmers"
@@ -125,28 +135,32 @@ const OpportunitiesPage = () => {
             />
 
             {farmerJobs.length > 0 ? (
-              <Box sx={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-                gap: 3 
-              }}>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))",
+                  gap: 3,
+                }}
+              >
                 {farmerJobs.map((job) => (
-                  <FarmerJobCard 
-                    key={job.id} 
+                  <FarmerJobCard
+                    key={job.id}
                     job={job}
-                    onViewMore={(job) => console.log('View job:', job)}
-                    onConnect={(job) => console.log('Connect to job:', job)}
+                    onViewMore={(job) => console.log("View job:", job)}
+                    onConnect={(job) => console.log("Connect to job:", job)}
                   />
                 ))}
               </Box>
             ) : (
-              <Box sx={{ 
-                textAlign: 'center', 
-                py: 8,
-                bgcolor: 'rgba(255,255,255,0.02)',
-                borderRadius: 2,
-                color: 'text.secondary'
-              }}>
+              <Box
+                sx={{
+                  textAlign: "center",
+                  py: 8,
+                  bgcolor: "rgba(255,255,255,0.02)",
+                  borderRadius: 2,
+                  color: "text.secondary",
+                }}
+              >
                 <Typography variant="h6" gutterBottom>
                   No farmers available for hire
                 </Typography>
@@ -166,7 +180,7 @@ const OpportunitiesPage = () => {
         onClose={handleCloseDialog}
         onInvest={handleInvest}
       />
-    </DashboardLayout>
+    </>
   );
 };
 
