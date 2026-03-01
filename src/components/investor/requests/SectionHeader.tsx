@@ -23,7 +23,7 @@ const SectionHeader = ({
     <div className="flex items-center justify-between mb-4 sticky top-0 py-2 z-10">
       <h3
         className="text-sm uppercase tracking-wide font-bold flex items-center gap-2"
-        style={{ color: '#e0e0e0', display: 'flex', alignItems: 'center' }}
+        style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center' }}
       >
         {withGradientBar && (
           <span
@@ -31,14 +31,14 @@ const SectionHeader = ({
               content: '""',
               width: '4px',
               height: '24px',
-              background: 'linear-gradient(180deg, #6B8E23 0%, #8FA887 100%)',
+              background: 'linear-gradient(180deg, var(--color-olive) 0%, var(--color-olive-light) 100%)',
               borderRadius: '4px',
               marginRight: '8px',
             }}
           ></span>
         )}
         {icon && (
-          <span style={{ color: '#8FA887' }} className="material-icons text-lg">
+          <span style={{ color: 'var(--color-olive-light)' }} className="material-icons text-lg">
             {icon}
           </span>
         )}

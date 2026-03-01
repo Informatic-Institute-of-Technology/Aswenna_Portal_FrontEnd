@@ -2,11 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
 @layer base {
   :root {
-    
     --font-sans: "Inter", "Roboto", "Helvetica Neue", Arial, sans-serif;
     --font-mono:
       "Roboto Mono", "JetBrains Mono", "Fira Code", Consolas, monospace;
@@ -37,7 +34,6 @@
     --tracking-wide: 0.025em;
     --tracking-caps: 0.08em;
 
-    
     --color-brand-primary: #22c55e;
     --color-brand-primary-hover: #16a34a;
     --color-brand-muted: rgba(34, 197, 94, 0.12);
@@ -46,7 +42,6 @@
     --color-brand-accent-hover: #ea580c;
     --color-brand-accent-muted: rgba(249, 115, 22, 0.12);
 
-    
     --color-paid: #22c55e;
     --color-paid-muted: rgba(34, 197, 94, 0.12);
     --color-paid-border: rgba(34, 197, 94, 0.25);
@@ -70,16 +65,15 @@
     --color-info: #818cf8;
     --color-info-bg: rgba(99, 102, 241, 0.2);
 
-    
     --surface-tint: rgba(255, 255, 255, 0.02);
     --surface-muted: rgba(255, 255, 255, 0.05);
     --surface-light: rgba(255, 255, 255, 0.1);
+    --text-on-dark: rgba(255, 255, 255, 0.452);
     --overlay-sm: rgba(0, 0, 0, 0.2);
     --overlay-md: rgba(0, 0, 0, 0.4);
     --overlay-lg: rgba(0, 0, 0, 0.5);
     --overlay-xl: rgba(0, 0, 0, 0.7);
 
-    
     --bg-app: #050505;
     --bg-page: #080808;
     --bg-surface: #0f0f0f;
@@ -91,7 +85,6 @@
     --bg-active: rgba(255, 255, 255, 0.08);
     --bg-selected: rgba(34, 197, 94, 0.12);
 
-    
     --border-base: #2a2a2a;
     --border-subtle: #242424;
     --border-strong: #404040;
@@ -99,7 +92,6 @@
     --border-focus: #4ade80;
     --border-error: #ef4444;
 
-    
     --text-primary: #ffffff;
     --text-secondary: #b0b0b0;
     --text-tertiary: #737373;
@@ -110,41 +102,54 @@
     --text-link: #60a5fa;
     --text-on-brand: #ffffff;
 
-    
     --tile-total: #94a3b8;
     --tile-paid: #22c55e;
     --tile-pending: #f97316;
     --tile-info: #818cf8;
 
-    
     --color-olive: #6b8e23;
+    --color-olive-dark: #4a6418;
     --color-olive-hover: #658147;
     --color-olive-light: #8fa887;
     --color-olive-muted: rgba(107, 142, 35, 0.12);
+    --color-olive-muted-strong: rgba(107, 142, 35, 0.2);
     --color-olive-glow: rgba(107, 142, 35, 0.3);
     --color-olive-glow-sm: rgba(107, 142, 35, 0.15);
     --color-legacy-green: #7c9473;
     --color-legacy-hover: rgba(124, 148, 115, 0.1);
     --color-legacy-active: rgba(124, 148, 115, 0.2);
-    --color-legacy-glow: rgba(
-      124,
-      148,
-      115,
-      0.3
-    ); 
+    --color-legacy-glow: rgba(124, 148, 115, 0.3);
     --color-nature-deep: #1a2e1a;
     --color-nature-mid: #2a3a2a;
-    
+
+    --color-amber: #f59e0b;
+    --color-amber-muted: rgba(245, 158, 11, 0.15);
+
+    --color-orange: #f97316;
+    --color-orange-muted: rgba(249, 115, 22, 0.12);
+    --color-orange-border: rgba(249, 115, 22, 0.25);
+
+    --color-lime: #84cc16;
+    --color-lime-hover: #65a30d;
+    --color-lime-muted: rgba(132, 204, 22, 0.12);
+    --color-lime-muted-strong: rgba(132, 204, 22, 0.22);
+    --color-lime-border: rgba(132, 204, 22, 0.25);
+
+    --color-info-blue: #60a5fa;
+    --color-info-blue-muted: rgba(96, 165, 250, 0.12);
+    --color-info-blue-border: rgba(96, 165, 250, 0.25);
+    --color-light-blue: #93c5fd;
+
+    --color-purple: #a855f7;
+
     --border-medium: #3a3a3a;
 
-    
     --neutral-700: #404040;
     --neutral-600: #555555;
     --neutral-500: #737373;
     --neutral-400: #888888;
     --neutral-350: #999999;
 
-    
     --radius-sm: 4px;
     --radius-base: 6px;
     --radius-md: 8px;
@@ -159,7 +164,6 @@
     --radius-badge: 9999px;
     --radius-input: 8px;
 
-    
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
     --shadow-base: 0 2px 6px rgba(0, 0, 0, 0.4);
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
@@ -170,7 +174,6 @@
     --shadow-accent: 0 2px 12px rgba(249, 115, 22, 0.4);
     --shadow-danger: 0 2px 12px rgba(239, 68, 68, 0.3);
 
-    
     --duration-fast: 150ms;
     --duration-base: 200ms;
     --duration-moderate: 300ms;
@@ -181,7 +184,6 @@
     --transition-colors:
       background-color 200ms, border-color 200ms, color 200ms;
 
-    
     font-family: var(--font-sans);
     font-size: var(--text-base);
     line-height: var(--leading-normal);
@@ -218,7 +220,6 @@
     background-color: var(--bg-app);
   }
 
-  
   h1 {
     font-size: var(--text-4xl);
     font-weight: var(--font-bold);
@@ -258,7 +259,6 @@
     color: var(--text-primary);
   }
 
-  
   a {
     font-weight: var(--font-medium);
     color: var(--text-link);
@@ -269,7 +269,6 @@
     color: var(--color-brand-primary);
   }
 
-  
   button {
     border-radius: var(--radius-button);
     border: none;
@@ -289,7 +288,6 @@
     pointer-events: none;
   }
 
-  
   input,
   textarea,
   select {
@@ -312,7 +310,6 @@
     border-color: var(--border-focus);
   }
 
-  
   code,
   kbd,
   samp,
@@ -321,10 +318,7 @@
   }
 }
 
-
-
 @layer components {
-  
   .card {
     background: var(--bg-elevated);
     border: 1px solid var(--border-base);
@@ -337,7 +331,6 @@
     box-shadow: var(--shadow-md);
   }
 
-  
   .badge {
     display: inline-flex;
     align-items: center;
@@ -370,7 +363,6 @@
     border: 1px solid rgba(129, 140, 248, 0.25);
   }
 
-  
   .btn-primary {
     background: linear-gradient(
       135deg,
@@ -389,7 +381,6 @@
     opacity: 0.9;
   }
 
-  
   .btn-ghost {
     background: transparent;
     color: var(--text-secondary);
@@ -405,7 +396,6 @@
     color: var(--text-primary);
   }
 
-  
   .btn-danger {
     background: linear-gradient(135deg, var(--color-error), #dc2626);
     color: #ffffff;
@@ -420,7 +410,6 @@
     opacity: 0.9;
   }
 
-  
   .section-heading {
     font-size: var(--text-sm);
     font-weight: var(--font-semibold);
@@ -429,7 +418,6 @@
     letter-spacing: var(--tracking-caps);
   }
 
-  
   .amount {
     font-family: var(--font-mono);
     font-weight: var(--font-bold);
@@ -441,9 +429,6 @@
     color: var(--text-tertiary);
   }
 }
-
-
-
 
 ::-webkit-scrollbar {
   width: 6px;
@@ -460,7 +445,6 @@
   background: var(--text-tertiary);
 }
 
-
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -468,7 +452,6 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-
 
 .line-clamp-1 {
   display: -webkit-box;
@@ -489,7 +472,6 @@
   overflow: hidden;
 }
 
-
 .step-line {
   position: absolute;
   top: 24px;
@@ -503,7 +485,6 @@
 .step-item:last-child .step-line {
   display: none;
 }
-
 
 .focus-ring:focus-visible {
   outline: 2px solid var(--border-focus);

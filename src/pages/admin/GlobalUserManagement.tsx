@@ -511,9 +511,9 @@ const GlobalUserManagement = () => {
         PaperProps={{
           sx: {
             borderRadius: 3,
-            background: "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)",
+            background: "linear-gradient(135deg, var(--bg-overlay) 0%, var(--bg-subtle) 100%)",
             backdropFilter: "blur(20px)",
-            border: "1px solid rgba(255,255,255,0.1)",
+            border: "1px solid var(--surface-light)",
           },
         }}
       >
@@ -521,9 +521,9 @@ const GlobalUserManagement = () => {
           <>
             <Box
               sx={{
-                background: "rgba(255, 255, 255, 0.05)",
+                background: "var(--surface-muted)",
                 backdropFilter: "blur(20px)",
-                borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+                borderBottom: "1px solid var(--surface-light)",
                 p: 3,
                 position: "relative",
               }}
@@ -542,8 +542,8 @@ const GlobalUserManagement = () => {
                   sx={{
                     width: 70,
                     height: 70,
-                    border: "2px solid rgba(255,255,255,0.2)",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                    border: "2px solid var(--surface-light)",
+                    boxShadow: "0 4px 12px var(--overlay-sm)",
                   }}
                 />
                 <Box sx={{ flex: 1 }}>
@@ -564,7 +564,7 @@ const GlobalUserManagement = () => {
                     <Typography
                       variant="body2"
                       sx={{
-                        color: "rgba(255,255,255,0.7)",
+                        color: "var(--text-on-dark)",
                         fontSize: "0.875rem",
                       }}
                     >
@@ -574,11 +574,11 @@ const GlobalUserManagement = () => {
                       label={selectedUser.role}
                       size="small"
                       sx={{
-                        bgcolor: "rgba(255,255,255,0.15)",
+                        bgcolor: "var(--surface-light)",
                         color: "white",
                         fontWeight: 600,
                         backdropFilter: "blur(10px)",
-                        border: "1px solid rgba(255,255,255,0.2)",
+                        border: "1px solid var(--surface-light)",
                       }}
                     />
                   </Box>
@@ -590,10 +590,10 @@ const GlobalUserManagement = () => {
                         onClick={handleSaveEdit}
                         disabled={saving}
                         sx={{
-                          color: "#4CAF50",
-                          bgcolor: "rgba(76, 175, 80, 0.1)",
+                          color: "var(--color-success)",
+                          bgcolor: "var(--color-success-bg)",
                           "&:hover": {
-                            bgcolor: "rgba(76, 175, 80, 0.2)",
+                            bgcolor: "var(--color-success-bg)",
                           },
                         }}
                       >
@@ -603,10 +603,10 @@ const GlobalUserManagement = () => {
                         onClick={handleCancelEdit}
                         disabled={saving}
                         sx={{
-                          color: "rgba(255,255,255,0.7)",
-                          bgcolor: "rgba(255,255,255,0.1)",
+                          color: "var(--text-on-dark)",
+                          bgcolor: "var(--surface-light)",
                           "&:hover": {
-                            bgcolor: "rgba(255,255,255,0.2)",
+                            bgcolor: "var(--surface-light)",
                           },
                         }}
                       >
@@ -617,10 +617,10 @@ const GlobalUserManagement = () => {
                     <IconButton
                       onClick={handleEditClick}
                       sx={{
-                        color: "rgba(255,255,255,0.9)",
-                        bgcolor: "rgba(255,255,255,0.1)",
+                        color: "var(--text-primary)",
+                        bgcolor: "var(--surface-light)",
                         "&:hover": {
-                          bgcolor: "rgba(255,255,255,0.2)",
+                          bgcolor: "var(--surface-light)",
                         },
                       }}
                     >
@@ -630,10 +630,10 @@ const GlobalUserManagement = () => {
                   <IconButton
                     onClick={handleCloseDialog}
                     sx={{
-                      color: "rgba(255,255,255,0.9)",
-                      bgcolor: "rgba(255,255,255,0.1)",
+                      color: "var(--text-primary)",
+                      bgcolor: "var(--surface-light)",
                       "&:hover": {
-                        bgcolor: "rgba(255,255,255,0.2)",
+                        bgcolor: "var(--surface-light)",
                       },
                     }}
                   >
@@ -649,8 +649,8 @@ const GlobalUserManagement = () => {
                   display: "flex",
                   justifyContent: "space-around",
                   p: 3,
-                  borderBottom: "1px solid rgba(255,255,255,0.1)",
-                  bgcolor: "rgba(255,255,255,0.02)",
+                  borderBottom: "1px solid var(--surface-light)",
+                  bgcolor: "var(--surface-tint)",
                 }}
               >
                 <Box sx={{ textAlign: "center" }}>
@@ -662,7 +662,7 @@ const GlobalUserManagement = () => {
                   </Typography>
                   <Typography
                     variant="caption"
-                    sx={{ color: "rgba(255,255,255,0.6)" }}
+                    sx={{ color: "var(--text-on-dark)" }}
                   >
                     Projects
                   </Typography>
@@ -670,13 +670,13 @@ const GlobalUserManagement = () => {
                 <Box sx={{ textAlign: "center" }}>
                   <Typography
                     variant="h5"
-                    sx={{ fontWeight: 700, color: "#4CAF50" }}
+                    sx={{ fontWeight: 700, color: "var(--color-success)" }}
                   >
                     {selectedUser.activeProjects}
                   </Typography>
                   <Typography
                     variant="caption"
-                    sx={{ color: "rgba(255,255,255,0.6)" }}
+                    sx={{ color: "var(--text-on-dark)" }}
                   >
                     Active
                   </Typography>
@@ -690,7 +690,7 @@ const GlobalUserManagement = () => {
                   </Typography>
                   <Typography
                     variant="caption"
-                    sx={{ color: "rgba(255,255,255,0.6)" }}
+                    sx={{ color: "var(--text-on-dark)" }}
                   >
                     Completed
                   </Typography>
@@ -719,7 +719,7 @@ const GlobalUserManagement = () => {
                   <Typography
                     variant="caption"
                     sx={{
-                      color: "rgba(255,255,255,0.6)",
+                      color: "var(--text-on-dark)",
                       display: "block",
                       mt: 0.5,
                     }}
@@ -754,7 +754,7 @@ const GlobalUserManagement = () => {
                         <Box sx={{ minWidth: 100 }}>
                           <Typography
                             variant="caption"
-                            sx={{ color: "rgba(255,255,255,0.5)" }}
+                            sx={{ color: "var(--text-on-dark)" }}
                           >
                             First Name
                           </Typography>
@@ -773,13 +773,13 @@ const GlobalUserManagement = () => {
                             "& .MuiOutlinedInput-root": {
                               color: "white",
                               "& fieldset": {
-                                borderColor: "rgba(255,255,255,0.2)",
+                                borderColor: "var(--surface-light)",
                               },
                               "&:hover fieldset": {
-                                borderColor: "rgba(255,255,255,0.3)",
+                                borderColor: "var(--surface-light)",
                               },
                               "&.Mui-focused fieldset": {
-                                borderColor: "#4CAF50",
+                                borderColor: "var(--color-success)",
                               },
                             },
                           }}
@@ -795,7 +795,7 @@ const GlobalUserManagement = () => {
                         <Box sx={{ minWidth: 100 }}>
                           <Typography
                             variant="caption"
-                            sx={{ color: "rgba(255,255,255,0.5)" }}
+                            sx={{ color: "var(--text-on-dark)" }}
                           >
                             Last Name
                           </Typography>
@@ -814,13 +814,13 @@ const GlobalUserManagement = () => {
                             "& .MuiOutlinedInput-root": {
                               color: "white",
                               "& fieldset": {
-                                borderColor: "rgba(255,255,255,0.2)",
+                                borderColor: "var(--surface-light)",
                               },
                               "&:hover fieldset": {
-                                borderColor: "rgba(255,255,255,0.3)",
+                                borderColor: "var(--surface-light)",
                               },
                               "&.Mui-focused fieldset": {
-                                borderColor: "#4CAF50",
+                                borderColor: "var(--color-success)",
                               },
                             },
                           }}
@@ -834,7 +834,7 @@ const GlobalUserManagement = () => {
                     <Box sx={{ minWidth: 100 }}>
                       <Typography
                         variant="caption"
-                        sx={{ color: "rgba(255,255,255,0.5)" }}
+                        sx={{ color: "var(--text-on-dark)" }}
                       >
                         Email
                       </Typography>
@@ -852,7 +852,7 @@ const GlobalUserManagement = () => {
                     <Box sx={{ minWidth: 100 }}>
                       <Typography
                         variant="caption"
-                        sx={{ color: "rgba(255,255,255,0.5)" }}
+                        sx={{ color: "var(--text-on-dark)" }}
                       >
                         Phone
                       </Typography>
@@ -872,13 +872,13 @@ const GlobalUserManagement = () => {
                           "& .MuiOutlinedInput-root": {
                             color: "white",
                             "& fieldset": {
-                              borderColor: "rgba(255,255,255,0.2)",
+                              borderColor: "var(--surface-light)",
                             },
                             "&:hover fieldset": {
-                              borderColor: "rgba(255,255,255,0.3)",
+                              borderColor: "var(--surface-light)",
                             },
                             "&.Mui-focused fieldset": {
-                              borderColor: "#4CAF50",
+                              borderColor: "var(--color-success)",
                             },
                           },
                         }}
@@ -898,7 +898,7 @@ const GlobalUserManagement = () => {
                     <Box sx={{ minWidth: 100 }}>
                       <Typography
                         variant="caption"
-                        sx={{ color: "rgba(255,255,255,0.5)" }}
+                        sx={{ color: "var(--text-on-dark)" }}
                       >
                         Address
                       </Typography>
@@ -920,13 +920,13 @@ const GlobalUserManagement = () => {
                           "& .MuiOutlinedInput-root": {
                             color: "white",
                             "& fieldset": {
-                              borderColor: "rgba(255,255,255,0.2)",
+                              borderColor: "var(--surface-light)",
                             },
                             "&:hover fieldset": {
-                              borderColor: "rgba(255,255,255,0.3)",
+                              borderColor: "var(--surface-light)",
                             },
                             "&.Mui-focused fieldset": {
-                              borderColor: "#4CAF50",
+                              borderColor: "var(--color-success)",
                             },
                           },
                         }}
@@ -946,7 +946,7 @@ const GlobalUserManagement = () => {
                     <Box sx={{ minWidth: 100 }}>
                       <Typography
                         variant="caption"
-                        sx={{ color: "rgba(255,255,255,0.5)" }}
+                        sx={{ color: "var(--text-on-dark)" }}
                       >
                         Joined
                       </Typography>
@@ -964,7 +964,7 @@ const GlobalUserManagement = () => {
                     <Box sx={{ minWidth: 100 }}>
                       <Typography
                         variant="caption"
-                        sx={{ color: "rgba(255,255,255,0.5)" }}
+                        sx={{ color: "var(--text-on-dark)" }}
                       >
                         Last Active
                       </Typography>
@@ -982,7 +982,7 @@ const GlobalUserManagement = () => {
                     <Box sx={{ minWidth: 100 }}>
                       <Typography
                         variant="caption"
-                        sx={{ color: "rgba(255,255,255,0.5)" }}
+                        sx={{ color: "var(--text-on-dark)" }}
                       >
                         Status
                       </Typography>
@@ -1002,7 +1002,7 @@ const GlobalUserManagement = () => {
                 sx={{
                   px: 3,
                   pb: 3,
-                  borderTop: "1px solid rgba(255,255,255,0.1)",
+                  borderTop: "1px solid var(--surface-light)",
                   pt: 3,
                 }}
               >
@@ -1026,7 +1026,7 @@ const GlobalUserManagement = () => {
                         selectedUser.verificationStatus.identity,
                       )!
                     }
-                    sx={{ bgcolor: "rgba(255,255,255,0.1)", color: "white" }}
+                    sx={{ bgcolor: "var(--surface-light)", color: "white" }}
                   />
                   <Chip
                     label={`Email: ${selectedUser.verificationStatus.email}`}
@@ -1065,7 +1065,7 @@ const GlobalUserManagement = () => {
                           selectedUser.verificationStatus.bankAccount,
                         )!
                       }
-                      sx={{ bgcolor: "rgba(255,255,255,0.1)", color: "white" }}
+                      sx={{ bgcolor: "var(--surface-light)", color: "white" }}
                     />
                   )}
                 </Box>
@@ -1079,7 +1079,7 @@ const GlobalUserManagement = () => {
                   sx={{
                     px: 3,
                     pb: 3,
-                    borderTop: "1px solid rgba(255,255,255,0.1)",
+                    borderTop: "1px solid var(--surface-light)",
                     pt: 3,
                   }}
                 >
@@ -1107,13 +1107,13 @@ const GlobalUserManagement = () => {
                       >
                         <Typography
                           variant="body2"
-                          sx={{ color: "rgba(255,255,255,0.7)" }}
+                          sx={{ color: "var(--text-on-dark)" }}
                         >
                           Total Invested
                         </Typography>
                         <Typography
                           variant="h6"
-                          sx={{ color: "#4CAF50", fontWeight: 700 }}
+                          sx={{ color: "var(--color-success)", fontWeight: 700 }}
                         >
                           {formatCurrency(selectedUser.totalInvested)}
                         </Typography>
@@ -1129,13 +1129,13 @@ const GlobalUserManagement = () => {
                       >
                         <Typography
                           variant="body2"
-                          sx={{ color: "rgba(255,255,255,0.7)" }}
+                          sx={{ color: "var(--text-on-dark)" }}
                         >
                           Total Earnings
                         </Typography>
                         <Typography
                           variant="h6"
-                          sx={{ color: "#4CAF50", fontWeight: 700 }}
+                          sx={{ color: "var(--color-success)", fontWeight: 700 }}
                         >
                           {formatCurrency(selectedUser.totalEarnings)}
                         </Typography>
@@ -1150,7 +1150,7 @@ const GlobalUserManagement = () => {
                     >
                       <Typography
                         variant="body2"
-                        sx={{ color: "rgba(255,255,255,0.7)" }}
+                        sx={{ color: "var(--text-on-dark)" }}
                       >
                         Overdue Payments
                       </Typography>
@@ -1159,7 +1159,7 @@ const GlobalUserManagement = () => {
                         sx={{
                           color:
                             selectedUser.overduePayments > 0
-                              ? "#f44336"
+                              ? "var(--color-overdue)"
                               : "white",
                           fontWeight: 600,
                         }}
@@ -1176,7 +1176,7 @@ const GlobalUserManagement = () => {
                     >
                       <Typography
                         variant="body2"
-                        sx={{ color: "rgba(255,255,255,0.7)" }}
+                        sx={{ color: "var(--text-on-dark)" }}
                       >
                         Transactions
                       </Typography>
@@ -1198,16 +1198,16 @@ const GlobalUserManagement = () => {
                   sx={{
                     px: 3,
                     pb: 3,
-                    borderTop: "1px solid rgba(244, 67, 54, 0.3)",
+                    borderTop: "1px solid var(--color-overdue-border)",
                     pt: 3,
-                    bgcolor: "rgba(244, 67, 54, 0.05)",
+                    bgcolor: "var(--color-overdue-muted)",
                   }}
                 >
                   <Typography
                     variant="subtitle2"
                     sx={{
                       fontWeight: 700,
-                      color: "#f44336",
+                      color: "var(--color-overdue)",
                       mb: 2,
                       letterSpacing: 0.5,
                     }}

@@ -21,7 +21,7 @@ const QuickActions = ({ actions, insight, withdrawAction }: QuickActionsProps) =
   return (
     <div
       style={{
-        background: 'linear-gradient(145deg, rgba(42, 42, 42, 0.8) 0%, rgba(31, 31, 31, 0.8) 100%)',
+        background: 'linear-gradient(145deg, var(--bg-subtle) 0%, var(--bg-overlay) 100%)',
       }}
       className="p-6"
     >
@@ -33,7 +33,7 @@ const QuickActions = ({ actions, insight, withdrawAction }: QuickActionsProps) =
             onClick={action.onClick}
             disabled={action.disabled}
             style={{
-              border: '1px solid rgba(107, 142, 35, 0.3)',
+              border: '1px solid var(--color-olive-glow)',
               transition: 'all 0.3s ease',
               opacity: action.disabled ? 0.5 : 1,
               cursor: action.disabled ? 'not-allowed' : 'pointer',
@@ -41,19 +41,19 @@ const QuickActions = ({ actions, insight, withdrawAction }: QuickActionsProps) =
             className="flex flex-col items-center justify-center p-4 rounded-xl group"
             onMouseEnter={(e) => {
               if (!action.disabled) {
-                e.currentTarget.style.background = 'rgba(107, 142, 35, 0.1)';
-                e.currentTarget.style.borderColor = 'rgba(107, 142, 35, 0.6)';
+                e.currentTarget.style.background = 'var(--color-olive-muted)';
+                e.currentTarget.style.borderColor = 'var(--color-olive-glow)';
               }
             }}
             onMouseLeave={(e) => {
               if (!action.disabled) {
                 e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.borderColor = 'rgba(107, 142, 35, 0.3)';
+                e.currentTarget.style.borderColor = 'var(--color-olive-glow)';
               }
             }}
           >
             <span
-              style={{ color: action.disabled ? '#6b7280' : (action.color || '#8FA887') }}
+              style={{ color: action.disabled ? 'var(--neutral-500)' : (action.color || 'var(--color-olive-light)') }}
               className="material-icons mb-2 group-hover:scale-110 transition-transform"
             >
               {action.icon}
@@ -92,21 +92,21 @@ const QuickActions = ({ actions, insight, withdrawAction }: QuickActionsProps) =
       {insight && (
         <div
           style={{
-            background: 'rgba(107, 142, 35, 0.1)',
-            border: '1px solid rgba(107, 142, 35, 0.3)',
+            background: 'var(--color-olive-muted)',
+            border: '1px solid var(--color-olive-glow)',
             backdropFilter: 'blur(10px)',
           }}
           className="mt-6 p-4 rounded-lg"
         >
           <div className="flex gap-3">
-            <span style={{ color: '#8FA887' }} className="material-icons text-sm mt-0.5">
+            <span style={{ color: 'var(--color-olive-light)' }} className="material-icons text-sm mt-0.5">
               lightbulb
             </span>
             <div>
-              <h5 style={{ color: '#8FA887' }} className="text-sm font-semibold">
+              <h5 style={{ color: 'var(--color-olive-light)' }} className="text-sm font-semibold">
                 Insight
               </h5>
-              <p style={{ color: '#b8c9b0' }} className="text-xs mt-1">
+              <p style={{ color: 'var(--text-secondary)' }} className="text-xs mt-1">
                 {insight.text}
               </p>
             </div>

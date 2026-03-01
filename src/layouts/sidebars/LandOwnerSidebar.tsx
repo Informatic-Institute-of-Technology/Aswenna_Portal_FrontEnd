@@ -1,6 +1,7 @@
 import { useAuth } from "@/Context/useAuth";
 import {
   AccountCircle,
+  Domain as AssetIcon,
   AttachMoney,
   BarChart as BarChartIcon,
   Cloud,
@@ -71,6 +72,14 @@ const LandOwnerSidebar = () => {
     },
   ];
 
+  const assetItems = [
+    {
+      text: "Land Asset Register",
+      icon: <AssetIcon />,
+      path: `${basePath}/dashboard/land-assets`,
+    },
+  ];
+
   const secondaryItems = [
     { text: "Inbox", icon: <Mail />, path: `${basePath}/dashboard/inbox` },
     {
@@ -112,6 +121,42 @@ const LandOwnerSidebar = () => {
 
       <List sx={{ flex: 1, py: 2 }}>
         {menuItems.map((item) => (
+          <ListItemButton
+            key={item.path}
+            selected={location.pathname === item.path}
+            onClick={() => navigate(item.path)}
+          >
+            <ListItemIcon
+              sx={{
+                color:
+                  location.pathname === item.path ? "primary.main" : "inherit",
+              }}
+            >
+              {item.icon}
+            </ListItemIcon>
+            <ListItemText primary={item.text} />
+          </ListItemButton>
+        ))}
+      </List>
+
+      <Divider />
+
+      <Box sx={{ px: 2, pt: 1.5, pb: 0.5 }}>
+        <Typography
+          variant="caption"
+          sx={{
+            color: "primary.main",
+            fontWeight: 700,
+            textTransform: "uppercase",
+            letterSpacing: 1,
+            fontSize: 10,
+          }}
+        >
+          Asset Management
+        </Typography>
+      </Box>
+      <List sx={{ py: 0 }}>
+        {assetItems.map((item) => (
           <ListItemButton
             key={item.path}
             selected={location.pathname === item.path}

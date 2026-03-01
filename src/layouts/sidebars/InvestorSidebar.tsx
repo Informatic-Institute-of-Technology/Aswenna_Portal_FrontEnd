@@ -1,13 +1,18 @@
 import { useAuth } from "@/Context/useAuth";
 import {
+  AccountBalance,
   AccountCircle,
+  HowToReg as ApprovalIcon,
   AttachMoney,
   BarChart as BarChartIcon,
   BusinessCenter,
   Description,
+  Ballot as GLIcon,
   Home,
   Landscape,
   Mail,
+  Payment,
+  PieChart,
   Settings,
   TrendingUp,
 } from "@mui/icons-material";
@@ -31,7 +36,7 @@ const InvestorSidebar = () => {
 
   const basePath = `/${sessionId}`;
 
-  const menuItems = [
+  const mainItems = [
     { text: "Dashboard", icon: <Home />, path: `${basePath}/dashboard` },
     {
       text: "My Offers",
@@ -62,6 +67,34 @@ const InvestorSidebar = () => {
       text: "Profitability Charts",
       icon: <BarChartIcon />,
       path: `${basePath}/dashboard/profitability`,
+    },
+  ];
+
+  const financeItems = [
+    {
+      text: "Finance Ledger",
+      icon: <AccountBalance />,
+      path: `${basePath}/dashboard/finance-ledger`,
+    },
+    {
+      text: "Payment Pipeline",
+      icon: <Payment />,
+      path: `${basePath}/dashboard/payment-pipeline`,
+    },
+    {
+      text: "Portfolio Analytics",
+      icon: <PieChart />,
+      path: `${basePath}/dashboard/portfolio`,
+    },
+    {
+      text: "GL Dashboard",
+      icon: <GLIcon />,
+      path: `${basePath}/dashboard/gl-dashboard`,
+    },
+    {
+      text: "Approval Workflow",
+      icon: <ApprovalIcon />,
+      path: `${basePath}/dashboard/approvals`,
     },
   ];
 
@@ -104,8 +137,8 @@ const InvestorSidebar = () => {
 
       <Divider />
 
-      <List sx={{ flex: 1, py: 2 }}>
-        {menuItems.map((item) => (
+      <List sx={{ flex: 1, py: 1, overflowY: "auto" }}>
+        {mainItems.map((item) => (
           <ListItemButton
             key={item.path}
             selected={location.pathname === item.path}
@@ -120,6 +153,55 @@ const InvestorSidebar = () => {
               {item.icon}
             </ListItemIcon>
             <ListItemText primary={item.text} />
+          </ListItemButton>
+        ))}
+
+        {/* ── Finance Module Section ── */}
+        <Box sx={{ px: 2, pt: 1.5, pb: 0.5 }}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: "primary.main",
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: "0.1em",
+              fontSize: "0.65rem",
+            }}
+          >
+            Finance & Analytics
+          </Typography>
+        </Box>
+        {financeItems.map((item) => (
+          <ListItemButton
+            key={item.path}
+            selected={location.pathname === item.path}
+            onClick={() => navigate(item.path)}
+            sx={{
+              "&.Mui-selected": {
+                bgcolor: "var(--color-olive-muted)",
+                borderRight: "3px solid",
+                borderColor: "primary.main",
+              },
+            }}
+          >
+            <ListItemIcon
+              sx={{
+                color:
+                  location.pathname === item.path
+                    ? "primary.main"
+                    : "text.secondary",
+                minWidth: 36,
+              }}
+            >
+              {item.icon}
+            </ListItemIcon>
+            <ListItemText
+              primary={item.text}
+              primaryTypographyProps={{
+                fontSize: "0.875rem",
+                fontWeight: location.pathname === item.path ? 600 : 400,
+              }}
+            />
           </ListItemButton>
         ))}
       </List>

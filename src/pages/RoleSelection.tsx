@@ -92,8 +92,8 @@ const RoleSelection = () => {
             onClick={handleBack}
             sx={{
               color: "white",
-              backgroundColor: "rgba(0,0,0,0.3)",
-              "&:hover": { backgroundColor: "rgba(0,0,0,0.5)" },
+              backgroundColor: "var(--overlay-sm)",
+              "&:hover": { backgroundColor: "var(--overlay-lg)" },
             }}
           >
             <ArrowBack />
@@ -105,7 +105,7 @@ const RoleSelection = () => {
               flex: 1,
               maxWidth: 400,
               "& .MuiStepConnector-line": {
-                borderColor: "rgba(255,255,255,0.3)",
+                borderColor: "var(--surface-light)",
               },
             }}
           >
@@ -113,11 +113,11 @@ const RoleSelection = () => {
               <StepLabel
                 sx={{
                   "& .MuiStepLabel-label": {
-                    color: "#9ca3af",
+                    color: "var(--neutral-350)",
                     fontSize: "0.875rem",
                     fontWeight: 500,
                   },
-                  "& .MuiStepIcon-root": { color: "#6b8e23" },
+                  "& .MuiStepIcon-root": { color: "var(--color-olive)" },
                   "& .MuiStepIcon-text": { fill: "white" },
                 }}
               >
@@ -137,7 +137,7 @@ const RoleSelection = () => {
                     border: "2px solid white",
                     borderRadius: "50%",
                   },
-                  "& .MuiStepIcon-text": { fill: "#1a1a1a" },
+                  "& .MuiStepIcon-text": { fill: "var(--bg-overlay)" },
                 }}
               >
                 Step 2
@@ -147,11 +147,11 @@ const RoleSelection = () => {
               <StepLabel
                 sx={{
                   "& .MuiStepLabel-label": {
-                    color: "#6b6b6b",
+                    color: "var(--neutral-500)",
                     fontSize: "0.875rem",
                     fontWeight: 500,
                   },
-                  "& .MuiStepIcon-root": { color: "#4a4a4a" },
+                  "& .MuiStepIcon-root": { color: "var(--neutral-700)" },
                   "& .MuiStepIcon-text": { fill: "white" },
                 }}
               >
@@ -181,7 +181,7 @@ const RoleSelection = () => {
           <Typography
             variant="h6"
             sx={{
-              color: "rgba(255,255,255,0.8)",
+              color: "var(--text-on-dark)",
               fontWeight: 400,
               maxWidth: "600px",
               margin: "0 auto",
@@ -216,18 +216,18 @@ const RoleSelection = () => {
                   )
                 }
                 sx={{
-                  backgroundColor: "#2e7d32",
+                  backgroundColor: "var(--color-success)",
                   color: "white",
                   borderRadius: "12px",
                   padding: "12px 24px",
                   fontSize: "1rem",
                   fontWeight: 600,
                   textTransform: "none",
-                  boxShadow: "0 4px 14px 0 rgba(0,0,0,0.39)",
+                  boxShadow: "0 4px 14px 0 var(--overlay-sm)",
                   "&:hover": {
-                    backgroundColor: "#1b5e20",
+                    backgroundColor: "var(--color-brand-primary-hover)",
                     transform: "translateY(-2px)",
-                    boxShadow: "0 6px 20px rgba(0,0,0,0.23)",
+                    boxShadow: "0 6px 20px var(--overlay-sm)",
                   },
                   transition: "all 0.2s ease-in-out",
                 }}

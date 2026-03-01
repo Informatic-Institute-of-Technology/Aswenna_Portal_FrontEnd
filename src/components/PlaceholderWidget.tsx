@@ -10,7 +10,7 @@ const PlaceholderWidget = ({ icon, title, description }: PlaceholderWidgetProps)
   return (
     <Box
       sx={{
-        backgroundColor: 'rgba(107, 142, 35, 0.05)',
+        backgroundColor: 'var(--color-olive-muted)',
         border: '2px dashed',
         borderColor: 'divider',
         borderRadius: 2,

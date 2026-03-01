@@ -782,7 +782,7 @@ const LandownerProfileSetup = () => {
                 component="h1"
                 sx={{ fontWeight: "bold", mb: 1 }}
               >
-                Landowner <span style={{ color: "#6B8E23" }}>Profile</span>
+                Landowner <span style={{ color: "var(--color-olive)" }}>Profile</span>
               </Typography>
             </Box>
 
@@ -896,8 +896,8 @@ const LandownerProfileSetup = () => {
                     sx={{
                       "& .MuiInputBase-input.Mui-disabled": {
                         WebkitTextFillColor: gender
-                          ? "rgba(255, 255, 255, 0.87)"
-                          : "rgba(255, 255, 255, 0.38)",
+                          ? "var(--text-primary)"
+                          : "var(--text-on-dark)",
                         fontWeight: gender ? 600 : 400,
                       },
                     }}
@@ -923,8 +923,8 @@ const LandownerProfileSetup = () => {
                     sx={{
                       "& .MuiInputBase-input.Mui-disabled": {
                         WebkitTextFillColor: birthday
-                          ? "rgba(255, 255, 255, 0.87)"
-                          : "rgba(255, 255, 255, 0.38)",
+                          ? "var(--text-primary)"
+                          : "var(--text-on-dark)",
                         fontWeight: birthday ? 600 : 400,
                       },
                     }}
@@ -943,8 +943,8 @@ const LandownerProfileSetup = () => {
                       "& .MuiInputBase-input.Mui-disabled": {
                         WebkitTextFillColor:
                           age !== null
-                            ? "rgba(255, 255, 255, 0.87)"
-                            : "rgba(255, 255, 255, 0.38)",
+                            ? "var(--text-primary)"
+                            : "var(--text-on-dark)",
                         fontWeight: age !== null ? 600 : 400,
                       },
                     }}
@@ -1134,8 +1134,8 @@ const LandownerProfileSetup = () => {
                     sx={{
                       "& .MuiInputBase-input.Mui-disabled": {
                         WebkitTextFillColor: pinLocation
-                          ? "rgba(255, 255, 255, 0.87)"
-                          : "rgba(255, 255, 255, 0.38)",
+                          ? "var(--text-primary)"
+                          : "var(--text-on-dark)",
                         fontWeight: pinLocation ? 600 : 400,
                       },
                     }}
@@ -1153,8 +1153,8 @@ const LandownerProfileSetup = () => {
                     sx={{
                       "& .MuiInputBase-input.Mui-disabled": {
                         WebkitTextFillColor: pinLocation
-                          ? "rgba(255, 255, 255, 0.87)"
-                          : "rgba(255, 255, 255, 0.38)",
+                          ? "var(--text-primary)"
+                          : "var(--text-on-dark)",
                         fontWeight: pinLocation ? 600 : 400,
                       },
                     }}

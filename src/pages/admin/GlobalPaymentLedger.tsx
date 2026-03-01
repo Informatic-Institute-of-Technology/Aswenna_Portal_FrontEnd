@@ -188,28 +188,28 @@ const formatDateTime = (dateString: string) => {
 const getStatusColor = (status: string) => {
   switch (status) {
     case "completed":
-      return { backgroundColor: "#1b5e20", color: "#ffffff" };
+      return { backgroundColor: "var(--color-brand-primary-hover)", color: "var(--text-primary)" };
     case "pending":
-      return { backgroundColor: "#f57c00", color: "#ffffff" };
+      return { backgroundColor: "var(--color-orange)", color: "var(--text-primary)" };
     case "failed":
-      return { backgroundColor: "#c62828", color: "#ffffff" };
+      return { backgroundColor: "var(--color-overdue)", color: "var(--text-primary)" };
     case "disputed":
-      return { backgroundColor: "#c62828", color: "#ffffff" };
+      return { backgroundColor: "var(--color-overdue)", color: "var(--text-primary)" };
     default:
-      return { backgroundColor: "#757575", color: "#ffffff" };
+      return { backgroundColor: "var(--neutral-500)", color: "var(--text-primary)" };
   }
 };
 
 const getTypeColor = (type: string) => {
   switch (type) {
     case "payment":
-      return { backgroundColor: "#1976d2", color: "#ffffff" };
+      return { backgroundColor: "var(--color-info-blue)", color: "var(--text-primary)" };
     case "refund":
-      return { backgroundColor: "#ed6c02", color: "#ffffff" };
+      return { backgroundColor: "var(--color-orange)", color: "var(--text-primary)" };
     case "platform_fee":
-      return { backgroundColor: "#9c27b0", color: "#ffffff" };
+      return { backgroundColor: "var(--color-purple)", color: "var(--text-primary)" };
     default:
-      return { backgroundColor: "#757575", color: "#ffffff" };
+      return { backgroundColor: "var(--neutral-500)", color: "var(--text-primary)" };
   }
 };
 
@@ -383,7 +383,7 @@ const GlobalPaymentLedger = () => {
                           width: 40,
                           height: 40,
                           borderRadius: "50%",
-                          background: "rgba(255, 255, 255, 0.2)",
+                          background: "var(--surface-light)",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
@@ -459,7 +459,7 @@ const GlobalPaymentLedger = () => {
                     width: 200,
                     height: 200,
                     borderRadius: "50%",
-                    background: "rgba(255, 255, 255, 0.1)",
+                    background: "var(--surface-light)",
                   }}
                 />
                 <Box
@@ -470,7 +470,7 @@ const GlobalPaymentLedger = () => {
                     width: 250,
                     height: 250,
                     borderRadius: "50%",
-                    background: "rgba(255, 255, 255, 0.05)",
+                    background: "var(--surface-muted)",
                   }}
                 />
               </Card>

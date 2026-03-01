@@ -18,24 +18,24 @@ interface CreateAdPopupProps {
 
 const fieldStyle = {
   "& .MuiInputBase-root": {
-    color: "#e0e0e0",
+    color: "var(--text-secondary)",
   },
   "& .MuiInput-underline:before": {
-    borderBottom: "1px solid #444",
+    borderBottom: "1px solid var(--neutral-700)",
   },
   "& .MuiInput-underline:hover:before": {
-    borderBottom: "1px solid #666",
+    borderBottom: "1px solid var(--neutral-500)",
   },
   "& .MuiInput-underline:after": {
-    borderBottom: "2px solid #6e8b3d",
+    borderBottom: "2px solid var(--color-olive)",
   },
   "& .MuiSelect-icon": {
-    color: "#e0e0e0",
+    color: "var(--text-secondary)",
   },
 };
 
 const Label = ({ text }: { text: string }) => (
-  <Box sx={{ color: "#fff", fontSize: "14px", fontWeight: 500, mb: "6px" }}>
+  <Box sx={{ color: "var(--text-primary)", fontSize: "14px", fontWeight: 500, mb: "6px" }}>
     {text}
   </Box>
 );
@@ -108,8 +108,8 @@ const CreateAdPopup = ({ open, onClose }: CreateAdPopupProps) => {
       PaperProps={{
         sx: {
           borderRadius: "16px",
-          background: "linear-gradient(180deg, #1c1f22, #141617)",
-          color: "#fff",
+          background: "linear-gradient(180deg, var(--bg-overlay), var(--bg-elevated))",
+          color: "var(--text-primary)",
           padding: "12px",
         },
       }}
@@ -124,7 +124,7 @@ const CreateAdPopup = ({ open, onClose }: CreateAdPopupProps) => {
         }}
       >
         Create an Ad
-        <IconButton onClick={onClose} sx={{ color: "#fff" }}>
+        <IconButton onClick={onClose} sx={{ color: "var(--text-primary)" }}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
@@ -203,7 +203,7 @@ const CreateAdPopup = ({ open, onClose }: CreateAdPopupProps) => {
               sx={{
                 "& .MuiOutlinedInput-root": {
                   borderRadius: "8px",
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "var(--text-primary)",
                 },
               }}
             >
@@ -228,7 +228,7 @@ const CreateAdPopup = ({ open, onClose }: CreateAdPopupProps) => {
               sx={{
                 "& .MuiOutlinedInput-root": {
                   borderRadius: "8px",
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "var(--text-primary)",
                 },
               }}
             >
@@ -259,19 +259,19 @@ const CreateAdPopup = ({ open, onClose }: CreateAdPopupProps) => {
             <Label text="Upload a Photo" />
             <Box
               sx={{
-                border: "1px dashed #ccc",
+                border: "1px dashed var(--text-secondary)",
                 borderRadius: "8px",
                 padding: "16px",
                 textAlign: "center",
                 cursor: "pointer",
-                backgroundColor: "#282828",
+                backgroundColor: "var(--bg-subtle)",
                 minHeight: "56px",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
                 "&:hover": {
-                  borderColor: "#6e8b3d",
+                  borderColor: "var(--color-olive)",
                   backgroundColor: "rgba(113, 188, 93, 0.04)",
                 },
               }}
@@ -284,12 +284,12 @@ const CreateAdPopup = ({ open, onClose }: CreateAdPopupProps) => {
                 onChange={handleFileChange}
                 style={{ display: "none" }}
               />
-              <div style={{ color: "#666", fontSize: "14px" }}>
+              <div style={{ color: "var(--neutral-500)", fontSize: "14px" }}>
                 {formData.photo ? formData.photo.name : "No file chosen"}
               </div>
               <div
                 style={{
-                  color: "#999",
+                  color: "var(--neutral-350)",
                   fontSize: "12px",
                   marginTop: "4px",
                 }}
@@ -305,13 +305,13 @@ const CreateAdPopup = ({ open, onClose }: CreateAdPopupProps) => {
             variant="contained"
             onClick={handleSubmit}
             sx={{
-              backgroundColor: "#6e8b3d",
+              backgroundColor: "var(--color-olive)",
               px: 8,
               py: 1.2,
               borderRadius: "10px",
               fontWeight: 600,
               "&:hover": {
-                backgroundColor: "#5d7633",
+                backgroundColor: "var(--color-olive-dark)",
               },
             }}
           >

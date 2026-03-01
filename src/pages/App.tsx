@@ -31,6 +31,30 @@ const MatchMakingPage = lazy(() => import("./common/MatchMakingPage"));
 const MyOffersPage = lazy(() => import("./investor/MyOffersPage"));
 const OpportunitiesPage = lazy(() => import("./investor/OpportunitiesPage"));
 const RequestsPage = lazy(() => import("./investor/RequestsPage"));
+const FinanceLedgerPage = lazy(() => import("./investor/FinanceLedgerPage"));
+const PaymentControlCenterPage = lazy(
+  () => import("./investor/payment/PaymentControlCenterPage"),
+);
+const PortfolioAnalyticsPage = lazy(
+  () => import("./investor/PortfolioAnalyticsPage"),
+);
+const GLDashboardPage = lazy(() => import("./investor/GLDashboardPage"));
+const ApprovalWorkflowPage = lazy(
+  () => import("./investor/ApprovalWorkflowPage"),
+);
+const ProjectPaymentMilestonePage = lazy(
+  () => import("./investor/payment/ProjectPaymentMilestonePage"),
+);
+const PayInstallmentPage = lazy(
+  () => import("./investor/payment/PayInstallmentPage"),
+);
+const CropJobsPage = lazy(() => import("./farmer/CropJobsPage"));
+const PurchaseRequisitionPage = lazy(
+  () => import("./farmer/PurchaseRequisitionPage"),
+);
+const LandAssetRegisterPage = lazy(
+  () => import("./landowner/LandAssetRegisterPage"),
+);
 
 const MyLandAdsPage = lazy(() => import("./landowner/MyLandAdsPage"));
 const ReceivedRequestsPage = lazy(
@@ -107,6 +131,28 @@ function AppRoutes() {
             <Route path="requests" element={<RequestsPage />} />
             <Route path="roi-analysis" element={<MatchMakingPage />} />
             <Route path="profitability" element={<Dashboard />} />
+            <Route path="finance-ledger" element={<FinanceLedgerPage />} />
+            <Route
+              path="payment-pipeline"
+              element={<PaymentControlCenterPage />}
+            />
+            <Route path="portfolio" element={<PortfolioAnalyticsPage />} />
+            <Route path="gl-dashboard" element={<GLDashboardPage />} />
+            <Route path="approvals" element={<ApprovalWorkflowPage />} />
+            <Route
+              path="payment-control"
+              element={<PaymentControlCenterPage />}
+            />
+            <Route
+              path="payment-milestone"
+              element={<ProjectPaymentMilestonePage />}
+            />
+            <Route path="pay-installment" element={<PayInstallmentPage />} />
+
+            <Route path="crop-jobs" element={<CropJobsPage />} />
+            <Route path="requisitions" element={<PurchaseRequisitionPage />} />
+
+            <Route path="land-assets" element={<LandAssetRegisterPage />} />
 
             <Route path="my-land-ads" element={<MyLandAdsPage />} />
             <Route

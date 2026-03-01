@@ -104,7 +104,7 @@ const SuperAdminSidebar = () => {
               bottom: 0,
               borderRadius: "50%",
               background:
-                "linear-gradient(90deg, #FF6B35, #F7931E, #FDC830, #4CAF50, #2196F3, #9C27B0, #FF6B35)",
+                "linear-gradient(90deg, var(--color-brand-accent), var(--color-brand-accent), var(--color-amber), var(--color-success), var(--color-info-blue), var(--color-purple), var(--color-brand-accent))",
               backgroundSize: "400% 400%",
               animation: "gradient-rotate 4s linear infinite",
               zIndex: 0,
@@ -132,7 +132,7 @@ const SuperAdminSidebar = () => {
               height: 124,
               position: "relative",
               zIndex: 1,
-              border: "3px solid #1a1a1a",
+              border: "3px solid var(--bg-overlay)",
             }}
           />
         </Box>

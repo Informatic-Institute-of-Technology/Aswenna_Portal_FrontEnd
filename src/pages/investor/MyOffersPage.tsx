@@ -130,7 +130,7 @@ const MyOffersPage = () => {
               content: '""',
               width: 4,
               height: 24,
-              background: "linear-gradient(180deg, #6B8E23 0%, #8FA887 100%)",
+              background: "linear-gradient(180deg, var(--color-olive) 0%, var(--color-olive-light) 100%)",
               borderRadius: 1,
             },
           }}
@@ -150,7 +150,7 @@ const MyOffersPage = () => {
             sx={{
               textAlign: "center",
               p: 6,
-              background: "rgba(255, 255, 255, 0.02)",
+              background: "var(--surface-tint)",
               borderRadius: 2,
               border: "2px dashed",
               borderColor: "divider",
@@ -176,7 +176,7 @@ const MyOffersPage = () => {
           border: "none",
           height: 1,
           background:
-            "linear-gradient(90deg, transparent, #3a3a3a, transparent)",
+            "linear-gradient(90deg, transparent, var(--border-medium), transparent)",
         }}
       />
 
@@ -194,7 +194,7 @@ const MyOffersPage = () => {
               content: '""',
               width: 4,
               height: 24,
-              background: "linear-gradient(180deg, #6B8E23 0%, #8FA887 100%)",
+              background: "linear-gradient(180deg, var(--color-olive) 0%, var(--color-olive-light) 100%)",
               borderRadius: 1,
             },
           }}
@@ -214,7 +214,7 @@ const MyOffersPage = () => {
             sx={{
               textAlign: "center",
               p: 6,
-              background: "rgba(255, 255, 255, 0.02)",
+              background: "var(--surface-tint)",
               borderRadius: 2,
               border: "2px dashed",
               borderColor: "divider",

@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "id": "1",
     "projectId": "PRJ-156",
@@ -195,7 +195,7 @@
         "milestoneId": "M6",
         "amount": 22000,
         "dueDate": "2026-01-15",
-        "status": "pending",
+        "status": "overdue",
         "description": "Milestone 6: Pre-Harvest Preparation Payment"
       },
       {
@@ -213,6 +213,58 @@
         "dueDate": "2026-04-30",
         "status": "pending",
         "description": "Milestone 8: Post-Harvest & Distribution Payment"
+      }
+    ],
+    "landRentals": [
+      {
+        "id": "P1R1",
+        "landArea": "12.5 acres",
+        "month": "November 2025",
+        "dueDate": "2025-11-30",
+        "paidDate": "2025-11-28",
+        "amount": 31250,
+        "status": "paid"
+      },
+      {
+        "id": "P1R2",
+        "landArea": "12.5 acres",
+        "month": "December 2025",
+        "dueDate": "2025-12-31",
+        "paidDate": "2025-12-30",
+        "amount": 31250,
+        "status": "paid"
+      },
+      {
+        "id": "P1R3",
+        "landArea": "12.5 acres",
+        "month": "January 2026",
+        "dueDate": "2026-01-31",
+        "amount": 31250,
+        "status": "overdue"
+      },
+      {
+        "id": "P1R4",
+        "landArea": "12.5 acres",
+        "month": "February 2026",
+        "dueDate": "2026-02-28",
+        "amount": 31250,
+        "status": "overdue"
+      },
+      {
+        "id": "P1R5",
+        "landArea": "12.5 acres",
+        "month": "March 2026",
+        "dueDate": "2026-03-31",
+        "amount": 31250,
+        "status": "pending"
+      },
+      {
+        "id": "P1R6",
+        "landArea": "12.5 acres",
+        "month": "April 2026",
+        "dueDate": "2026-04-30",
+        "amount": 31250,
+        "status": "pending"
       }
     ],
     "financialBreakdown": [
@@ -414,7 +466,7 @@
         "milestoneId": "VM3",
         "amount": 35000,
         "dueDate": "2026-01-31",
-        "status": "pending",
+        "status": "overdue",
         "description": "Growth Phase Monitoring Payment"
       },
       {
@@ -422,7 +474,7 @@
         "milestoneId": "VM4",
         "amount": 38000,
         "dueDate": "2026-02-15",
-        "status": "pending",
+        "status": "overdue",
         "description": "First Harvest Cycle Payment"
       },
       {
@@ -440,6 +492,41 @@
         "dueDate": "2026-03-15",
         "status": "pending",
         "description": "Final Harvest & Distribution Payment"
+      }
+    ],
+    "landRentals": [
+      {
+        "id": "P2R1",
+        "landArea": "8 acres",
+        "month": "December 2025",
+        "dueDate": "2025-12-31",
+        "paidDate": "2025-12-29",
+        "amount": 18000,
+        "status": "paid"
+      },
+      {
+        "id": "P2R2",
+        "landArea": "8 acres",
+        "month": "January 2026",
+        "dueDate": "2026-01-31",
+        "amount": 18000,
+        "status": "overdue"
+      },
+      {
+        "id": "P2R3",
+        "landArea": "8 acres",
+        "month": "February 2026",
+        "dueDate": "2026-02-28",
+        "amount": 18000,
+        "status": "overdue"
+      },
+      {
+        "id": "P2R4",
+        "landArea": "8 acres",
+        "month": "March 2026",
+        "dueDate": "2026-03-15",
+        "amount": 18000,
+        "status": "pending"
       }
     ],
     "financialBreakdown": [
@@ -689,6 +776,62 @@
         "description": "Milestone 6: Final Assessment & Handover Payment"
       }
     ],
+    "landRentals": [
+      {
+        "id": "P3R1",
+        "landArea": "15 acres",
+        "month": "June 2025",
+        "dueDate": "2025-06-30",
+        "paidDate": "2025-06-28",
+        "amount": 28500,
+        "status": "paid"
+      },
+      {
+        "id": "P3R2",
+        "landArea": "15 acres",
+        "month": "July 2025",
+        "dueDate": "2025-07-31",
+        "paidDate": "2025-07-30",
+        "amount": 28500,
+        "status": "paid"
+      },
+      {
+        "id": "P3R3",
+        "landArea": "15 acres",
+        "month": "August 2025",
+        "dueDate": "2025-08-31",
+        "paidDate": "2025-08-29",
+        "amount": 28500,
+        "status": "paid"
+      },
+      {
+        "id": "P3R4",
+        "landArea": "15 acres",
+        "month": "September 2025",
+        "dueDate": "2025-09-30",
+        "paidDate": "2025-09-28",
+        "amount": 28500,
+        "status": "paid"
+      },
+      {
+        "id": "P3R5",
+        "landArea": "15 acres",
+        "month": "October 2025",
+        "dueDate": "2025-10-31",
+        "paidDate": "2025-10-30",
+        "amount": 28500,
+        "status": "paid"
+      },
+      {
+        "id": "P3R6",
+        "landArea": "15 acres",
+        "month": "November 2025",
+        "dueDate": "2025-11-30",
+        "paidDate": "2025-11-29",
+        "amount": 28500,
+        "status": "paid"
+      }
+    ],
     "financialBreakdown": [
       {
         "category": "Land Preparation & Survey",
@@ -932,6 +1075,71 @@
         "paidDate": "2025-10-31",
         "status": "paid",
         "description": "Milestone 6: Certification & Harvest Prep Payment"
+      }
+    ],
+    "landRentals": [
+      {
+        "id": "P4R1",
+        "landArea": "10 acres",
+        "month": "April 2025",
+        "dueDate": "2025-04-30",
+        "paidDate": "2025-04-29",
+        "amount": 22000,
+        "status": "paid"
+      },
+      {
+        "id": "P4R2",
+        "landArea": "10 acres",
+        "month": "May 2025",
+        "dueDate": "2025-05-31",
+        "paidDate": "2025-05-30",
+        "amount": 22000,
+        "status": "paid"
+      },
+      {
+        "id": "P4R3",
+        "landArea": "10 acres",
+        "month": "June 2025",
+        "dueDate": "2025-06-30",
+        "paidDate": "2025-06-29",
+        "amount": 22000,
+        "status": "paid"
+      },
+      {
+        "id": "P4R4",
+        "landArea": "10 acres",
+        "month": "July 2025",
+        "dueDate": "2025-07-31",
+        "paidDate": "2025-07-30",
+        "amount": 22000,
+        "status": "paid"
+      },
+      {
+        "id": "P4R5",
+        "landArea": "10 acres",
+        "month": "August 2025",
+        "dueDate": "2025-08-31",
+        "paidDate": "2025-08-30",
+        "amount": 22000,
+        "status": "paid"
+      },
+      {
+        "id": "P4R6",
+        "landArea": "10 acres",
+        "month": "September 2025",
+        "dueDate": "2025-09-30",
+        "paidDate": "2025-09-29",
+        "amount": 22000,
+        "status": "paid"
+      },
+      {
+        "id": "P4R7",
+        "landArea": "10 acres",
+        "month": "October 2025",
+        "dueDate": "2025-10-31",
+        "paidDate": "2025-10-30",
+        "amount": 22000,
+        "status": "paid"
       }
     ],
     "financialBreakdown": [

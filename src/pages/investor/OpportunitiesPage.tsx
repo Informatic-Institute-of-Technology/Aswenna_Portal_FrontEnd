@@ -84,7 +84,7 @@ const OpportunitiesPage = () => {
             <SectionHeader
               title="Investment Opportunities"
               description="Fund farmers' cultivation projects with detailed cost breakdowns and payment schedules"
-              accentColor="#F7931E"
+              accentColor="var(--color-brand-accent)"
               showLeftBorder={true}
             />
 
@@ -109,7 +109,7 @@ const OpportunitiesPage = () => {
                 sx={{
                   textAlign: "center",
                   py: 8,
-                  bgcolor: "rgba(255,255,255,0.02)",
+                  bgcolor: "var(--surface-tint)",
                   borderRadius: 2,
                   color: "text.secondary",
                 }}
@@ -130,7 +130,7 @@ const OpportunitiesPage = () => {
             <SectionHeader
               title="Hire Farmers"
               description="Hire skilled farmers for various agricultural services"
-              accentColor="#F7931E"
+              accentColor="var(--color-brand-accent)"
               showLeftBorder={true}
             />
 
@@ -156,7 +156,7 @@ const OpportunitiesPage = () => {
                 sx={{
                   textAlign: "center",
                   py: 8,
-                  bgcolor: "rgba(255,255,255,0.02)",
+                  bgcolor: "var(--surface-tint)",
                   borderRadius: 2,
                   color: "text.secondary",
                 }}

@@ -32,7 +32,7 @@ export const ImageGallery = ({
                             borderRadius: 2,
                             overflow: 'hidden',
                             aspectRatio: '4/3',
-                            bgcolor: '#f5f5f5'
+                            bgcolor: 'var(--text-primary)'
                         }}>
                             <img
                                 src={img.preview}
@@ -45,8 +45,8 @@ export const ImageGallery = ({
                                     position: 'absolute',
                                     top: 8,
                                     right: 8,
-                                    bgcolor: 'rgba(255, 255, 255, 0.9)',
-                                    '&:hover': { bgcolor: 'rgba(255, 255, 255, 1)' }
+                                    bgcolor: 'var(--text-primary)',
+                                    '&:hover': { bgcolor: 'var(--text-primary)' }
                                 }}
                                 size="small"
                             >

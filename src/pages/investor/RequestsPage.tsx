@@ -122,7 +122,7 @@ const RequestsPage = () => {
             icon: "article",
             label: "View Land Post",
             onClick: () => handleQuickAction("view-land"),
-            color: "#3b82f6",
+            color: "var(--color-info-blue)",
           },
           {
             icon: "message",
@@ -150,7 +150,7 @@ const RequestsPage = () => {
           {
             icon: "block",
             label: "Reject",
-            color: "#ef5350",
+            color: "var(--color-overdue)",
             onClick: () => handleQuickAction("reject"),
           },
         ];
@@ -159,7 +159,7 @@ const RequestsPage = () => {
     <>
       <div
         style={{
-          background: "linear-gradient(145deg, #2a2a2a 0%, #1f1f1f 100%)",
+          background: "linear-gradient(145deg, var(--bg-subtle) 0%, var(--bg-overlay) 100%)",
         }}
         className="text-gray-300 font-sans h-full flex flex-col overflow-hidden transition-colors duration-200"
       >
@@ -218,8 +218,8 @@ const RequestsPage = () => {
                   <section
                     style={{
                       background:
-                        "linear-gradient(145deg, rgba(42, 42, 42, 0.6) 0%, rgba(31, 31, 31, 0.6) 100%)",
-                      border: "1px solid rgba(107, 142, 35, 0.2)",
+                        "linear-gradient(145deg, var(--bg-subtle) 0%, var(--bg-overlay) 100%)",
+                      border: "1px solid var(--color-olive-muted-strong)",
                     }}
                     className="rounded-2xl p-4"
                   >
@@ -283,8 +283,8 @@ const RequestsPage = () => {
                   <section
                     style={{
                       background:
-                        "linear-gradient(145deg, rgba(42, 42, 42, 0.6) 0%, rgba(31, 31, 31, 0.6) 100%)",
-                      border: "1px solid rgba(107, 142, 35, 0.2)",
+                        "linear-gradient(145deg, var(--bg-subtle) 0%, var(--bg-overlay) 100%)",
+                      border: "1px solid var(--color-olive-muted-strong)",
                     }}
                     className="rounded-2xl p-4"
                   >
@@ -378,7 +378,7 @@ const RequestsPage = () => {
                         <span
                           className="absolute bottom-0 left-0 right-0 h-0.5"
                           style={{
-                            backgroundColor: "#4ADE80",
+                            backgroundColor: "var(--color-brand-primary)",
                             marginBottom: "-1px",
                           }}
                         ></span>
@@ -413,7 +413,7 @@ const RequestsPage = () => {
                         <span
                           className="absolute bottom-0 left-0 right-0 h-0.5"
                           style={{
-                            backgroundColor: "#6B8E23",
+                            backgroundColor: "var(--color-olive)",
                             marginBottom: "-1px",
                           }}
                         ></span>
@@ -479,10 +479,10 @@ const RequestsPage = () => {
                                       ? `${request.statusBadge.color}20`
                                       : "#fef3c720",
                                     color:
-                                      request.statusBadge.color || "#f59e0b",
+                                      request.statusBadge.color || "var(--color-pending)",
                                     border: request.statusBadge.color
                                       ? `1px solid ${request.statusBadge.color}10`
-                                      : "1px solid #f59e0b10",
+                                      : "1px solid var(--color-pending)10",
                                   }}
                                   className="px-2.5 py-1 rounded text-xs font-semibold flex items-center"
                                 >
@@ -628,12 +628,12 @@ const RequestsPage = () => {
                                   style={{
                                     background: request.statusBadge.color
                                       ? `${request.statusBadge.color}20`
-                                      : "#3b82f620",
+                                      : "var(--color-info-blue)20",
                                     color:
-                                      request.statusBadge.color || "#3b82f6",
+                                      request.statusBadge.color || "var(--color-info-blue)",
                                     border: request.statusBadge.color
                                       ? `1px solid ${request.statusBadge.color}10`
-                                      : "1px solid #3b82f610",
+                                      : "1px solid var(--color-info-blue)10",
                                   }}
                                   className="px-2.5 py-1 rounded text-xs font-semibold flex items-center"
                                 >
@@ -729,8 +729,8 @@ const RequestsPage = () => {
             {/* Right Sidebar */}
             <div
               style={{
-                background: "linear-gradient(145deg, #2a2a2a 0%, #1f1f1f 100%)",
-                borderLeft: "1px solid rgba(107, 142, 35, 0.3)",
+                background: "linear-gradient(145deg, var(--bg-subtle) 0%, var(--bg-overlay) 100%)",
+                borderLeft: "1px solid var(--color-olive-glow)",
               }}
               className="w-full lg:w-[400px] xl:w-[450px] flex flex-col overflow-y-auto z-10"
             >

@@ -227,7 +227,7 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
                     border: 2,
                     borderColor: offerType === 'direct-harvest' ? 'primary.main' : 'divider',
                     borderRadius: 2,
-                    bgcolor: offerType === 'direct-harvest' ? 'rgba(107, 142, 35, 0.05)' : 'transparent',
+                    bgcolor: offerType === 'direct-harvest' ? 'var(--color-olive-muted)' : 'transparent',
                     cursor: 'pointer',
                     transition: 'all 0.2s'
                   }}
@@ -258,7 +258,7 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
                     border: 2,
                     borderColor: offerType === 'sponsorship' ? 'primary.main' : 'divider',
                     borderRadius: 2,
-                    bgcolor: offerType === 'sponsorship' ? 'rgba(33, 150, 243, 0.05)' : 'transparent',
+                    bgcolor: offerType === 'sponsorship' ? 'var(--color-info-blue-muted)' : 'transparent',
                     cursor: 'pointer',
                     transition: 'all 0.2s'
                   }}
@@ -299,9 +299,9 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
             helperText="Auto-populated from your account"
             InputProps={{
               sx: {
-                bgcolor: 'rgba(0, 0, 0, 0.02)',
+                bgcolor: 'var(--surface-tint)',
                 '& .Mui-disabled': {
-                  WebkitTextFillColor: 'rgba(0, 0, 0, 0.8)',
+                  WebkitTextFillColor: 'var(--overlay-xl)',
                 }
               }
             }}
@@ -592,9 +592,9 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
           size="large"
           sx={{
             minWidth: 150,
-            background: 'linear-gradient(135deg, #6B8E23 0%, #8FA887 100%)',
+            background: 'linear-gradient(135deg, var(--color-olive) 0%, var(--color-olive-light) 100%)',
             '&:hover': {
-              background: 'linear-gradient(135deg, #7C9F34 0%, #A4C29D 100%)',
+              background: 'linear-gradient(135deg, var(--color-olive-hover) 0%, var(--color-olive-light) 100%)',
             }
           }}
         >

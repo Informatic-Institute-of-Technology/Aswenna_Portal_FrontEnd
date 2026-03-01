@@ -25,7 +25,7 @@ const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
         },
     },
     [`& .${stepConnectorClasses.line}`]: {
-        borderColor: theme.palette.mode === 'dark' ? '#444' : '#eaeaf0',
+        borderColor: theme.palette.mode === 'dark' ? 'var(--neutral-700)' : '#eaeaf0',
         borderTopWidth: 2,
         borderRadius: 1,
     },
@@ -56,8 +56,8 @@ export const ProfileStepper = ({ activeStep, steps }: ProfileStepperProps) => {
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                         bgcolor: completed || active ? 'primary.main' : 'transparent',
-                                        border: completed || active ? 'none' : '2px solid #555',
-                                        color: completed || active ? 'white' : '#777',
+                                        border: completed || active ? 'none' : '2px solid var(--neutral-600)',
+                                        color: completed || active ? 'white' : 'var(--neutral-500)',
                                         fontWeight: 'bold'
                                     }}>
                                         {completed ? <CheckIcon fontSize="small" /> : index + 1}

@@ -419,7 +419,7 @@ const InvestorProfileSetup = () => {
                 component="h1"
                 sx={{ fontWeight: "bold", mb: 1 }}
               >
-                Investor <span style={{ color: "#6B8E23" }}>Profile</span>
+                Investor <span style={{ color: "var(--color-olive)" }}>Profile</span>
               </Typography>
             </Box>
 
@@ -515,8 +515,8 @@ const InvestorProfileSetup = () => {
                     sx={{
                       "& .MuiInputBase-input.Mui-disabled": {
                         WebkitTextFillColor: gender
-                          ? "rgba(255, 255, 255, 0.87)"
-                          : "rgba(255, 255, 255, 0.38)",
+                          ? "var(--text-primary)"
+                          : "var(--text-on-dark)",
                         fontWeight: gender ? 600 : 400,
                       },
                     }}
@@ -541,8 +541,8 @@ const InvestorProfileSetup = () => {
                     sx={{
                       "& .MuiInputBase-input.Mui-disabled": {
                         WebkitTextFillColor: birthday
-                          ? "rgba(255, 255, 255, 0.87)"
-                          : "rgba(255, 255, 255, 0.38)",
+                          ? "var(--text-primary)"
+                          : "var(--text-on-dark)",
                         fontWeight: birthday ? 600 : 400,
                       },
                     }}
@@ -560,8 +560,8 @@ const InvestorProfileSetup = () => {
                       "& .MuiInputBase-input.Mui-disabled": {
                         WebkitTextFillColor:
                           age !== null
-                            ? "rgba(255, 255, 255, 0.87)"
-                            : "rgba(255, 255, 255, 0.38)",
+                            ? "var(--text-primary)"
+                            : "var(--text-on-dark)",
                         fontWeight: age !== null ? 600 : 400,
                       },
                     }}

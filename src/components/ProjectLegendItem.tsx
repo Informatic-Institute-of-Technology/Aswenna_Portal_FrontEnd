@@ -16,7 +16,7 @@ const ProjectLegendItem = ({ name, color, startDate, endDate }: ProjectLegendIte
         gap: 1,
         px: 2,
         py: 1,
-        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        backgroundColor: 'var(--surface-muted)',
         borderRadius: 2,
         border: `2px solid ${color}`,
       }}
@@ -33,7 +33,7 @@ const ProjectLegendItem = ({ name, color, startDate, endDate }: ProjectLegendIte
         <Typography
           variant="caption"
           sx={{
-            color: 'rgba(255, 255, 255, 0.9)',
+            color: 'var(--text-primary)',
             fontWeight: 600,
             display: 'block',
           }}
@@ -43,7 +43,7 @@ const ProjectLegendItem = ({ name, color, startDate, endDate }: ProjectLegendIte
         <Typography
           variant="caption"
           sx={{
-            color: 'rgba(255, 255, 255, 0.5)',
+            color: 'var(--text-on-dark)',
             fontSize: '0.65rem',
           }}
         >
