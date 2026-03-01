@@ -7,7 +7,7 @@
     "cropType": "Rice (Nadu)",
     "cropIcon": "🌾",
     "farmerName": "Kamal Perera",
-    "farmerId": "FAR-234",
+    "farmerId": "696f80d38acf46d6c09ecc87",
     "farmerImage": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
     "location": "Anuradhapura",
     "district": "Anuradhapura",
@@ -22,7 +22,7 @@
     "investorName": "Smart Agri Investments",
     "investorAmount": 250000,
     "landownerName": "Perera Estates",
-    "landownerId": "LND-019",
+    "landownerId": "696f80d38acf46d6c09ecc87",
     "riskLevel": "LOW",
     "riskStatus": "No Issues",
     "milestones": [
@@ -299,7 +299,7 @@
     ],
     "partyMembers": [
       {
-        "id": "FAR-234",
+        "id": "696f80d38acf46d6c09ecc87",
         "name": "Kamal Perera",
         "role": "farmer",
         "email": "kamal.perera@agrimail.lk",
@@ -312,7 +312,7 @@
         "rating": 4.8
       },
       {
-        "id": "LND-019",
+        "id": "696f80d38acf46d6c09ecc87",
         "name": "Perera Estates",
         "role": "landowner",
         "email": "contact@pereraestates.lk",
@@ -334,7 +334,7 @@
     "cropType": "Mixed Vegetables",
     "cropIcon": "🥬",
     "farmerName": "Sunil Fernando",
-    "farmerId": "FAR-189",
+    "farmerId": "696f80d38acf46d6c09ecc87",
     "farmerImage": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
     "location": "Nuwara Eliya",
     "district": "Nuwara Eliya",
@@ -351,7 +351,7 @@
     "investorName": "Green Valley Investors",
     "investorAmount": 180000,
     "landownerName": "Highland Farms",
-    "landownerId": "LND-045",
+    "landownerId": "696f80d38acf46d6c09ecc87",
     "riskLevel": "MEDIUM",
     "riskStatus": "Weather concerns",
     "milestones": [
@@ -573,7 +573,7 @@
     ],
     "partyMembers": [
       {
-        "id": "FAR-189",
+        "id": "696f80d38acf46d6c09ecc87",
         "name": "Sunil Fernando",
         "role": "farmer",
         "email": "sunil.fernando@organicfarms.lk",
@@ -586,7 +586,7 @@
         "rating": 4.9
       },
       {
-        "id": "LND-045",
+        "id": "696f80d38acf46d6c09ecc87",
         "name": "Highland Farms",
         "role": "landowner",
         "email": "contact@highlandfarms.lk",
@@ -608,7 +608,7 @@
     "cropType": "King Coconut",
     "cropIcon": "🥥",
     "farmerName": "Mahinda Silva",
-    "farmerId": "FAR-178",
+    "farmerId": "696f80d38acf46d6c09ecc87",
     "farmerImage": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
     "location": "Kurunegala",
     "district": "Kurunegala",
@@ -625,7 +625,7 @@
     "investorName": "Smart Agri Investments",
     "investorAmount": 320000,
     "landownerName": "Silva Estates",
-    "landownerId": "LND-054",
+    "landownerId": "696f80d38acf46d6c09ecc87",
     "riskLevel": "LOW",
     "riskStatus": "Successfully Completed",
     "milestones": [
@@ -876,7 +876,7 @@
     ],
     "partyMembers": [
       {
-        "id": "FAR-178",
+        "id": "696f80d38acf46d6c09ecc87",
         "name": "Mahinda Silva",
         "role": "farmer",
         "email": "mahinda.silva@coconutfarms.lk",
@@ -889,7 +889,7 @@
         "rating": 4.8
       },
       {
-        "id": "LND-054",
+        "id": "696f80d38acf46d6c09ecc87",
         "name": "Silva Estates",
         "role": "landowner",
         "email": "contact@silvaestates.lk",
@@ -911,7 +911,7 @@
     "cropType": "Cinnamon & Pepper",
     "cropIcon": "🌿",
     "farmerName": "Saman Kumara",
-    "farmerId": "FAR-211",
+    "farmerId": "696f80d38acf46d6c09ecc87",
     "farmerImage": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150",
     "location": "Matale",
     "district": "Matale",
@@ -926,7 +926,7 @@
     "investorName": "Spice Trade International",
     "investorAmount": 420000,
     "landownerName": "Kumara Holdings",
-    "landownerId": "LND-067",
+    "landownerId": "696f80d38acf46d6c09ecc87",
     "riskLevel": "LOW",
     "riskStatus": "Successfully Completed",
     "milestones": [
@@ -1174,7 +1174,7 @@
     ],
     "partyMembers": [
       {
-        "id": "FAR-211",
+        "id": "696f80d38acf46d6c09ecc87",
         "name": "Saman Kumara",
         "role": "farmer",
         "email": "saman.kumara@spicefarms.lk",
@@ -1187,7 +1187,7 @@
         "rating": 4.9
       },
       {
-        "id": "LND-067",
+        "id": "696f80d38acf46d6c09ecc87",
         "name": "Kumara Holdings",
         "role": "landowner",
         "email": "contact@kumaraholdings.lk",
