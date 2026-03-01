@@ -1,35 +1,20 @@
-:root {
-  --primary-green: #7c9473;
-  --primary-green-dark: #6a7f62;
-  --secondary-green: #8fa887;
-  --accent-green: #a4b89b;
-  --dark-bg: #1a1a1a;
-  --darker-bg: #0f0f0f;
-  --card-bg: #2a2a2a;
-  --text-primary: #ffffff;
-  --text-secondary: #b0b0b0;
-  --text-muted: #808080;
-  --border-color: #3a3a3a;
-  --success: #4caf50;
-  --warning: #ff9800;
-  --error: #f44336;
-}
+
 
 .dashboard-container {
   display: flex;
   min-height: 100vh;
-  background: var(--darker-bg);
+  background: var(--bg-surface);
   color: var(--text-primary);
 }
 
-/* Sidebar Styles */
+
 .sidebar {
   width: 280px;
-  background: var(--dark-bg);
+  background: var(--bg-overlay);
   padding: 2rem 0;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-medium);
   position: fixed;
   height: 100vh;
   overflow-y: auto;
@@ -40,7 +25,7 @@
   flex-direction: column;
   align-items: center;
   padding: 0 1.5rem 2rem;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-medium);
 }
 
 .sidebar-profile-image {
@@ -48,7 +33,7 @@
   height: 120px;
   border-radius: 50%;
   object-fit: cover;
-  border: 4px solid var(--primary-green);
+  border: 4px solid var(--color-legacy-green);
   margin-bottom: 1rem;
 }
 
@@ -83,14 +68,14 @@
 }
 
 .sidebar-nav-item:hover {
-  background: rgba(124, 148, 115, 0.1);
-  border-left-color: var(--primary-green);
+  background: var(--color-legacy-hover);
+  border-left-color: var(--color-legacy-green);
 }
 
 .sidebar-nav-item.active {
-  background: rgba(124, 148, 115, 0.2);
-  border-left-color: var(--primary-green);
-  color: var(--primary-green);
+  background: var(--color-legacy-active);
+  border-left-color: var(--color-legacy-green);
+  color: var(--color-legacy-green);
 }
 
 .sidebar-nav-icon {
@@ -102,10 +87,10 @@
 .sidebar-logout {
   margin: 1rem 1.5rem;
   padding: 0.875rem;
-  background: var(--primary-green);
-  color: white;
+  background: var(--color-legacy-green);
+  color: var(--text-primary);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-button);
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
@@ -113,10 +98,10 @@
 }
 
 .sidebar-logout:hover {
-  background: var(--primary-green-dark);
+  background: var(--color-olive-hover);
 }
 
-/* Main Content Styles */
+
 .dashboard-main {
   flex: 1;
   margin-left: 280px;
@@ -129,7 +114,7 @@
   align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-medium);
 }
 
 .dashboard-title {
@@ -144,9 +129,9 @@
 }
 
 .dashboard-icon-button {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-button);
   padding: 0.625rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -155,22 +140,22 @@
 }
 
 .dashboard-icon-button:hover {
-  background: var(--border-color);
+  background: var(--border-medium);
 }
 
 .dashboard-icon-button .badge {
   position: absolute;
   top: -4px;
   right: -4px;
-  background: var(--error);
-  color: white;
+  background: var(--color-error);
+  color: var(--text-primary);
   border-radius: 10px;
   padding: 2px 6px;
   font-size: 0.7rem;
   font-weight: 600;
 }
 
-/* Stats Cards */
+
 .dashboard-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -179,19 +164,21 @@
 }
 
 .stat-card {
-  background: var(--card-bg);
+  background: var(--bg-subtle);
   padding: 1.5rem;
-  border-radius: 12px;
-  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-medium);
   display: flex;
   align-items: center;
   gap: 1rem;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(124, 148, 115, 0.1);
+  box-shadow: 0 4px 12px var(--color-legacy-hover);
 }
 
 .stat-card-icon {
@@ -205,18 +192,18 @@
 }
 
 .stat-card-icon.green {
-  background: rgba(124, 148, 115, 0.2);
-  color: var(--primary-green);
+  background: var(--color-legacy-active);
+  color: var(--color-legacy-green);
 }
 
 .stat-card-icon.blue {
-  background: rgba(59, 130, 246, 0.2);
-  color: #3b82f6;
+  background: var(--color-info-bg);
+  color: var(--color-info);
 }
 
 .stat-card-icon.yellow {
-  background: rgba(251, 191, 36, 0.2);
-  color: #fbbf24;
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
 }
 
 .stat-card-content {
@@ -234,16 +221,16 @@
   font-weight: 700;
 }
 
-/* Widget Cards */
+
 .dashboard-widgets {
   display: grid;
   gap: 1.5rem;
 }
 
 .widget-card {
-  background: var(--card-bg);
-  border-radius: 12px;
-  border: 1px solid var(--border-color);
+  background: var(--bg-subtle);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-medium);
   padding: 1.5rem;
 }
 
@@ -263,8 +250,8 @@
 }
 
 .widget-card-badge {
-  background: var(--primary-green);
-  color: white;
+  background: var(--color-legacy-green);
+  color: var(--text-primary);
   padding: 0.25rem 0.75rem;
   border-radius: 12px;
   font-size: 0.875rem;
@@ -274,18 +261,18 @@
   color: var(--text-secondary);
 }
 
-/* Chart Placeholder */
+
 .chart-placeholder {
   background: rgba(124, 148, 115, 0.05);
-  border: 2px dashed var(--border-color);
-  border-radius: 8px;
+  border: 2px dashed var(--border-medium);
+  border-radius: var(--radius-button);
   padding: 3rem;
   text-align: center;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   font-size: 1.125rem;
 }
 
-/* Schedule Grid */
+
 .schedule-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -294,14 +281,14 @@
 
 .schedule-month {
   background: rgba(124, 148, 115, 0.05);
-  border-radius: 8px;
+  border-radius: var(--radius-button);
   padding: 1rem;
 }
 
 .schedule-month-header {
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: var(--primary-green);
+  color: var(--color-legacy-green);
 }
 
 .schedule-calendar {
@@ -314,12 +301,12 @@
 .schedule-day {
   padding: 0.25rem;
   text-align: center;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .schedule-event {
-  background: var(--primary-green);
-  color: white;
+  background: var(--color-legacy-green);
+  color: var(--text-primary);
   padding: 0.5rem;
   border-radius: 4px;
   margin-top: 0.5rem;
@@ -327,7 +314,7 @@
   text-align: center;
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .sidebar {
     width: 240px;
