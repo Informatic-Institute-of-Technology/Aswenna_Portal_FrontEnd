@@ -29,7 +29,7 @@ const LocationMapPicker = ({
                 height,
                 borderRadius: 2,
                 overflow: 'hidden',
-                bgcolor: '#1a2e1a',
+                bgcolor: 'var(--color-nature-deep)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'

@@ -468,21 +468,21 @@ const ActiveProjectsMonitoring = () => {
                       >
                         <Tooltip title={`Farmer: ${project.farmer.name}`}>
                           <Avatar
-                            sx={{ width: 32, height: 32, bgcolor: "#6B8E23" }}
+                            sx={{ width: 32, height: 32, bgcolor: "var(--color-olive)" }}
                           >
                             F
                           </Avatar>
                         </Tooltip>
                         <Tooltip title={`Investor: ${project.investor.name}`}>
                           <Avatar
-                            sx={{ width: 32, height: 32, bgcolor: "#2196F3" }}
+                            sx={{ width: 32, height: 32, bgcolor: "var(--color-info-blue)" }}
                           >
                             I
                           </Avatar>
                         </Tooltip>
                         <Tooltip title={`Landowner: ${project.landowner.name}`}>
                           <Avatar
-                            sx={{ width: 32, height: 32, bgcolor: "#FF9800" }}
+                            sx={{ width: 32, height: 32, bgcolor: "var(--color-orange)" }}
                           >
                             L
                           </Avatar>

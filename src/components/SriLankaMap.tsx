@@ -1,6 +1,6 @@
-import { Box, CircularProgress, Typography } from '@mui/material';
-import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
-import { useCallback, useEffect, useState } from 'react';
+import { Box, CircularProgress, Typography } from "@mui/material";
+import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
+import { useCallback, useEffect, useState } from "react";
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
@@ -16,7 +16,7 @@ interface LocationMarker extends Coordinates {
   investors?: number;
   landowners?: number;
   total?: number;
-  type?: 'farmers' | 'investors' | 'landowners' | 'mixed';
+  type?: "farmers" | "investors" | "landowners" | "mixed";
 }
 
 interface ProvinceDistribution {
@@ -36,11 +36,14 @@ interface SriLankaMapProps {
 }
 
 const mapContainerStyle = {
-  width: '100%',
-  height: '500px',
+  width: "100%",
+  height: "500px",
 };
 
-const getMarkerIcon = (type: 'farmers' | 'investors' | 'landowners', size: number = 45) => {
+const getMarkerIcon = (
+  type: "farmers" | "investors" | "landowners",
+  size: number = 45,
+) => {
   const icons = {
     farmers: `data:image/svg+xml,${encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size + 10}" viewBox="0 0 24 34">
@@ -65,15 +68,24 @@ const getMarkerIcon = (type: 'farmers' | 'investors' | 'landowners', size: numbe
           <path fill="#FFFFFF" d="M14,6l-3.75,5l2.85,3.8l-1.6,1.2C9.81,13.75,7,10,7,10l-6,8h22L14,6z"/>
         </g>
       </svg>
-    `)}`
+    `)}`,
   };
   return icons[type];
 };
 
-const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistribution, provinceDistribution }: SriLankaMapProps) => {
-  const [loading, setLoading] = useState(!coordinates && !userDistribution && !provinceDistribution);
+const SriLankaMap = ({
+  location = "Kegalle, Sri Lanka",
+  coordinates,
+  userDistribution,
+  provinceDistribution,
+}: SriLankaMapProps) => {
+  const [loading, setLoading] = useState(
+    !coordinates && !userDistribution && !provinceDistribution,
+  );
   const [error, setError] = useState<string | null>(null);
-  const [mapCoordinates, setMapCoordinates] = useState<Coordinates | null>(coordinates || null);
+  const [mapCoordinates, setMapCoordinates] = useState<Coordinates | null>(
+    coordinates || null,
+  );
   const [markers, setMarkers] = useState<LocationMarker[]>([]);
 
   const { isLoaded, loadError } = useLoadScript({
@@ -82,14 +94,14 @@ const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistrib
 
   const getLocationData = useCallback(async (address: string) => {
     if (!GOOGLE_MAPS_API_KEY) {
-      setError('Google Maps API key is missing');
-      console.error('API key is missing');
+      setError("Google Maps API key is missing");
+      console.error("API key is missing");
       return null;
     }
 
-    if (!address || typeof address !== 'string') {
-      setError('Invalid address provided');
-      console.error('Invalid address provided');
+    if (!address || typeof address !== "string") {
+      setError("Invalid address provided");
+      console.error("Invalid address provided");
       return null;
     }
 
@@ -97,7 +109,7 @@ const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistrib
       const encodedAddress = encodeURIComponent(address);
       const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=${GOOGLE_MAPS_API_KEY}`;
 
-      console.log('Fetching location data for:', address);
+      console.log("Fetching location data for:", address);
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -105,9 +117,9 @@ const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistrib
       }
 
       const data = await response.json();
-      console.log('Geocoding response:', data);
+      console.log("Geocoding response:", data);
 
-      if (data.status !== 'OK') {
+      if (data.status !== "OK") {
         throw new Error(`Geocoding API error: ${data.status}`);
       }
 
@@ -117,9 +129,10 @@ const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistrib
         lng: locationData.lng,
       };
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+      const errorMessage =
+        err instanceof Error ? err.message : "An unknown error occurred";
       setError(errorMessage);
-      console.error('Error fetching location data:', errorMessage);
+      console.error("Error fetching location data:", errorMessage);
       return null;
     }
   }, []);
@@ -130,13 +143,15 @@ const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistrib
       const fetchProvinceMarkers = async () => {
         setLoading(true);
         const fetchedMarkers: LocationMarker[] = [];
-        
+
         for (const [province, data] of Object.entries(provinceDistribution)) {
-          const coords = await getLocationData(`${province} Province, Sri Lanka`);
+          const coords = await getLocationData(
+            `${province} Province, Sri Lanka`,
+          );
           if (coords) {
             // Create separate markers for each user type in this province
             const offset = 0.05; // Small offset to separate markers
-            
+
             if (data.farmers > 0) {
               fetchedMarkers.push({
                 ...coords,
@@ -146,10 +161,10 @@ const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistrib
                 name: province,
                 farmers: data.farmers,
                 total: data.total,
-                type: 'farmers',
+                type: "farmers",
               });
             }
-            
+
             if (data.investors > 0) {
               fetchedMarkers.push({
                 ...coords,
@@ -158,10 +173,10 @@ const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistrib
                 name: province,
                 investors: data.investors,
                 total: data.total,
-                type: 'investors',
+                type: "investors",
               });
             }
-            
+
             if (data.landowners > 0) {
               fetchedMarkers.push({
                 ...coords,
@@ -171,12 +186,12 @@ const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistrib
                 name: province,
                 landowners: data.landowners,
                 total: data.total,
-                type: 'landowners',
+                type: "landowners",
               });
             }
           }
         }
-        
+
         if (fetchedMarkers.length > 0) {
           setMarkers(fetchedMarkers);
           setMapCoordinates({ lat: 7.8731, lng: 80.7718 });
@@ -192,7 +207,7 @@ const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistrib
       const fetchDistributionMarkers = async () => {
         setLoading(true);
         const fetchedMarkers: LocationMarker[] = [];
-        
+
         for (const [city, count] of Object.entries(userDistribution)) {
           const coords = await getLocationData(`${city}, Sri Lanka`);
           if (coords) {
@@ -201,15 +216,19 @@ const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistrib
               id: city,
               name: city,
               total: count,
-              type: 'mixed',
+              type: "mixed",
             });
           }
         }
-        
+
         if (fetchedMarkers.length > 0) {
           setMarkers(fetchedMarkers);
-          const centerLat = fetchedMarkers.reduce((sum, m) => sum + m.lat, 0) / fetchedMarkers.length;
-          const centerLng = fetchedMarkers.reduce((sum, m) => sum + m.lng, 0) / fetchedMarkers.length;
+          const centerLat =
+            fetchedMarkers.reduce((sum, m) => sum + m.lat, 0) /
+            fetchedMarkers.length;
+          const centerLng =
+            fetchedMarkers.reduce((sum, m) => sum + m.lng, 0) /
+            fetchedMarkers.length;
           setMapCoordinates({ lat: centerLat, lng: centerLng });
         }
         setLoading(false);
@@ -237,23 +256,29 @@ const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistrib
     };
 
     fetchCoordinates();
-  }, [location, coordinates, userDistribution, provinceDistribution, getLocationData]);
+  }, [
+    location,
+    coordinates,
+    userDistribution,
+    provinceDistribution,
+    getLocationData,
+  ]);
 
   if (loadError) {
     return (
       <Box
         sx={{
           height: 500,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: 'background.paper',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "background.paper",
           borderRadius: 2,
-          border: '1px solid',
-          borderColor: 'divider',
+          border: "1px solid",
+          borderColor: "divider",
         }}
       >
-        <Box sx={{ textAlign: 'center', p: 3 }}>
+        <Box sx={{ textAlign: "center", p: 3 }}>
           <Typography variant="h6" color="error" gutterBottom>
             Failed to Load Google Maps
           </Typography>
@@ -270,16 +295,16 @@ const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistrib
       <Box
         sx={{
           height: 500,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: 'background.paper',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "background.paper",
           borderRadius: 2,
-          border: '1px solid',
-          borderColor: 'divider',
+          border: "1px solid",
+          borderColor: "divider",
         }}
       >
-        <Box sx={{ textAlign: 'center', p: 3 }}>
+        <Box sx={{ textAlign: "center", p: 3 }}>
           <Typography variant="h6" color="error" gutterBottom>
             Map Unavailable
           </Typography>
@@ -296,16 +321,16 @@ const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistrib
       <Box
         sx={{
           height: 500,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: 'background.paper',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "background.paper",
           borderRadius: 2,
-          border: '1px solid',
-          borderColor: 'divider',
+          border: "1px solid",
+          borderColor: "divider",
         }}
       >
-        <Box sx={{ textAlign: 'center' }}>
+        <Box sx={{ textAlign: "center" }}>
           <CircularProgress size={40} />
           <Typography variant="body2" sx={{ mt: 2 }}>
             Loading Map...
@@ -320,12 +345,12 @@ const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistrib
       <Box
         sx={{
           height: 500,
-          width: '100%',
+          width: "100%",
           borderRadius: 2,
-          overflow: 'hidden',
-          border: '1px solid',
-          borderColor: 'divider',
-          position: 'relative',
+          overflow: "hidden",
+          border: "1px solid",
+          borderColor: "divider",
+          position: "relative",
         }}
       >
         <GoogleMap
@@ -337,14 +362,17 @@ const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistrib
             streetViewControl: true,
             mapTypeControl: true,
             fullscreenControl: true,
-            mapTypeId: 'satellite',
+            mapTypeId: "satellite",
           }}
         >
           {markers.map((marker, index) => {
             const getTitle = () => {
-              if (marker.type === 'farmers') return `${marker.name} - Farmers: ${marker.farmers}`;
-              if (marker.type === 'investors') return `${marker.name} - Investors: ${marker.investors}`;
-              if (marker.type === 'landowners') return `${marker.name} - Landowners: ${marker.landowners}`;
+              if (marker.type === "farmers")
+                return `${marker.name} - Farmers: ${marker.farmers}`;
+              if (marker.type === "investors")
+                return `${marker.name} - Investors: ${marker.investors}`;
+              if (marker.type === "landowners")
+                return `${marker.name} - Landowners: ${marker.landowners}`;
               return `${marker.name} - Total: ${marker.total}`;
             };
 
@@ -353,11 +381,15 @@ const SriLankaMap = ({ location = 'Kegalle, Sri Lanka', coordinates, userDistrib
                 key={marker.id || index}
                 position={{ lat: marker.lat, lng: marker.lng }}
                 title={getTitle()}
-                icon={marker.type && marker.type !== 'mixed' ? {
-                  url: getMarkerIcon(marker.type),
-                  scaledSize: new window.google.maps.Size(45, 55),
-                  anchor: new window.google.maps.Point(22.5, 55),
-                } : undefined}
+                icon={
+                  marker.type && marker.type !== "mixed"
+                    ? {
+                        url: getMarkerIcon(marker.type),
+                        scaledSize: new window.google.maps.Size(45, 55),
+                        anchor: new window.google.maps.Point(22.5, 55),
+                      }
+                    : undefined
+                }
               />
             );
           })}

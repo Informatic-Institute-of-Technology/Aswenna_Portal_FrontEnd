@@ -1,5 +1,5 @@
-import { Box, Chip, Tab, Tabs } from '@mui/material';
-import type { ReactNode } from 'react';
+import { Box, Chip, Tab, Tabs } from "@mui/material";
+import type { ReactNode } from "react";
 
 export interface TabItem {
   value: string;
@@ -12,44 +12,44 @@ interface TabNavigationProps {
   activeTab: string;
   tabs: TabItem[];
   onChange: (value: string) => void;
-  variant?: 'default' | 'dark' | 'colored';
+  variant?: "default" | "dark" | "colored";
 }
 
 const TabNavigation = ({
   activeTab,
   tabs,
   onChange,
-  variant = 'dark',
+  variant = "dark",
 }: TabNavigationProps) => {
   const getTabStyles = (isActive: boolean) => {
     const baseStyles = {
       minHeight: 48,
-      textTransform: 'none' as const,
-      fontSize: '0.95rem',
+      textTransform: "none" as const,
+      fontSize: "0.95rem",
       fontWeight: 600,
       px: 3,
       py: 1.5,
       borderRadius: 3,
-      transition: 'all 0.3s ease',
+      transition: "all 0.3s ease",
     };
 
-    if (variant === 'dark') {
+    if (variant === "dark") {
       return {
         ...baseStyles,
-        color: isActive ? '#ffffff' : 'rgba(255,255,255,0.7)',
+        color: isActive ? "var(--text-primary)" : "var(--text-on-dark)",
         background: isActive
-          ? 'linear-gradient(135deg, #2c2c2c 0%, #3f3f3f 100%)'
-          : 'transparent',
+          ? "linear-gradient(135deg, var(--bg-subtle) 0%, var(--border-medium) 100%)"
+          : "transparent",
         border: isActive
-          ? '1px solid rgba(255,255,255,0.15)'
-          : '1px solid rgba(255,255,255,0.1)',
-        '&:hover': {
+          ? "1px solid var(--surface-light)"
+          : "1px solid var(--surface-light)",
+        "&:hover": {
           background: isActive
-            ? 'linear-gradient(135deg, #3a3a3a 0%, #4f4f4f 100%)'
-            : 'rgba(255,255,255,0.05)',
+            ? "linear-gradient(135deg, var(--border-medium) 0%, var(--border-medium) 100%)"
+            : "var(--surface-muted)",
         },
-        '& .MuiTab-iconWrapper': {
-          color: isActive ? '#ffffff' : 'rgba(255,255,255,0.7)',
+        "& .MuiTab-iconWrapper": {
+          color: isActive ? "var(--text-primary)" : "var(--text-on-dark)",
         },
       };
     }
@@ -63,11 +63,11 @@ const TabNavigation = ({
         value={activeTab}
         onChange={(_, newValue) => onChange(newValue)}
         sx={{
-          minHeight: 'auto',
-          '& .MuiTabs-indicator': {
-            display: 'none',
+          minHeight: "auto",
+          "& .MuiTabs-indicator": {
+            display: "none",
           },
-          '& .MuiTabs-flexContainer': {
+          "& .MuiTabs-flexContainer": {
             gap: 2,
           },
         }}
@@ -79,10 +79,10 @@ const TabNavigation = ({
             label={
               <Box
                 sx={{
-                  display: 'flex',
-                  alignItems: 'center',
+                  display: "flex",
+                  alignItems: "center",
                   gap: 1.5,
-                  color: '#fff',
+                  color: "var(--text-primary)",
                 }}
               >
                 <span>{tab.label}</span>
@@ -92,17 +92,17 @@ const TabNavigation = ({
                     size="small"
                     sx={{
                       height: 24,
-                      fontSize: '0.75rem',
+                      fontSize: "0.75rem",
                       fontWeight: 700,
                       bgcolor:
                         activeTab === tab.value
-                          ? 'rgba(0,0,0,0.2)'
-                          : 'rgba(255,255,255,0.1)',
-                      color: '#fff',
+                          ? "var(--overlay-sm)"
+                          : "var(--surface-light)",
+                      color: "var(--text-primary)",
                       border:
                         activeTab === tab.value
-                          ? 'none'
-                          : '1px solid rgba(255,255,255,0.2)',
+                          ? "none"
+                          : "1px solid var(--surface-light)",
                     }}
                   />
                 )}
@@ -113,7 +113,7 @@ const TabNavigation = ({
           />
         ))}
       </Tabs>
-      <Box sx={{ height: 1, bgcolor: 'rgba(255,255,255,0.08)', mt: 3 }} />
+      <Box sx={{ height: 1, bgcolor: "var(--bg-active)", mt: 3 }} />
     </Box>
   );
 };

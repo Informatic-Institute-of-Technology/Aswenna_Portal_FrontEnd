@@ -55,59 +55,59 @@ const RequestCard = ({
     switch (statusBadge.variant) {
       case 'action':
         return {
-          background: 'rgba(107, 142, 35, 0.2)',
-          color: '#8FA887',
-          border: '1px solid rgba(107, 142, 35, 0.4)',
+          background: 'var(--color-olive-muted-strong)',
+          color: 'var(--color-olive-light)',
+          border: '1px solid var(--color-olive-glow)',
           backdropFilter: 'blur(10px)',
         };
       case 'pending':
         return {
-          background: 'rgba(107, 142, 35, 0.15)',
-          color: '#8FA887',
-          border: '1px solid rgba(107, 142, 35, 0.3)',
+          background: 'var(--color-olive-glow-sm)',
+          color: 'var(--color-olive-light)',
+          border: '1px solid var(--color-olive-glow)',
           backdropFilter: 'blur(10px)',
         };
       case 'review':
         return {
-          background: 'rgba(255, 193, 7, 0.2)',
-          color: '#ffc107',
-          border: '1px solid rgba(255, 193, 7, 0.3)',
+          background: 'var(--color-warning-bg)',
+          color: 'var(--color-amber)',
+          border: '1px solid var(--color-warning-border)',
         };
       case 'new':
         return {
-          background: 'rgba(128, 128, 128, 0.2)',
-          color: '#a0a0a0',
-          border: '1px solid rgba(128, 128, 128, 0.3)',
+          background: 'var(--surface-muted)',
+          color: 'var(--text-secondary)',
+          border: '1px solid var(--surface-light)',
         };
       case 'accepted':
         return {
-          background: 'rgba(16, 185, 129, 0.2)',
-          color: '#10b981',
-          border: '1px solid rgba(16, 185, 129, 0.3)',
+          background: 'var(--color-success-bg)',
+          color: 'var(--color-success)',
+          border: '1px solid var(--color-success-border)',
         };
       case 'rejected':
         return {
-          background: 'rgba(239, 68, 68, 0.2)',
-          color: '#ef4444',
-          border: '1px solid rgba(239, 68, 68, 0.3)',
+          background: 'var(--color-error-bg)',
+          color: 'var(--color-overdue)',
+          border: '1px solid var(--color-overdue-border)',
         };
       case 'pending_response':
         return {
-          background: 'rgba(245, 158, 11, 0.2)',
-          color: '#f59e0b',
-          border: '1px solid rgba(245, 158, 11, 0.3)',
+          background: 'var(--color-warning-bg)',
+          color: 'var(--color-pending)',
+          border: '1px solid var(--color-pending-border)',
         };
       case 'under_review':
         return {
-          background: 'rgba(59, 130, 246, 0.2)',
-          color: '#3b82f6',
-          border: '1px solid rgba(59, 130, 246, 0.3)',
+          background: 'var(--color-info-blue-muted)',
+          color: 'var(--color-info-blue)',
+          border: '1px solid var(--color-info-blue-border)',
         };
       case 'negotiating':
         return {
-          background: 'rgba(245, 158, 11, 0.2)',
-          color: '#f59e0b',
-          border: '1px solid rgba(245, 158, 11, 0.3)',
+          background: 'var(--color-warning-bg)',
+          color: 'var(--color-pending)',
+          border: '1px solid var(--color-pending-border)',
         };
       default:
         return {};
@@ -116,28 +116,28 @@ const RequestCard = ({
 
   const cardStyle = isSelected
     ? {
-        background: 'linear-gradient(145deg, rgba(26, 46, 26, 0.4) 0%, rgba(42, 58, 42, 0.4) 100%)',
-        border: '2px solid rgba(107, 142, 35, 0.8)',
+        background: 'linear-gradient(145deg, var(--color-nature-deep) 0%, var(--color-nature-mid) 100%)',
+        border: '2px solid var(--color-olive-glow)',
         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-        boxShadow: '0 0 25px rgba(107, 142, 35, 0.4)',
+        boxShadow: '0 0 25px var(--color-olive-glow)',
       }
     : {
-        background: 'linear-gradient(145deg, #2a2a2a 0%, #1f1f1f 100%)',
-        border: '1px solid rgba(107, 142, 35, 0.2)',
+        background: 'linear-gradient(145deg, var(--bg-subtle) 0%, var(--bg-overlay) 100%)',
+        border: '1px solid var(--color-olive-muted-strong)',
         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
       };
 
   const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isSelected) return; // Don't apply hover effect if already selected
     e.currentTarget.style.transform = 'translateY(-4px)';
-    e.currentTarget.style.borderColor = 'rgba(107, 142, 35, 0.5)';
+    e.currentTarget.style.borderColor = 'var(--color-olive-glow)';
   };
 
   const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isSelected) return; // Keep selected state
     e.currentTarget.style.transform = 'translateY(0)';
     e.currentTarget.style.boxShadow = '';
-    e.currentTarget.style.borderColor = 'rgba(107, 142, 35, 0.2)';
+    e.currentTarget.style.borderColor = 'var(--color-olive-muted-strong)';
   };
 
   return (
@@ -158,8 +158,8 @@ const RequestCard = ({
           ) : (
             <div
               style={{
-                background: 'linear-gradient(135deg, #6B8E23 0%, #8FA887 100%)',
-                border: '2px solid rgba(107, 142, 35, 0.4)',
+                background: 'linear-gradient(135deg, var(--color-olive) 0%, var(--color-olive-light) 100%)',
+                border: '2px solid var(--color-olive-glow)',
               }}
               className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold"
             >
@@ -195,9 +195,9 @@ const RequestCard = ({
                 style={
                   tag.variant === 'primary'
                     ? {
-                        background: 'rgba(107, 142, 35, 0.15)',
-                        color: '#8FA887',
-                        border: '1px solid rgba(107, 142, 35, 0.3)',
+                        background: 'var(--color-olive-glow-sm)',
+                        color: 'var(--color-olive-light)',
+                        border: '1px solid var(--color-olive-glow)',
                       }
                     : {}
                 }
@@ -231,11 +231,11 @@ const RequestCard = ({
             onClick={primaryAction.onClick}
             style={{
               background: type === 'agreement'
-                ? 'linear-gradient(135deg, #6B8E23 0%, #8FA887 100%)'
+                ? 'linear-gradient(135deg, var(--color-olive) 0%, var(--color-olive-light) 100%)'
                 : undefined,
               boxShadow: type === 'agreement'
-                ? '0 4px 12px rgba(107, 142, 35, 0.3)'
-                : '0 2px 8px rgba(107, 142, 35, 0.3)',
+                ? '0 4px 12px var(--color-olive-glow)'
+                : '0 2px 8px var(--color-olive-glow)',
             }}
             className={
               type === 'agreement'

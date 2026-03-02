@@ -180,34 +180,34 @@ const EmailVerification = () => {
             maxWidth: "400px",
             marginBottom: "1rem",
             "& .MuiStepConnector-line": {
-              borderColor: "#444",
+              borderColor: "var(--neutral-700)",
             },
             "& .MuiStepConnector-root.Mui-completed .MuiStepConnector-line": {
-              borderColor: "#6b8e23",
+              borderColor: "var(--color-olive)",
             },
             "& .MuiStepConnector-root.Mui-active .MuiStepConnector-line": {
-              borderColor: "#6b8e23",
+              borderColor: "var(--color-olive)",
             },
             "& .MuiStepLabel-label": {
-              color: "#9ca3af",
+              color: "var(--neutral-350)",
               marginTop: "0.5rem",
             },
             "& .MuiStepLabel-label.Mui-active": {
-              color: "#6b8e23",
+              color: "var(--color-olive)",
               fontWeight: 600,
             },
             "& .MuiStepLabel-label.Mui-completed": {
-              color: "#6b8e23",
+              color: "var(--color-olive)",
             },
             "& .MuiStepIcon-root": {
-              color: "#444",
+              color: "var(--neutral-700)",
               fontSize: "2.5rem",
             },
             "& .MuiStepIcon-root.Mui-completed": {
-              color: "#6b8e23",
+              color: "var(--color-olive)",
             },
             "& .MuiStepIcon-root.Mui-active": {
-              color: "#6b8e23",
+              color: "var(--color-olive)",
             },
           }}
         >

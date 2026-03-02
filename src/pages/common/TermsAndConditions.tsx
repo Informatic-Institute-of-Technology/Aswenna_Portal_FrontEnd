@@ -92,7 +92,7 @@ const TermsAndConditions = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)",
+        background: "linear-gradient(135deg, var(--bg-overlay) 0%, var(--bg-subtle) 100%)",
         color: "white",
         py: 3,
       }}
@@ -111,8 +111,8 @@ const TermsAndConditions = () => {
             startIcon={<ArrowBack />}
             sx={{
               color: "white",
-              backgroundColor: "rgba(0,0,0,0.3)",
-              "&:hover": { backgroundColor: "rgba(0,0,0,0.5)" },
+              backgroundColor: "var(--overlay-sm)",
+              "&:hover": { backgroundColor: "var(--overlay-lg)" },
               textTransform: "none",
               px: 2,
               py: 0.75,
@@ -128,7 +128,7 @@ const TermsAndConditions = () => {
               maxWidth: 400,
               mx: 4,
               "& .MuiStepConnector-line": {
-                borderColor: "rgba(255,255,255,0.3)",
+                borderColor: "var(--surface-light)",
               },
             }}
           >
@@ -136,10 +136,10 @@ const TermsAndConditions = () => {
               <StepLabel
                 sx={{
                   "& .MuiStepLabel-label": {
-                    color: "#9ca3af",
+                    color: "var(--neutral-350)",
                     fontSize: "0.75rem",
                   },
-                  "& .MuiStepIcon-root": { color: "#6B8E23" },
+                  "& .MuiStepIcon-root": { color: "var(--color-olive)" },
                   "& .MuiStepIcon-text": { fill: "white" },
                 }}
               >
@@ -150,10 +150,10 @@ const TermsAndConditions = () => {
               <StepLabel
                 sx={{
                   "& .MuiStepLabel-label": {
-                    color: "#9ca3af",
+                    color: "var(--neutral-350)",
                     fontSize: "0.75rem",
                   },
-                  "& .MuiStepIcon-root": { color: "#6B8E23" },
+                  "& .MuiStepIcon-root": { color: "var(--color-olive)" },
                   "& .MuiStepIcon-text": { fill: "white" },
                 }}
               >
@@ -173,7 +173,7 @@ const TermsAndConditions = () => {
                     border: "2px solid white",
                     borderRadius: "50%",
                   },
-                  "& .MuiStepIcon-text": { fill: "#1a1a1a" },
+                  "& .MuiStepIcon-text": { fill: "var(--bg-overlay)" },
                 }}
               >
                 Consent
@@ -203,7 +203,7 @@ const TermsAndConditions = () => {
           <Typography
             variant="body2"
             sx={{
-              color: "#b0b0b0",
+              color: "var(--text-secondary)",
               maxWidth: "600px",
               margin: "0 auto",
             }}
@@ -216,17 +216,17 @@ const TermsAndConditions = () => {
         <Paper
           elevation={0}
           sx={{
-            bgcolor: "rgba(107, 142, 35, 0.15)",
+            bgcolor: "var(--color-olive-glow-sm)",
             p: 2.5,
             mb: 3,
             borderRadius: 2,
-            border: "1px solid rgba(107, 142, 35, 0.4)",
+            border: "1px solid var(--color-olive-glow)",
           }}
         >
           <Box sx={{ display: "flex", alignItems: "flex-start", gap: 2 }}>
             <Box
               sx={{
-                bgcolor: "#6B8E23",
+                bgcolor: "var(--color-olive)",
                 borderRadius: 2,
                 p: 1,
                 display: "flex",
@@ -240,7 +240,7 @@ const TermsAndConditions = () => {
               <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>
                 Data Security Guarantee
               </Typography>
-              <Typography variant="body2" sx={{ color: "#b0b0b0" }}>
+              <Typography variant="body2" sx={{ color: "var(--text-secondary)" }}>
                 We use bank-level AES-256 encryption to protect your
                 information. Your agricultural data, land records, financial
                 inputs, and personal details remain your exclusive property.
@@ -253,10 +253,10 @@ const TermsAndConditions = () => {
         <Paper
           elevation={0}
           sx={{
-            bgcolor: "#1a1a1a",
+            bgcolor: "var(--bg-overlay)",
             p: 3,
             borderRadius: 2,
-            border: "1px solid #3a3a3a",
+            border: "1px solid var(--border-medium)",
             mb: 3,
             maxHeight: "400px",
             overflowY: "auto",
@@ -264,11 +264,11 @@ const TermsAndConditions = () => {
               width: "6px",
             },
             "&::-webkit-scrollbar-track": {
-              background: "#2a2a2a",
+              background: "var(--bg-subtle)",
               borderRadius: "3px",
             },
             "&::-webkit-scrollbar-thumb": {
-              background: "#6B8E23",
+              background: "var(--color-olive)",
               borderRadius: "3px",
             },
           }}
@@ -280,16 +280,16 @@ const TermsAndConditions = () => {
               alignItems: "center",
               mb: 2,
               pb: 1.5,
-              borderBottom: "1px solid #3a3a3a",
+              borderBottom: "1px solid var(--border-medium)",
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Gavel sx={{ color: "#6B8E23", fontSize: 20 }} />
+              <Gavel sx={{ color: "var(--color-olive)", fontSize: 20 }} />
               <Typography variant="h6" sx={{ fontWeight: 600 }}>
                 Platform Agreement
               </Typography>
             </Box>
-            <Typography variant="caption" sx={{ color: "#b0b0b0" }}>
+            <Typography variant="caption" sx={{ color: "var(--text-secondary)" }}>
               Last updated: January 2026
             </Typography>
           </Box>
@@ -299,15 +299,15 @@ const TermsAndConditions = () => {
               <Box
                 sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}
               >
-                <VerifiedUser sx={{ color: "#6B8E23", fontSize: 18 }} />
+                <VerifiedUser sx={{ color: "var(--color-olive)", fontSize: 18 }} />
                 <Typography
                   variant="subtitle2"
-                  sx={{ fontWeight: 600, color: "#6B8E23" }}
+                  sx={{ fontWeight: 600, color: "var(--color-olive)" }}
                 >
                   1. Usage License & Platform Access
                 </Typography>
               </Box>
-              <Typography variant="body2" sx={{ color: "#b0b0b0", pl: 3.5 }}>
+              <Typography variant="body2" sx={{ color: "var(--text-secondary)", pl: 3.5 }}>
                 By accessing and using the Aswenna Agricultural Platform, you
                 accept and agree to be bound by these terms. The platform
                 connects Farmers, Landowners, and Investors to facilitate
@@ -322,15 +322,15 @@ const TermsAndConditions = () => {
               <Box
                 sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}
               >
-                <SecurityIcon sx={{ color: "#6B8E23", fontSize: 18 }} />
+                <SecurityIcon sx={{ color: "var(--color-olive)", fontSize: 18 }} />
                 <Typography
                   variant="subtitle2"
-                  sx={{ fontWeight: 600, color: "#6B8E23" }}
+                  sx={{ fontWeight: 600, color: "var(--color-olive)" }}
                 >
                   2. Data Ownership & Privacy
                 </Typography>
               </Box>
-              <Typography variant="body2" sx={{ color: "#b0b0b0", pl: 3.5 }}>
+              <Typography variant="body2" sx={{ color: "var(--text-secondary)", pl: 3.5 }}>
                 You retain full ownership of all data uploaded to Aswenna,
                 including: land details, crop information, soil reports,
                 investment records, NIC documents, and financial transactions.
@@ -344,15 +344,15 @@ const TermsAndConditions = () => {
               <Box
                 sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}
               >
-                <Handshake sx={{ color: "#6B8E23", fontSize: 18 }} />
+                <Handshake sx={{ color: "var(--color-olive)", fontSize: 18 }} />
                 <Typography
                   variant="subtitle2"
-                  sx={{ fontWeight: 600, color: "#6B8E23" }}
+                  sx={{ fontWeight: 600, color: "var(--color-olive)" }}
                 >
                   3. Partnership Agreements & Liability
                 </Typography>
               </Box>
-              <Typography variant="body2" sx={{ color: "#b0b0b0", pl: 3.5 }}>
+              <Typography variant="body2" sx={{ color: "var(--text-secondary)", pl: 3.5 }}>
                 Aswenna facilitates connections between agricultural
                 stakeholders but is not a party to agreements made between
                 users. All land leases, investment contracts, and farming
@@ -366,15 +366,15 @@ const TermsAndConditions = () => {
               <Box
                 sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}
               >
-                <CheckCircle sx={{ color: "#6B8E23", fontSize: 18 }} />
+                <CheckCircle sx={{ color: "var(--color-olive)", fontSize: 18 }} />
                 <Typography
                   variant="subtitle2"
-                  sx={{ fontWeight: 600, color: "#6B8E23" }}
+                  sx={{ fontWeight: 600, color: "var(--color-olive)" }}
                 >
                   4. Verification & Trust
                 </Typography>
               </Box>
-              <Typography variant="body2" sx={{ color: "#b0b0b0", pl: 3.5 }}>
+              <Typography variant="body2" sx={{ color: "var(--text-secondary)", pl: 3.5 }}>
                 All users undergo identity verification through NIC document
                 submission. Land ownership is verified through deed
                 certificates. Aswenna reserves the right to remove unverified
@@ -388,15 +388,15 @@ const TermsAndConditions = () => {
               <Box
                 sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}
               >
-                <Gavel sx={{ color: "#6B8E23", fontSize: 18 }} />
+                <Gavel sx={{ color: "var(--color-olive)", fontSize: 18 }} />
                 <Typography
                   variant="subtitle2"
-                  sx={{ fontWeight: 600, color: "#6B8E23" }}
+                  sx={{ fontWeight: 600, color: "var(--color-olive)" }}
                 >
                   5. Dispute Resolution
                 </Typography>
               </Box>
-              <Typography variant="body2" sx={{ color: "#b0b0b0", pl: 3.5 }}>
+              <Typography variant="body2" sx={{ color: "var(--text-secondary)", pl: 3.5 }}>
                 In case of disputes between parties, Aswenna provides a
                 mediation service to help resolve conflicts amicably. However,
                 legal disputes must be resolved through appropriate Sri Lankan
@@ -411,10 +411,10 @@ const TermsAndConditions = () => {
         <Paper
           elevation={0}
           sx={{
-            bgcolor: "#1a1a1a",
+            bgcolor: "var(--bg-overlay)",
             p: 2,
             borderRadius: 2,
-            border: "1px solid #3a3a3a",
+            border: "1px solid var(--border-medium)",
             mb: 3,
           }}
         >
@@ -424,9 +424,9 @@ const TermsAndConditions = () => {
                 checked={agreed}
                 onChange={(e) => setAgreed(e.target.checked)}
                 sx={{
-                  color: "#6B8E23",
+                  color: "var(--color-olive)",
                   "&.Mui-checked": {
-                    color: "#6B8E23",
+                    color: "var(--color-olive)",
                   },
                 }}
               />
@@ -434,11 +434,11 @@ const TermsAndConditions = () => {
             label={
               <Typography variant="body2">
                 I agree to the{" "}
-                <span style={{ color: "#6B8E23", fontWeight: 600 }}>
+                <span style={{ color: "var(--color-olive)", fontWeight: 600 }}>
                   Terms & Conditions
                 </span>{" "}
                 and{" "}
-                <span style={{ color: "#6B8E23", fontWeight: 600 }}>
+                <span style={{ color: "var(--color-olive)", fontWeight: 600 }}>
                   Data Usage Policy
                 </span>
               </Typography>
@@ -448,7 +448,7 @@ const TermsAndConditions = () => {
             variant="caption"
             sx={{
               display: "block",
-              color: "#b0b0b0",
+              color: "var(--text-secondary)",
               ml: 4,
               mt: 0.5,
             }}
@@ -465,13 +465,13 @@ const TermsAndConditions = () => {
             disabled={isSubmitting}
             sx={{
               color: "white",
-              borderColor: "#3a3a3a",
+              borderColor: "var(--border-medium)",
               textTransform: "none",
               px: 3,
               py: 1,
               fontSize: "0.875rem",
               "&:hover": {
-                borderColor: "#6B8E23",
+                borderColor: "var(--color-olive)",
                 bgcolor: "transparent",
               },
             }}
@@ -485,22 +485,22 @@ const TermsAndConditions = () => {
             disabled={!agreed || isSubmitting}
             endIcon={<CheckCircle />}
             sx={{
-              bgcolor: "#6B8E23",
+              bgcolor: "var(--color-olive)",
               color: "white",
               textTransform: "none",
               fontWeight: 600,
               px: 4,
               py: 1,
               fontSize: "0.875rem",
-              boxShadow: "0 4px 14px 0 rgba(107, 142, 35, 0.39)",
+              boxShadow: "0 4px 14px 0 var(--color-olive-glow)",
               "&:hover": {
-                bgcolor: "#5A7519",
+                bgcolor: "var(--color-olive-dark)",
                 transform: "translateY(-1px)",
-                boxShadow: "0 6px 20px rgba(107, 142, 35, 0.4)",
+                boxShadow: "0 6px 20px var(--color-olive-glow)",
               },
               "&:disabled": {
-                bgcolor: "#3a3a3a",
-                color: "#6b7280",
+                bgcolor: "var(--border-medium)",
+                color: "var(--neutral-500)",
               },
               transition: "all 0.2s ease-in-out",
             }}
@@ -531,7 +531,7 @@ const TermsAndConditions = () => {
             <Typography
               variant="caption"
               sx={{
-                color: "#b0b0b0",
+                color: "var(--text-secondary)",
                 letterSpacing: 1,
               }}
             >
@@ -541,7 +541,7 @@ const TermsAndConditions = () => {
           <Typography
             variant="caption"
             sx={{
-              color: "#6b7280",
+              color: "var(--neutral-500)",
               display: "block",
               mt: 1,
               fontStyle: "italic",
@@ -558,9 +558,9 @@ const TermsAndConditions = () => {
         open={isSubmitting}
         PaperProps={{
           sx: {
-            bgcolor: "#1a1a1a",
+            bgcolor: "var(--bg-overlay)",
             borderRadius: 3,
-            border: "1px solid #3a3a3a",
+            border: "1px solid var(--border-medium)",
             p: 4,
             textAlign: "center",
             minWidth: 300,
@@ -568,14 +568,14 @@ const TermsAndConditions = () => {
         }}
       >
         <DialogContent sx={{ p: 0 }}>
-          <CircularProgress size={60} sx={{ color: "#6B8E23", mb: 3 }} />
+          <CircularProgress size={60} sx={{ color: "var(--color-olive)", mb: 3 }} />
           <Typography
             variant="h6"
             sx={{ color: "white", fontWeight: 600, mb: 1 }}
           >
             Creating Your Account
           </Typography>
-          <Typography variant="body2" sx={{ color: "#b0b0b0" }}>
+          <Typography variant="body2" sx={{ color: "var(--text-secondary)" }}>
             Please wait while we set up your Aswenna profile...
           </Typography>
         </DialogContent>
@@ -584,9 +584,9 @@ const TermsAndConditions = () => {
         open={showSuccessDialog}
         PaperProps={{
           sx: {
-            bgcolor: "#1a1a1a",
+            bgcolor: "var(--bg-overlay)",
             borderRadius: 3,
-            border: "1px solid #6B8E23",
+            border: "1px solid var(--color-olive)",
             p: 4,
             textAlign: "center",
             minWidth: 350,
@@ -599,7 +599,7 @@ const TermsAndConditions = () => {
               width: 80,
               height: 80,
               borderRadius: "50%",
-              bgcolor: "rgba(107, 142, 35, 0.2)",
+              bgcolor: "var(--color-olive-muted-strong)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -607,7 +607,7 @@ const TermsAndConditions = () => {
               mb: 3,
             }}
           >
-            <CheckCircle sx={{ color: "#6B8E23", fontSize: 50 }} />
+            <CheckCircle sx={{ color: "var(--color-olive)", fontSize: 50 }} />
           </Box>
           <Typography
             variant="h5"
@@ -615,7 +615,7 @@ const TermsAndConditions = () => {
           >
             Account Created Successfully!
           </Typography>
-          <Typography variant="body2" sx={{ color: "#b0b0b0", mb: 2 }}>
+          <Typography variant="body2" sx={{ color: "var(--text-secondary)", mb: 2 }}>
             Your Aswenna account has been created. You will be redirected to the
             login page shortly.
           </Typography>
@@ -635,7 +635,7 @@ const TermsAndConditions = () => {
             />
             <Typography
               variant="body2"
-              sx={{ color: "#6B8E23", fontWeight: 600 }}
+              sx={{ color: "var(--color-olive)", fontWeight: 600 }}
             >
               Welcome to Aswenna!
             </Typography>

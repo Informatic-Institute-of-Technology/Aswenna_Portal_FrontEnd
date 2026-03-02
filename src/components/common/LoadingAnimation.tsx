@@ -38,7 +38,7 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
               top: 0,
               width: '100%',
               height: '100%',
-              background: '#6B8E23',
+              background: 'var(--color-olive)',
               borderRadius: '7px',
             },
             '&:nth-of-type(3n)': {

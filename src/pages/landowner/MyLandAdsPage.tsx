@@ -147,7 +147,7 @@ const MyLandAdsPage = () => {
               content: '""',
               width: 4,
               height: 24,
-              background: "linear-gradient(180deg, #6B8E23 0%, #8FA887 100%)",
+              background: "linear-gradient(180deg, var(--color-olive) 0%, var(--color-olive-light) 100%)",
               borderRadius: 1,
             },
           }}
@@ -170,7 +170,7 @@ const MyLandAdsPage = () => {
                       display: "flex",
                       flexDirection: "column",
                       background:
-                        "linear-gradient(145deg, #2a2a2a 0%, #1f1f1f 100%)",
+                        "linear-gradient(145deg, var(--bg-subtle) 0%, var(--bg-overlay) 100%)",
                       transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                       opacity: isAllocated ? 0.72 : 1,
                       "&:hover": isAllocated
@@ -178,7 +178,7 @@ const MyLandAdsPage = () => {
                         : {
                             transform: "translateY(-8px)",
                             boxShadow:
-                              "0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(107, 142, 35, 0.1)",
+                              "0 20px 40px var(--overlay-md), 0 0 20px var(--color-olive-muted)",
                           },
                     }}
                   >
@@ -197,7 +197,7 @@ const MyLandAdsPage = () => {
                           right: 0,
                           bottom: 0,
                           background:
-                            "linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.75) 100%)",
+                            "linear-gradient(180deg, transparent 0%, var(--overlay-xl) 100%)",
                         }}
                       />
                       <Box sx={{ position: "absolute", top: 12, left: 12 }}>
@@ -209,8 +209,8 @@ const MyLandAdsPage = () => {
                           size="small"
                           sx={{
                             fontWeight: 600,
-                            bgcolor: "rgba(0,0,0,0.65)",
-                            color: "#fff",
+                            bgcolor: "var(--overlay-xl)",
+                            color: "var(--text-primary)",
                           }}
                         />
                       </Box>
@@ -254,7 +254,7 @@ const MyLandAdsPage = () => {
                           sx={{
                             p: 1.5,
                             borderRadius: 1.5,
-                            background: "rgba(255, 255, 255, 0.04)",
+                            background: "var(--surface-tint)",
                             border: "1px solid",
                             borderColor: "divider",
                           }}
@@ -328,7 +328,7 @@ const MyLandAdsPage = () => {
             sx={{
               textAlign: "center",
               p: 6,
-              background: "rgba(255, 255, 255, 0.02)",
+              background: "var(--surface-tint)",
               borderRadius: 2,
               border: "2px dashed",
               borderColor: "divider",

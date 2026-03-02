@@ -14,7 +14,7 @@ const SectionHeader = ({
   title,
   description,
   icon,
-  accentColor = '#F7931E',
+  accentColor = 'var(--color-brand-accent)',
   showLeftBorder = false,
   showIconBox = false,
 }: SectionHeaderProps) => {
@@ -52,7 +52,7 @@ const SectionHeader = ({
           sx={{
             fontWeight: 700,
             mb: description ? 0.5 : 0,
-            color: '#fff',
+            color: 'var(--text-primary)',
             fontSize: '1.2rem',
           }}
         >
@@ -62,7 +62,7 @@ const SectionHeader = ({
           <Typography
             variant="body2"
             sx={{
-              color: 'rgba(255,255,255,0.6)',
+              color: 'var(--text-on-dark)',
               lineHeight: 1.5,
             }}
           >

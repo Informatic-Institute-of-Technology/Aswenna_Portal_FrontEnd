@@ -31,7 +31,7 @@ const CalendarMonth = ({
     <Paper
       elevation={3}
       sx={{
-        backgroundColor: '#2a2a2a',
+        backgroundColor: 'var(--bg-subtle)',
         borderRadius: 2,
         overflow: 'hidden',
       }}
@@ -69,7 +69,7 @@ const CalendarMonth = ({
               key={idx}
               sx={{
                 textAlign: 'center',
-                color: 'rgba(255, 255, 255, 0.5)',
+                color: 'var(--text-on-dark)',
               }}
             >
               <Typography variant="caption" sx={{ fontSize: '0.7rem', fontWeight: 600 }}>
@@ -116,10 +116,10 @@ const CalendarMonth = ({
                   borderRadius: 1,
                   backgroundColor: activeProject
                     ? activeProject.color
-                    : 'rgba(255, 255, 255, 0.05)',
+                    : 'var(--surface-muted)',
                   border: activeProject
                     ? `2px solid ${activeProject.color}`
-                    : '1px solid rgba(255, 255, 255, 0.1)',
+                    : '1px solid var(--surface-light)',
                   position: 'relative',
                   transition: 'all 0.2s',
                   cursor: activeProject ? 'pointer' : 'default',
@@ -134,7 +134,7 @@ const CalendarMonth = ({
                   sx={{
                     fontSize: '0.75rem',
                     fontWeight: activeProject ? 700 : 500,
-                    color: activeProject ? '#000' : 'rgba(255, 255, 255, 0.7)',
+                    color: activeProject ? 'var(--bg-app)' : 'var(--text-on-dark)',
                   }}
                 >
                   {day}
@@ -148,7 +148,7 @@ const CalendarMonth = ({
                       width: 4,
                       height: 4,
                       borderRadius: '50%',
-                      backgroundColor: '#000',
+                      backgroundColor: 'var(--bg-app)',
                     }}
                   />
                 )}

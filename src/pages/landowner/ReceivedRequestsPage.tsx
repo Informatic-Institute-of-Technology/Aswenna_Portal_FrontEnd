@@ -191,7 +191,7 @@ const ReceivedRequestsPage = () => {
 
       <Stack spacing={2.5}>
         {pendingRequests.map((request) => {
-          const { financials, investor_info } = request;
+          const { financials: _financials, investor_info } = request;
 
           return (
             <Box
@@ -201,7 +201,7 @@ const ReceivedRequestsPage = () => {
                 borderColor: "divider",
                 borderRadius: 2,
                 p: 2,
-                background: "rgba(255, 255, 255, 0.02)",
+                background: "var(--surface-tint)",
               }}
             >
               <Stack
@@ -264,7 +264,7 @@ const ReceivedRequestsPage = () => {
             borderRadius: 2,
             border: "2px dashed",
             borderColor: "divider",
-            background: "rgba(255, 255, 255, 0.02)",
+            background: "var(--surface-tint)",
           }}
         >
           <Typography variant="h6" sx={{ mb: 1 }}>

@@ -329,7 +329,7 @@ const SuperAdminDashboard = () => {
               value={userStats.totalUsers}
               subtitle="Active platform users"
               icon={<GroupOutlined sx={{ fontSize: 32 }} />}
-              color="#2196F3"
+              color="var(--color-info-blue)"
               growth={growth.users}
               trend="up"
             />
@@ -340,7 +340,7 @@ const SuperAdminDashboard = () => {
               value={userStats.farmers}
               subtitle="Cultivators registered"
               icon={<Agriculture sx={{ fontSize: 32 }} />}
-              color="#4CAF50"
+              color="var(--color-success)"
               growth={growth.farmers}
               trend="up"
             />
@@ -351,7 +351,7 @@ const SuperAdminDashboard = () => {
               value={userStats.investors}
               subtitle="Active investors"
               icon={<Business sx={{ fontSize: 32 }} />}
-              color="#FF9800"
+              color="var(--color-orange)"
               growth={growth.investors}
               trend="up"
             />
@@ -362,7 +362,7 @@ const SuperAdminDashboard = () => {
               value={userStats.landowners}
               subtitle="Property owners"
               icon={<Landscape sx={{ fontSize: 32 }} />}
-              color="#9C27B0"
+              color="var(--color-purple)"
               growth={growth.landowners}
               trend="up"
             />
@@ -373,7 +373,7 @@ const SuperAdminDashboard = () => {
           <Grid size={{ xs: 12, md: 6 }}>
             <Card
               sx={{
-                background: "linear-gradient(135deg, #4CAF50 0%, #45a049 100%)",
+                background: "linear-gradient(135deg, var(--color-success) 0%, var(--color-lime-hover) 100%)",
                 color: "white",
               }}
             >
@@ -408,7 +408,7 @@ const SuperAdminDashboard = () => {
           <Grid size={{ xs: 12, md: 6 }}>
             <Card
               sx={{
-                background: "linear-gradient(135deg, #FF9800 0%, #F57C00 100%)",
+                background: "linear-gradient(135deg, var(--color-orange) 0%, var(--color-orange) 100%)",
                 color: "white",
               }}
             >
@@ -489,7 +489,7 @@ const SuperAdminDashboard = () => {
                         top: 10,
                         right: 10,
                         p: 1.5,
-                        bgcolor: "rgba(0, 0, 0, 0.3)",
+                        bgcolor: "var(--overlay-sm)",
                         borderRadius: 1,
                         boxShadow: 3,
                         maxWidth: 180,
@@ -522,7 +522,7 @@ const SuperAdminDashboard = () => {
                           }}
                         >
                           <Agriculture
-                            sx={{ color: "#4CAF50", fontSize: 16 }}
+                            sx={{ color: "var(--color-success)", fontSize: 16 }}
                           />
                           <Typography variant="caption" sx={{ color: "white" }}>
                             Farmers
@@ -535,7 +535,7 @@ const SuperAdminDashboard = () => {
                             gap: 0.5,
                           }}
                         >
-                          <Business sx={{ color: "#FF9800", fontSize: 16 }} />
+                          <Business sx={{ color: "var(--color-orange)", fontSize: 16 }} />
                           <Typography variant="caption" sx={{ color: "white" }}>
                             Investors
                           </Typography>
@@ -547,7 +547,7 @@ const SuperAdminDashboard = () => {
                             gap: 0.5,
                           }}
                         >
-                          <Landscape sx={{ color: "#9C27B0", fontSize: 16 }} />
+                          <Landscape sx={{ color: "var(--color-purple)", fontSize: 16 }} />
                           <Typography variant="caption" sx={{ color: "white" }}>
                             Landowners
                           </Typography>
@@ -594,11 +594,11 @@ const SuperAdminDashboard = () => {
                                   borderRadius: "50%",
                                   bgcolor:
                                     index === 0
-                                      ? "#FFD700"
+                                      ? "var(--color-amber)"
                                       : index === 1
-                                        ? "#1a6ac5"
+                                        ? "var(--color-info-blue)"
                                         : index === 2
-                                          ? "#CD7F32"
+                                          ? "var(--color-amber)"
                                           : "primary.main",
                                   display: "flex",
                                   alignItems: "center",
@@ -651,11 +651,11 @@ const SuperAdminDashboard = () => {
                                 width: `${(district.count / maxDistrictCount) * 100}%`,
                                 bgcolor:
                                   index === 0
-                                    ? "#FFD700"
+                                    ? "var(--color-amber)"
                                     : index === 1
-                                      ? "#37c44a"
+                                      ? "var(--color-success)"
                                       : index === 2
-                                        ? "#CD7F32"
+                                        ? "var(--color-amber)"
                                         : "primary.main",
                                 transition: "width 0.3s ease",
                                 borderRadius: 4,
@@ -681,7 +681,7 @@ const SuperAdminDashboard = () => {
                 <Grid size={{ xs: 12, md: 4 }}>
                   <Paper sx={{ p: 3, textAlign: "center" }}>
                     <Agriculture
-                      sx={{ fontSize: 48, color: "#4CAF50", mb: 2 }}
+                      sx={{ fontSize: 48, color: "var(--color-success)", mb: 2 }}
                     />
                     <Typography variant="h4" sx={{ fontWeight: 700 }}>
                       {userStats.farmers}
@@ -713,7 +713,7 @@ const SuperAdminDashboard = () => {
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
                   <Paper sx={{ p: 3, textAlign: "center" }}>
-                    <Business sx={{ fontSize: 48, color: "#FF9800", mb: 2 }} />
+                    <Business sx={{ fontSize: 48, color: "var(--color-orange)", mb: 2 }} />
                     <Typography variant="h4" sx={{ fontWeight: 700 }}>
                       {userStats.investors}
                     </Typography>
@@ -745,7 +745,7 @@ const SuperAdminDashboard = () => {
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
                   <Paper sx={{ p: 3, textAlign: "center" }}>
-                    <Landscape sx={{ fontSize: 48, color: "#9C27B0", mb: 2 }} />
+                    <Landscape sx={{ fontSize: 48, color: "var(--color-purple)", mb: 2 }} />
                     <Typography variant="h4" sx={{ fontWeight: 700 }}>
                       {userStats.landowners}
                     </Typography>
@@ -868,29 +868,29 @@ const SuperAdminDashboard = () => {
                       } = {
                         "696e40fda4f896e9f40c8b93": {
                           name: "Farmer",
-                          color: "#4CAF50",
+                          color: "var(--color-success)",
                           icon: <Agriculture sx={{ fontSize: 16 }} />,
                         },
                         "696e6163b558abe269548099": {
                           name: "Investor",
-                          color: "#FF9800",
+                          color: "var(--color-orange)",
                           icon: <Business sx={{ fontSize: 16 }} />,
                         },
                         "696e616db558abe26954809c": {
                           name: "Landowner",
-                          color: "#9C27B0",
+                          color: "var(--color-purple)",
                           icon: <Landscape sx={{ fontSize: 16 }} />,
                         },
                         "696f008a3e12fb6fd9ed945b": {
                           name: "Super Admin",
-                          color: "#F44336",
+                          color: "var(--color-overdue)",
                           icon: <Verified sx={{ fontSize: 16 }} />,
                         },
                       };
 
                       const roleInfo = roleMap[user.role] || {
                         name: "Unknown",
-                        color: "#757575",
+                        color: "var(--neutral-500)",
                         icon: <People sx={{ fontSize: 16 }} />,
                       };
 

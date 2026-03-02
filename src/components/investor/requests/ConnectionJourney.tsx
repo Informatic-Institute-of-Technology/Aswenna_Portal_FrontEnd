@@ -20,8 +20,8 @@ const ConnectionJourney = ({ farmerName, steps }: ConnectionJourneyProps) => {
   return (
     <div
       style={{
-        background: 'linear-gradient(135deg, rgba(26, 46, 26, 0.4) 0%, rgba(42, 58, 42, 0.4) 100%)',
-        borderBottom: '1px solid rgba(107, 142, 35, 0.3)',
+        background: 'linear-gradient(135deg, var(--color-nature-deep) 0%, var(--color-nature-mid) 100%)',
+        borderBottom: '1px solid var(--color-olive-glow)',
       }}
       className="p-6"
     >
@@ -46,21 +46,21 @@ const ConnectionJourney = ({ farmerName, steps }: ConnectionJourneyProps) => {
                 style={
                   step.status === 'completed' && step.icon === 'close'
                     ? {
-                        background: '#ef4444',
+                        background: 'var(--color-overdue)',
                         border: '2px solid white',
                       }
                     : step.status === 'completed'
                     ? {
-                        background: '#22c55e',
+                        background: 'var(--color-brand-primary)',
                         border: '2px solid white',
                       }
                     : step.status === 'active'
                     ? {
-                        background: '#f59e0b',
-                        border: '4px solid rgba(251, 191, 36, 0.4)',
+                        background: 'var(--color-pending)',
+                        border: '4px solid var(--color-amber-muted)',
                       }
                     : {
-                        background: '#27272a',
+                        background: 'var(--bg-subtle)',
                         border: '2px solid white',
                       }
                 }
@@ -118,17 +118,17 @@ const ConnectionJourney = ({ farmerName, steps }: ConnectionJourneyProps) => {
                 {step.uploadArea && (
                   <div
                     style={{
-                      background: 'rgba(42, 42, 42, 0.8)',
-                      border: '2px dashed rgba(107, 142, 35, 0.4)',
+                      background: 'var(--bg-subtle)',
+                      border: '2px dashed var(--color-olive-glow)',
                       transition: 'all 0.3s ease',
                     }}
                     className="mt-3 p-3 rounded-lg text-center cursor-pointer"
                     onClick={step.uploadArea.onUpload}
                     onMouseEnter={(e) =>
-                      (e.currentTarget.style.borderColor = 'rgba(107, 142, 35, 0.8)')
+                      (e.currentTarget.style.borderColor = 'var(--color-olive-glow)')
                     }
                     onMouseLeave={(e) =>
-                      (e.currentTarget.style.borderColor = 'rgba(107, 142, 35, 0.4)')
+                      (e.currentTarget.style.borderColor = 'var(--color-olive-glow)')
                     }
                   >
                     <span className="material-icons text-gray-400 text-2xl mb-1">cloud_upload</span>

@@ -368,7 +368,7 @@ const FarmerProfileSetup = () => {
                 component="h1"
                 sx={{ fontWeight: "bold", mb: 1 }}
               >
-                Farmer <span style={{ color: "#6B8E23" }}>Information</span>
+                Farmer <span style={{ color: "var(--color-olive)" }}>Information</span>
               </Typography>
               <Typography variant="body1" color="text.secondary">
                 Complete your farmer profile to start connecting with investors
@@ -533,8 +533,8 @@ const FarmerProfileSetup = () => {
                     sx={{
                       "& .MuiInputBase-input.Mui-disabled": {
                         WebkitTextFillColor: gender
-                          ? "rgba(255, 255, 255, 0.87)"
-                          : "rgba(255, 255, 255, 0.38)",
+                          ? "var(--text-primary)"
+                          : "var(--text-on-dark)",
                         fontWeight: gender ? 600 : 400,
                       },
                     }}
@@ -560,8 +560,8 @@ const FarmerProfileSetup = () => {
                     sx={{
                       "& .MuiInputBase-input.Mui-disabled": {
                         WebkitTextFillColor: birthday
-                          ? "rgba(255, 255, 255, 0.87)"
-                          : "rgba(255, 255, 255, 0.38)",
+                          ? "var(--text-primary)"
+                          : "var(--text-on-dark)",
                         fontWeight: birthday ? 600 : 400,
                       },
                     }}
@@ -580,8 +580,8 @@ const FarmerProfileSetup = () => {
                       "& .MuiInputBase-input.Mui-disabled": {
                         WebkitTextFillColor:
                           age !== null
-                            ? "rgba(255, 255, 255, 0.87)"
-                            : "rgba(255, 255, 255, 0.38)",
+                            ? "var(--text-primary)"
+                            : "var(--text-on-dark)",
                         fontWeight: age !== null ? 600 : 400,
                       },
                     }}
@@ -858,11 +858,11 @@ const FarmerProfileSetup = () => {
                         color: selectedCrops.includes(crop)
                           ? "white"
                           : "text.secondary",
-                        border: `1px solid ${selectedCrops.includes(crop) ? "#6B8E23" : "#444"}`,
+                        border: `1px solid ${selectedCrops.includes(crop) ? "var(--color-olive)" : "var(--neutral-700)"}`,
                         "&:hover": {
                           bgcolor: selectedCrops.includes(crop)
                             ? "primary.dark"
-                            : "rgba(255,255,255,0.05)",
+                            : "var(--surface-muted)",
                         },
                       }}
                     />
@@ -875,9 +875,9 @@ const FarmerProfileSetup = () => {
                     sx={{
                       bgcolor: "transparent",
                       color: "text.secondary",
-                      border: "1px solid #444",
+                      border: "1px solid var(--neutral-700)",
                       "&:hover": {
-                        bgcolor: "rgba(255,255,255,0.05)",
+                        bgcolor: "var(--surface-muted)",
                         borderColor: "text.secondary",
                       },
                     }}
@@ -984,7 +984,7 @@ const FarmerProfileSetup = () => {
               <Box
                 sx={{
                   bgcolor: "rgba(255, 167, 38, 0.1)",
-                  border: "1px solid rgba(255, 167, 38, 0.3)",
+                  border: "1px solid var(--color-orange-border)",
                   borderRadius: 1,
                   p: 2,
                   display: "flex",
@@ -992,9 +992,9 @@ const FarmerProfileSetup = () => {
                 }}
               >
                 <InfoIcon
-                  sx={{ color: "#ffa726", fontSize: 16, mt: 0.5, mr: 1 }}
+                  sx={{ color: "var(--color-amber)", fontSize: 16, mt: 0.5, mr: 1 }}
                 />
-                <Typography variant="caption" color="#ffa726">
+                <Typography variant="caption" color="var(--color-amber)">
                   Documents will be reviewed by our team within 24-48 hours.
                   Ensure images are clear and readable.
                 </Typography>
@@ -1173,7 +1173,7 @@ const FarmerProfileSetup = () => {
                   py: 1.5,
                   textTransform: "none",
                   fontWeight: "bold",
-                  boxShadow: "0 4px 14px 0 rgba(107, 142, 35, 0.39)",
+                  boxShadow: "0 4px 14px 0 var(--color-olive-glow)",
                 }}
               >
                 {isSubmitting ? (
@@ -1191,7 +1191,7 @@ const FarmerProfileSetup = () => {
                 sx={{
                   py: 1.5,
                   textTransform: "none",
-                  borderColor: "#444",
+                  borderColor: "var(--neutral-700)",
                   color: "white",
                   "&:hover": { borderColor: "white" },
                 }}
@@ -1203,9 +1203,9 @@ const FarmerProfileSetup = () => {
             <Box sx={{ position: "fixed", bottom: 32, right: 32 }}>
               <IconButton
                 sx={{
-                  bgcolor: "#333",
-                  color: "#fbbf24",
-                  "&:hover": { bgcolor: "#444" },
+                  bgcolor: "var(--border-medium)",
+                  color: "var(--color-amber)",
+                  "&:hover": { bgcolor: "var(--neutral-700)" },
                 }}
               >
                 <WbSunny />

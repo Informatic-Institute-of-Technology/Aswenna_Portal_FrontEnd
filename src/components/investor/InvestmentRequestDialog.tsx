@@ -83,7 +83,7 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
       fullWidth
       PaperProps={{
         sx: {
-          background: '#2a2a2a',
+          background: 'var(--bg-subtle)',
           borderRadius: 2,
           maxHeight: '92vh',
         },
@@ -93,9 +93,9 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
       <Box
         sx={{
           p: 2.5,
-          borderBottom: '1px solid #3a3a3a',
+          borderBottom: '1px solid var(--border-medium)',
           position: 'relative',
-          bgcolor: '#242424',
+          bgcolor: 'var(--border-subtle)',
         }}
       >
         <IconButton
@@ -104,15 +104,15 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
             position: 'absolute',
             right: 12,
             top: 12,
-            color: '#999',
-            bgcolor: '#1f1f1f',
-            '&:hover': { bgcolor: '#333', color: '#fff' },
+            color: 'var(--neutral-350)',
+            bgcolor: 'var(--bg-overlay)',
+            '&:hover': { bgcolor: 'var(--border-medium)', color: 'var(--text-primary)' },
           }}
         >
           <Close fontSize="small" />
         </IconButton>
 
-        <Typography variant="h5" fontWeight={600} sx={{ color: '#fff', mb: 1.5, pr: 6 }}>
+        <Typography variant="h5" fontWeight={600} sx={{ color: 'var(--text-primary)', mb: 1.5, pr: 6 }}>
           {request.projectTitle}
         </Typography>
         
@@ -121,11 +121,11 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
             label={`INV-${request.id.toUpperCase()}`}
             size="small"
             sx={{
-              bgcolor: '#1f1f1f',
-              color: '#999',
+              bgcolor: 'var(--bg-overlay)',
+              color: 'var(--neutral-350)',
               fontWeight: 600,
               fontSize: '0.7rem',
-              border: '1px solid #3a3a3a',
+              border: '1px solid var(--border-medium)',
               height: 24,
             }}
           />
@@ -133,16 +133,16 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
             label={request.status.toUpperCase()}
             size="small"
             sx={{
-              bgcolor: request.status === 'open' ? '#76c043' : '#666',
-              color: '#fff',
+              bgcolor: request.status === 'open' ? 'var(--color-lime)' : 'var(--neutral-500)',
+              color: 'var(--text-primary)',
               fontWeight: 700,
               fontSize: '0.7rem',
               height: 24,
             }}
           />
           <Stack direction="row" spacing={0.5} alignItems="center">
-            <CalendarToday sx={{ fontSize: 14, color: '#999' }} />
-            <Typography variant="caption" sx={{ color: '#999', fontSize: '0.75rem' }}>
+            <CalendarToday sx={{ fontSize: 14, color: 'var(--neutral-350)' }} />
+            <Typography variant="caption" sx={{ color: 'var(--neutral-350)', fontSize: '0.75rem' }}>
               Started {formatDate(request.createdAt)}
             </Typography>
           </Stack>
@@ -157,25 +157,25 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
             <Avatar
               src={request.farmerImage}
               alt={request.farmerName}
-              sx={{ width: 60, height: 60, border: '2px solid #76c043' }}
+              sx={{ width: 60, height: 60, border: '2px solid var(--color-lime)' }}
             >
               <Person />
             </Avatar>
             <Box sx={{ flex: 1 }}>
-              <Typography variant="h6" fontWeight={600} sx={{ color: '#fff', mb: 0.5 }}>
+              <Typography variant="h6" fontWeight={600} sx={{ color: 'var(--text-primary)', mb: 0.5 }}>
                 {request.farmerName}
               </Typography>
               <Stack direction="row" spacing={2} alignItems="center">
                 <Stack direction="row" spacing={0.5} alignItems="center">
-                  <Schedule sx={{ fontSize: 16, color: '#999' }} />
-                  <Typography variant="caption" sx={{ color: '#999' }}>
+                  <Schedule sx={{ fontSize: 16, color: 'var(--neutral-350)' }} />
+                  <Typography variant="caption" sx={{ color: 'var(--neutral-350)' }}>
                     {request.farmerExperience}+ years experience
                   </Typography>
                 </Stack>
                 {request.farmerRating && (
                   <Stack direction="row" spacing={0.5} alignItems="center">
-                    <Star sx={{ fontSize: 16, color: '#ffa726' }} />
-                    <Typography variant="caption" sx={{ color: '#999' }}>
+                    <Star sx={{ fontSize: 16, color: 'var(--color-amber)' }} />
+                    <Typography variant="caption" sx={{ color: 'var(--neutral-350)' }}>
                       {request.farmerRating} rating
                     </Typography>
                   </Stack>
@@ -183,8 +183,8 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
               </Stack>
             </Box>
             <Stack direction="row" spacing={1} alignItems="center">
-              <LocationOn sx={{ fontSize: 18, color: '#999' }} />
-              <Typography variant="body2" sx={{ color: '#ccc' }}>
+              <LocationOn sx={{ fontSize: 18, color: 'var(--neutral-350)' }} />
+              <Typography variant="body2" sx={{ color: 'var(--text-secondary)' }}>
                 {request.location}, {request.district}
               </Typography>
             </Stack>
@@ -194,14 +194,14 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
         {/* Full Financial Summary - Investment Transparency */}
         <Box
           sx={{
-            bgcolor: '#1f1f1f',
-            border: '1px solid #3a3a3a',
+            bgcolor: 'var(--bg-overlay)',
+            border: '1px solid var(--border-medium)',
             borderRadius: 2,
             p: 3,
             mb: 3,
           }}
         >
-          <Typography variant="h6" fontWeight={700} sx={{ color: '#fff', mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Typography variant="h6" fontWeight={700} sx={{ color: 'var(--text-primary)', mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
             <Box component="span" sx={{ fontSize: '1.3rem' }}>💰</Box>
             Investment Financial Summary
           </Typography>
@@ -215,48 +215,48 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
               mb: 3,
             }}
           >
-            <Box sx={{ p: 2, bgcolor: '#242424', borderRadius: 1.5, border: '1px solid #3a3a3a' }}>
-              <Typography variant="caption" sx={{ color: '#999', fontSize: '0.7rem', letterSpacing: 0.5, textTransform: 'uppercase', display: 'block', mb: 0.5 }}>
+            <Box sx={{ p: 2, bgcolor: 'var(--border-subtle)', borderRadius: 1.5, border: '1px solid var(--border-medium)' }}>
+              <Typography variant="caption" sx={{ color: 'var(--neutral-350)', fontSize: '0.7rem', letterSpacing: 0.5, textTransform: 'uppercase', display: 'block', mb: 0.5 }}>
                 Total Investment
               </Typography>
-              <Typography variant="h5" fontWeight={700} sx={{ color: '#fff' }}>
+              <Typography variant="h5" fontWeight={700} sx={{ color: 'var(--text-primary)' }}>
                 {formatCurrency(request.totalInvestmentRequired)}
               </Typography>
             </Box>
             
-            <Box sx={{ p: 2, bgcolor: '#242424', borderRadius: 1.5, border: '1px solid #3a3a3a' }}>
-              <Typography variant="caption" sx={{ color: '#999', fontSize: '0.7rem', letterSpacing: 0.5, textTransform: 'uppercase', display: 'block', mb: 0.5 }}>
+            <Box sx={{ p: 2, bgcolor: 'var(--border-subtle)', borderRadius: 1.5, border: '1px solid var(--border-medium)' }}>
+              <Typography variant="caption" sx={{ color: 'var(--neutral-350)', fontSize: '0.7rem', letterSpacing: 0.5, textTransform: 'uppercase', display: 'block', mb: 0.5 }}>
                 Expected ROI
               </Typography>
-              <Typography variant="h5" fontWeight={700} sx={{ color: '#76c043' }}>
+              <Typography variant="h5" fontWeight={700} sx={{ color: 'var(--color-lime)' }}>
                 {request.expectedROI}%
               </Typography>
             </Box>
             
-            <Box sx={{ p: 2, bgcolor: '#242424', borderRadius: 1.5, border: '1px solid #3a3a3a' }}>
-              <Typography variant="caption" sx={{ color: '#999', fontSize: '0.7rem', letterSpacing: 0.5, textTransform: 'uppercase', display: 'block', mb: 0.5 }}>
+            <Box sx={{ p: 2, bgcolor: 'var(--border-subtle)', borderRadius: 1.5, border: '1px solid var(--border-medium)' }}>
+              <Typography variant="caption" sx={{ color: 'var(--neutral-350)', fontSize: '0.7rem', letterSpacing: 0.5, textTransform: 'uppercase', display: 'block', mb: 0.5 }}>
                 Project Duration
               </Typography>
-              <Typography variant="h5" fontWeight={700} sx={{ color: '#fff' }}>
+              <Typography variant="h5" fontWeight={700} sx={{ color: 'var(--text-primary)' }}>
                 {request.expectedDuration} months
               </Typography>
             </Box>
             
-            <Box sx={{ p: 2, bgcolor: '#242424', borderRadius: 1.5, border: '1px solid #3a3a3a' }}>
-              <Typography variant="caption" sx={{ color: '#999', fontSize: '0.7rem', letterSpacing: 0.5, textTransform: 'uppercase', display: 'block', mb: 0.5 }}>
+            <Box sx={{ p: 2, bgcolor: 'var(--border-subtle)', borderRadius: 1.5, border: '1px solid var(--border-medium)' }}>
+              <Typography variant="caption" sx={{ color: 'var(--neutral-350)', fontSize: '0.7rem', letterSpacing: 0.5, textTransform: 'uppercase', display: 'block', mb: 0.5 }}>
                 Payment Installments
               </Typography>
-              <Typography variant="h5" fontWeight={700} sx={{ color: '#fff' }}>
+              <Typography variant="h5" fontWeight={700} sx={{ color: 'var(--text-primary)' }}>
                 {request.installmentSchedule.length}
               </Typography>
             </Box>
           </Box>
 
           {/* Investment Type and Details */}
-          <Box sx={{ mb: 3, p: 2, bgcolor: '#242424', borderRadius: 1.5, border: '1px solid #3a3a3a' }}>
+          <Box sx={{ mb: 3, p: 2, bgcolor: 'var(--border-subtle)', borderRadius: 1.5, border: '1px solid var(--border-medium)' }}>
             <Stack direction="row" spacing={3} alignItems="center" flexWrap="wrap">
               <Box>
-                <Typography variant="caption" sx={{ color: '#999', fontSize: '0.7rem', letterSpacing: 0.5, textTransform: 'uppercase', display: 'block', mb: 0.5 }}>
+                <Typography variant="caption" sx={{ color: 'var(--neutral-350)', fontSize: '0.7rem', letterSpacing: 0.5, textTransform: 'uppercase', display: 'block', mb: 0.5 }}>
                   Investment Type
                 </Typography>
                 <Chip
@@ -264,35 +264,35 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
                   label="Harvest-Based"
                   size="small"
                   sx={{
-                    bgcolor: 'rgba(118, 192, 67, 0.15)',
-                    color: '#76c043',
-                    border: '1px solid rgba(118, 192, 67, 0.3)',
+                    bgcolor: 'var(--color-lime-muted)',
+                    color: 'var(--color-lime)',
+                    border: '1px solid var(--color-lime-border)',
                     fontWeight: 600,
                     fontSize: '0.75rem',
                   }}
                 />
               </Box>
               <Box>
-                <Typography variant="caption" sx={{ color: '#999', fontSize: '0.7rem', letterSpacing: 0.5, textTransform: 'uppercase', display: 'block', mb: 0.5 }}>
+                <Typography variant="caption" sx={{ color: 'var(--neutral-350)', fontSize: '0.7rem', letterSpacing: 0.5, textTransform: 'uppercase', display: 'block', mb: 0.5 }}>
                   Crop Type
                 </Typography>
-                <Typography variant="body2" fontWeight={600} sx={{ color: '#fff' }}>
+                <Typography variant="body2" fontWeight={600} sx={{ color: 'var(--text-primary)' }}>
                   {request.cropType}
                 </Typography>
               </Box>
               <Box>
-                <Typography variant="caption" sx={{ color: '#999', fontSize: '0.7rem', letterSpacing: 0.5, textTransform: 'uppercase', display: 'block', mb: 0.5 }}>
+                <Typography variant="caption" sx={{ color: 'var(--neutral-350)', fontSize: '0.7rem', letterSpacing: 0.5, textTransform: 'uppercase', display: 'block', mb: 0.5 }}>
                   Expected Yield
                 </Typography>
-                <Typography variant="body2" fontWeight={600} sx={{ color: '#fff' }}>
+                <Typography variant="body2" fontWeight={600} sx={{ color: 'var(--text-primary)' }}>
                   {request.expectedYield}
                 </Typography>
               </Box>
               <Box>
-                <Typography variant="caption" sx={{ color: '#999', fontSize: '0.7rem', letterSpacing: 0.5, textTransform: 'uppercase', display: 'block', mb: 0.5 }}>
+                <Typography variant="caption" sx={{ color: 'var(--neutral-350)', fontSize: '0.7rem', letterSpacing: 0.5, textTransform: 'uppercase', display: 'block', mb: 0.5 }}>
                   Funding Deadline
                 </Typography>
-                <Typography variant="body2" fontWeight={600} sx={{ color: isUrgent ? '#ff9800' : '#fff' }}>
+                <Typography variant="body2" fontWeight={600} sx={{ color: isUrgent ? 'var(--color-orange)' : 'var(--text-primary)' }}>
                   {formatDate(request.fundingDeadline)} {isUrgent && `(${daysLeft} days left)`}
                 </Typography>
               </Box>
@@ -306,20 +306,20 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
             value={activeTab}
             onChange={handleTabChange}
             sx={{
-              borderBottom: '1px solid #3a3a3a',
+              borderBottom: '1px solid var(--border-medium)',
               mb: 3,
               '& .MuiTab-root': {
-                color: '#999',
+                color: 'var(--neutral-350)',
                 textTransform: 'none',
                 fontWeight: 600,
                 fontSize: '0.875rem',
                 minHeight: 48,
                 '&.Mui-selected': {
-                  color: '#76c043',
+                  color: 'var(--color-lime)',
                 },
               },
               '& .MuiTabs-indicator': {
-                backgroundColor: '#76c043',
+                backgroundColor: 'var(--color-lime)',
                 height: 3,
               },
             }}
@@ -334,52 +334,52 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
             <Box>
               <Box
                 sx={{
-                  bgcolor: '#1f1f1f',
-                  border: '1px solid #3a3a3a',
+                  bgcolor: 'var(--bg-overlay)',
+                  border: '1px solid var(--border-medium)',
                   borderRadius: 2,
                   p: 2.5,
                   mb: 3,
                 }}
               >
-                <Typography variant="subtitle1" fontWeight={600} sx={{ color: '#fff', mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="subtitle1" fontWeight={600} sx={{ color: 'var(--text-primary)', mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Description sx={{ fontSize: 20 }} />
                   Project Description
                 </Typography>
-                <Typography variant="body2" sx={{ color: '#ccc', lineHeight: 1.7, mb: 2 }}>
+                <Typography variant="body2" sx={{ color: 'var(--text-secondary)', lineHeight: 1.7, mb: 2 }}>
                   {request.description}
                 </Typography>
                 
                 <Stack direction="row" spacing={3} flexWrap="wrap">
                   <Box>
-                    <Typography variant="caption" sx={{ color: '#999', display: 'block', mb: 0.5 }}>
+                    <Typography variant="caption" sx={{ color: 'var(--neutral-350)', display: 'block', mb: 0.5 }}>
                       Duration
                     </Typography>
-                    <Typography variant="body2" fontWeight={600} sx={{ color: '#fff' }}>
+                    <Typography variant="body2" fontWeight={600} sx={{ color: 'var(--text-primary)' }}>
                       {request.expectedDuration} months
                     </Typography>
                   </Box>
                   <Box>
-                    <Typography variant="caption" sx={{ color: '#999', display: 'block', mb: 0.5 }}>
+                    <Typography variant="caption" sx={{ color: 'var(--neutral-350)', display: 'block', mb: 0.5 }}>
                       Expected Yield
                     </Typography>
-                    <Typography variant="body2" fontWeight={600} sx={{ color: '#fff' }}>
+                    <Typography variant="body2" fontWeight={600} sx={{ color: 'var(--text-primary)' }}>
                       {request.expectedYield}
                     </Typography>
                   </Box>
                   <Box>
-                    <Typography variant="caption" sx={{ color: '#999', display: 'block', mb: 0.5 }}>
+                    <Typography variant="caption" sx={{ color: 'var(--neutral-350)', display: 'block', mb: 0.5 }}>
                       Crop Type
                     </Typography>
-                    <Typography variant="body2" fontWeight={600} sx={{ color: '#fff' }}>
+                    <Typography variant="body2" fontWeight={600} sx={{ color: 'var(--text-primary)' }}>
                       {request.cropType}
                     </Typography>
                   </Box>
                   {isUrgent && (
                     <Box>
-                      <Typography variant="caption" sx={{ color: '#ff9800', display: 'block', mb: 0.5 }}>
+                      <Typography variant="caption" sx={{ color: 'var(--color-orange)', display: 'block', mb: 0.5 }}>
                         ⚠️ Funding Deadline
                       </Typography>
-                      <Typography variant="body2" fontWeight={600} sx={{ color: '#ff9800' }}>
+                      <Typography variant="body2" fontWeight={600} sx={{ color: 'var(--color-orange)' }}>
                         {daysLeft} days left
                       </Typography>
                     </Box>
@@ -393,13 +393,13 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
           {activeTab === 1 && (
             <Box
               sx={{
-                bgcolor: '#1f1f1f',
-                border: '1px solid #3a3a3a',
+                bgcolor: 'var(--bg-overlay)',
+                border: '1px solid var(--border-medium)',
                 borderRadius: 2,
                 p: 2.5,
               }}
             >
-              <Typography variant="subtitle1" fontWeight={600} sx={{ color: '#fff', mb: 2 }}>
+              <Typography variant="subtitle1" fontWeight={600} sx={{ color: 'var(--text-primary)', mb: 2 }}>
                 💵 Detailed Cost Breakdown
               </Typography>
 
@@ -409,10 +409,10 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
                 <TableRow>
                   <TableCell
                     sx={{
-                      color: '#999',
+                      color: 'var(--neutral-350)',
                       fontWeight: 600,
                       fontSize: '0.75rem',
-                      borderBottom: '1px solid #3a3a3a',
+                      borderBottom: '1px solid var(--border-medium)',
                       textTransform: 'uppercase',
                       letterSpacing: 0.5,
                       py: 1.5,
@@ -423,10 +423,10 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
                   <TableCell
                     align="right"
                     sx={{
-                      color: '#999',
+                      color: 'var(--neutral-350)',
                       fontWeight: 600,
                       fontSize: '0.75rem',
-                      borderBottom: '1px solid #3a3a3a',
+                      borderBottom: '1px solid var(--border-medium)',
                       textTransform: 'uppercase',
                       letterSpacing: 0.5,
                       py: 1.5,
@@ -441,29 +441,29 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
                   <TableRow
                     key={item.id}
                     sx={{
-                      '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.02)' },
+                      '&:hover': { bgcolor: 'var(--surface-tint)' },
                     }}
                   >
                     <TableCell
                       sx={{
-                        borderBottom: '1px solid #333',
+                        borderBottom: '1px solid var(--border-medium)',
                         py: 2,
                       }}
                     >
-                      <Typography variant="body2" fontWeight={600} sx={{ color: '#fff', mb: 0.5 }}>
+                      <Typography variant="body2" fontWeight={600} sx={{ color: 'var(--text-primary)', mb: 0.5 }}>
                         {item.category}
                       </Typography>
-                      <Typography variant="caption" sx={{ color: '#999' }}>
+                      <Typography variant="caption" sx={{ color: 'var(--neutral-350)' }}>
                         {item.description}
                       </Typography>
                     </TableCell>
                     <TableCell
                       align="right"
                       sx={{
-                        color: '#ccc',
+                        color: 'var(--text-secondary)',
                         fontSize: '0.95rem',
                         fontWeight: 600,
-                        borderBottom: '1px solid #333',
+                        borderBottom: '1px solid var(--border-medium)',
                       }}
                     >
                       {formatCurrency(item.estimatedCost)}
@@ -473,10 +473,10 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
                 <TableRow>
                   <TableCell
                     sx={{
-                      color: '#fff',
+                      color: 'var(--text-primary)',
                       fontWeight: 700,
                       fontSize: '1rem',
-                      borderTop: '2px solid #3a3a3a',
+                      borderTop: '2px solid var(--border-medium)',
                       borderBottom: 'none',
                       py: 2,
                     }}
@@ -486,10 +486,10 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
                   <TableCell
                     align="right"
                     sx={{
-                      color: '#76c043',
+                      color: 'var(--color-lime)',
                       fontSize: '1.1rem',
                       fontWeight: 700,
-                      borderTop: '2px solid #3a3a3a',
+                      borderTop: '2px solid var(--border-medium)',
                       borderBottom: 'none',
                     }}
                   >
@@ -506,13 +506,13 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
           {activeTab === 2 && (
             <Box
               sx={{
-                bgcolor: '#1f1f1f',
-                border: '1px solid #3a3a3a',
+                bgcolor: 'var(--bg-overlay)',
+                border: '1px solid var(--border-medium)',
                 borderRadius: 2,
                 p: 2.5,
               }}
             >
-              <Typography variant="subtitle1" fontWeight={600} sx={{ color: '#fff', mb: 2 }}>
+              <Typography variant="subtitle1" fontWeight={600} sx={{ color: 'var(--text-primary)', mb: 2 }}>
                 📅 Payment Schedule ({request.installmentSchedule.length} Installments)
               </Typography>
 
@@ -520,19 +520,19 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ color: '#999', fontWeight: 600, fontSize: '0.75rem', borderBottom: '1px solid #3a3a3a', textTransform: 'uppercase', py: 1.5, width: 60 }}>
+                  <TableCell sx={{ color: 'var(--neutral-350)', fontWeight: 600, fontSize: '0.75rem', borderBottom: '1px solid var(--border-medium)', textTransform: 'uppercase', py: 1.5, width: 60 }}>
                     #
                   </TableCell>
-                  <TableCell sx={{ color: '#999', fontWeight: 600, fontSize: '0.75rem', borderBottom: '1px solid #3a3a3a', textTransform: 'uppercase', py: 1.5 }}>
+                  <TableCell sx={{ color: 'var(--neutral-350)', fontWeight: 600, fontSize: '0.75rem', borderBottom: '1px solid var(--border-medium)', textTransform: 'uppercase', py: 1.5 }}>
                     Milestone
                   </TableCell>
-                  <TableCell align="right" sx={{ color: '#999', fontWeight: 600, fontSize: '0.75rem', borderBottom: '1px solid #3a3a3a', textTransform: 'uppercase', py: 1.5 }}>
+                  <TableCell align="right" sx={{ color: 'var(--neutral-350)', fontWeight: 600, fontSize: '0.75rem', borderBottom: '1px solid var(--border-medium)', textTransform: 'uppercase', py: 1.5 }}>
                     Amount
                   </TableCell>
-                  <TableCell align="right" sx={{ color: '#999', fontWeight: 600, fontSize: '0.75rem', borderBottom: '1px solid #3a3a3a', textTransform: 'uppercase', py: 1.5 }}>
+                  <TableCell align="right" sx={{ color: 'var(--neutral-350)', fontWeight: 600, fontSize: '0.75rem', borderBottom: '1px solid var(--border-medium)', textTransform: 'uppercase', py: 1.5 }}>
                     Due Date
                   </TableCell>
-                  <TableCell align="center" sx={{ color: '#999', fontWeight: 600, fontSize: '0.75rem', borderBottom: '1px solid #3a3a3a', textTransform: 'uppercase', py: 1.5 }}>
+                  <TableCell align="center" sx={{ color: 'var(--neutral-350)', fontWeight: 600, fontSize: '0.75rem', borderBottom: '1px solid var(--border-medium)', textTransform: 'uppercase', py: 1.5 }}>
                     Status
                   </TableCell>
                 </TableRow>
@@ -542,24 +542,24 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
                   <TableRow
                     key={installment.id}
                     sx={{
-                      '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.02)' },
+                      '&:hover': { bgcolor: 'var(--surface-tint)' },
                     }}
                   >
                     <TableCell
                       sx={{
-                        color: '#ccc',
+                        color: 'var(--text-secondary)',
                         fontSize: '0.875rem',
                         fontWeight: 600,
-                        borderBottom: '1px solid #333',
+                        borderBottom: '1px solid var(--border-medium)',
                       }}
                     >
                       {installment.installmentNumber}
                     </TableCell>
                     <TableCell
                       sx={{
-                        color: '#fff',
+                        color: 'var(--text-primary)',
                         fontSize: '0.875rem',
-                        borderBottom: '1px solid #333',
+                        borderBottom: '1px solid var(--border-medium)',
                         fontWeight: 500,
                       }}
                     >
@@ -568,10 +568,10 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
                     <TableCell
                       align="right"
                       sx={{
-                        color: '#ccc',
+                        color: 'var(--text-secondary)',
                         fontSize: '0.95rem',
                         fontWeight: 600,
-                        borderBottom: '1px solid #333',
+                        borderBottom: '1px solid var(--border-medium)',
                       }}
                     >
                       {formatCurrency(installment.amount)}
@@ -579,9 +579,9 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
                     <TableCell
                       align="right"
                       sx={{
-                        color: '#999',
+                        color: 'var(--neutral-350)',
                         fontSize: '0.875rem',
-                        borderBottom: '1px solid #333',
+                        borderBottom: '1px solid var(--border-medium)',
                       }}
                     >
                       {formatDate(installment.dueDate)}
@@ -589,19 +589,19 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
                     <TableCell
                       align="center"
                       sx={{
-                        borderBottom: '1px solid #333',
+                        borderBottom: '1px solid var(--border-medium)',
                       }}
                     >
                       <Chip
                         label={installment.status?.toUpperCase() || 'PENDING'}
                         size="small"
                         sx={{
-                          bgcolor: installment.status === 'paid' ? 'rgba(118, 192, 67, 0.2)' : 'rgba(255, 167, 38, 0.2)',
-                          color: installment.status === 'paid' ? '#76c043' : '#ffa726',
+                          bgcolor: installment.status === 'paid' ? 'var(--color-lime-muted-strong)' : 'var(--color-orange-muted)',
+                          color: installment.status === 'paid' ? 'var(--color-lime)' : 'var(--color-amber)',
                           fontWeight: 600,
                           fontSize: '0.7rem',
                           height: 22,
-                          border: installment.status === 'paid' ? '1px solid rgba(118, 192, 67, 0.3)' : '1px solid rgba(255, 167, 38, 0.3)',
+                          border: installment.status === 'paid' ? '1px solid var(--color-lime-border)' : '1px solid var(--color-orange-border)',
                         }}
                       />
                     </TableCell>
@@ -619,8 +619,8 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
       <Box
         sx={{
           p: 2.5,
-          borderTop: '1px solid #3a3a3a',
-          bgcolor: '#242424',
+          borderTop: '1px solid var(--border-medium)',
+          bgcolor: 'var(--border-subtle)',
           display: 'flex',
           justifyContent: 'space-between',
           gap: 2,
@@ -631,14 +631,14 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
           size="large"
           onClick={onClose}
           sx={{
-            borderColor: '#3a3a3a',
-            color: '#ccc',
+            borderColor: 'var(--border-medium)',
+            color: 'var(--text-secondary)',
             fontWeight: 600,
             textTransform: 'none',
             px: 4,
             '&:hover': {
-              borderColor: '#4a4a4a',
-              bgcolor: 'rgba(255, 255, 255, 0.02)',
+              borderColor: 'var(--neutral-700)',
+              bgcolor: 'var(--surface-tint)',
             },
           }}
         >
@@ -650,15 +650,15 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
             size="large"
             startIcon={<GetApp />}
             sx={{
-              bgcolor: '#76c043',
-              color: '#fff',
+              bgcolor: 'var(--color-lime)',
+              color: 'var(--text-primary)',
               fontWeight: 700,
               textTransform: 'none',
               px: 4,
-              boxShadow: '0 4px 12px rgba(118, 192, 67, 0.3)',
+              boxShadow: '0 4px 12px var(--color-lime-border)',
               '&:hover': {
-                bgcolor: '#68a83b',
-                boxShadow: '0 6px 16px rgba(118, 192, 67, 0.4)',
+                bgcolor: 'var(--color-lime-hover)',
+                boxShadow: '0 6px 16px var(--color-lime-border)',
               },
             }}
           >
@@ -674,15 +674,15 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
             }}
             disabled={request.status !== 'open'}
             sx={{
-              bgcolor: request.status === 'open' ? '#76c043' : '#444',
-              color: '#fff',
+              bgcolor: request.status === 'open' ? 'var(--color-lime)' : 'var(--neutral-700)',
+              color: 'var(--text-primary)',
               fontWeight: 700,
               textTransform: 'none',
               px: 4,
-              boxShadow: request.status === 'open' ? '0 4px 12px rgba(118, 192, 67, 0.3)' : 'none',
+              boxShadow: request.status === 'open' ? '0 4px 12px var(--color-lime-border)' : 'none',
               '&:hover': {
-                bgcolor: request.status === 'open' ? '#68a83b' : '#444',
-                boxShadow: request.status === 'open' ? '0 6px 16px rgba(118, 192, 67, 0.4)' : 'none',
+                bgcolor: request.status === 'open' ? 'var(--color-lime-hover)' : 'var(--neutral-700)',
+                boxShadow: request.status === 'open' ? '0 6px 16px var(--color-lime-border)' : 'none',
               },
             }}
           >

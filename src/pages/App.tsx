@@ -31,6 +31,16 @@ const MatchMakingPage = lazy(() => import("./common/MatchMakingPage"));
 const MyOffersPage = lazy(() => import("./investor/MyOffersPage"));
 const OpportunitiesPage = lazy(() => import("./investor/OpportunitiesPage"));
 const RequestsPage = lazy(() => import("./investor/RequestsPage"));
+const FinanceLedgerPage = lazy(() => import("./investor/FinanceLedgerPage"));
+const PaymentControlCenterPage = lazy(
+  () => import("./investor/payment/PaymentControlCenterPage"),
+);
+const ProjectPaymentMilestonePage = lazy(
+  () => import("./investor/payment/ProjectPaymentMilestonePage"),
+);
+const PayInstallmentPage = lazy(
+  () => import("./investor/payment/PayInstallmentPage"),
+);
 
 const MyLandAdsPage = lazy(() => import("./landowner/MyLandAdsPage"));
 const ReceivedRequestsPage = lazy(
@@ -107,6 +117,20 @@ function AppRoutes() {
             <Route path="requests" element={<RequestsPage />} />
             <Route path="roi-analysis" element={<MatchMakingPage />} />
             <Route path="profitability" element={<Dashboard />} />
+            <Route path="finance-ledger" element={<FinanceLedgerPage />} />
+            <Route
+              path="payment-pipeline"
+              element={<PaymentControlCenterPage />}
+            />
+            <Route
+              path="payment-control"
+              element={<PaymentControlCenterPage />}
+            />
+            <Route
+              path="payment-milestone"
+              element={<ProjectPaymentMilestonePage />}
+            />
+            <Route path="pay-installment" element={<PayInstallmentPage />} />
 
             <Route path="my-land-ads" element={<MyLandAdsPage />} />
             <Route

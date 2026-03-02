@@ -95,7 +95,7 @@ const FarmerDashboard = () => {
         <div className="col-12 col-sm-6 col-md-4">
           <StatCard
             icon={Description}
-            iconBgColor="rgba(107, 142, 35, 0.2)"
+            iconBgColor="var(--color-olive-muted-strong)"
             iconColor="primary.main"
             label="Active Projects"
             value="04"
@@ -104,8 +104,8 @@ const FarmerDashboard = () => {
         <div className="col-12 col-sm-6 col-md-4">
           <StatCard
             icon={CheckCircle}
-            iconBgColor="rgba(59, 130, 246, 0.2)"
-            iconColor="#3b82f6"
+            iconBgColor="var(--color-info-blue-muted)"
+            iconColor="var(--color-info-blue)"
             label="Completed Projects"
             value="06"
           />
@@ -113,8 +113,8 @@ const FarmerDashboard = () => {
         <div className="col-12 col-sm-6 col-md-4">
           <StatCard
             icon={TrendingUp}
-            iconBgColor="rgba(251, 191, 36, 0.2)"
-            iconColor="#fbbf24"
+            iconBgColor="var(--color-amber-muted)"
+            iconColor="var(--color-amber)"
             label="New Requests"
             value="13+"
           />
@@ -160,7 +160,7 @@ const FarmerDashboard = () => {
             <CardContent>
               <Box
                 sx={{
-                  backgroundColor: "#1e1e1e",
+                  backgroundColor: "var(--bg-overlay)",
                   borderRadius: 2,
                   p: 3,
                 }}
@@ -192,7 +192,7 @@ const FarmerDashboard = () => {
                     flexWrap: "wrap",
                     justifyContent: "center",
                     pt: 2,
-                    borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderTop: "1px solid var(--surface-light)",
                   }}
                 >
                   {mockProjects.map((project) => (
