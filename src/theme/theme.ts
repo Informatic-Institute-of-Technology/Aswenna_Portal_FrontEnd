@@ -1,10 +1,3 @@
-/**
- * ============================================================
- *  ASWENNA PORTAL — MUI Theme
- *  All values come exclusively from tokens.ts.
- *  Do NOT hardcode colors here — update tokens.ts instead.
- * ============================================================
- */
 import { createTheme } from "@mui/material/styles";
 import { color, font, radius, shadow, transition } from "./tokens";
 
@@ -83,7 +76,7 @@ export const theme = createTheme({
   },
 
   shape: {
-    borderRadius: 8, // matches radius.md
+    borderRadius: 8,
   },
 
   shadows: [
@@ -115,7 +108,6 @@ export const theme = createTheme({
   ],
 
   components: {
-    // ── Text Field ─────────────────────────────────────────
     MuiTextField: {
       defaultProps: { variant: "standard" },
       styleOverrides: {
@@ -128,7 +120,6 @@ export const theme = createTheme({
       },
     },
 
-    // ── Button ─────────────────────────────────────────────
     MuiButton: {
       styleOverrides: {
         root: {
@@ -149,7 +140,6 @@ export const theme = createTheme({
       },
     },
 
-    // ── Icon Button ────────────────────────────────────────
     MuiIconButton: {
       styleOverrides: {
         root: {
@@ -159,8 +149,6 @@ export const theme = createTheme({
         },
       },
     },
-
-    // ── Card ───────────────────────────────────────────────
     MuiCard: {
       styleOverrides: {
         root: {
@@ -182,7 +170,6 @@ export const theme = createTheme({
       },
     },
 
-    // ── Paper ──────────────────────────────────────────────
     MuiPaper: {
       styleOverrides: {
         root: {
@@ -196,7 +183,6 @@ export const theme = createTheme({
       },
     },
 
-    // ── Dialog ─────────────────────────────────────────────
     MuiDialog: {
       styleOverrides: {
         paper: {
@@ -225,7 +211,6 @@ export const theme = createTheme({
       },
     },
 
-    // ── Drawer ─────────────────────────────────────────────
     MuiDrawer: {
       styleOverrides: {
         paper: {
@@ -237,7 +222,6 @@ export const theme = createTheme({
       },
     },
 
-    // ── List / nav items ───────────────────────────────────
     MuiListItemButton: {
       styleOverrides: {
         root: {
@@ -256,7 +240,6 @@ export const theme = createTheme({
       },
     },
 
-    // ── Table ──────────────────────────────────────────────
     MuiTableHead: {
       styleOverrides: {
         root: { "& .MuiTableCell-head": { backgroundColor: color.bg.subtle, color: color.text.secondary } },
@@ -278,7 +261,6 @@ export const theme = createTheme({
       },
     },
 
-    // ── Chip ───────────────────────────────────────────────
     MuiChip: {
       styleOverrides: {
         root: {
@@ -292,14 +274,12 @@ export const theme = createTheme({
       },
     },
 
-    // ── Badge ──────────────────────────────────────────────
     MuiBadge: {
       styleOverrides: {
         badge: { backgroundColor: color.status.error, color: "#ffffff", fontWeight: font.weight.bold },
       },
     },
 
-    // ── Tooltip ────────────────────────────────────────────
     MuiTooltip: {
       styleOverrides: {
         tooltip: {
@@ -313,14 +293,12 @@ export const theme = createTheme({
       },
     },
 
-    // ── Divider ────────────────────────────────────────────
     MuiDivider: {
       styleOverrides: {
         root: { borderColor: color.border.base },
       },
     },
 
-    // ── Input / Outlined ───────────────────────────────────
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
@@ -333,14 +311,12 @@ export const theme = createTheme({
       },
     },
 
-    // ── Select ─────────────────────────────────────────────
     MuiSelect: {
       styleOverrides: {
         icon: { color: color.text.tertiary },
       },
     },
 
-    // ── Menu ───────────────────────────────────────────────
     MuiMenu: {
       styleOverrides: {
         paper: {
@@ -362,7 +338,6 @@ export const theme = createTheme({
       },
     },
 
-    // ── Tabs ───────────────────────────────────────────────
     MuiTab: {
       styleOverrides: {
         root: {
@@ -381,7 +356,6 @@ export const theme = createTheme({
       },
     },
 
-    // ── Linear Progress ────────────────────────────────────
     MuiLinearProgress: {
       styleOverrides: {
         root:          { backgroundColor: color.bg.subtle, borderRadius: radius.full },
@@ -389,14 +363,12 @@ export const theme = createTheme({
       },
     },
 
-    // ── Circular Progress ──────────────────────────────────
     MuiCircularProgress: {
       styleOverrides: {
         root:  { color: color.brand.primary },
       },
     },
 
-    // ── Switch ─────────────────────────────────────────────
     MuiSwitch: {
       styleOverrides: {
         switchBase: {
@@ -407,21 +379,18 @@ export const theme = createTheme({
       },
     },
 
-    // ── Checkbox ───────────────────────────────────────────
     MuiCheckbox: {
       styleOverrides: {
         root: { color: color.border.strong, "&.Mui-checked": { color: color.brand.primary } },
       },
     },
 
-    // ── Radio ──────────────────────────────────────────────
     MuiRadio: {
       styleOverrides: {
         root: { color: color.border.strong, "&.Mui-checked": { color: color.brand.primary } },
       },
     },
 
-    // ── Stepper ────────────────────────────────────────────
     MuiStepIcon: {
       styleOverrides: {
         root:       { color: color.border.strong },

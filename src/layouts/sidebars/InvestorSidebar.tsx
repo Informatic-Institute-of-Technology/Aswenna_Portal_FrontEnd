@@ -2,17 +2,14 @@ import { useAuth } from "@/Context/useAuth";
 import {
   AccountBalance,
   AccountCircle,
-  HowToReg as ApprovalIcon,
   AttachMoney,
   BarChart as BarChartIcon,
   BusinessCenter,
   Description,
-  Ballot as GLIcon,
   Home,
   Landscape,
   Mail,
   Payment,
-  PieChart,
   Settings,
   TrendingUp,
 } from "@mui/icons-material";
@@ -81,21 +78,6 @@ const InvestorSidebar = () => {
       icon: <Payment />,
       path: `${basePath}/dashboard/payment-pipeline`,
     },
-    {
-      text: "Portfolio Analytics",
-      icon: <PieChart />,
-      path: `${basePath}/dashboard/portfolio`,
-    },
-    {
-      text: "GL Dashboard",
-      icon: <GLIcon />,
-      path: `${basePath}/dashboard/gl-dashboard`,
-    },
-    {
-      text: "Approval Workflow",
-      icon: <ApprovalIcon />,
-      path: `${basePath}/dashboard/approvals`,
-    },
   ];
 
   const secondaryItems = [
@@ -156,7 +138,6 @@ const InvestorSidebar = () => {
           </ListItemButton>
         ))}
 
-        {/* ── Finance Module Section ── */}
         <Box sx={{ px: 2, pt: 1.5, pb: 0.5 }}>
           <Typography
             variant="caption"

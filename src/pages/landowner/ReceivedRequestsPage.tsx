@@ -191,7 +191,7 @@ const ReceivedRequestsPage = () => {
 
       <Stack spacing={2.5}>
         {pendingRequests.map((request) => {
-          const { financials, investor_info } = request;
+          const { financials: _financials, investor_info } = request;
 
           return (
             <Box

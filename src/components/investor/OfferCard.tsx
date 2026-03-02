@@ -62,7 +62,7 @@ export interface PartyMember {
   phone: string;
   image: string;
   location?: string;
-  coordinates?: string; // Added coordinates field
+  coordinates?: string;
   specialization?: string;
   experience?: string;
   rating?: number;
@@ -81,12 +81,12 @@ export interface OfferCardProps {
   district?: string;
   province?: string;
   coordinates?: string;
-  budget?: number; // Optional - can be auto-calculated
-  disbursed?: number; // Optional - can be auto-calculated
-  remaining?: number; // Optional - can be auto-calculated
+  budget?: number;
+  disbursed?: number;
+  remaining?: number;
   expectedROI: number;
   status: "active" | "completed" | "pending";
-  progress?: number; // Optional - can be auto-calculated
+  progress?: number;
   startDate: string;
   endDate?: string;
   backgroundImage?: string;
@@ -94,16 +94,15 @@ export interface OfferCardProps {
   investorId?: string;
   landownerName?: string;
   landownerId?: string;
-  totalMilestones?: number; // Optional - can be auto-calculated
-  completedMilestones?: number; // Optional - can be auto-calculated
-  pendingMilestones?: number; // Optional - can be auto-calculated
+  totalMilestones?: number;
+  completedMilestones?: number;
+  pendingMilestones?: number;
   riskLevel?: "LOW" | "MEDIUM" | "HIGH";
   riskStatus?: string;
   investmentType?: "harvest" | "commission";
-  commissionRate?: number; // Percentage rate for commission-based investments
-  earnedCommission?: number; // Total commission earned (for completed or active commission projects)
-  investorAmount?: number; // Initial investment amount from investor
-  // Detailed information - REQUIRED for auto-calculation
+  commissionRate?: number;
+  earnedCommission?: number;
+  investorAmount?: number;
   milestones?: Milestone[];
   payments?: PaymentInstallment[];
   landRentals?: LandRental[];
@@ -111,8 +110,8 @@ export interface OfferCardProps {
   financialBreakdown?: {
     category: string;
     amount: number;
-    percentage?: number; // Optional - auto-calculated on frontend
-    type?: "expense" | "commission"; // Optional - filters commission from expenses
+    percentage?: number;
+    type?: "expense" | "commission";
   }[];
   onViewDetails?: (id: string) => void;
 }
@@ -131,7 +130,6 @@ const OfferCard = ({
   progress,
   milestones,
   payments,
-  landRentals,
   financialBreakdown,
   startDate,
   endDate,
@@ -164,7 +162,6 @@ const OfferCard = ({
     return Math.round(totalProgress / milestones.length);
   }, [progress, milestones]);
 
-  // Auto-calculate budget if not provided
   const calculatedBudget = useMemo(() => {
     if (budget !== undefined) return budget;
     if (payments && payments.length > 0) {
@@ -176,7 +173,6 @@ const OfferCard = ({
     return 0;
   }, [budget, payments, financialBreakdown]);
 
-  // Analyze for critical/warning notifications
   const notificationStatus = useMemo(() => {
     const today = new Date();
     let hasCritical = false;
@@ -184,7 +180,6 @@ const OfferCard = ({
     let criticalCount = 0;
     let warningCount = 0;
 
-    // Check payments
     if (payments) {
       payments.forEach((payment) => {
         const dueDate = new Date(payment.dueDate);
@@ -192,13 +187,10 @@ const OfferCard = ({
           (dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
         );
 
-        // Critical: Overdue payments
         if (payment.status === "pending" && daysDiff < 0) {
           hasCritical = true;
           criticalCount++;
-        }
-        // Warning: Payment due within 7 days
-        else if (
+        } else if (
           payment.status === "pending" &&
           daysDiff >= 0 &&
           daysDiff <= 7
@@ -209,7 +201,6 @@ const OfferCard = ({
       });
     }
 
-    // Check milestones
     if (milestones) {
       milestones.forEach((milestone) => {
         const endDate = new Date(milestone.endDate);
@@ -217,13 +208,10 @@ const OfferCard = ({
           (endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
         );
 
-        // Critical: Delayed milestones
         if (milestone.status === "delayed") {
           hasCritical = true;
           criticalCount++;
-        }
-        // Warning: Milestone nearing deadline (in-progress with <=5 days)
-        else if (
+        } else if (
           milestone.status === "in-progress" &&
           daysDiff >= 0 &&
           daysDiff <= 5
@@ -279,7 +267,8 @@ const OfferCard = ({
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        background: "linear-gradient(145deg, var(--bg-subtle) 0%, var(--bg-overlay) 100%)",
+        background:
+          "linear-gradient(145deg, var(--bg-subtle) 0%, var(--bg-overlay) 100%)",
         transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
         "&:hover": {
           transform: "translateY(-8px)",
@@ -292,7 +281,8 @@ const OfferCard = ({
         sx={{
           position: "relative",
           height: 160,
-          background: "linear-gradient(135deg, var(--color-nature-deep) 0%, var(--color-nature-mid) 100%)",
+          background:
+            "linear-gradient(135deg, var(--color-nature-deep) 0%, var(--color-nature-mid) 100%)",
           overflow: "hidden",
         }}
       >
@@ -339,7 +329,6 @@ const OfferCard = ({
             justifyContent: "space-between",
           }}
         >
-          {/* Status Badge */}
           <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
             <Chip
               label={status.toUpperCase()}
@@ -352,7 +341,6 @@ const OfferCard = ({
                 textTransform: "uppercase",
               }}
             />
-            {/* Notification Badge */}
             {(notificationStatus.hasCritical ||
               notificationStatus.hasWarning) && (
               <Tooltip
@@ -431,7 +419,6 @@ const OfferCard = ({
             )}
           </Box>
 
-          {/* Crop Info */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
             <Box
               sx={{
@@ -471,11 +458,9 @@ const OfferCard = ({
         </Box>
       </Box>
 
-      {/* Card Body */}
       <CardContent
         sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 2, p: 2 }}
       >
-        {/* Stats Row using Bootstrap Grid */}
         <div className="row g-2">
           <div className="col-6">
             <Box
@@ -494,7 +479,11 @@ const OfferCard = ({
               </Typography>
               <Typography
                 variant="h6"
-                sx={{ fontWeight: 700, color: "var(--color-olive)", fontSize: "1rem" }}
+                sx={{
+                  fontWeight: 700,
+                  color: "var(--color-olive)",
+                  fontSize: "1rem",
+                }}
               >
                 {formatCurrency(calculatedBudget)}
               </Typography>
@@ -519,7 +508,11 @@ const OfferCard = ({
               </Typography>
               <Typography
                 variant="h6"
-                sx={{ fontWeight: 700, color: "var(--color-success)", fontSize: "1rem" }}
+                sx={{
+                  fontWeight: 700,
+                  color: "var(--color-success)",
+                  fontSize: "1rem",
+                }}
               >
                 {calculatedROI}%
               </Typography>
@@ -527,7 +520,6 @@ const OfferCard = ({
           </div>
         </div>
 
-        {/* Progress (only for active projects) */}
         {status === "active" && (
           <Box sx={{ mt: "auto" }}>
             <Box
@@ -565,7 +557,6 @@ const OfferCard = ({
             borderTop: "1px solid var(--surface-muted)",
           }}
         >
-          {/* Party Members */}
           <Box
             sx={{
               display: "flex",
@@ -617,10 +608,15 @@ const OfferCard = ({
                 >
                   Farmer
                 </Typography>
-                <Typography variant="caption" sx={{ color: "var(--neutral-500)" }}>
+                <Typography
+                  variant="caption"
+                  sx={{ color: "var(--neutral-500)" }}
+                >
                   •
                 </Typography>
-                <LocationOn sx={{ fontSize: 12, color: "var(--neutral-400)" }} />
+                <LocationOn
+                  sx={{ fontSize: 12, color: "var(--neutral-400)" }}
+                />
                 <Typography
                   variant="caption"
                   color="text.secondary"
@@ -666,7 +662,9 @@ const OfferCard = ({
                     bgcolor: "var(--color-orange-muted)",
                   }}
                 >
-                  <Landscape sx={{ fontSize: 20, color: "var(--color-orange)" }} />
+                  <Landscape
+                    sx={{ fontSize: 20, color: "var(--color-orange)" }}
+                  />
                 </Avatar>
                 <Box
                   sx={{
@@ -700,10 +698,15 @@ const OfferCard = ({
                   >
                     Landowner
                   </Typography>
-                  <Typography variant="caption" sx={{ color: "var(--neutral-500)" }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "var(--neutral-500)" }}
+                  >
                     •
                   </Typography>
-                  <LocationOn sx={{ fontSize: 12, color: "var(--neutral-400)" }} />
+                  <LocationOn
+                    sx={{ fontSize: 12, color: "var(--neutral-400)" }}
+                  />
                   <Typography
                     variant="caption"
                     color="text.secondary"

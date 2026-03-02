@@ -35,25 +35,11 @@ const FinanceLedgerPage = lazy(() => import("./investor/FinanceLedgerPage"));
 const PaymentControlCenterPage = lazy(
   () => import("./investor/payment/PaymentControlCenterPage"),
 );
-const PortfolioAnalyticsPage = lazy(
-  () => import("./investor/PortfolioAnalyticsPage"),
-);
-const GLDashboardPage = lazy(() => import("./investor/GLDashboardPage"));
-const ApprovalWorkflowPage = lazy(
-  () => import("./investor/ApprovalWorkflowPage"),
-);
 const ProjectPaymentMilestonePage = lazy(
   () => import("./investor/payment/ProjectPaymentMilestonePage"),
 );
 const PayInstallmentPage = lazy(
   () => import("./investor/payment/PayInstallmentPage"),
-);
-const CropJobsPage = lazy(() => import("./farmer/CropJobsPage"));
-const PurchaseRequisitionPage = lazy(
-  () => import("./farmer/PurchaseRequisitionPage"),
-);
-const LandAssetRegisterPage = lazy(
-  () => import("./landowner/LandAssetRegisterPage"),
 );
 
 const MyLandAdsPage = lazy(() => import("./landowner/MyLandAdsPage"));
@@ -136,9 +122,6 @@ function AppRoutes() {
               path="payment-pipeline"
               element={<PaymentControlCenterPage />}
             />
-            <Route path="portfolio" element={<PortfolioAnalyticsPage />} />
-            <Route path="gl-dashboard" element={<GLDashboardPage />} />
-            <Route path="approvals" element={<ApprovalWorkflowPage />} />
             <Route
               path="payment-control"
               element={<PaymentControlCenterPage />}
@@ -148,11 +131,6 @@ function AppRoutes() {
               element={<ProjectPaymentMilestonePage />}
             />
             <Route path="pay-installment" element={<PayInstallmentPage />} />
-
-            <Route path="crop-jobs" element={<CropJobsPage />} />
-            <Route path="requisitions" element={<PurchaseRequisitionPage />} />
-
-            <Route path="land-assets" element={<LandAssetRegisterPage />} />
 
             <Route path="my-land-ads" element={<MyLandAdsPage />} />
             <Route
