@@ -4,6 +4,7 @@ import {
   FormSection,
   ImageGallery,
   LocationMapPicker,
+  NicUploader,
   ProfileStepper,
 } from "@/components";
 import {
@@ -72,6 +73,8 @@ const LandownerProfileSetup = () => {
   const [city, setCity] = useState("");
   const [postalCode, setPostalCode] = useState("");
 
+  const [nicFrontFile, setNicFrontFile] = useState<File | null>(null);
+  const [nicBackFile, setNicBackFile] = useState<File | null>(null);
   const [nicNumber, setNicNumber] = useState("");
   const [nicError, setNicError] = useState("");
   const [birthday, setBirthday] = useState("");
@@ -773,6 +776,8 @@ const LandownerProfileSetup = () => {
     localStorage.setItem("pendingRegistrationPayload", JSON.stringify(payload));
     registrationStore.setFiles({
       profilePicture: profilePictureFile,
+      nicFrontImage: nicFrontFile,
+      nicBackImage: nicBackFile,
       bimsaviyaCertificate: certificateFiles[0] ?? null,
       landImages: galleryImages.map((g) => g.file),
     });
@@ -1132,6 +1137,14 @@ const LandownerProfileSetup = () => {
               icon={<Description sx={{ color: "primary.main", mr: 1.5 }} />}
               title="Legal Documentation"
             >
+              <Box sx={{ mb: 3 }}>
+                <NicUploader
+                  frontFile={nicFrontFile}
+                  backFile={nicBackFile}
+                  onFrontChange={setNicFrontFile}
+                  onBackChange={setNicBackFile}
+                />
+              </Box>
               <FileUploader
                 label="Upload Bimsaviya Certificate"
                 helperText="PDF, JPG, or PNG (Max 10MB)"

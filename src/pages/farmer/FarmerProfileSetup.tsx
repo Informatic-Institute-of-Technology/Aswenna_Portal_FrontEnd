@@ -1,5 +1,5 @@
 import AswendLogo from "@/assets/Aswenna Logo.png";
-import { FileUploader, ProfileStepper } from "@/components";
+import { FileUploader, NicUploader, ProfileStepper } from "@/components";
 import {
   LocationService,
   registrationStore,
@@ -64,7 +64,8 @@ const FarmerProfileSetup = () => {
   const [province, setProvince] = useState("");
   const [district, setDistrict] = useState("");
   const [selectedCrops, setSelectedCrops] = useState<string[]>(["Paddy"]);
-  const [nicFiles, setNicFiles] = useState<File[]>([]);
+  const [nicFrontFile, setNicFrontFile] = useState<File | null>(null);
+  const [nicBackFile, setNicBackFile] = useState<File | null>(null);
 
   const [nicNumber, setNicNumber] = useState("");
   const [nicError, setNicError] = useState("");
@@ -943,16 +944,11 @@ const FarmerProfileSetup = () => {
               </Box>
 
               <Box sx={{ mb: 3 }}>
-                <FileUploader
-                  label="National ID (NIC) *"
-                  helperText="Upload Front & Back (Required)"
-                  files={nicFiles}
-                  onFilesSelected={(newFiles) =>
-                    setNicFiles([...nicFiles, ...newFiles])
-                  }
-                  onFileDelete={(index) =>
-                    setNicFiles(nicFiles.filter((_, i) => i !== index))
-                  }
+                <NicUploader
+                  frontFile={nicFrontFile}
+                  backFile={nicBackFile}
+                  onFrontChange={setNicFrontFile}
+                  onBackChange={setNicBackFile}
                 />
               </Box>
 
@@ -1106,8 +1102,8 @@ const FarmerProfileSetup = () => {
                     );
                     registrationStore.setFiles({
                       profilePicture: profilePictureFile,
-                      nicFrontImage: nicFiles[0] ?? null,
-                      nicBackImage: nicFiles[1] ?? null,
+                      nicFrontImage: nicFrontFile,
+                      nicBackImage: nicBackFile,
                       GovijanaSevaPassbookImage: passbookFiles[0] ?? null,
                       gnCertificateImage: gnFiles[0] ?? null,
                     });

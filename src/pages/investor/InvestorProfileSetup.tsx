@@ -1,7 +1,7 @@
 import {
   AdministrativeFields,
-  FileUploader,
   FormSection,
+  NicUploader,
   ProfileStepper,
 } from "@/components";
 import {
@@ -89,7 +89,8 @@ const InvestorProfileSetup = () => {
   const [cropFocus, setCropFocus] = useState<string[]>([]);
 
   // Documents
-  const [nicFiles, setNicFiles] = useState<File[]>([]);
+  const [nicFrontFile, setNicFrontFile] = useState<File | null>(null);
+  const [nicBackFile, setNicBackFile] = useState<File | null>(null);
 
   // Sri Lanka locations data
   const sriLankaLocations: Record<string, string[]> = {
@@ -353,14 +354,6 @@ const InvestorProfileSetup = () => {
     setCropFocus(typeof value === "string" ? value.split(",") : value);
   };
 
-  const handleNicFilesSelected = (newFiles: File[]) => {
-    setNicFiles((prev) => [...prev, ...newFiles]);
-  };
-
-  const handleNicFileDelete = (index: number) => {
-    setNicFiles((prev) => prev.filter((_, i) => i !== index));
-  };
-
   const handleCompleteRegistration = () => {
     const { email, password, emailVerified } = getStoredCredentials();
     const formattedPhone = phoneNumber.startsWith("+")
@@ -402,8 +395,8 @@ const InvestorProfileSetup = () => {
     localStorage.setItem("pendingRegistrationPayload", JSON.stringify(payload));
     registrationStore.setFiles({
       profilePicture: profilePictureFile,
-      nicFrontImage: nicFiles[0] ?? null,
-      nicBackImage: nicFiles[1] ?? null,
+      nicFrontImage: nicFrontFile,
+      nicBackImage: nicBackFile,
     });
     navigate("/terms-and-conditions");
   };
@@ -839,13 +832,11 @@ const InvestorProfileSetup = () => {
               icon={<Description sx={{ color: "primary.main", mr: 1.5 }} />}
               title="National ID Copy"
             >
-              <FileUploader
-                files={nicFiles}
-                onFilesSelected={handleNicFilesSelected}
-                onFileDelete={handleNicFileDelete}
-                accept="image/*,application/pdf"
-                label="Upload NIC Copy (Front & Back)"
-                helperText="Upload clear copies of both sides of your National ID"
+              <NicUploader
+                frontFile={nicFrontFile}
+                backFile={nicBackFile}
+                onFrontChange={setNicFrontFile}
+                onBackChange={setNicBackFile}
               />
             </FormSection>
 

@@ -95,16 +95,12 @@ export type RegistrationRequest =
   | InvestorRegistrationRequest
   | LandownerRegistrationRequest;
 
-// Field names match backend UserImageTarget enum values exactly
 export interface UploadUserFilesRequest {
   profilePicture?: File | null;
-  // Farmer + Investor
   nicFrontImage?: File | null;
   nicBackImage?: File | null;
-  // Farmer only
   GovijanaSevaPassbookImage?: File | null;
   gnCertificateImage?: File | null;
-  // Landowner only
   bimsaviyaCertificate?: File | null;
   landImages?: File[];
 }
