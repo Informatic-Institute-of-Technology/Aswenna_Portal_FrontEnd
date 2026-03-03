@@ -4,10 +4,15 @@ import {
   FormSection,
   ImageGallery,
   LocationMapPicker,
+  NicUploader,
   ProfileStepper,
 } from "@/components";
-import { LocationService } from "@/services";
-import { validateNIC } from "@/utils";
+import {
+  LocationService,
+  registrationStore,
+  type LandownerRegistrationRequest,
+} from "@/services";
+import { getStoredCredentials, validateNIC } from "@/utils";
 import {
   AccountBalance,
   Add as AddIcon,
@@ -36,10 +41,10 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  type SelectChangeEvent,
   TextField,
   Tooltip,
   Typography,
+  type SelectChangeEvent,
 } from "@mui/material";
 import { useJsApiLoader } from "@react-google-maps/api";
 import type { ChangeEvent } from "react";
@@ -60,10 +65,16 @@ const LandownerProfileSetup = () => {
 
   const [fullName, setFullName] = useState("");
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
+  const [profilePictureFile, setProfilePictureFile] = useState<File | null>(
+    null,
+  );
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [street, setStreet] = useState("");
   const [city, setCity] = useState("");
   const [postalCode, setPostalCode] = useState("");
 
+  const [nicFrontFile, setNicFrontFile] = useState<File | null>(null);
+  const [nicBackFile, setNicBackFile] = useState<File | null>(null);
   const [nicNumber, setNicNumber] = useState("");
   const [nicError, setNicError] = useState("");
   const [birthday, setBirthday] = useState("");
@@ -398,6 +409,7 @@ const LandownerProfileSetup = () => {
         alert("File size should not exceed 5MB");
         return;
       }
+      setProfilePictureFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfilePicture(reader.result as string);
@@ -712,37 +724,63 @@ const LandownerProfileSetup = () => {
     setLandGnDivision("");
   };
 
-  const handleCompleteRegistration = () => {
-    const profileData = {
+  const handleCompleteRegistration = async () => {
+    const { email, password, emailVerified } = getStoredCredentials();
+    const formattedPhone = phoneNumber.startsWith("+")
+      ? phoneNumber
+      : phoneNumber.startsWith("0")
+        ? `+94${phoneNumber.substring(1)}`
+        : `+94${phoneNumber}`;
+
+    const payload: LandownerRegistrationRequest = {
+      fullName,
+      email,
+      emailVerified,
+      phoneNumber: formattedPhone,
+      phoneNumberVerified: false,
+      password,
       role: "landowner",
       personalInfo: {
-        fullName,
-        street,
+        nicNumber,
+        birthday,
+        gender: gender as "Male" | "Female",
+        age: age || 0,
+        address: street,
         city,
-        province,
-        district,
         postalCode,
+        district,
+        province,
+      },
+      landOwnerDetails: {
         dsDivision,
         gnDivision,
+        location: {
+          latitude: pinLocation?.lat ?? 0,
+          longitude: pinLocation?.lng ?? 0,
+        },
+        landAddress: {
+          street: landStreet,
+          city: landCity,
+          province: landProvince,
+          district: landDistrict,
+          postalCode: landPostalCode,
+          size: landSize,
+          soilType,
+          rentalExpectation,
+          dsDivision: landDsDivision,
+          gnDivision: landGnDivision,
+        },
       },
-      landInfo: {
-        landStreet,
-        landCity,
-        landProvince,
-        landDistrict,
-        landPostalCode,
-        landDsDivision,
-        landGnDivision,
-        landSize,
-        soilType,
-        rentalExpectation,
-        pinLocation,
-      },
-      termsAccepted: false,
     };
 
-    localStorage.setItem("profileSetupData", JSON.stringify(profileData));
-    console.log("Landowner profile data saved:", profileData);
+    localStorage.setItem("pendingRegistrationPayload", JSON.stringify(payload));
+    registrationStore.setFiles({
+      profilePicture: profilePictureFile,
+      nicFrontImage: nicFrontFile,
+      nicBackImage: nicBackFile,
+      bimsaviyaCertificate: certificateFiles[0] ?? null,
+      landImages: galleryImages.map((g) => g.file),
+    });
     navigate("/terms-and-conditions");
   };
 
@@ -782,7 +820,8 @@ const LandownerProfileSetup = () => {
                 component="h1"
                 sx={{ fontWeight: "bold", mb: 1 }}
               >
-                Landowner <span style={{ color: "var(--color-olive)" }}>Profile</span>
+                Landowner{" "}
+                <span style={{ color: "var(--color-olive)" }}>Profile</span>
               </Typography>
             </Box>
 
@@ -848,6 +887,17 @@ const LandownerProfileSetup = () => {
                     variant="outlined"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="Phone Number"
+                    placeholder="+94771234567"
+                    variant="outlined"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
                     InputLabelProps={{ shrink: true }}
                   />
                 </Grid>
@@ -1087,6 +1137,14 @@ const LandownerProfileSetup = () => {
               icon={<Description sx={{ color: "primary.main", mr: 1.5 }} />}
               title="Legal Documentation"
             >
+              <Box sx={{ mb: 3 }}>
+                <NicUploader
+                  frontFile={nicFrontFile}
+                  backFile={nicBackFile}
+                  onFrontChange={setNicFrontFile}
+                  onBackChange={setNicBackFile}
+                />
+              </Box>
               <FileUploader
                 label="Upload Bimsaviya Certificate"
                 helperText="PDF, JPG, or PNG (Max 10MB)"

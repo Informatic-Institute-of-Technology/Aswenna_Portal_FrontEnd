@@ -1,13 +1,13 @@
 import AswendLogo from "@/assets/Aswenna Logo.png";
-import { FileUploader, ProfileStepper } from "@/components";
+import { FileUploader, NicUploader, ProfileStepper } from "@/components";
 import {
   LocationService,
-  registrationService,
+  registrationStore,
   type FarmerDetails,
   type FarmerRegistrationRequest,
   type PersonalInfo,
 } from "@/services";
-import { getFileAsBase64, validateNIC } from "@/utils";
+import { validateNIC } from "@/utils";
 import {
   AccountBalance,
   Add as AddIcon,
@@ -58,10 +58,14 @@ const FarmerProfileSetup = () => {
   const { notification, showError, showSuccess, hideNotification } =
     useNotification();
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
+  const [profilePictureFile, setProfilePictureFile] = useState<File | null>(
+    null,
+  );
   const [province, setProvince] = useState("");
   const [district, setDistrict] = useState("");
   const [selectedCrops, setSelectedCrops] = useState<string[]>(["Paddy"]);
-  const [nicFiles, setNicFiles] = useState<File[]>([]);
+  const [nicFrontFile, setNicFrontFile] = useState<File | null>(null);
+  const [nicBackFile, setNicBackFile] = useState<File | null>(null);
 
   const [nicNumber, setNicNumber] = useState("");
   const [nicError, setNicError] = useState("");
@@ -292,6 +296,7 @@ const FarmerProfileSetup = () => {
         showError("File size should not exceed 5MB");
         return;
       }
+      setProfilePictureFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfilePicture(reader.result as string);
@@ -368,7 +373,8 @@ const FarmerProfileSetup = () => {
                 component="h1"
                 sx={{ fontWeight: "bold", mb: 1 }}
               >
-                Farmer <span style={{ color: "var(--color-olive)" }}>Information</span>
+                Farmer{" "}
+                <span style={{ color: "var(--color-olive)" }}>Information</span>
               </Typography>
               <Typography variant="body1" color="text.secondary">
                 Complete your farmer profile to start connecting with investors
@@ -938,16 +944,11 @@ const FarmerProfileSetup = () => {
               </Box>
 
               <Box sx={{ mb: 3 }}>
-                <FileUploader
-                  label="National ID (NIC) *"
-                  helperText="Upload Front & Back (Required)"
-                  files={nicFiles}
-                  onFilesSelected={(newFiles) =>
-                    setNicFiles([...nicFiles, ...newFiles])
-                  }
-                  onFileDelete={(index) =>
-                    setNicFiles(nicFiles.filter((_, i) => i !== index))
-                  }
+                <NicUploader
+                  frontFile={nicFrontFile}
+                  backFile={nicBackFile}
+                  onFrontChange={setNicFrontFile}
+                  onBackChange={setNicBackFile}
                 />
               </Box>
 
@@ -992,7 +993,12 @@ const FarmerProfileSetup = () => {
                 }}
               >
                 <InfoIcon
-                  sx={{ color: "var(--color-amber)", fontSize: 16, mt: 0.5, mr: 1 }}
+                  sx={{
+                    color: "var(--color-amber)",
+                    fontSize: 16,
+                    mt: 0.5,
+                    mr: 1,
+                  }}
                 />
                 <Typography variant="caption" color="var(--color-amber)">
                   Documents will be reviewed by our team within 24-48 hours.
@@ -1021,23 +1027,14 @@ const FarmerProfileSetup = () => {
                     const emailVerified =
                       localStorage.getItem("email_verified") === "true";
 
-                    const nicFrontImage = await getFileAsBase64(nicFiles, 0);
-                    const nicBackImage = await getFileAsBase64(nicFiles, 1);
-                    const govijanaSevaPassbookImage = await getFileAsBase64(
-                      passbookFiles,
-                      0,
-                    );
-                    const gnCertificateImage = await getFileAsBase64(
-                      gnFiles,
-                      0,
-                    );
-
                     if (!phoneNumber) {
                       showError("Phone number is required");
+                      setIsSubmitting(false);
                       return;
                     }
                     if (!city) {
                       showError("City is required");
+                      setIsSubmitting(false);
                       return;
                     }
                     // if (nicFiles.length < 2) {
@@ -1066,10 +1063,9 @@ const FarmerProfileSetup = () => {
                         : `+94${phoneNumber}`;
 
                     const personalInfo: PersonalInfo = {
-                      profilePicture: profilePicture || "",
                       nicNumber,
                       birthday,
-                      gender: gender.toLowerCase() as "male" | "female",
+                      gender: gender as "Male" | "Female",
                       age: age || 0,
                       address: address || city,
                       city,
@@ -1077,10 +1073,6 @@ const FarmerProfileSetup = () => {
                       district,
                       province,
                     };
-
-                    if (nicFrontImage)
-                      personalInfo.nicFrontImage = nicFrontImage;
-                    if (nicBackImage) personalInfo.nicBackImage = nicBackImage;
 
                     const farmerDetails: FarmerDetails = {
                       dsDivision,
@@ -1091,14 +1083,6 @@ const FarmerProfileSetup = () => {
                       regions: regions || district,
                       specificNeeds: specificNeeds || "None",
                     };
-
-                    if (govijanaSevaPassbookImage) {
-                      farmerDetails.GovijanaSevaPassbookImage =
-                        govijanaSevaPassbookImage;
-                    }
-                    if (gnCertificateImage) {
-                      farmerDetails.gnCertificateImage = gnCertificateImage;
-                    }
 
                     const registrationData: FarmerRegistrationRequest = {
                       fullName: fullName || "User Name",
@@ -1112,27 +1096,18 @@ const FarmerProfileSetup = () => {
                       farmerDetails,
                     };
 
-                    console.log("=== FARMER REGISTRATION PAYLOAD ===");
-                    console.log(JSON.stringify(registrationData, null, 2));
-                    console.log(
-                      "=== Payload size:",
-                      new Blob([JSON.stringify(registrationData)]).size,
-                      "bytes ===",
+                    localStorage.setItem(
+                      "pendingRegistrationPayload",
+                      JSON.stringify(registrationData),
                     );
-
-                    await registrationService.registerFarmer(registrationData);
-
-                    localStorage.removeItem("temp_email");
-                    localStorage.removeItem("temp_password");
-                    localStorage.removeItem("email_verified");
-
-                    console.log("Farmer registration successful!");
-                    showSuccess(
-                      "Registration successful! Redirecting to login...",
-                    );
-                    setTimeout(() => {
-                      navigate("/login");
-                    }, 2000);
+                    registrationStore.setFiles({
+                      profilePicture: profilePictureFile,
+                      nicFrontImage: nicFrontFile,
+                      nicBackImage: nicBackFile,
+                      GovijanaSevaPassbookImage: passbookFiles[0] ?? null,
+                      gnCertificateImage: gnFiles[0] ?? null,
+                    });
+                    navigate("/terms-and-conditions");
                   } catch (error) {
                     console.error("Registration failed:", error);
 

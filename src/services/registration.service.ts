@@ -2,26 +2,21 @@ import { httpClient } from "./httpClient";
 
 // Base interfaces
 export interface PersonalInfo {
-  profilePicture: string;
   nicNumber: string;
   birthday: string;
-  gender: "male" | "female";
+  gender: "Male" | "Female";
   age: number;
   address: string;
   city: string;
   postalCode: string;
   district: string;
   province: string;
-  nicFrontImage?: string;
-  nicBackImage?: string;
 }
 
 export interface FarmerDetails {
   dsDivision: string;
   gnDivision: string;
   govijanaSevaId: string;
-  GovijanaSevaPassbookImage?: string;
-  gnCertificateImage?: string;
   crop: string;
   experience: string;
   regions: string;
@@ -56,7 +51,6 @@ export interface LandOwnerDetails {
     rentalExpectation: string;
     dsDivision: string;
     gnDivision: string;
-    landImages: string[];
   };
 }
 
@@ -101,7 +95,18 @@ export type RegistrationRequest =
   | InvestorRegistrationRequest
   | LandownerRegistrationRequest;
 
+export interface UploadUserFilesRequest {
+  profilePicture?: File | null;
+  nicFrontImage?: File | null;
+  nicBackImage?: File | null;
+  GovijanaSevaPassbookImage?: File | null;
+  gnCertificateImage?: File | null;
+  bimsaviyaCertificate?: File | null;
+  landImages?: File[];
+}
+
 export interface RegistrationResponse {
+  _id?: string;
   message?: string;
   success?: boolean;
   user?: {
@@ -112,12 +117,14 @@ export interface RegistrationResponse {
 }
 
 class RegistrationService {
-
   async registerFarmer(
     data: FarmerRegistrationRequest,
   ): Promise<RegistrationResponse> {
     console.log("[RegistrationService] POST /v1/user");
-    console.log("[RegistrationService] Farmer data:", JSON.stringify(data, null, 2));
+    console.log(
+      "[RegistrationService] Farmer data:",
+      JSON.stringify(data, null, 2),
+    );
     return await httpClient.post<RegistrationResponse>("/v1/user", data);
   }
 
@@ -125,7 +132,10 @@ class RegistrationService {
     data: InvestorRegistrationRequest,
   ): Promise<RegistrationResponse> {
     console.log("[RegistrationService] POST /v1/user");
-    console.log("[RegistrationService] Investor data:", JSON.stringify(data, null, 2));
+    console.log(
+      "[RegistrationService] Investor data:",
+      JSON.stringify(data, null, 2),
+    );
     return await httpClient.post<RegistrationResponse>("/v1/user", data);
   }
 
@@ -133,14 +143,51 @@ class RegistrationService {
     data: LandownerRegistrationRequest,
   ): Promise<RegistrationResponse> {
     console.log("[RegistrationService] POST /v1/user");
-    console.log("[RegistrationService] Landowner data:", JSON.stringify(data, null, 2));
+    console.log(
+      "[RegistrationService] Landowner data:",
+      JSON.stringify(data, null, 2),
+    );
     return await httpClient.post<RegistrationResponse>("/v1/user", data);
   }
 
   async register(data: RegistrationRequest): Promise<RegistrationResponse> {
     console.log("[RegistrationService] POST /v1/user");
-    console.log("[RegistrationService] Registration data:", JSON.stringify(data, null, 2));
+    console.log(
+      "[RegistrationService] Registration data:",
+      JSON.stringify(data, null, 2),
+    );
     return await httpClient.post<RegistrationResponse>("/v1/user", data);
+  }
+
+  async uploadUserFiles(
+    userId: string,
+    files: UploadUserFilesRequest,
+  ): Promise<RegistrationResponse> {
+    console.log("[RegistrationService] POST /v1/user/:user/upload", userId);
+    const formData = new FormData();
+    if (files.profilePicture)
+      formData.append("profilePicture", files.profilePicture);
+    if (files.nicFrontImage)
+      formData.append("nicFrontImage", files.nicFrontImage);
+    if (files.nicBackImage) formData.append("nicBackImage", files.nicBackImage);
+    if (files.GovijanaSevaPassbookImage)
+      formData.append(
+        "GovijanaSevaPassbookImage",
+        files.GovijanaSevaPassbookImage,
+      );
+    if (files.gnCertificateImage)
+      formData.append("gnCertificateImage", files.gnCertificateImage);
+    if (files.bimsaviyaCertificate)
+      formData.append("bimsaviyaCertificate", files.bimsaviyaCertificate);
+    if (files.landImages?.length) {
+      for (const img of files.landImages) {
+        formData.append("landImages", img);
+      }
+    }
+    return await httpClient.postMultipart<RegistrationResponse>(
+      `/v1/user/${userId}/upload`,
+      formData,
+    );
   }
 }
 

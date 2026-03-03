@@ -30,5 +30,7 @@ export {
   type PersonalInfo,
   type RegistrationRequest,
   type RegistrationResponse,
+  type UploadUserFilesRequest,
 } from "./registration.service";
+export { registrationStore } from "./registrationStore";
 export { userService, type UpdateUserProfileDTO } from "./user.service";

@@ -1,6 +1,9 @@
 import AswendLogo from "@/assets/Aswenna Logo.png";
-import { useAuth } from "@/Context";
-import { profileService } from "@/services";
+import {
+  registrationService,
+  registrationStore,
+  type RegistrationResponse,
+} from "@/services";
 import {
   ArrowBack,
   CheckCircle,
@@ -29,7 +32,6 @@ import { useNavigate } from "react-router-dom";
 
 const TermsAndConditions = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const [agreed, setAgreed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
@@ -43,28 +45,44 @@ const TermsAndConditions = () => {
     setIsSubmitting(true);
 
     try {
-      const profileData = profileService.getProfileSetupData();
-      const userRole = profileService.getUserRole();
-
-      if (!profileData) {
+      const payloadStr = localStorage.getItem("pendingRegistrationPayload");
+      if (!payloadStr) {
         throw new Error(
-          "Profile data not found. Please complete the profile setup.",
+          "Registration data not found. Please complete the profile setup.",
         );
       }
 
-      profileData.termsAccepted = true;
+      const payload = JSON.parse(payloadStr);
+      const role: string = payload.role;
 
-      const payload = {
-        ...profileData,
-        role: userRole || profileData.role,
-        termsAcceptedAt: new Date().toISOString(),
-        userId: user?._id || null,
-        email: user?.email || null,
-      };
+      let registrationResponse: RegistrationResponse;
+      if (role === "farmer") {
+        registrationResponse =
+          await registrationService.registerFarmer(payload);
+      } else if (role === "investor") {
+        registrationResponse =
+          await registrationService.registerInvestor(payload);
+      } else if (role === "landowner") {
+        registrationResponse =
+          await registrationService.registerLandowner(payload);
+      } else {
+        throw new Error(`Unknown role: ${role}`);
+      }
 
-      await profileService.completeProfile(payload);
+      const userId = registrationResponse._id || registrationResponse.user?._id;
+      if (userId) {
+        const files = registrationStore.getFiles();
+        const hasFiles = Object.values(files).some((f) => !!f);
+        if (hasFiles) {
+          await registrationService.uploadUserFiles(userId, files);
+        }
+      }
 
-      profileService.clearProfileSetupData();
+      localStorage.removeItem("pendingRegistrationPayload");
+      localStorage.removeItem("temp_email");
+      localStorage.removeItem("temp_password");
+      localStorage.removeItem("email_verified");
+      registrationStore.clear();
 
       setShowSuccessDialog(true);
 
@@ -92,7 +110,8 @@ const TermsAndConditions = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg, var(--bg-overlay) 0%, var(--bg-subtle) 100%)",
+        background:
+          "linear-gradient(135deg, var(--bg-overlay) 0%, var(--bg-subtle) 100%)",
         color: "white",
         py: 3,
       }}
@@ -240,7 +259,10 @@ const TermsAndConditions = () => {
               <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>
                 Data Security Guarantee
               </Typography>
-              <Typography variant="body2" sx={{ color: "var(--text-secondary)" }}>
+              <Typography
+                variant="body2"
+                sx={{ color: "var(--text-secondary)" }}
+              >
                 We use bank-level AES-256 encryption to protect your
                 information. Your agricultural data, land records, financial
                 inputs, and personal details remain your exclusive property.
@@ -289,7 +311,10 @@ const TermsAndConditions = () => {
                 Platform Agreement
               </Typography>
             </Box>
-            <Typography variant="caption" sx={{ color: "var(--text-secondary)" }}>
+            <Typography
+              variant="caption"
+              sx={{ color: "var(--text-secondary)" }}
+            >
               Last updated: January 2026
             </Typography>
           </Box>
@@ -299,7 +324,9 @@ const TermsAndConditions = () => {
               <Box
                 sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}
               >
-                <VerifiedUser sx={{ color: "var(--color-olive)", fontSize: 18 }} />
+                <VerifiedUser
+                  sx={{ color: "var(--color-olive)", fontSize: 18 }}
+                />
                 <Typography
                   variant="subtitle2"
                   sx={{ fontWeight: 600, color: "var(--color-olive)" }}
@@ -307,7 +334,10 @@ const TermsAndConditions = () => {
                   1. Usage License & Platform Access
                 </Typography>
               </Box>
-              <Typography variant="body2" sx={{ color: "var(--text-secondary)", pl: 3.5 }}>
+              <Typography
+                variant="body2"
+                sx={{ color: "var(--text-secondary)", pl: 3.5 }}
+              >
                 By accessing and using the Aswenna Agricultural Platform, you
                 accept and agree to be bound by these terms. The platform
                 connects Farmers, Landowners, and Investors to facilitate
@@ -322,7 +352,9 @@ const TermsAndConditions = () => {
               <Box
                 sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}
               >
-                <SecurityIcon sx={{ color: "var(--color-olive)", fontSize: 18 }} />
+                <SecurityIcon
+                  sx={{ color: "var(--color-olive)", fontSize: 18 }}
+                />
                 <Typography
                   variant="subtitle2"
                   sx={{ fontWeight: 600, color: "var(--color-olive)" }}
@@ -330,7 +362,10 @@ const TermsAndConditions = () => {
                   2. Data Ownership & Privacy
                 </Typography>
               </Box>
-              <Typography variant="body2" sx={{ color: "var(--text-secondary)", pl: 3.5 }}>
+              <Typography
+                variant="body2"
+                sx={{ color: "var(--text-secondary)", pl: 3.5 }}
+              >
                 You retain full ownership of all data uploaded to Aswenna,
                 including: land details, crop information, soil reports,
                 investment records, NIC documents, and financial transactions.
@@ -352,7 +387,10 @@ const TermsAndConditions = () => {
                   3. Partnership Agreements & Liability
                 </Typography>
               </Box>
-              <Typography variant="body2" sx={{ color: "var(--text-secondary)", pl: 3.5 }}>
+              <Typography
+                variant="body2"
+                sx={{ color: "var(--text-secondary)", pl: 3.5 }}
+              >
                 Aswenna facilitates connections between agricultural
                 stakeholders but is not a party to agreements made between
                 users. All land leases, investment contracts, and farming
@@ -366,7 +404,9 @@ const TermsAndConditions = () => {
               <Box
                 sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}
               >
-                <CheckCircle sx={{ color: "var(--color-olive)", fontSize: 18 }} />
+                <CheckCircle
+                  sx={{ color: "var(--color-olive)", fontSize: 18 }}
+                />
                 <Typography
                   variant="subtitle2"
                   sx={{ fontWeight: 600, color: "var(--color-olive)" }}
@@ -374,7 +414,10 @@ const TermsAndConditions = () => {
                   4. Verification & Trust
                 </Typography>
               </Box>
-              <Typography variant="body2" sx={{ color: "var(--text-secondary)", pl: 3.5 }}>
+              <Typography
+                variant="body2"
+                sx={{ color: "var(--text-secondary)", pl: 3.5 }}
+              >
                 All users undergo identity verification through NIC document
                 submission. Land ownership is verified through deed
                 certificates. Aswenna reserves the right to remove unverified
@@ -396,7 +439,10 @@ const TermsAndConditions = () => {
                   5. Dispute Resolution
                 </Typography>
               </Box>
-              <Typography variant="body2" sx={{ color: "var(--text-secondary)", pl: 3.5 }}>
+              <Typography
+                variant="body2"
+                sx={{ color: "var(--text-secondary)", pl: 3.5 }}
+              >
                 In case of disputes between parties, Aswenna provides a
                 mediation service to help resolve conflicts amicably. However,
                 legal disputes must be resolved through appropriate Sri Lankan
@@ -568,7 +614,10 @@ const TermsAndConditions = () => {
         }}
       >
         <DialogContent sx={{ p: 0 }}>
-          <CircularProgress size={60} sx={{ color: "var(--color-olive)", mb: 3 }} />
+          <CircularProgress
+            size={60}
+            sx={{ color: "var(--color-olive)", mb: 3 }}
+          />
           <Typography
             variant="h6"
             sx={{ color: "white", fontWeight: 600, mb: 1 }}
@@ -615,7 +664,10 @@ const TermsAndConditions = () => {
           >
             Account Created Successfully!
           </Typography>
-          <Typography variant="body2" sx={{ color: "var(--text-secondary)", mb: 2 }}>
+          <Typography
+            variant="body2"
+            sx={{ color: "var(--text-secondary)", mb: 2 }}
+          >
             Your Aswenna account has been created. You will be redirected to the
             login page shortly.
           </Typography>
