@@ -4,8 +4,12 @@ import {
   FormSection,
   ProfileStepper,
 } from "@/components";
-import { LocationService } from "@/services";
-import { validateNIC } from "@/utils";
+import {
+  LocationService,
+  registrationStore,
+  type InvestorRegistrationRequest,
+} from "@/services";
+import { getStoredCredentials, validateNIC } from "@/utils";
 import {
   AccountBalance,
   ArrowBack,
@@ -30,9 +34,9 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  type SelectChangeEvent,
   TextField,
   Typography,
+  type SelectChangeEvent,
 } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -43,6 +47,9 @@ const InvestorProfileSetup = () => {
 
   // Personal Information
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
+  const [profilePictureFile, setProfilePictureFile] = useState<File | null>(
+    null,
+  );
   const [fullName, setFullName] = useState("");
   const [nicNumber, setNicNumber] = useState("");
   const [nicError, setNicError] = useState("");
@@ -229,6 +236,7 @@ const InvestorProfileSetup = () => {
         alert("File size should not exceed 5MB");
         return;
       }
+      setProfilePictureFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfilePicture(reader.result as string);
@@ -354,32 +362,49 @@ const InvestorProfileSetup = () => {
   };
 
   const handleCompleteRegistration = () => {
-    const profileData = {
+    const { email, password, emailVerified } = getStoredCredentials();
+    const formattedPhone = phoneNumber.startsWith("+")
+      ? phoneNumber
+      : phoneNumber.startsWith("0")
+        ? `+94${phoneNumber.substring(1)}`
+        : `+94${phoneNumber}`;
+
+    const payload: InvestorRegistrationRequest = {
+      fullName,
+      email,
+      emailVerified,
+      phoneNumber: formattedPhone,
+      phoneNumberVerified: false,
+      password,
       role: "investor",
       personalInfo: {
-        fullName,
         nicNumber,
-        phoneNumber,
-        street,
+        birthday,
+        gender: gender as "Male" | "Female",
+        age: age || 0,
+        address: street,
         city,
-        province,
-        district,
         postalCode,
+        district,
+        province,
+      },
+      investorDetails: {
         dsDivision,
         gnDivision,
-      },
-      organizationInfo: {
         organizationName,
-        headOfficeLocation,
-        organizationContactNo,
-        businessRegistrationNo,
-        cropFocus,
+        companyAddress: headOfficeLocation,
+        organizationPhoneNumber: organizationContactNo,
+        registrationNo: businessRegistrationNo,
+        cropFocus: cropFocus.join(", "),
       },
-      termsAccepted: false,
     };
 
-    localStorage.setItem("profileSetupData", JSON.stringify(profileData));
-    console.log("Investor profile data saved:", profileData);
+    localStorage.setItem("pendingRegistrationPayload", JSON.stringify(payload));
+    registrationStore.setFiles({
+      profilePicture: profilePictureFile,
+      nicFrontImage: nicFiles[0] ?? null,
+      nicBackImage: nicFiles[1] ?? null,
+    });
     navigate("/terms-and-conditions");
   };
 
@@ -419,7 +444,8 @@ const InvestorProfileSetup = () => {
                 component="h1"
                 sx={{ fontWeight: "bold", mb: 1 }}
               >
-                Investor <span style={{ color: "var(--color-olive)" }}>Profile</span>
+                Investor{" "}
+                <span style={{ color: "var(--color-olive)" }}>Profile</span>
               </Typography>
             </Box>
 

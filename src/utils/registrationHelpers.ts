@@ -1,9 +1,8 @@
 import type {
-    FarmerRegistrationRequest,
-    InvestorRegistrationRequest,
-    LandownerRegistrationRequest,
+  FarmerRegistrationRequest,
+  InvestorRegistrationRequest,
+  LandownerRegistrationRequest,
 } from "@/services";
-import { getFileAsBase64 } from "@/utils";
 
 export const getStoredCredentials = () => {
   return {
@@ -46,11 +45,6 @@ export const prepareFarmerRegistrationData = async (formData: {
 }): Promise<FarmerRegistrationRequest> => {
   const { email, password, emailVerified } = getStoredCredentials();
 
-  const nicFrontImage = await getFileAsBase64(formData.nicFiles, 0);
-  const nicBackImage = await getFileAsBase64(formData.nicFiles, 1);
-  const govijanaSevaPassbookImage = await getFileAsBase64(formData.passbookFiles, 0);
-  const gnCertificateImage = await getFileAsBase64(formData.gnFiles, 0);
-
   return {
     fullName: formData.fullName,
     email,
@@ -59,26 +53,21 @@ export const prepareFarmerRegistrationData = async (formData: {
     phoneNumberVerified: formData.phoneNumberVerified,
     password,
     personalInfo: {
-      profilePicture: formData.profilePicture || "",
       nicNumber: formData.nicNumber,
       birthday: formData.birthday,
-      gender: formData.gender.toLowerCase() as "male" | "female",
+      gender: formData.gender as "Male" | "Female",
       age: formData.age || 0,
       address: formData.address || formData.city || "",
       city: formData.city || "",
       postalCode: formData.postalCode,
       district: formData.district,
       province: formData.province,
-      nicFrontImage,
-      nicBackImage,
     },
     role: "farmer",
     farmerDetails: {
       dsDivision: formData.dsDivision,
       gnDivision: formData.gnDivision,
       govijanaSevaId: formData.govijanaSevaId || "",
-      GovijanaSevaPassbookImage: govijanaSevaPassbookImage,
-      gnCertificateImage,
       crop: formData.selectedCrops.join(", "),
       experience: formData.experience || "0 years",
       regions: formData.regions || formData.district,
@@ -111,9 +100,6 @@ export const prepareInvestorRegistrationData = async (formData: {
 }): Promise<InvestorRegistrationRequest> => {
   const { email, password, emailVerified } = getStoredCredentials();
 
-  const nicFrontImage = await getFileAsBase64(formData.nicFiles, 0);
-  const nicBackImage = await getFileAsBase64(formData.nicFiles, 1);
-
   return {
     fullName: formData.fullName,
     email,
@@ -123,18 +109,15 @@ export const prepareInvestorRegistrationData = async (formData: {
     password,
     role: "investor",
     personalInfo: {
-      profilePicture: formData.profilePicture || "",
       nicNumber: formData.nicNumber,
       birthday: formData.birthday,
-      gender: formData.gender.toLowerCase() as "male" | "female",
+      gender: formData.gender as "Male" | "Female",
       age: formData.age || 0,
       address: formData.street,
       city: formData.city,
       postalCode: formData.postalCode,
       district: formData.district,
       province: formData.province,
-      nicFrontImage,
-      nicBackImage,
     },
     investorDetails: {
       dsDivision: formData.dsDivision,
@@ -147,7 +130,6 @@ export const prepareInvestorRegistrationData = async (formData: {
     },
   };
 };
-
 
 export const prepareLandownerRegistrationData = async (formData: {
   fullName: string;
@@ -181,15 +163,6 @@ export const prepareLandownerRegistrationData = async (formData: {
 }): Promise<LandownerRegistrationRequest> => {
   const { email, password, emailVerified } = getStoredCredentials();
 
-  const nicFrontImage = await getFileAsBase64(formData.nicFiles, 0);
-  const nicBackImage = await getFileAsBase64(formData.nicFiles, 1);
-
-  const landImages: string[] = [];
-  for (const file of formData.landImageFiles) {
-    const base64 = await getFileAsBase64([file], 0);
-    if (base64) landImages.push(base64);
-  }
-
   return {
     fullName: formData.fullName,
     email,
@@ -199,18 +172,15 @@ export const prepareLandownerRegistrationData = async (formData: {
     password,
     role: "landowner",
     personalInfo: {
-      profilePicture: formData.profilePicture || "",
       nicNumber: formData.nicNumber,
       birthday: formData.birthday,
-      gender: formData.gender.toLowerCase() as "male" | "female",
+      gender: formData.gender as "Male" | "Female",
       age: formData.age || 0,
       address: formData.street,
       city: formData.city,
       postalCode: formData.postalCode,
       district: formData.district,
       province: formData.province,
-      nicFrontImage,
-      nicBackImage,
     },
     landOwnerDetails: {
       dsDivision: formData.dsDivision,
@@ -230,7 +200,6 @@ export const prepareLandownerRegistrationData = async (formData: {
         rentalExpectation: formData.rentalExpectation,
         dsDivision: formData.landDsDivision,
         gnDivision: formData.landGnDivision,
-        landImages,
       },
     },
   };
