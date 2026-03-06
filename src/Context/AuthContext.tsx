@@ -1,8 +1,11 @@
 import { authService } from "@/services";
+import type { AuthBroadcastMessage } from "@/services/auth.service";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { User } from "./createAuthContext";
 import { AuthContext } from "./createAuthContext";
+
+const IDLE_TOUCH_THROTTLE_MS = 1_000;
 
 const ACTIVITY_EVENTS: (keyof WindowEventMap)[] = [
   "mousedown",
@@ -28,21 +31,57 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let lastTouch = 0;
     const throttled = () => {
       const now = Date.now();
-      if (now - lastTouch > 1000) {
+      if (now - lastTouch > IDLE_TOUCH_THROTTLE_MS) {
         lastTouch = now;
         handleActivity();
       }
     };
-
     ACTIVITY_EVENTS.forEach((evt) =>
       window.addEventListener(evt, throttled, { passive: true }),
     );
-    return () => {
+    return () =>
       ACTIVITY_EVENTS.forEach((evt) =>
         window.removeEventListener(evt, throttled),
       );
-    };
   }, [user, handleActivity]);
+
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      if (
+        document.visibilityState === "visible" &&
+        authService.isSessionExpired()
+      ) {
+        handleLogout();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, []);
+
+  useEffect(() => {
+    let bc: BroadcastChannel | null = null;
+    try {
+      bc = new BroadcastChannel("aswenna_auth");
+      bc.onmessage = (e: MessageEvent<AuthBroadcastMessage>) => {
+        switch (e.data?.type) {
+          case "LOGOUT":
+            console.info("[Auth] Another tab signed out.");
+            break;
+          case "LOGIN":
+            console.info(
+              `[Auth] Another tab signed in as ${e.data.role ?? "unknown"}.`,
+            );
+            break;
+        }
+      };
+    } catch {
+      console.warn("BroadcastChannel not supported in this browser.");
+    }
+    return () => {
+      bc?.close();
+    };
+  }, []);
 
   useEffect(() => {
     authService
@@ -53,9 +92,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setSessionId(result.sessionId);
         }
       })
-      .finally(() => {
-        setLoading(false);
-      });
+      .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -64,7 +101,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     expiryTimerRef.current = setInterval(() => {
       if (authService.isSessionExpired()) {
-        console.log("Session expired (absolute or idle). Logging out.");
         handleLogout();
       }
     }, 30_000);
