@@ -166,6 +166,7 @@ function getLoginAttempts(): LoginAttempts {
     const raw = sessionStorage.getItem(SS_ATTEMPTS);
     if (raw) return JSON.parse(raw) as LoginAttempts;
   } catch {
+    console.error("Failed to parse login attempts:");
   }
   return { count: 0, lastAttempt: 0, lockedUntil: 0 };
 }
