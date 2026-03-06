@@ -204,7 +204,10 @@ class AuthService {
           credentials,
         );
       } catch (err) {
-        const newCount = attempts.count + 1;
+        const isExpiredLockout =
+          attempts.lockedUntil > 0 && Date.now() >= attempts.lockedUntil;
+        const baseCount = isExpiredLockout ? 0 : attempts.count;
+        const newCount = baseCount + 1;
         setLoginAttempts({
           count: newCount,
           lastAttempt: Date.now(),

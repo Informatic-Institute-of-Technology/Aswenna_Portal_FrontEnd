@@ -147,7 +147,7 @@ const AccountProcessingDialog = ({
           If you have any questions or require further assistance, please
           contact the{" "}
           <span style={{ color: "#6aab2b", fontWeight: 700 }}>
-            Aswenna Admin team
+            Aswenna Admin team - ( Aswenna.agrilink@gmail.com )
           </span>
           . We appreciate your patience and look forward to welcoming you to our
           platform.
