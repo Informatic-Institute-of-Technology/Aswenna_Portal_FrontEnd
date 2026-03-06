@@ -135,14 +135,17 @@ const DocumentsTab = ({ selectedUser, userDetail }: DocumentsTabProps) => {
   const bimsaviyaUrl = lo?.landAddress?.bimsaviyaCertificate?.url;
   const landImgUrl = lo?.landAddress?.landImages?.[0]?.url;
 
-  const fd = userDetail?.farmerDetails as
+  const fd = (userDetail?.farmer || userDetail?.farmerDetails) as
     | {
+        GovijanaSevaPassbookImage?: { url?: string };
         govijanaSevaPassbook?: { url?: string };
+        gnCertificateImage?: { url?: string };
         gnCertificate?: { url?: string };
       }
     | undefined;
-  const passbookUrl = fd?.govijanaSevaPassbook?.url;
-  const gnCertUrl = fd?.gnCertificate?.url;
+  const passbookUrl =
+    fd?.GovijanaSevaPassbookImage?.url || fd?.govijanaSevaPassbook?.url;
+  const gnCertUrl = fd?.gnCertificateImage?.url || fd?.gnCertificate?.url;
 
   const inv = userDetail?.investorDetails as
     | {

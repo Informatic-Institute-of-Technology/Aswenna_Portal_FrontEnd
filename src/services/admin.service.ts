@@ -31,7 +31,8 @@ export interface ApiUser {
   updatedAt: string;
   __v: number;
   status?: string;
-  statues?: string; // API typo field
+  statues?: string;
+  personalInfo?: PersonalInfo;
 }
 
 export interface ApiImageFile {
@@ -55,7 +56,6 @@ export interface PersonalInfo {
   province?: string;
   dsDivision?: string;
   gnDivision?: string;
-  // Can be a plain string URL or a full image object from API
   profilePicture?: string | ApiImageFile | null;
   nicFrontImage?: ApiImageFile;
   nicBackImage?: ApiImageFile;
@@ -64,7 +64,6 @@ export interface PersonalInfo {
   updatedAt?: string;
 }
 
-// Actual API field names — "farmer", "investor", "landOwner"
 export interface FarmerProfile {
   _id?: string;
   user?: string;
@@ -88,7 +87,19 @@ export interface FarmerProfile {
     fileSize?: string;
     mimeType?: string;
   };
+  GovijanaSevaPassbookImage?: {
+    filename?: string;
+    url?: string;
+    fileSize?: string;
+    mimeType?: string;
+  };
   gnCertificate?: {
+    filename?: string;
+    url?: string;
+    fileSize?: string;
+    mimeType?: string;
+  };
+  gnCertificateImage?: {
     filename?: string;
     url?: string;
     fileSize?: string;
@@ -162,18 +173,15 @@ export interface LandOwnerProfile {
   }>;
 }
 
-// Keep old names as aliases for backward compat
 export type FarmerDetails = FarmerProfile;
 export type InvestorDetails = InvestorProfile;
 export type LandOwnerDetails = LandOwnerProfile;
 
 export interface ApiUserDetail extends ApiUser {
   personalInfo?: PersonalInfo;
-  // Actual API field names
   farmer?: FarmerProfile;
   investor?: InvestorProfile;
   landOwner?: LandOwnerProfile;
-  // Legacy field names (kept for safety)
   farmerDetails?: FarmerProfile;
   investorDetails?: InvestorProfile;
   landOwnerDetails?: LandOwnerProfile;

@@ -91,6 +91,7 @@ const UserTableRow = ({
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
           <Avatar
+            src={user.avatar || undefined}
             sx={{
               width: 40,
               height: 40,

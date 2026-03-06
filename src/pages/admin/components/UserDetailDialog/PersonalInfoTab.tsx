@@ -6,14 +6,15 @@ import {
   CalendarMonth,
   CheckCircle,
   Email,
+  Fingerprint,
   Home,
   LocationOn,
   PhoneAndroid,
   Wc,
 } from "@mui/icons-material";
 import { Box, Typography } from "@mui/material";
-import InfoRow from "../InfoRow";
 import { formatJoinDate } from "../../utils/userManagement.utils";
+import InfoRow from "../InfoRow";
 
 interface PersonalInfoTabProps {
   selectedUser: GlobalUser;
@@ -134,6 +135,11 @@ const PersonalInfoTab = ({
           selectedUser.phoneNumber ||
           "N/A"
         }
+      />
+      <InfoRow
+        icon={<Fingerprint sx={{ fontSize: 18 }} />}
+        label="USER ID"
+        value={userDetail?._id || selectedUser.id}
       />
       <InfoRow
         icon={<BadgeIcon sx={{ fontSize: 18 }} />}

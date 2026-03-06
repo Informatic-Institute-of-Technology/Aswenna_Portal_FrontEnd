@@ -49,10 +49,25 @@ const AccountPage = () => {
 
   useEffect(() => {
     if (user) {
+      const nameParts = (user.fullName || "").trim().split(/\s+/);
+      const derivedFirstName =
+        user.firstName ||
+        (nameParts.length > 1
+          ? nameParts.slice(0, -1).join(" ")
+          : nameParts[0]) ||
+        "";
+      const derivedLastName =
+        user.lastName ||
+        (nameParts.length > 1 ? nameParts[nameParts.length - 1] : "") ||
+        "";
+      const derivedAddress =
+        (user.personalInfo?.address as string | undefined) ||
+        user.address ||
+        "";
       setFormData({
-        firstName: user.firstName || "",
-        lastName: user.lastName || "",
-        address: user.address || "",
+        firstName: derivedFirstName,
+        lastName: derivedLastName,
+        address: derivedAddress,
         phoneNumber: user.phoneNumber || "",
       });
     }
@@ -172,15 +187,12 @@ const AccountPage = () => {
                 <Box sx={{ textAlign: "center", py: 3 }}>
                   <ProfileAvatar
                     fullName={user?.fullName || null}
-                    avatarUrl={
-                      user?.role === "farmer"
-                        ? "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJP8vN8tGwjdGdBoNRb3S7qP1VA0Q1F-SfWg&s"
-                        : user?.role === "investor"
-                          ? "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWHUQslqLEawVVIzUcGFkYYRm30cguWYwuhg&s"
-                          : user?.role === "landowner"
-                            ? "https://businesstoday.lk/wp-content/uploads/2024/11/Ishara-Nanayakkara-Executive-Chairman-1.png"
-                            : undefined
-                    }
+                    avatarUrl={(() => {
+                      const pic = user?.personalInfo?.profilePicture;
+                      if (!pic) return undefined;
+                      if (typeof pic === "string") return pic;
+                      return pic.url || undefined;
+                    })()}
                     size={140}
                     editable={true}
                   />

@@ -32,44 +32,85 @@ export interface UserApiResponse {
   createdAt: string | null;
   updatedAt: string | null;
   __v: number | null;
+  personalInfo?: {
+    nicNumber?: string;
+    gender?: string;
+    birthday?: string;
+    age?: number;
+    address?: string;
+    city?: string;
+    province?: string;
+    postalCode?: string;
+    district?: string;
+    profilePicture?: string | { url?: string; filename?: string } | null;
+    nicFrontImage?: { url?: string; filename?: string } | null;
+    nicBackImage?: { url?: string; filename?: string } | null;
+  } | null;
 }
+
+export type AuthBroadcastMessage =
+  | { type: "LOGIN"; role: string | undefined }
+  | { type: "LOGOUT" };
 
 interface SessionPayload {
   token: string;
   tokenType: string;
   user: User;
   csrfToken: string;
-  fingerprint: string;
   nonce: string;
   createdAt: number;
 }
-const SALT = new TextEncoder().encode("aswenna-portal-session-v2");
-const SESSION_ID_KEY = "session_id";
-const SESSION_EXPIRY_KEY = "session_expiry";
-const IDLE_EXPIRY_KEY = "idle_expiry";
-const SESSION_DATA_KEY = "session_data";
-const LOGIN_ATTEMPTS_KEY = "login_attempts";
 
-const ABSOLUTE_TIMEOUT_MS = 12 * 60 * 60 * 1000;   
-const IDLE_TIMEOUT_MS = 30 * 60 * 1000;       
+interface LoginAttempts {
+  count: number;
+  lastAttempt: number;
+  lockedUntil: number;
+}
+
+const SS_SESSION_ID = "aswenna.sid";
+const SS_EXPIRY = "aswenna.exp";
+const SS_IDLE = "aswenna.idle";
+const SS_DATA = "aswenna.dat";
+const SS_ATTEMPTS = "aswenna.attempts";
+
+const ABSOLUTE_TIMEOUT_MS = 12 * 60 * 60 * 1000;
+const IDLE_TIMEOUT_MS = 30 * 60 * 1000;
 const MAX_LOGIN_ATTEMPTS = 5;
-const BASE_LOCKOUT_MS = 30_000;        
-const MAX_LOCKOUT_MS = 15 * 60 * 1000;         
+const BASE_LOCKOUT_MS = 30_000;
+
+const BROADCAST_CHANNEL = "aswenna_auth";
+
+const HKDF_SALT = new TextEncoder().encode("aswenna-portal-2025");
+const HKDF_INFO = new TextEncoder().encode("aswenna-portal-session-v3");
+
+let _cachedKey: CryptoKey | null = null;
+let _cachedSessionId: string | null = null;
+
 async function deriveKey(sessionId: string): Promise<CryptoKey> {
+  if (_cachedKey && _cachedSessionId === sessionId) return _cachedKey;
+
   const raw = await crypto.subtle.importKey(
     "raw",
     new TextEncoder().encode(sessionId),
-    "PBKDF2",
+    "HKDF",
     false,
     ["deriveKey"],
   );
-  return crypto.subtle.deriveKey(
-    { name: "PBKDF2", salt: SALT, iterations: 100_000, hash: "SHA-256" },
+  const key = await crypto.subtle.deriveKey(
+    { name: "HKDF", hash: "SHA-256", salt: HKDF_SALT, info: HKDF_INFO },
     raw,
     { name: "AES-GCM", length: 256 },
     false,
     ["encrypt", "decrypt"],
   );
+  _cachedKey = key;
+  _cachedSessionId = sessionId;
+  return key;
+}
+
+function clearKeyCache(): void {
+  _cachedKey = null;
+  _cachedSessionId = null;
 }
 
 async function encryptSession(
@@ -78,15 +119,14 @@ async function encryptSession(
 ): Promise<string> {
   const key = await deriveKey(sessionId);
   const iv = crypto.getRandomValues(new Uint8Array(12));
-  const encoded = new TextEncoder().encode(JSON.stringify(payload));
-  const ciphertext = await crypto.subtle.encrypt(
+  const ct = await crypto.subtle.encrypt(
     { name: "AES-GCM", iv },
     key,
-    encoded,
+    new TextEncoder().encode(JSON.stringify(payload)),
   );
-  const combined = new Uint8Array(iv.byteLength + ciphertext.byteLength);
+  const combined = new Uint8Array(iv.byteLength + ct.byteLength);
   combined.set(iv, 0);
-  combined.set(new Uint8Array(ciphertext), iv.byteLength);
+  combined.set(new Uint8Array(ct), iv.byteLength);
   return btoa(String.fromCharCode(...combined));
 }
 
@@ -96,231 +136,207 @@ async function decryptSession(
 ): Promise<SessionPayload> {
   const key = await deriveKey(sessionId);
   const combined = Uint8Array.from(atob(encrypted), (c) => c.charCodeAt(0));
-  const iv = combined.slice(0, 12);
-  const ciphertext = combined.slice(12);
-  const plaintext = await crypto.subtle.decrypt(
-    { name: "AES-GCM", iv },
+  const plain = await crypto.subtle.decrypt(
+    { name: "AES-GCM", iv: combined.slice(0, 12) },
     key,
-    ciphertext,
+    combined.slice(12),
   );
-  return JSON.parse(new TextDecoder().decode(plaintext)) as SessionPayload;
+  return JSON.parse(new TextDecoder().decode(plain)) as SessionPayload;
 }
-async function generateFingerprint(): Promise<string> {
-  const components = [
-    navigator.userAgent,
-    navigator.language,
-    navigator.languages?.join(",") ?? "",
-    Intl.DateTimeFormat().resolvedOptions().timeZone,
-    `${screen.width}x${screen.height}x${screen.colorDepth}`,
-    navigator.hardwareConcurrency?.toString() ?? "",
-    navigator.platform ?? "",
-  ];
-  const raw = components.join("|");
-  const hash = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(raw),
-  );
-  return Array.from(new Uint8Array(hash))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
+async function withLock<T>(name: string, fn: () => Promise<T>): Promise<T> {
+  if (typeof navigator !== "undefined" && "locks" in navigator) {
+    return navigator.locks.request(`aswenna_${name}`, fn);
+  }
+  return fn();
 }
-interface LoginAttempts {
-  count: number;
-  lastAttempt: number;
-  lockedUntil: number;
+
+function broadcastAuth(msg: AuthBroadcastMessage): void {
+  try {
+    const bc = new BroadcastChannel(BROADCAST_CHANNEL);
+    bc.postMessage(msg);
+    bc.close();
+  } catch {
+    console.warn("BroadcastChannel not supported in this browser.");
+  }
 }
 
 function getLoginAttempts(): LoginAttempts {
   try {
-    const raw = sessionStorage.getItem(LOGIN_ATTEMPTS_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch { /* ignore */ }
+    const raw = sessionStorage.getItem(SS_ATTEMPTS);
+    if (raw) {
+      const parsed = JSON.parse(raw) as LoginAttempts;
+      if (parsed.lockedUntil > 0 && parsed.lastAttempt > 0) {
+        parsed.lockedUntil = Math.min(
+          parsed.lockedUntil,
+          parsed.lastAttempt + BASE_LOCKOUT_MS,
+        );
+      }
+      return parsed;
+    }
+  } catch {
+    console.error("Failed to parse login attempts:");
+  }
   return { count: 0, lastAttempt: 0, lockedUntil: 0 };
 }
 
-function setLoginAttempts(attempts: LoginAttempts): void {
-  sessionStorage.setItem(LOGIN_ATTEMPTS_KEY, JSON.stringify(attempts));
+function setLoginAttempts(a: LoginAttempts): void {
+  sessionStorage.setItem(SS_ATTEMPTS, JSON.stringify(a));
 }
 
 function clearLoginAttempts(): void {
-  sessionStorage.removeItem(LOGIN_ATTEMPTS_KEY);
+  sessionStorage.removeItem(SS_ATTEMPTS);
 }
-
-
 class AuthService {
   async login(credentials: LoginCredentials): Promise<User> {
-
-    const attempts = getLoginAttempts();
-    if (attempts.lockedUntil > Date.now()) {
-      const remainingSec = Math.ceil(
-        (attempts.lockedUntil - Date.now()) / 1000,
-      );
-      throw new Error(
-        `Too many failed attempts. Try again in ${remainingSec} seconds.`,
-      );
-    }
-
-    let loginResponse: LoginResponse;
-    try {
-      loginResponse = await httpClient.post<LoginResponse>(
-        "/auth/login",
-        credentials,
-      );
-    } catch (err) {
-      const newCount = attempts.count + 1;
-      let lockedUntil = 0;
-      if (newCount >= MAX_LOGIN_ATTEMPTS) {
-        const backoff = Math.min(
-          BASE_LOCKOUT_MS * Math.pow(2, newCount - MAX_LOGIN_ATTEMPTS),
-          MAX_LOCKOUT_MS,
+    return withLock("login", async () => {
+      const attempts = getLoginAttempts();
+      if (attempts.lockedUntil > Date.now()) {
+        const remaining = Math.ceil((attempts.lockedUntil - Date.now()) / 1000);
+        throw new Error(
+          `Too many failed attempts. Try again in ${remaining} seconds.`,
         );
-        lockedUntil = Date.now() + backoff;
       }
-      setLoginAttempts({
-        count: newCount,
-        lastAttempt: Date.now(),
-        lockedUntil,
-      });
-      throw err;
-    }
-    clearLoginAttempts();
 
-    if (!loginResponse.access_token) {
-      throw new Error("No access token received");
-    }
+      let loginResponse: LoginResponse;
+      try {
+        loginResponse = await httpClient.post<LoginResponse>(
+          "/auth/login",
+          credentials,
+        );
+      } catch (err) {
+        const isExpiredLockout =
+          attempts.lockedUntil > 0 && Date.now() >= attempts.lockedUntil;
+        const baseCount = isExpiredLockout ? 0 : attempts.count;
+        const newCount = baseCount + 1;
+        setLoginAttempts({
+          count: newCount,
+          lastAttempt: Date.now(),
+          lockedUntil:
+            newCount >= MAX_LOGIN_ATTEMPTS ? Date.now() + BASE_LOCKOUT_MS : 0,
+        });
+        throw err;
+      }
+      clearLoginAttempts();
 
-    const token = loginResponse.access_token;
-    const decryptedData = decryptToken(token);
+      if (!loginResponse.access_token)
+        throw new Error("No access token received");
 
-    const userId =
-      decryptedData?.sub || decryptedData?.userId || decryptedData?.id;
-    const userRole = decryptedData?.role;
+      const token = loginResponse.access_token;
+      const decryptedData = decryptToken(token);
+      const userId =
+        decryptedData?.sub ?? decryptedData?.userId ?? decryptedData?.id;
+      const userRole = decryptedData?.role;
 
-    if (!userId) throw new Error("No user ID found in token");
+      if (!userId) throw new Error("No user ID found in token");
 
-    const userProfile = await httpClient.get<UserApiResponse>(
-      `/v1/user/${userId}`,
-    );
+      const userProfile = await httpClient.get<UserApiResponse>(
+        `/v1/user/${userId}`,
+      );
 
-    const userData: User = {
-      _id: userProfile._id || null,
-      firstName: userProfile.firstName || null,
-      lastName: userProfile.lastName || null,
-      fullName: userProfile.fullName || null,
-      address: userProfile.address || null,
-      email: userProfile.email || null,
-      emailVerified: userProfile.emailVerified ?? null,
-      phoneNumber: userProfile.phoneNumber || null,
-      phoneNumberVerified: userProfile.phoneNumberVerified ?? null,
-      roles: Array.isArray(userProfile.roles) ? userProfile.roles : [],
-      permissions: Array.isArray(userProfile.permissions)
-        ? userProfile.permissions
-        : [],
-      createdBy: userProfile.createdBy || null,
-      updatedBy: userProfile.updatedBy || null,
-      meta: Array.isArray(userProfile.meta) ? userProfile.meta : [],
-      createdAt: userProfile.createdAt || null,
-      updatedAt: userProfile.updatedAt || null,
-      __v: userProfile.__v ?? null,
-      role: userRole as UserRole,
-    };
+      const userData: User = {
+        _id: userProfile._id || null,
+        firstName: userProfile.firstName || null,
+        lastName: userProfile.lastName || null,
+        fullName: userProfile.fullName || null,
+        address: userProfile.address || null,
+        email: userProfile.email || null,
+        emailVerified: userProfile.emailVerified ?? null,
+        phoneNumber: userProfile.phoneNumber || null,
+        phoneNumberVerified: userProfile.phoneNumberVerified ?? null,
+        roles: Array.isArray(userProfile.roles) ? userProfile.roles : [],
+        permissions: Array.isArray(userProfile.permissions)
+          ? userProfile.permissions
+          : [],
+        createdBy: userProfile.createdBy || null,
+        updatedBy: userProfile.updatedBy || null,
+        meta: Array.isArray(userProfile.meta) ? userProfile.meta : [],
+        createdAt: userProfile.createdAt || null,
+        updatedAt: userProfile.updatedAt || null,
+        __v: userProfile.__v ?? null,
+        role: userRole as UserRole,
+        personalInfo: userProfile.personalInfo ?? null,
+      };
 
-    const sessionId = crypto.randomUUID();
-    const csrfToken = crypto.randomUUID();
-    const nonce = crypto.randomUUID();
-    const fingerprint = await generateFingerprint();
-    const now = Date.now();
+      const sessionId = crypto.randomUUID();
+      const csrfToken = crypto.randomUUID();
+      const nonce = crypto.randomUUID();
+      const now = Date.now();
 
-    const encryptedPayload = await encryptSession(
-      {
-        token,
-        tokenType: loginResponse.token_type || "Bearer",
-        user: userData,
-        csrfToken,
-        fingerprint,
-        nonce,
-        createdAt: now,
-      },
-      sessionId,
-    );
+      const encrypted = await encryptSession(
+        {
+          token,
+          tokenType: loginResponse.token_type || "Bearer",
+          user: userData,
+          csrfToken,
+          nonce,
+          createdAt: now,
+        },
+        sessionId,
+      );
+      sessionStorage.setItem(SS_SESSION_ID, sessionId);
+      sessionStorage.setItem(SS_EXPIRY, String(now + ABSOLUTE_TIMEOUT_MS));
+      sessionStorage.setItem(SS_IDLE, String(now + IDLE_TIMEOUT_MS));
+      sessionStorage.setItem(SS_DATA, encrypted);
 
-    localStorage.setItem(SESSION_ID_KEY, sessionId);
-    localStorage.setItem(
-      SESSION_EXPIRY_KEY,
-      (now + ABSOLUTE_TIMEOUT_MS).toString(),
-    );
-    localStorage.setItem(
-      IDLE_EXPIRY_KEY,
-      (now + IDLE_TIMEOUT_MS).toString(),
-    );
+      setAuthHeader(`${loginResponse.token_type || "Bearer"} ${token}`);
+      setCsrfToken(csrfToken);
 
-    sessionStorage.setItem(SESSION_DATA_KEY, encryptedPayload);
+      broadcastAuth({ type: "LOGIN", role: userData.role });
 
-    setAuthHeader(
-      `${loginResponse.token_type || "Bearer"} ${token}`,
-    );
-    setCsrfToken(csrfToken);
-
-    console.log("Secure session created:", sessionId);
-
-    return userData;
+      return userData;
+    });
   }
 
-  async restoreSession(): Promise<{
-    user: User;
-    sessionId: string;
-  } | null> {
-    try {
-      if (this.isSessionExpired()) {
+  async restoreSession(): Promise<{ user: User; sessionId: string } | null> {
+    return withLock("restore", async () => {
+      try {
+        if (this.isSessionExpired()) {
+          this.logout();
+          return null;
+        }
+
+        const sessionId = sessionStorage.getItem(SS_SESSION_ID);
+        const encryptedData = sessionStorage.getItem(SS_DATA);
+        if (!sessionId || !encryptedData) return null;
+
+        const payload = await decryptSession(encryptedData, sessionId);
+
+        setAuthHeader(`${payload.tokenType} ${payload.token}`);
+        setCsrfToken(payload.csrfToken);
+        this.touchIdleTimer();
+
+        return { user: payload.user, sessionId };
+      } catch (err) {
+        console.error("Failed to restore session:", err);
         this.logout();
         return null;
       }
-
-      const sessionId = localStorage.getItem(SESSION_ID_KEY);
-      const encryptedData = sessionStorage.getItem(SESSION_DATA_KEY);
-      if (!sessionId || !encryptedData) return null;
-
-      const payload = await decryptSession(encryptedData, sessionId);
-
-      const currentFingerprint = await generateFingerprint();
-      if (payload.fingerprint !== currentFingerprint) {
-        console.warn("Session fingerprint mismatch — possible hijack.");
-        this.logout();
-        return null;
-      }
-
-      setAuthHeader(`${payload.tokenType} ${payload.token}`);
-      setCsrfToken(payload.csrfToken);
-
-      this.touchIdleTimer();
-
-      return { user: payload.user, sessionId };
-    } catch (err) {
-      console.error("Failed to restore session:", err);
-      this.logout();
-      return null;
-    }
+    });
   }
+
   async updateSessionUser(updatedUser: User): Promise<void> {
-    try {
-      const sessionId = localStorage.getItem(SESSION_ID_KEY);
-      const encryptedData = sessionStorage.getItem(SESSION_DATA_KEY);
-      if (!sessionId || !encryptedData) return;
+    return withLock("update", async () => {
+      try {
+        const sessionId = sessionStorage.getItem(SS_SESSION_ID);
+        const encryptedData = sessionStorage.getItem(SS_DATA);
+        if (!sessionId || !encryptedData) return;
 
-      const payload = await decryptSession(encryptedData, sessionId);
-      payload.user = updatedUser;
-      payload.nonce = crypto.randomUUID();
-      const newEncrypted = await encryptSession(payload, sessionId);
-      sessionStorage.setItem(SESSION_DATA_KEY, newEncrypted);
-    } catch (err) {
-      console.error("Failed to update session user:", err);
-    }
+        const payload = await decryptSession(encryptedData, sessionId);
+        payload.user = updatedUser;
+        payload.nonce = crypto.randomUUID();
+        sessionStorage.setItem(
+          SS_DATA,
+          await encryptSession(payload, sessionId),
+        );
+      } catch (err) {
+        console.error("Failed to update session user:", err);
+      }
+    });
   }
-
   async getToken(): Promise<string | null> {
     try {
-      const sessionId = localStorage.getItem(SESSION_ID_KEY);
-      const encryptedData = sessionStorage.getItem(SESSION_DATA_KEY);
+      const sessionId = sessionStorage.getItem(SS_SESSION_ID);
+      const encryptedData = sessionStorage.getItem(SS_DATA);
       if (!sessionId || !encryptedData || this.isSessionExpired()) return null;
       const payload = await decryptSession(encryptedData, sessionId);
       return `${payload.tokenType} ${payload.token}`;
@@ -330,63 +346,53 @@ class AuthService {
   }
 
   touchIdleTimer(): void {
-    if (!localStorage.getItem(SESSION_ID_KEY)) return;
-    localStorage.setItem(
-      IDLE_EXPIRY_KEY,
-      (Date.now() + IDLE_TIMEOUT_MS).toString(),
-    );
+    if (!sessionStorage.getItem(SS_SESSION_ID)) return;
+    sessionStorage.setItem(SS_IDLE, String(Date.now() + IDLE_TIMEOUT_MS));
   }
 
   isIdle(): boolean {
-    const idle = localStorage.getItem(IDLE_EXPIRY_KEY);
-    if (!idle) return true;
-    return Date.now() > parseInt(idle, 10);
+    const idle = sessionStorage.getItem(SS_IDLE);
+    return !idle || Date.now() > parseInt(idle, 10);
   }
 
   isSessionExpired(): boolean {
-    const expiry = localStorage.getItem(SESSION_EXPIRY_KEY);
-    if (!expiry) return true;
-    if (Date.now() > parseInt(expiry, 10)) return true;
+    const expiry = sessionStorage.getItem(SS_EXPIRY);
+    if (!expiry || Date.now() > parseInt(expiry, 10)) return true;
     return this.isIdle();
   }
 
   isAuthenticated(): boolean {
-    return (
-      !!localStorage.getItem(SESSION_ID_KEY) && !this.isSessionExpired()
-    );
+    return !!sessionStorage.getItem(SS_SESSION_ID) && !this.isSessionExpired();
   }
 
   getSessionId(): string | null {
-    return localStorage.getItem(SESSION_ID_KEY);
+    return sessionStorage.getItem(SS_SESSION_ID);
   }
 
   validateSessionId(urlSessionId: string): boolean {
-    const storedId = localStorage.getItem(SESSION_ID_KEY);
-    if (!storedId) return false;
-    if (storedId.length !== urlSessionId.length) return false;
+    const stored = sessionStorage.getItem(SS_SESSION_ID);
+    if (!stored || stored.length !== urlSessionId.length) return false;
     let mismatch = 0;
-    for (let i = 0; i < storedId.length; i++) {
-      mismatch |= storedId.charCodeAt(i) ^ urlSessionId.charCodeAt(i);
+    for (let i = 0; i < stored.length; i++) {
+      mismatch |= stored.charCodeAt(i) ^ urlSessionId.charCodeAt(i);
     }
     return mismatch === 0;
   }
 
   logout(): void {
-    localStorage.removeItem(SESSION_ID_KEY);
-    localStorage.removeItem(SESSION_EXPIRY_KEY);
-    localStorage.removeItem(IDLE_EXPIRY_KEY);
-    sessionStorage.removeItem(SESSION_DATA_KEY);
+    clearKeyCache();
+    sessionStorage.removeItem(SS_SESSION_ID);
+    sessionStorage.removeItem(SS_EXPIRY);
+    sessionStorage.removeItem(SS_IDLE);
+    sessionStorage.removeItem(SS_DATA);
     setAuthHeader(null);
     setCsrfToken(null);
-    console.log("User logged out — session destroyed");
+    broadcastAuth({ type: "LOGOUT" });
   }
 
-  getSessionInfo(): {
-    remainingMs: number;
-    idleRemainingMs: number;
-  } | null {
-    const expiry = localStorage.getItem(SESSION_EXPIRY_KEY);
-    const idle = localStorage.getItem(IDLE_EXPIRY_KEY);
+  getSessionInfo(): { remainingMs: number; idleRemainingMs: number } | null {
+    const expiry = sessionStorage.getItem(SS_EXPIRY);
+    const idle = sessionStorage.getItem(SS_IDLE);
     if (!expiry || !idle) return null;
     return {
       remainingMs: Math.max(0, parseInt(expiry, 10) - Date.now()),

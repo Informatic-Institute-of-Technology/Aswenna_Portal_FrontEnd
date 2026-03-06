@@ -98,7 +98,12 @@ const LandOwnerSidebar = () => {
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <Box sx={{ p: 3, textAlign: "center" }}>
         <Avatar
-          src="https://businesstoday.lk/wp-content/uploads/2024/11/Ishara-Nanayakkara-Executive-Chairman-1.png"
+          src={(() => {
+            const p = user?.personalInfo?.profilePicture;
+            if (!p) return undefined;
+            if (typeof p === "string") return p;
+            return p.url || undefined;
+          })()}
           alt={user?.fullName || "null"}
           sx={{
             width: 120,

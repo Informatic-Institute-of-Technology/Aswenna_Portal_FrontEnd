@@ -98,7 +98,12 @@ const InvestorSidebar = () => {
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <Box sx={{ p: 3, textAlign: "center" }}>
         <Avatar
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWHUQslqLEawVVIzUcGFkYYRm30cguWYwuhg&s"
+          src={(() => {
+            const p = user?.personalInfo?.profilePicture;
+            if (!p) return undefined;
+            if (typeof p === "string") return p;
+            return p.url || undefined;
+          })()}
           alt={user?.fullName || "null"}
           sx={{
             width: 120,

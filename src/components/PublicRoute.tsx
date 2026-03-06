@@ -1,14 +1,10 @@
 import { useAuth } from "@/Context/useAuth";
 import { Navigate, Outlet } from "react-router-dom";
 
-/**
- * Layout route guard — renders nested <Outlet /> for unauthenticated users,
- * redirects authenticated users to their session-scoped dashboard.
- */
 const PublicRoute = () => {
-  const { user, sessionId, loading } = useAuth();
+  const { user, sessionId, initializing } = useAuth();
 
-  if (loading) {
+  if (initializing) {
     return (
       <div
         style={{

@@ -93,7 +93,12 @@ const FarmerSidebar = () => {
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <Box sx={{ p: 3, textAlign: "center" }}>
         <Avatar
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJP8vN8tGwjdGdBoNRb3S7qP1VA0Q1F-SfWg&s"
+          src={(() => {
+            const p = user?.personalInfo?.profilePicture;
+            if (!p) return undefined;
+            if (typeof p === "string") return p;
+            return p.url || undefined;
+          })()}
           alt={user?.fullName || "null"}
           sx={{
             width: 120,
