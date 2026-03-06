@@ -334,7 +334,6 @@ const GlobalPaymentLedger = () => {
         </Grid>
       </Grid>
 
-      {/* Platform Payments Overview */}
       <Card sx={{ mb: 3 }}>
         <CardHeaderWithIcon icon={AttachMoney} title="Platform Payments" />
         <CardContent>
@@ -362,7 +361,6 @@ const GlobalPaymentLedger = () => {
                     justifyContent: "space-between",
                   }}
                 >
-                  {/* Card Header */}
                   <Box>
                     <Box
                       sx={{
@@ -393,7 +391,6 @@ const GlobalPaymentLedger = () => {
                       </Box>
                     </Box>
 
-                    {/* Total Amount */}
                     <Box sx={{ mb: 3 }}>
                       <Typography
                         variant="caption"
@@ -411,7 +408,6 @@ const GlobalPaymentLedger = () => {
                     </Box>
                   </Box>
 
-                  {/* Card Footer */}
                   <Box>
                     <Box
                       sx={{
@@ -450,7 +446,6 @@ const GlobalPaymentLedger = () => {
                   </Box>
                 </CardContent>
 
-                {/* Decorative Background Elements */}
                 <Box
                   sx={{
                     position: "absolute",
@@ -599,7 +594,6 @@ const GlobalPaymentLedger = () => {
           }
         />
         <CardContent>
-          {/* Filters */}
           <Grid container spacing={2} sx={{ mb: 3 }}>
             <Grid size={{ xs: 12, md: 6 }}>
               <TextField
@@ -649,7 +643,6 @@ const GlobalPaymentLedger = () => {
             </Grid>
           </Grid>
 
-          {/* Transactions Table */}
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
