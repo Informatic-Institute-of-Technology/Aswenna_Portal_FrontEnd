@@ -1,4 +1,4 @@
-import { FilterList, Search } from "@mui/icons-material";
+import { FilterList, Refresh, Search } from "@mui/icons-material";
 import {
   Box,
   Chip,
@@ -21,6 +21,8 @@ interface TableSectionHeaderProps {
   filterCount: number;
   onFilterToggle: () => void;
   mt?: number | string;
+  onRefresh?: () => void;
+  refreshing?: boolean;
 }
 
 const TableSectionHeader = ({
@@ -36,6 +38,8 @@ const TableSectionHeader = ({
   filterCount,
   onFilterToggle,
   mt,
+  onRefresh,
+  refreshing,
 }: TableSectionHeaderProps) => (
   <Box
     sx={{
@@ -67,6 +71,38 @@ const TableSectionHeader = ({
         {subtitle}
       </Typography>
     </Box>
+
+    {onRefresh && (
+      <Tooltip title="Refresh">
+        <Box
+          onClick={onRefresh}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            px: 1.25,
+            py: 0.5,
+            borderRadius: 1.5,
+            cursor: refreshing ? "default" : "pointer",
+            border: "1px solid transparent",
+            color: accentColor,
+            transition: "all 0.15s",
+            "&:hover": { bgcolor: `${accentColor}18` },
+            mr: 0,
+          }}
+        >
+          <Refresh
+            sx={{
+              fontSize: 16,
+              animation: refreshing ? "spin 0.8s linear infinite" : "none",
+              "@keyframes spin": {
+                from: { transform: "rotate(0deg)" },
+                to: { transform: "rotate(360deg)" },
+              },
+            }}
+          />
+        </Box>
+      </Tooltip>
+    )}
 
     <Tooltip title={filterPaneOpen ? "Close filter pane" : "Open filter pane"}>
       <Box

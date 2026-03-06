@@ -74,6 +74,7 @@ const GlobalUserManagement = () => {
     actionError,
     requestAction,
     handleConfirmAction,
+    refreshUsers,
   } = useUserManagement();
 
   const pendingFilter = useTableFilter();
@@ -182,6 +183,8 @@ const GlobalUserManagement = () => {
               filterPaneOpen={pendingFilter.filterPaneOpen}
               filterCount={pendingFilter.activeFilterCount}
               onFilterToggle={() => pendingFilter.setFilterPaneOpen((v) => !v)}
+              onRefresh={refreshUsers}
+              refreshing={loading}
             />
             <UserTableSection
               filter={pendingFilter}
@@ -214,6 +217,8 @@ const GlobalUserManagement = () => {
             filterPaneOpen={mainFilter.filterPaneOpen}
             filterCount={mainFilter.activeFilterCount}
             onFilterToggle={() => mainFilter.setFilterPaneOpen((v) => !v)}
+            onRefresh={refreshUsers}
+            refreshing={loading}
           />
           <UserTableSection
             filter={mainFilter}

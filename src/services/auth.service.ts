@@ -3,7 +3,6 @@ import { decryptToken } from "@/utils";
 import { httpClient } from "./httpClient";
 import { setAuthHeader, setCsrfToken } from "./tokenStore";
 
-
 export interface LoginCredentials {
   email: string;
   password: string;
@@ -33,13 +32,25 @@ export interface UserApiResponse {
   createdAt: string | null;
   updatedAt: string | null;
   __v: number | null;
+  personalInfo?: {
+    nicNumber?: string;
+    gender?: string;
+    birthday?: string;
+    age?: number;
+    address?: string;
+    city?: string;
+    province?: string;
+    postalCode?: string;
+    district?: string;
+    profilePicture?: string | { url?: string; filename?: string } | null;
+    nicFrontImage?: { url?: string; filename?: string } | null;
+    nicBackImage?: { url?: string; filename?: string } | null;
+  } | null;
 }
-
 
 export type AuthBroadcastMessage =
   | { type: "LOGIN"; role: string | undefined }
   | { type: "LOGOUT" };
-
 
 interface SessionPayload {
   token: string;
@@ -56,16 +67,14 @@ interface LoginAttempts {
   lockedUntil: number;
 }
 
-
 const SS_SESSION_ID = "aswenna.sid";
 const SS_EXPIRY = "aswenna.exp";
 const SS_IDLE = "aswenna.idle";
 const SS_DATA = "aswenna.dat";
 const SS_ATTEMPTS = "aswenna.attempts";
 
-
-const ABSOLUTE_TIMEOUT_MS = 12 * 60 * 60 * 1000; // 12 h
-const IDLE_TIMEOUT_MS = 30 * 60 * 1000; // 30 min
+const ABSOLUTE_TIMEOUT_MS = 12 * 60 * 60 * 1000;
+const IDLE_TIMEOUT_MS = 30 * 60 * 1000;
 const MAX_LOGIN_ATTEMPTS = 5;
 const BASE_LOCKOUT_MS = 30_000;
 const MAX_LOCKOUT_MS = 15 * 60 * 1000;
@@ -157,7 +166,6 @@ function getLoginAttempts(): LoginAttempts {
     const raw = sessionStorage.getItem(SS_ATTEMPTS);
     if (raw) return JSON.parse(raw) as LoginAttempts;
   } catch {
-    // Ignore parse errors and treat as no attempts.
   }
   return { count: 0, lastAttempt: 0, lockedUntil: 0 };
 }
@@ -242,6 +250,7 @@ class AuthService {
         updatedAt: userProfile.updatedAt || null,
         __v: userProfile.__v ?? null,
         role: userRole as UserRole,
+        personalInfo: userProfile.personalInfo ?? null,
       };
 
       const sessionId = crypto.randomUUID();

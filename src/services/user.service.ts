@@ -1,10 +1,5 @@
-/**
- * User Service
- * Handles all user-related API calls
- */
-
-import type { User } from '@/Context/createAuthContext';
-import { httpClient } from './httpClient';
+import type { User } from "@/Context/createAuthContext";
+import { httpClient } from "./httpClient";
 
 export interface UpdateUserProfileDTO {
   firstName: string;
@@ -31,45 +26,53 @@ export interface UserApiResponse {
   createdAt: string | null;
   updatedAt: string | null;
   __v: number | null;
+  personalInfo?: {
+    nicNumber?: string;
+    gender?: string;
+    birthday?: string;
+    age?: number;
+    address?: string;
+    city?: string;
+    province?: string;
+    postalCode?: string;
+    district?: string;
+    profilePicture?: string | { url?: string; filename?: string } | null;
+    nicFrontImage?: { url?: string; filename?: string } | null;
+    nicBackImage?: { url?: string; filename?: string } | null;
+  } | null;
 }
 
 class UserService {
-  /**
-   * Get user profile by ID
-   */
   async getUserProfile(userId: string): Promise<User> {
-    const response = await httpClient.get<UserApiResponse>(`/v1/user/${userId}`);
+    const response = await httpClient.get<UserApiResponse>(
+      `/v1/user/${userId}`,
+    );
     return this.mapUserResponse(response);
   }
-
-  /**
-   * Update user profile
-   */
-  async updateUserProfile(userId: string, data: UpdateUserProfileDTO): Promise<User> {
-    const response = await httpClient.patch<UserApiResponse>(`/v1/user/${userId}`, data);
+  async updateUserProfile(
+    userId: string,
+    data: UpdateUserProfileDTO,
+  ): Promise<User> {
+    const response = await httpClient.patch<UserApiResponse>(
+      `/v1/user/${userId}`,
+      data,
+    );
     return this.mapUserResponse(response);
   }
-
-  /**
-   * Get current user from token
-   */
   async getCurrentUser(): Promise<User | null> {
     try {
-      const storedUser = localStorage.getItem('user');
+      const storedUser = localStorage.getItem("user");
       if (storedUser) {
         const user = JSON.parse(storedUser);
         return user;
       }
       return null;
     } catch (error) {
-      console.error('Failed to get current user:', error);
+      console.error("Failed to get current user:", error);
       return null;
     }
   }
 
-  /**
-   * Map API response to User interface
-   */
   private mapUserResponse(response: UserApiResponse): User {
     return {
       _id: response._id || null,
@@ -82,13 +85,16 @@ class UserService {
       phoneNumber: response.phoneNumber || null,
       phoneNumberVerified: response.phoneNumberVerified ?? null,
       roles: Array.isArray(response.roles) ? response.roles : [],
-      permissions: Array.isArray(response.permissions) ? response.permissions : [],
+      permissions: Array.isArray(response.permissions)
+        ? response.permissions
+        : [],
       createdBy: response.createdBy || null,
       updatedBy: response.updatedBy || null,
       meta: Array.isArray(response.meta) ? response.meta : [],
       createdAt: response.createdAt || null,
       updatedAt: response.updatedAt || null,
       __v: response.__v ?? null,
+      personalInfo: response.personalInfo ?? null,
     };
   }
 }

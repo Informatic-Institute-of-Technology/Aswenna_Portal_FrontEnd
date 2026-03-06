@@ -1,3 +1,4 @@
+import { config } from "@/core/config";
 import type { ApiUser } from "@/services/admin.service";
 import type { GlobalUser } from "@/types/admin.types";
 
@@ -40,7 +41,7 @@ export const mapApiUserToGlobalUser = (user: ApiUser): GlobalUser => {
     fullName: fullName || "Unknown User",
     email: user.email,
     phoneNumber: user.phoneNumber,
-    nic: user.nic,
+    nic: user.nic || user.personalInfo?.nicNumber,
     role: roleIdToRole(user.role),
     registrationDate: user.createdAt,
     lastLogin: user.updatedAt || user.createdAt,
@@ -48,7 +49,20 @@ export const mapApiUserToGlobalUser = (user: ApiUser): GlobalUser => {
     isActive: true,
     apiStatus:
       user.status || user.statues || (isVerified ? "Active" : "PENDING"),
-    address: user.address,
+    address:
+      user.address ||
+      user.personalInfo?.district ||
+      user.personalInfo?.city ||
+      user.personalInfo?.address,
+    avatar: (() => {
+      const pic = user.personalInfo?.profilePicture;
+      if (!pic) return undefined;
+      if (typeof pic === "string") return pic;
+      const p = pic as { url?: string; filename?: string };
+      if (p.url) return p.url;
+      if (p.filename) return `${config.storage.baseUrl}/${p.filename}`;
+      return undefined;
+    })(),
     totalProjects: 0,
     activeProjects: 0,
     completedProjects: 0,

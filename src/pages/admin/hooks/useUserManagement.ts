@@ -39,8 +39,21 @@ export const useUserManagement = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
 
+  const fetchUsers = async () => {
+    try {
+      setError(null);
+      setLoading(true);
+      const apiUsers = await adminService.getAllUsersPaginated();
+      setUsers(apiUsers.map(mapApiUserToGlobalUser));
+    } catch {
+      setError("Failed to load users");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchUsersOnMount = async () => {
       try {
         setError(null);
         const apiUsers = await adminService.getAllUsersPaginated();
@@ -51,7 +64,7 @@ export const useUserManagement = () => {
         setLoading(false);
       }
     };
-    fetchUsers();
+    fetchUsersOnMount();
   }, []);
 
   const getStatusCategory = (
@@ -207,6 +220,7 @@ export const useUserManagement = () => {
     users,
     loading,
     error,
+    refreshUsers: fetchUsers,
     paginatedUsers,
     filteredUsers,
     statusCounts,
