@@ -77,7 +77,6 @@ const ABSOLUTE_TIMEOUT_MS = 12 * 60 * 60 * 1000;
 const IDLE_TIMEOUT_MS = 30 * 60 * 1000;
 const MAX_LOGIN_ATTEMPTS = 5;
 const BASE_LOCKOUT_MS = 30_000;
-const MAX_LOCKOUT_MS = 15 * 60 * 1000;
 
 const BROADCAST_CHANNEL = "aswenna_auth";
 
@@ -164,7 +163,16 @@ function broadcastAuth(msg: AuthBroadcastMessage): void {
 function getLoginAttempts(): LoginAttempts {
   try {
     const raw = sessionStorage.getItem(SS_ATTEMPTS);
-    if (raw) return JSON.parse(raw) as LoginAttempts;
+    if (raw) {
+      const parsed = JSON.parse(raw) as LoginAttempts;
+      if (parsed.lockedUntil > 0 && parsed.lastAttempt > 0) {
+        parsed.lockedUntil = Math.min(
+          parsed.lockedUntil,
+          parsed.lastAttempt + BASE_LOCKOUT_MS,
+        );
+      }
+      return parsed;
+    }
   } catch {
     console.error("Failed to parse login attempts:");
   }
@@ -197,19 +205,11 @@ class AuthService {
         );
       } catch (err) {
         const newCount = attempts.count + 1;
-        let lockedUntil = 0;
-        if (newCount >= MAX_LOGIN_ATTEMPTS) {
-          lockedUntil =
-            Date.now() +
-            Math.min(
-              BASE_LOCKOUT_MS * Math.pow(2, newCount - MAX_LOGIN_ATTEMPTS),
-              MAX_LOCKOUT_MS,
-            );
-        }
         setLoginAttempts({
           count: newCount,
           lastAttempt: Date.now(),
-          lockedUntil,
+          lockedUntil:
+            newCount >= MAX_LOGIN_ATTEMPTS ? Date.now() + BASE_LOCKOUT_MS : 0,
         });
         throw err;
       }

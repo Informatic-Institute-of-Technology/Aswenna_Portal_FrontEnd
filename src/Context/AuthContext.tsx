@@ -19,7 +19,8 @@ const ACTIVITY_EVENTS: (keyof WindowEventMap)[] = [
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [initializing, setInitializing] = useState(true);
   const expiryTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const handleActivity = useCallback(() => {
@@ -92,7 +93,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setSessionId(result.sessionId);
         }
       })
-      .finally(() => setLoading(false));
+      .finally(() => setInitializing(false));
   }, []);
 
   useEffect(() => {
@@ -141,6 +142,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         user,
         sessionId,
         loading,
+        initializing,
         login,
         logout: handleLogout,
         updateUser,
