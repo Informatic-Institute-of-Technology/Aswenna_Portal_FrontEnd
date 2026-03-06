@@ -1,4 +1,4 @@
-import type { UserRole } from './index';
+import type { UserRole } from "./index";
 
 export interface SuperAdminDashboardData {
   totalUsers: number;
@@ -52,11 +52,13 @@ export interface GlobalUser {
   fullName: string;
   email: string;
   phoneNumber: string;
+  nic?: string;
   role: UserRole;
   registrationDate: string;
   lastLogin: string;
   isVerified: boolean;
   isActive: boolean;
+  apiStatus?: string; // raw status from API (PENDING | ACTIVE | SUSPENDED)
   avatar?: string;
   address?: string;
   totalProjects: number;
@@ -73,18 +75,18 @@ export interface GlobalUser {
 }
 
 export interface VerificationStatus {
-  identity: 'pending' | 'verified' | 'rejected';
-  email: 'pending' | 'verified' | 'rejected';
-  phone: 'pending' | 'verified' | 'rejected';
-  bankAccount?: 'pending' | 'verified' | 'rejected';
+  identity: "pending" | "verified" | "rejected";
+  email: "pending" | "verified" | "rejected";
+  phone: "pending" | "verified" | "rejected";
+  bankAccount?: "pending" | "verified" | "rejected";
 }
 
 export interface VerificationDocument {
   id: string;
-  type: 'national_id' | 'passport' | 'bank_statement' | 'land_deed' | 'other';
+  type: "national_id" | "passport" | "bank_statement" | "land_deed" | "other";
   fileName: string;
   uploadDate: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: "pending" | "approved" | "rejected";
   reviewedBy?: string;
   reviewDate?: string;
   notes?: string;
@@ -100,7 +102,12 @@ export interface UserDetailView {
 export interface Transaction {
   id: string;
   transactionId: string;
-  type: 'payment' | 'refund' | 'escrow_deposit' | 'escrow_release' | 'platform_fee';
+  type:
+    | "payment"
+    | "refund"
+    | "escrow_deposit"
+    | "escrow_release"
+    | "platform_fee";
   payer: {
     id: string;
     name: string;
@@ -116,7 +123,7 @@ export interface Transaction {
   amount: number;
   currency: string;
   date: string;
-  status: 'pending' | 'completed' | 'failed' | 'in_escrow' | 'disputed';
+  status: "pending" | "completed" | "failed" | "in_escrow" | "disputed";
   paymentMethod?: string;
   description?: string;
   milestoneId?: string;
@@ -133,8 +140,8 @@ export interface OverduePayment {
   amount: number;
   dueDate: string;
   daysOverdue: number;
-  type: 'milestone_payment' | 'rent' | 'investment' | 'profit_share';
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  type: "milestone_payment" | "rent" | "investment" | "profit_share";
+  severity: "low" | "medium" | "high" | "critical";
 }
 
 export interface EscrowAccount {
@@ -151,7 +158,7 @@ export interface ProjectSummary {
   id: string;
   name: string;
   type: string;
-  status: 'active' | 'completed' | 'cancelled' | 'disputed' | 'pending';
+  status: "active" | "completed" | "cancelled" | "disputed" | "pending";
   startDate: string;
   endDate?: string;
   completionPercentage: number;
@@ -184,7 +191,7 @@ export interface ProjectSummary {
   };
   hasDisputes: boolean;
   hasOverduePayments: boolean;
-  riskLevel: 'low' | 'medium' | 'high';
+  riskLevel: "low" | "medium" | "high";
 }
 
 export interface Project360View extends ProjectSummary {
@@ -206,7 +213,7 @@ export interface Milestone {
   description: string;
   dueDate: string;
   completionDate?: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'overdue' | 'disputed';
+  status: "pending" | "in_progress" | "completed" | "overdue" | "disputed";
   budgetAllocated: number;
   amountPaid: number;
   approvedBy?: string[];
@@ -227,8 +234,8 @@ export interface Communication {
     role: UserRole;
   };
   subject: string;
-  type: 'message' | 'notification' | 'alert' | 'approval_request';
-  status: 'sent' | 'read' | 'replied';
+  type: "message" | "notification" | "alert" | "approval_request";
+  status: "sent" | "read" | "replied";
 }
 
 export interface Dispute {
@@ -245,11 +252,11 @@ export interface Dispute {
     name: string;
     role: UserRole;
   };
-  type: 'payment' | 'milestone' | 'agreement_breach' | 'quality' | 'other';
+  type: "payment" | "milestone" | "agreement_breach" | "quality" | "other";
   description: string;
   initiatedDate: string;
-  status: 'open' | 'in_review' | 'resolved' | 'escalated';
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  status: "open" | "in_review" | "resolved" | "escalated";
+  severity: "low" | "medium" | "high" | "critical";
   amountInDispute?: number;
   resolution?: string;
   resolvedDate?: string;
@@ -268,7 +275,7 @@ export interface SystemActivity {
   target?: {
     id: string;
     name: string;
-    type: 'user' | 'project' | 'transaction' | 'document';
+    type: "user" | "project" | "transaction" | "document";
   };
   action: string;
   description: string;
@@ -276,24 +283,24 @@ export interface SystemActivity {
   ipAddress?: string;
 }
 
-export type ActivityType = 
-  | 'user_registration'
-  | 'user_login'
-  | 'user_logout'
-  | 'project_created'
-  | 'project_updated'
-  | 'project_completed'
-  | 'agreement_signed'
-  | 'payment_initiated'
-  | 'payment_completed'
-  | 'milestone_completed'
-  | 'milestone_approved'
-  | 'dispute_raised'
-  | 'dispute_resolved'
-  | 'document_uploaded'
-  | 'verification_completed'
-  | 'message_sent'
-  | 'system_alert';
+export type ActivityType =
+  | "user_registration"
+  | "user_login"
+  | "user_logout"
+  | "project_created"
+  | "project_updated"
+  | "project_completed"
+  | "agreement_signed"
+  | "payment_initiated"
+  | "payment_completed"
+  | "milestone_completed"
+  | "milestone_approved"
+  | "dispute_raised"
+  | "dispute_resolved"
+  | "document_uploaded"
+  | "verification_completed"
+  | "message_sent"
+  | "system_alert";
 
 export interface AdminFilters {
   dateRange?: {
@@ -301,10 +308,10 @@ export interface AdminFilters {
     to: string;
   };
   userRole?: UserRole[];
-  projectStatus?: ProjectSummary['status'][];
-  transactionStatus?: Transaction['status'][];
-  paymentStatus?: 'all' | 'overdue' | 'pending' | 'completed';
-  verificationStatus?: ('verified' | 'pending' | 'rejected')[];
+  projectStatus?: ProjectSummary["status"][];
+  transactionStatus?: Transaction["status"][];
+  paymentStatus?: "all" | "overdue" | "pending" | "completed";
+  verificationStatus?: ("verified" | "pending" | "rejected")[];
   searchQuery?: string;
 }
 

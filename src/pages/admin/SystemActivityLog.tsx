@@ -274,7 +274,6 @@ const SystemActivityLog = () => {
           }
         />
         <CardContent>
-          {/* Filters */}
           <Grid container spacing={2} sx={{ mb: 3 }}>
             <Grid size={{ xs: 12, md: 6 }}>
               <TextField
@@ -320,7 +319,6 @@ const SystemActivityLog = () => {
             </Grid>
           </Grid>
 
-          {/* Activity Feed */}
           <Paper sx={{ maxHeight: 800, overflow: "auto", p: 2 }}>
             <List>
               {filteredActivities.map((activity, index) => (
@@ -339,7 +337,6 @@ const SystemActivityLog = () => {
                     alignItems: "flex-start",
                   }}
                 >
-                  {/* Timeline Icon */}
                   <Box
                     sx={{
                       width: 48,
@@ -357,9 +354,7 @@ const SystemActivityLog = () => {
                     {getActivityIcon(activity.type)}
                   </Box>
 
-                  {/* Activity Content */}
                   <Box sx={{ flex: 1, minWidth: 0 }}>
-                    {/* Header */}
                     <Box
                       sx={{
                         display: "flex",
@@ -422,7 +417,6 @@ const SystemActivityLog = () => {
                       {activity.description}
                     </Typography>
 
-                    {/* Metadata */}
                     <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
                       {activity.target && (
                         <Typography variant="caption" color="text.secondary">
@@ -456,7 +450,6 @@ const SystemActivityLog = () => {
             )}
           </Paper>
 
-          {/* Stats Summary */}
           <Box
             sx={{
               mt: 3,
