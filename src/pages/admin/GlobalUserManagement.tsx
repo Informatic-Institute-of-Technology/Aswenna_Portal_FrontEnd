@@ -1,5 +1,14 @@
-import { PersonAdd } from "@mui/icons-material";
-import { Box, Button, Chip, Tab, Tabs, Typography } from "@mui/material";
+import { PersonAdd, Refresh } from "@mui/icons-material";
+import {
+  Box,
+  Button,
+  Chip,
+  IconButton,
+  Tab,
+  Tabs,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import React from "react";
 import ConfirmActionDialog from "./components/ConfirmActionDialog";
 import TableSectionHeader from "./components/TableSectionHeader";
@@ -145,26 +154,53 @@ const GlobalUserManagement = () => {
               {users.length} registered users across all roles
             </Typography>
           </Box>
-          <Button
-            variant="contained"
-            startIcon={<PersonAdd />}
-            sx={{
-              background:
-                "linear-gradient(135deg, var(--color-olive-dark) 0%, var(--color-olive) 100%)",
-              borderRadius: 2,
-              px: 2.5,
-              py: 1,
-              fontWeight: 600,
-              textTransform: "none",
-              boxShadow: "0 4px 14px var(--color-olive-glow)",
-              "&:hover": {
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <Tooltip title="Refresh all data">
+              <IconButton
+                onClick={refreshUsers}
+                disabled={loading}
+                size="small"
+                sx={{
+                  color: "var(--color-olive)",
+                  border: "1px solid var(--color-olive-muted-strong)",
+                  borderRadius: 2,
+                  p: 1,
+                  "&:hover": { bgcolor: "var(--color-olive-muted)" },
+                }}
+              >
+                <Refresh
+                  sx={{
+                    fontSize: 18,
+                    animation: loading ? "spin 0.8s linear infinite" : "none",
+                    "@keyframes spin": {
+                      from: { transform: "rotate(0deg)" },
+                      to: { transform: "rotate(360deg)" },
+                    },
+                  }}
+                />
+              </IconButton>
+            </Tooltip>
+            <Button
+              variant="contained"
+              startIcon={<PersonAdd />}
+              sx={{
                 background:
-                  "linear-gradient(135deg, var(--color-olive-dark) 0%, var(--color-olive-hover) 100%)",
-              },
-            }}
-          >
-            Add User
-          </Button>
+                  "linear-gradient(135deg, var(--color-olive-dark) 0%, var(--color-olive) 100%)",
+                borderRadius: 2,
+                px: 2.5,
+                py: 1,
+                fontWeight: 600,
+                textTransform: "none",
+                boxShadow: "0 4px 14px var(--color-olive-glow)",
+                "&:hover": {
+                  background:
+                    "linear-gradient(135deg, var(--color-olive-dark) 0%, var(--color-olive-hover) 100%)",
+                },
+              }}
+            >
+              Add User
+            </Button>
+          </Box>
         </Box>
 
         <UserStatCards roleStats={roleStats} activeRate={activeRate} />
@@ -183,8 +219,6 @@ const GlobalUserManagement = () => {
               filterPaneOpen={pendingFilter.filterPaneOpen}
               filterCount={pendingFilter.activeFilterCount}
               onFilterToggle={() => pendingFilter.setFilterPaneOpen((v) => !v)}
-              onRefresh={refreshUsers}
-              refreshing={loading}
             />
             <UserTableSection
               filter={pendingFilter}
@@ -217,8 +251,6 @@ const GlobalUserManagement = () => {
             filterPaneOpen={mainFilter.filterPaneOpen}
             filterCount={mainFilter.activeFilterCount}
             onFilterToggle={() => mainFilter.setFilterPaneOpen((v) => !v)}
-            onRefresh={refreshUsers}
-            refreshing={loading}
           />
           <UserTableSection
             filter={mainFilter}
