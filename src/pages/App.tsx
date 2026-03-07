@@ -27,6 +27,8 @@ const MyProjectsPage = lazy(() => import("./common/MyProjectsPage"));
 const InvestorsPage = lazy(() => import("./common/InvestorsPage"));
 const LandOwnersPage = lazy(() => import("./common/LandOwnersPage"));
 const MatchMakingPage = lazy(() => import("./common/MatchMakingPage"));
+const AgreementPage = lazy(() => import("./common/AgreementPage"));
+const AgreementOnboarding = lazy(() => import("./common/AgreementOnboarding"));
 
 const MyOffersPage = lazy(() => import("./investor/MyOffersPage"));
 const OpportunitiesPage = lazy(() => import("./investor/OpportunitiesPage"));
@@ -111,6 +113,8 @@ function AppRoutes() {
             <Route path="land-owners" element={<LandOwnersPage />} />
             <Route path="match-making" element={<MatchMakingPage />} />
             <Route path="opportunities" element={<OpportunitiesPage />} />
+            <Route path="agreement" element={<AgreementPage />} />
+            <Route path="agreement-onboarding" element={<AgreementOnboarding />} />
 
             <Route path="my-offers" element={<MyOffersPage />} />
             <Route path="land-search" element={<LandOwnersPage />} />

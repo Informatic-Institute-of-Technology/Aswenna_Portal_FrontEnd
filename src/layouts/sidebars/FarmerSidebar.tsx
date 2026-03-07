@@ -3,6 +3,7 @@ import {
   AccountCircle,
   Agriculture as AgriIcon,
   BarChart as BarChartIcon,
+  Gavel,
   Handshake,
   Home,
   Landscape,
@@ -49,6 +50,11 @@ const FarmerSidebar = () => {
       text: "Land Owners",
       icon: <Landscape />,
       path: `${basePath}/dashboard/land-owners`,
+    },
+    {
+      text: "Agreement",
+      icon: <Gavel />,
+      path: `${basePath}/dashboard/agreement`,
     },
     {
       text: "Match Making",
