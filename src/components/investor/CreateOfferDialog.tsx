@@ -1,109 +1,149 @@
-import { useAuth } from '@/Context/useAuth';
-import type { DirectHarvestOffer, SponsorshipOffer } from '@/types/investor.types';
-import { Close } from '@mui/icons-material';
+import { useAuth } from "@/Context/useAuth";
+import type {
+  DirectHarvestOffer,
+  SponsorshipOffer,
+} from "@/types/investor.types";
+import { Close } from "@mui/icons-material";
 import {
-    Box,
-    Button,
-    Chip,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Divider,
-    FormControl,
-    FormControlLabel,
-    FormHelperText,
-    FormLabel,
-    IconButton,
-    InputAdornment,
-    InputLabel,
-    MenuItem,
-    Radio,
-    RadioGroup,
-    Select,
-    TextField,
-    Typography,
-} from '@mui/material';
-import { useMemo, useState } from 'react';
+  Box,
+  Button,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  FormHelperText,
+  FormLabel,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Radio,
+  RadioGroup,
+  Select,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { useMemo, useState } from "react";
 
 interface CreateOfferDialogProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (offer: Partial<DirectHarvestOffer> | Partial<SponsorshipOffer>) => void;
+  onSubmit: (
+    offer: Partial<DirectHarvestOffer> | Partial<SponsorshipOffer>,
+  ) => void;
 }
 
-type OfferType = 'direct-harvest' | 'sponsorship';
+type OfferType = "direct-harvest" | "sponsorship";
 
 const CROP_TYPES = [
-  'Rice', 'Wheat', 'Corn', 'Tomatoes', 'Potatoes', 'Onions', 'Carrots',
-  'Tea', 'Coffee', 'Rubber', 'Coconut', 'Vegetables (Mixed)', 'Fruits (Mixed)'
+  "Rice",
+  "Wheat",
+  "Corn",
+  "Tomatoes",
+  "Potatoes",
+  "Onions",
+  "Carrots",
+  "Tea",
+  "Coffee",
+  "Rubber",
+  "Coconut",
+  "Vegetables (Mixed)",
+  "Fruits (Mixed)",
 ];
 
 const REGIONS = [
-  'Colombo', 'Gampaha', 'Kalutara', 'Kandy', 'Matale', 'Nuwara Eliya',
-  'Galle', 'Matara', 'Hambantota', 'Jaffna', 'Kilinochchi', 'Mannar',
-  'Vavuniya', 'Mullaitivu', 'Batticaloa', 'Ampara', 'Trincomalee',
-  'Kurunegala', 'Puttalam', 'Anuradhapura', 'Polonnaruwa', 'Badulla',
-  'Monaragala', 'Ratnapura', 'Kegalle'
+  "Colombo",
+  "Gampaha",
+  "Kalutara",
+  "Kandy",
+  "Matale",
+  "Nuwara Eliya",
+  "Galle",
+  "Matara",
+  "Hambantota",
+  "Jaffna",
+  "Kilinochchi",
+  "Mannar",
+  "Vavuniya",
+  "Mullaitivu",
+  "Batticaloa",
+  "Ampara",
+  "Trincomalee",
+  "Kurunegala",
+  "Puttalam",
+  "Anuradhapura",
+  "Polonnaruwa",
+  "Badulla",
+  "Moneragala",
+  "Ratnapura",
+  "Kegalle",
 ];
 
 const SUPPORT_TYPES = [
-  { value: 'capital', label: 'Capital Investment' },
-  { value: 'equipment', label: 'Equipment & Tools' },
-  { value: 'expertise', label: 'Technical Expertise' },
-  { value: 'marketing', label: 'Marketing Support' }
+  { value: "capital", label: "Capital Investment" },
+  { value: "equipment", label: "Equipment & Tools" },
+  { value: "expertise", label: "Technical Expertise" },
+  { value: "marketing", label: "Marketing Support" },
 ];
 
-const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) => {
+const CreateOfferDialog = ({
+  open,
+  onClose,
+  onSubmit,
+}: CreateOfferDialogProps) => {
   const { user } = useAuth();
-  const [offerType, setOfferType] = useState<OfferType>('direct-harvest');
-  
+  const [offerType, setOfferType] = useState<OfferType>("direct-harvest");
+
   // Auto-compute investor name from logged user
   const investorName = useMemo(() => {
-    if (!user) return '';
-    const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
-    return fullName || user.email || 'Investor';
+    if (!user) return "";
+    const fullName = `${user.firstName || ""} ${user.lastName || ""}`.trim();
+    return fullName || user.email || "Investor";
   }, [user]);
-  
+
   // Common fields
-  const [projectTitle, setProjectTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [projectTitle, setProjectTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
-  
+
   // Direct Harvest specific
-  const [cropType, setCropType] = useState('');
-  const [cropVariety, setCropVariety] = useState('');
-  const [requiredQuantity, setRequiredQuantity] = useState('');
-  const [quantityUnit, setQuantityUnit] = useState<'kg' | 'tons'>('kg');
-  const [pricePerUnit, setPricePerUnit] = useState('');
-  const [qualityStandards, setQualityStandards] = useState('');
-  const [deliveryDeadline, setDeliveryDeadline] = useState('');
-  const [deliveryLocation, setDeliveryLocation] = useState('');
-  const [companyName, setCompanyName] = useState('');
-  const [totalBudget, setTotalBudget] = useState('');
-  
+  const [cropType, setCropType] = useState("");
+  const [cropVariety, setCropVariety] = useState("");
+  const [requiredQuantity, setRequiredQuantity] = useState("");
+  const [quantityUnit, setQuantityUnit] = useState<"kg" | "tons">("kg");
+  const [pricePerUnit, setPricePerUnit] = useState("");
+  const [qualityStandards, setQualityStandards] = useState("");
+  const [deliveryDeadline, setDeliveryDeadline] = useState("");
+  const [deliveryLocation, setDeliveryLocation] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [totalBudget, setTotalBudget] = useState("");
+
   // Sponsorship specific
   const [selectedCropTypes, setSelectedCropTypes] = useState<string[]>([]);
-  const [farmingMethod, setFarmingMethod] = useState<'organic' | 'conventional' | 'mixed'>('conventional');
-  const [commissionRate, setCommissionRate] = useState('');
-  const [minInvestment, setMinInvestment] = useState('');
-  const [maxInvestment, setMaxInvestment] = useState('');
-  const [minDuration, setMinDuration] = useState('');
-  const [maxDuration, setMaxDuration] = useState('');
-  const [supportTypes, setSupportTypes] = useState<string[]>(['capital']);
+  const [farmingMethod, setFarmingMethod] = useState<
+    "organic" | "conventional" | "mixed"
+  >("conventional");
+  const [commissionRate, setCommissionRate] = useState("");
+  const [minInvestment, setMinInvestment] = useState("");
+  const [maxInvestment, setMaxInvestment] = useState("");
+  const [minDuration, setMinDuration] = useState("");
+  const [maxDuration, setMaxDuration] = useState("");
+  const [supportTypes, setSupportTypes] = useState<string[]>(["capital"]);
 
   const handleSupportTypeToggle = (value: string) => {
-    setSupportTypes(prev =>
-      prev.includes(value)
-        ? prev.filter(t => t !== value)
-        : [...prev, value]
+    setSupportTypes((prev) =>
+      prev.includes(value) ? prev.filter((t) => t !== value) : [...prev, value],
     );
   };
 
   const handleSubmit = () => {
-    if (offerType === 'direct-harvest') {
+    if (offerType === "direct-harvest") {
       const offer: Partial<DirectHarvestOffer> = {
-        offerType: 'direct-harvest',
+        offerType: "direct-harvest",
         investorName,
         projectTitle,
         cropType,
@@ -115,20 +155,21 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
         deliveryDeadline,
         deliveryLocation,
         totalBudget: Number(totalBudget),
-        currency: 'LKR',
-        preferredRegion: selectedRegions.length > 0 ? selectedRegions : undefined,
+        currency: "LKR",
+        preferredRegion:
+          selectedRegions.length > 0 ? selectedRegions : undefined,
         companyName: companyName || undefined,
         description,
-        status: 'pending',
+        status: "pending",
         applicationsCount: 0,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        paymentInstallments: [] // Farmer will plan installments
+        paymentInstallments: [], // Farmer will plan installments
       };
       onSubmit(offer);
     } else {
       const offer: Partial<SponsorshipOffer> = {
-        offerType: 'sponsorship',
+        offerType: "sponsorship",
         investorName,
         sponsorshipTitle: projectTitle,
         cropTypes: selectedCropTypes,
@@ -136,17 +177,23 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
         minimumInvestment: Number(minInvestment),
         maximumInvestment: Number(maxInvestment),
         commissionRate: Number(commissionRate),
-        currency: 'LKR',
-        supportType: supportTypes as ('capital' | 'equipment' | 'expertise' | 'marketing')[],
+        currency: "LKR",
+        supportType: supportTypes as (
+          | "capital"
+          | "equipment"
+          | "expertise"
+          | "marketing"
+        )[],
         minimumProjectDuration: minDuration ? Number(minDuration) : undefined,
         maximumProjectDuration: maxDuration ? Number(maxDuration) : undefined,
-        preferredRegions: selectedRegions.length > 0 ? selectedRegions : undefined,
+        preferredRegions:
+          selectedRegions.length > 0 ? selectedRegions : undefined,
         description,
-        status: 'pending',
+        status: "pending",
         applicationsCount: 0,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        paymentInstallments: [] // Farmer will plan installments
+        paymentInstallments: [], // Farmer will plan installments
       };
       onSubmit(offer);
     }
@@ -155,48 +202,50 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
 
   const handleClose = () => {
     // Reset form (keep investorName as it's auto-populated)
-    setOfferType('direct-harvest');
-    setProjectTitle('');
-    setDescription('');
+    setOfferType("direct-harvest");
+    setProjectTitle("");
+    setDescription("");
     setSelectedRegions([]);
-    setCropType('');
-    setCropVariety('');
-    setRequiredQuantity('');
-    setPricePerUnit('');
-    setQualityStandards('');
-    setDeliveryDeadline('');
-    setDeliveryLocation('');
-    setCompanyName('');
-    setTotalBudget('');
+    setCropType("");
+    setCropVariety("");
+    setRequiredQuantity("");
+    setPricePerUnit("");
+    setQualityStandards("");
+    setDeliveryDeadline("");
+    setDeliveryLocation("");
+    setCompanyName("");
+    setTotalBudget("");
     setSelectedCropTypes([]);
-    setCommissionRate('');
-    setMinInvestment('');
-    setMaxInvestment('');
-    setMinDuration('');
-    setMaxDuration('');
-    setSupportTypes(['capital']);
+    setCommissionRate("");
+    setMinInvestment("");
+    setMaxInvestment("");
+    setMinDuration("");
+    setMaxDuration("");
+    setSupportTypes(["capital"]);
     onClose();
   };
 
   return (
-    <Dialog 
-      open={open} 
+    <Dialog
+      open={open}
       onClose={handleClose}
       maxWidth="md"
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: '16px',
-          maxHeight: '90vh'
-        }
+          borderRadius: "16px",
+          maxHeight: "90vh",
+        },
       }}
     >
-      <DialogTitle sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        pb: 2
-      }}>
+      <DialogTitle
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          pb: 2,
+        }}
+      >
         <Typography variant="h5" fontWeight={600}>
           Create New Offer
         </Typography>
@@ -211,27 +260,36 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
         {/* Offer Type Selection */}
         <Box sx={{ mb: 4 }}>
           <FormControl component="fieldset">
-            <FormLabel component="legend" sx={{ mb: 2, fontWeight: 600, color: 'text.primary' }}>
+            <FormLabel
+              component="legend"
+              sx={{ mb: 2, fontWeight: 600, color: "text.primary" }}
+            >
               Select Offer Type
             </FormLabel>
             <RadioGroup
               value={offerType}
               onChange={(e) => setOfferType(e.target.value as OfferType)}
             >
-              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+              <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
                 <Box
                   sx={{
                     flex: 1,
                     minWidth: 250,
                     p: 2,
                     border: 2,
-                    borderColor: offerType === 'direct-harvest' ? 'primary.main' : 'divider',
+                    borderColor:
+                      offerType === "direct-harvest"
+                        ? "primary.main"
+                        : "divider",
                     borderRadius: 2,
-                    bgcolor: offerType === 'direct-harvest' ? 'var(--color-olive-muted)' : 'transparent',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s'
+                    bgcolor:
+                      offerType === "direct-harvest"
+                        ? "var(--color-olive-muted)"
+                        : "transparent",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
                   }}
-                  onClick={() => setOfferType('direct-harvest')}
+                  onClick={() => setOfferType("direct-harvest")}
                 >
                   <FormControlLabel
                     value="direct-harvest"
@@ -242,11 +300,12 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
                           🌾 Direct Harvest Order
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          I need specific harvest quantity by a deadline (e.g., 100KG tomatoes for my business)
+                          I need specific harvest quantity by a deadline (e.g.,
+                          100KG tomatoes for my business)
                         </Typography>
                       </Box>
                     }
-                    sx={{ alignItems: 'flex-start', m: 0 }}
+                    sx={{ alignItems: "flex-start", m: 0 }}
                   />
                 </Box>
 
@@ -256,13 +315,17 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
                     minWidth: 250,
                     p: 2,
                     border: 2,
-                    borderColor: offerType === 'sponsorship' ? 'primary.main' : 'divider',
+                    borderColor:
+                      offerType === "sponsorship" ? "primary.main" : "divider",
                     borderRadius: 2,
-                    bgcolor: offerType === 'sponsorship' ? 'var(--color-info-blue-muted)' : 'transparent',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s'
+                    bgcolor:
+                      offerType === "sponsorship"
+                        ? "var(--color-info-blue-muted)"
+                        : "transparent",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
                   }}
-                  onClick={() => setOfferType('sponsorship')}
+                  onClick={() => setOfferType("sponsorship")}
                 >
                   <FormControlLabel
                     value="sponsorship"
@@ -273,11 +336,12 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
                           💰 Sponsorship Program
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          I want to sponsor farmers and earn commission on their harvest
+                          I want to sponsor farmers and earn commission on their
+                          harvest
                         </Typography>
                       </Box>
                     }
-                    sx={{ alignItems: 'flex-start', m: 0 }}
+                    sx={{ alignItems: "flex-start", m: 0 }}
                   />
                 </Box>
               </Box>
@@ -288,7 +352,7 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
         <Divider sx={{ mb: 3 }} />
 
         {/* Common Fields - All Offers */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mb: 3 }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 3, mb: 3 }}>
           <TextField
             label="Investor Name *"
             value={investorName}
@@ -299,11 +363,11 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
             helperText="Auto-populated from your account"
             InputProps={{
               sx: {
-                bgcolor: 'var(--surface-tint)',
-                '& .Mui-disabled': {
-                  WebkitTextFillColor: 'var(--overlay-xl)',
-                }
-              }
+                bgcolor: "var(--surface-tint)",
+                "& .Mui-disabled": {
+                  WebkitTextFillColor: "var(--overlay-xl)",
+                },
+              },
             }}
           />
 
@@ -311,9 +375,10 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
             label="Project Title *"
             value={projectTitle}
             onChange={(e) => setProjectTitle(e.target.value)}
-            placeholder={offerType === 'direct-harvest' 
-              ? "e.g., Tomato Purchase for Sauce Production Q1 2026" 
-              : "e.g., Organic Farming Sponsorship Program 2026"
+            placeholder={
+              offerType === "direct-harvest"
+                ? "e.g., Tomato Purchase for Sauce Production Q1 2026"
+                : "e.g., Organic Farming Sponsorship Program 2026"
             }
             fullWidth
             required
@@ -338,26 +403,30 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
               onChange={(e) => setSelectedRegions(e.target.value as string[])}
               label="Preferred Regions (Optional)"
               renderValue={(selected) => (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                   {selected.map((value) => (
                     <Chip key={value} label={value} size="small" />
                   ))}
                 </Box>
               )}
             >
-              {REGIONS.map(region => (
-                <MenuItem key={region} value={region}>{region}</MenuItem>
+              {REGIONS.map((region) => (
+                <MenuItem key={region} value={region}>
+                  {region}
+                </MenuItem>
               ))}
             </Select>
-            <FormHelperText>Select regions you prefer to work with</FormHelperText>
+            <FormHelperText>
+              Select regions you prefer to work with
+            </FormHelperText>
           </FormControl>
         </Box>
 
         <Divider sx={{ my: 3 }} />
 
         {/* Direct Harvest Fields */}
-        {offerType === 'direct-harvest' && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        {offerType === "direct-harvest" && (
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
             <TextField
               label="Company Name (Optional)"
               value={companyName}
@@ -385,7 +454,7 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
               fullWidth
             />
 
-            <Box sx={{ display: 'flex', gap: 2 }}>
+            <Box sx={{ display: "flex", gap: 2 }}>
               <TextField
                 label="Required Quantity *"
                 type="number"
@@ -398,7 +467,9 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
                 <InputLabel>Unit *</InputLabel>
                 <Select
                   value={quantityUnit}
-                  onChange={(e) => setQuantityUnit(e.target.value as 'kg' | 'tons')}
+                  onChange={(e) =>
+                    setQuantityUnit(e.target.value as "kg" | "tons")
+                  }
                   label="Unit *"
                 >
                   <MenuItem value="kg">KG</MenuItem>
@@ -413,7 +484,9 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
               value={pricePerUnit}
               onChange={(e) => setPricePerUnit(e.target.value)}
               InputProps={{
-                startAdornment: <InputAdornment position="start">LKR</InputAdornment>
+                startAdornment: (
+                  <InputAdornment position="start">LKR</InputAdornment>
+                ),
               }}
               fullWidth
               required
@@ -455,7 +528,9 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
               value={totalBudget}
               onChange={(e) => setTotalBudget(e.target.value)}
               InputProps={{
-                startAdornment: <InputAdornment position="start">LKR</InputAdornment>
+                startAdornment: (
+                  <InputAdornment position="start">LKR</InputAdornment>
+                ),
               }}
               helperText="Total amount you're willing to invest for this harvest order"
               fullWidth
@@ -465,51 +540,75 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
         )}
 
         {/* Sponsorship Fields */}
-        {offerType === 'sponsorship' && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        {offerType === "sponsorship" && (
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
             <FormControl fullWidth required>
               <InputLabel>Crop Types *</InputLabel>
               <Select
                 multiple
                 value={selectedCropTypes}
-                onChange={(e) => setSelectedCropTypes(e.target.value as string[])}
+                onChange={(e) =>
+                  setSelectedCropTypes(e.target.value as string[])
+                }
                 label="Crop Types *"
                 renderValue={(selected) => (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                     {selected.map((value) => (
                       <Chip key={value} label={value} size="small" />
                     ))}
                   </Box>
                 )}
               >
-                {CROP_TYPES.map(crop => (
-                  <MenuItem key={crop} value={crop}>{crop}</MenuItem>
+                {CROP_TYPES.map((crop) => (
+                  <MenuItem key={crop} value={crop}>
+                    {crop}
+                  </MenuItem>
                 ))}
               </Select>
-              <FormHelperText>Select multiple crops you're willing to sponsor</FormHelperText>
+              <FormHelperText>
+                Select multiple crops you're willing to sponsor
+              </FormHelperText>
             </FormControl>
 
             <FormControl>
               <FormLabel>Preferred Farming Method</FormLabel>
               <RadioGroup
                 value={farmingMethod}
-                onChange={(e) => setFarmingMethod(e.target.value as 'organic' | 'conventional' | 'mixed')}
+                onChange={(e) =>
+                  setFarmingMethod(
+                    e.target.value as "organic" | "conventional" | "mixed",
+                  )
+                }
                 row
               >
-                <FormControlLabel value="organic" control={<Radio />} label="Organic Only" />
-                <FormControlLabel value="conventional" control={<Radio />} label="Conventional" />
-                <FormControlLabel value="mixed" control={<Radio />} label="Any Method" />
+                <FormControlLabel
+                  value="organic"
+                  control={<Radio />}
+                  label="Organic Only"
+                />
+                <FormControlLabel
+                  value="conventional"
+                  control={<Radio />}
+                  label="Conventional"
+                />
+                <FormControlLabel
+                  value="mixed"
+                  control={<Radio />}
+                  label="Any Method"
+                />
               </RadioGroup>
             </FormControl>
 
-            <Box sx={{ display: 'flex', gap: 2 }}>
+            <Box sx={{ display: "flex", gap: 2 }}>
               <TextField
                 label="Minimum Investment (LKR) *"
                 type="number"
                 value={minInvestment}
                 onChange={(e) => setMinInvestment(e.target.value)}
                 InputProps={{
-                  startAdornment: <InputAdornment position="start">LKR</InputAdornment>
+                  startAdornment: (
+                    <InputAdornment position="start">LKR</InputAdornment>
+                  ),
                 }}
                 helperText="Minimum amount you'll invest"
                 fullWidth
@@ -521,7 +620,9 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
                 value={maxInvestment}
                 onChange={(e) => setMaxInvestment(e.target.value)}
                 InputProps={{
-                  startAdornment: <InputAdornment position="start">LKR</InputAdornment>
+                  startAdornment: (
+                    <InputAdornment position="start">LKR</InputAdornment>
+                  ),
                 }}
                 helperText="Maximum amount you'll invest"
                 fullWidth
@@ -535,7 +636,7 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
               value={commissionRate}
               onChange={(e) => setCommissionRate(e.target.value)}
               InputProps={{
-                endAdornment: <InputAdornment position="end">%</InputAdornment>
+                endAdornment: <InputAdornment position="end">%</InputAdornment>,
               }}
               helperText="Your share of the harvest revenue (e.g., 15% of total sales)"
               fullWidth
@@ -543,22 +644,30 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
             />
 
             <Box>
-              <FormLabel sx={{ mb: 1, display: 'block' }}>Support Types *</FormLabel>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                {SUPPORT_TYPES.map(type => (
+              <FormLabel sx={{ mb: 1, display: "block" }}>
+                Support Types *
+              </FormLabel>
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                {SUPPORT_TYPES.map((type) => (
                   <Chip
                     key={type.value}
                     label={type.label}
                     onClick={() => handleSupportTypeToggle(type.value)}
-                    color={supportTypes.includes(type.value) ? 'primary' : 'default'}
-                    variant={supportTypes.includes(type.value) ? 'filled' : 'outlined'}
+                    color={
+                      supportTypes.includes(type.value) ? "primary" : "default"
+                    }
+                    variant={
+                      supportTypes.includes(type.value) ? "filled" : "outlined"
+                    }
                   />
                 ))}
               </Box>
-              <FormHelperText>Select the types of support you'll provide</FormHelperText>
+              <FormHelperText>
+                Select the types of support you'll provide
+              </FormHelperText>
             </Box>
 
-            <Box sx={{ display: 'flex', gap: 2 }}>
+            <Box sx={{ display: "flex", gap: 2 }}>
               <TextField
                 label="Min Duration (Months)"
                 type="number"
@@ -592,10 +701,12 @@ const CreateOfferDialog = ({ open, onClose, onSubmit }: CreateOfferDialogProps) 
           size="large"
           sx={{
             minWidth: 150,
-            background: 'linear-gradient(135deg, var(--color-olive) 0%, var(--color-olive-light) 100%)',
-            '&:hover': {
-              background: 'linear-gradient(135deg, var(--color-olive-hover) 0%, var(--color-olive-light) 100%)',
-            }
+            background:
+              "linear-gradient(135deg, var(--color-olive) 0%, var(--color-olive-light) 100%)",
+            "&:hover": {
+              background:
+                "linear-gradient(135deg, var(--color-olive-hover) 0%, var(--color-olive-light) 100%)",
+            },
           }}
         >
           Create Offer

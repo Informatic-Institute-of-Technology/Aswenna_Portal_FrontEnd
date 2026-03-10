@@ -50,6 +50,7 @@ import { useJsApiLoader } from "@react-google-maps/api";
 import type { ChangeEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useFormPersistence } from "../../shared/hooks/useFormPersistence";
 
 const LandownerProfileSetup = () => {
   const navigate = useNavigate();
@@ -101,17 +102,7 @@ const LandownerProfileSetup = () => {
     gnNumber?: string;
   } | null>(null);
 
-  const sriLankaLocations: Record<string, string[]> = {
-    Central: ["Kandy", "Matale", "Nuwara Eliya"],
-    Eastern: ["Ampara", "Batticaloa", "Trincomalee"],
-    "North Central": ["Anuradhapura", "Polonnaruwa"],
-    Northern: ["Jaffna", "Kilinochchi", "Mannar", "Mullaitivu", "Vavuniya"],
-    "North Western": ["Kurunegala", "Puttalam"],
-    Sabaragamuwa: ["Kegalle", "Ratnapura"],
-    Southern: ["Galle", "Hambantota", "Matara"],
-    Uva: ["Badulla", "Monaragala"],
-    Western: ["Colombo", "Gampaha", "Kalutara"],
-  };
+  const sriLankaLocations = LocationService.getProvinceDistrictMap();
 
   const [landStreet, setLandStreet] = useState("");
   const [landCity, setLandCity] = useState("");
@@ -783,6 +774,99 @@ const LandownerProfileSetup = () => {
     });
     navigate("/terms-and-conditions");
   };
+
+  // Form persistence - auto-save form data to IndexedDB
+  const formData = {
+    profilePicture,
+    fullName,
+    phoneNumber,
+    nicNumber,
+    birthday,
+    gender,
+    age,
+    street,
+    city,
+    province,
+    district,
+    postalCode,
+    dsDivision,
+    gnDivision,
+    landStreet,
+    landCity,
+    landProvince,
+    landDistrict,
+    landPostalCode,
+    landDsDivision,
+    landGnDivision,
+    landSize,
+    soilType,
+    rentalExpectation,
+    pinLocation,
+  };
+
+  const { loadFormData } = useFormPersistence("landowner", formData);
+
+  // Load saved form data on mount
+  useEffect(() => {
+    const loadSavedData = async () => {
+      const savedData = await loadFormData();
+      if (savedData) {
+        console.log("Loading saved landowner form data...");
+
+        // Load personal info
+        if (savedData.fullName) setFullName(savedData.fullName as string);
+        if (savedData.phoneNumber)
+          setPhoneNumber(savedData.phoneNumber as string);
+        if (savedData.nicNumber) setNicNumber(savedData.nicNumber as string);
+        if (savedData.birthday) setBirthday(savedData.birthday as string);
+        if (savedData.gender) setGender(savedData.gender as "Male" | "Female");
+        if (savedData.age) setAge(savedData.age as number);
+        if (savedData.street) setStreet(savedData.street as string);
+        if (savedData.city) setCity(savedData.city as string);
+        if (savedData.province) setProvince(savedData.province as string);
+        // Prime pendingLocationUpdate before setDistrict so the district useEffect
+        // restores DS/GN instead of resetting them to "".
+        if (savedData.dsDivision) {
+          pendingLocationUpdate.current = {
+            ds: savedData.dsDivision as string,
+            gn: (savedData.gnDivision as string) || undefined,
+          };
+        }
+        if (savedData.district) setDistrict(savedData.district as string);
+        if (savedData.postalCode) setPostalCode(savedData.postalCode as string);
+
+        // Load land info
+        if (savedData.landStreet) setLandStreet(savedData.landStreet as string);
+        if (savedData.landCity) setLandCity(savedData.landCity as string);
+        if (savedData.landProvince)
+          setLandProvince(savedData.landProvince as string);
+        // Prime pendingLandLocationUpdate before setLandDistrict for the same reason.
+        if (savedData.landDsDivision) {
+          pendingLandLocationUpdate.current = {
+            ds: savedData.landDsDivision as string,
+            gn: (savedData.landGnDivision as string) || undefined,
+          };
+        }
+        if (savedData.landDistrict)
+          setLandDistrict(savedData.landDistrict as string);
+        if (savedData.landPostalCode)
+          setLandPostalCode(savedData.landPostalCode as string);
+        if (savedData.landSize) setLandSize(savedData.landSize as string);
+        if (savedData.soilType) setSoilType(savedData.soilType as string);
+        if (savedData.rentalExpectation)
+          setRentalExpectation(savedData.rentalExpectation as string);
+        if (savedData.pinLocation)
+          setPinLocation(savedData.pinLocation as { lat: number; lng: number });
+        if (savedData.profilePicture)
+          setProfilePicture(savedData.profilePicture as string);
+
+        alert("Your previous form data has been restored!");
+      }
+    };
+
+    loadSavedData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>

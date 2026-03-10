@@ -1,5 +1,6 @@
 import AswendLogo from "@/assets/Aswenna Logo.png";
 import { FileUploader, NicUploader, ProfileStepper } from "@/components";
+import { useFormPersistence } from "@/hooks/useFormPersistence";
 import {
   LocationService,
   registrationStore,
@@ -80,17 +81,7 @@ const FarmerProfileSetup = () => {
   const [specificNeeds, setSpecificNeeds] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const sriLankaLocations: Record<string, string[]> = {
-    Central: ["Kandy", "Matale", "Nuwara Eliya"],
-    Eastern: ["Ampara", "Batticaloa", "Trincomalee"],
-    "North Central": ["Anuradhapura", "Polonnaruwa"],
-    Northern: ["Jaffna", "Kilinochchi", "Mannar", "Mullaitivu", "Vavuniya"],
-    "North Western": ["Kurunegala", "Puttalam"],
-    Sabaragamuwa: ["Kegalle", "Ratnapura"],
-    Southern: ["Galle", "Hambantota", "Matara"],
-    Uva: ["Badulla", "Monaragala"],
-    Western: ["Colombo", "Gampaha", "Kalutara"],
-  };
+  const sriLankaLocations = LocationService.getProvinceDistrictMap();
 
   const handleProvinceChange = (event: SelectChangeEvent<string>) => {
     setProvince(event.target.value);
@@ -332,6 +323,79 @@ const FarmerProfileSetup = () => {
       }
     }
   };
+
+  // Form persistence - auto-save form data to IndexedDB
+  const formData = {
+    profilePicture,
+    fullName,
+    nicNumber,
+    birthday,
+    gender,
+    age,
+    phoneNumber,
+    isPhoneVerified,
+    province,
+    district,
+    dsDivision,
+    gnDivision,
+    city,
+    address,
+    postalCode,
+    selectedCrops,
+    govijanaSevaId,
+    experience,
+    regions,
+    specificNeeds,
+  };
+
+  const { loadFormData } = useFormPersistence("farmer", formData);
+
+  useEffect(() => {
+    const loadSavedData = async () => {
+      const savedData = await loadFormData();
+      if (savedData) {
+        console.log("Loading saved farmer form data...");
+
+        if (savedData.fullName) setFullName(savedData.fullName as string);
+        if (savedData.nicNumber) setNicNumber(savedData.nicNumber as string);
+        if (savedData.birthday) setBirthday(savedData.birthday as string);
+        if (savedData.gender) setGender(savedData.gender as "Male" | "Female");
+        if (savedData.age) setAge(savedData.age as number);
+        if (savedData.phoneNumber)
+          setPhoneNumber(savedData.phoneNumber as string);
+        if (savedData.isPhoneVerified)
+          setIsPhoneVerified(savedData.isPhoneVerified as boolean);
+        if (savedData.province) setProvince(savedData.province as string);
+        // Prime pendingLocationUpdate before setDistrict so the district useEffect
+        // restores DS/GN instead of resetting them to "".
+        if (savedData.dsDivision) {
+          pendingLocationUpdate.current = {
+            ds: savedData.dsDivision as string,
+            gn: (savedData.gnDivision as string) || undefined,
+          };
+        }
+        if (savedData.district) setDistrict(savedData.district as string);
+        if (savedData.city) setCity(savedData.city as string);
+        if (savedData.address) setAddress(savedData.address as string);
+        if (savedData.postalCode) setPostalCode(savedData.postalCode as string);
+        if (savedData.selectedCrops)
+          setSelectedCrops(savedData.selectedCrops as string[]);
+        if (savedData.govijanaSevaId)
+          setGovijanaSevaId(savedData.govijanaSevaId as string);
+        if (savedData.experience) setExperience(savedData.experience as string);
+        if (savedData.regions) setRegions(savedData.regions as string);
+        if (savedData.specificNeeds)
+          setSpecificNeeds(savedData.specificNeeds as string);
+        if (savedData.profilePicture)
+          setProfilePicture(savedData.profilePicture as string);
+
+        showSuccess("Your previous form data has been restored!");
+      }
+    };
+
+    loadSavedData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const steps = ["Account", "Details", "Verification"];
 

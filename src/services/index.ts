@@ -4,6 +4,11 @@ export {
   type UsersResponse,
 } from "./admin.service";
 export { authService } from "./auth.service";
+export {
+  formPersistenceService,
+  type FormData,
+  type UserRole,
+} from "./formPersistence.service";
 export { HttpClient, httpClient } from "./httpClient";
 export { LocationService } from "./location.service";
 export {

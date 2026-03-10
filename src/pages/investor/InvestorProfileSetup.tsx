@@ -40,6 +40,7 @@ import {
 } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useFormPersistence } from "../../shared/hooks/useFormPersistence";
 
 const InvestorProfileSetup = () => {
   const navigate = useNavigate();
@@ -93,17 +94,7 @@ const InvestorProfileSetup = () => {
   const [nicBackFile, setNicBackFile] = useState<File | null>(null);
 
   // Sri Lanka locations data
-  const sriLankaLocations: Record<string, string[]> = {
-    Central: ["Kandy", "Matale", "Nuwara Eliya"],
-    Eastern: ["Ampara", "Batticaloa", "Trincomalee"],
-    "North Central": ["Anuradhapura", "Polonnaruwa"],
-    Northern: ["Jaffna", "Kilinochchi", "Mannar", "Mullaitivu", "Vavuniya"],
-    "North Western": ["Kurunegala", "Puttalam"],
-    Sabaragamuwa: ["Kegalle", "Ratnapura"],
-    Southern: ["Galle", "Hambantota", "Matara"],
-    Uva: ["Badulla", "Monaragala"],
-    Western: ["Colombo", "Gampaha", "Kalutara"],
-  };
+  const sriLankaLocations = LocationService.getProvinceDistrictMap();
 
   // Available crop types
   const cropTypes = [
@@ -400,6 +391,79 @@ const InvestorProfileSetup = () => {
     });
     navigate("/terms-and-conditions");
   };
+
+  // Form persistence - auto-save form data to IndexedDB
+  const formData = {
+    profilePicture,
+    fullName,
+    nicNumber,
+    birthday,
+    gender,
+    age,
+    phoneNumber,
+    street,
+    city,
+    province,
+    district,
+    postalCode,
+    dsDivision,
+    gnDivision,
+    organizationName,
+    headOfficeLocation,
+    organizationContactNo,
+    businessRegistrationNo,
+    cropFocus,
+  };
+
+  const { loadFormData } = useFormPersistence("investor", formData);
+
+  // Load saved form data on mount
+  useEffect(() => {
+    const loadSavedData = async () => {
+      const savedData = await loadFormData();
+      if (savedData) {
+        console.log("Loading saved investor form data...");
+
+        // Load text fields
+        if (savedData.fullName) setFullName(savedData.fullName as string);
+        if (savedData.nicNumber) setNicNumber(savedData.nicNumber as string);
+        if (savedData.birthday) setBirthday(savedData.birthday as string);
+        if (savedData.gender) setGender(savedData.gender as "Male" | "Female");
+        if (savedData.age) setAge(savedData.age as number);
+        if (savedData.phoneNumber)
+          setPhoneNumber(savedData.phoneNumber as string);
+        if (savedData.street) setStreet(savedData.street as string);
+        if (savedData.city) setCity(savedData.city as string);
+        if (savedData.province) setProvince(savedData.province as string);
+        // Prime pendingLocationUpdate before setDistrict so the district useEffect
+        // restores DS/GN instead of resetting them to "".
+        if (savedData.dsDivision) {
+          pendingLocationUpdate.current = {
+            ds: savedData.dsDivision as string,
+            gn: (savedData.gnDivision as string) || undefined,
+          };
+        }
+        if (savedData.district) setDistrict(savedData.district as string);
+        if (savedData.postalCode) setPostalCode(savedData.postalCode as string);
+        if (savedData.organizationName)
+          setOrganizationName(savedData.organizationName as string);
+        if (savedData.headOfficeLocation)
+          setHeadOfficeLocation(savedData.headOfficeLocation as string);
+        if (savedData.organizationContactNo)
+          setOrganizationContactNo(savedData.organizationContactNo as string);
+        if (savedData.businessRegistrationNo)
+          setBusinessRegistrationNo(savedData.businessRegistrationNo as string);
+        if (savedData.cropFocus) setCropFocus(savedData.cropFocus as string[]);
+        if (savedData.profilePicture)
+          setProfilePicture(savedData.profilePicture as string);
+
+        alert("Your previous form data has been restored!");
+      }
+    };
+
+    loadSavedData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
