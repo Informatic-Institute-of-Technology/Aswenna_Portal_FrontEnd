@@ -51,6 +51,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Notification from "../../shared/components/Notification";
+import { useFormPersistence } from "../../shared/hooks/useFormPersistence";
 import { useNotification } from "../../shared/hooks/useNotification";
 
 const FarmerProfileSetup = () => {
@@ -80,17 +81,7 @@ const FarmerProfileSetup = () => {
   const [specificNeeds, setSpecificNeeds] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const sriLankaLocations: Record<string, string[]> = {
-    Central: ["Kandy", "Matale", "Nuwara Eliya"],
-    Eastern: ["Ampara", "Batticaloa", "Trincomalee"],
-    "North Central": ["Anuradhapura", "Polonnaruwa"],
-    Northern: ["Jaffna", "Kilinochchi", "Mannar", "Mullaitivu", "Vavuniya"],
-    "North Western": ["Kurunegala", "Puttalam"],
-    Sabaragamuwa: ["Kegalle", "Ratnapura"],
-    Southern: ["Galle", "Hambantota", "Matara"],
-    Uva: ["Badulla", "Monaragala"],
-    Western: ["Colombo", "Gampaha", "Kalutara"],
-  };
+  const sriLankaLocations = LocationService.getProvinceDistrictMap();
 
   const handleProvinceChange = (event: SelectChangeEvent<string>) => {
     setProvince(event.target.value);
@@ -332,6 +323,76 @@ const FarmerProfileSetup = () => {
       }
     }
   };
+
+  const formData = {
+    profilePicture,
+    fullName,
+    nicNumber,
+    birthday,
+    gender,
+    age,
+    phoneNumber,
+    isPhoneVerified,
+    province,
+    district,
+    dsDivision,
+    gnDivision,
+    city,
+    address,
+    postalCode,
+    selectedCrops,
+    govijanaSevaId,
+    experience,
+    regions,
+    specificNeeds,
+  };
+
+  const { loadFormData } = useFormPersistence("farmer", formData);
+
+  useEffect(() => {
+    const loadSavedData = async () => {
+      const savedData = await loadFormData();
+      if (savedData) {
+        console.log("Loading saved farmer form data...");
+
+        if (savedData.fullName) setFullName(savedData.fullName as string);
+        if (savedData.nicNumber) setNicNumber(savedData.nicNumber as string);
+        if (savedData.birthday) setBirthday(savedData.birthday as string);
+        if (savedData.gender) setGender(savedData.gender as "Male" | "Female");
+        if (savedData.age) setAge(savedData.age as number);
+        if (savedData.phoneNumber)
+          setPhoneNumber(savedData.phoneNumber as string);
+        if (savedData.isPhoneVerified)
+          setIsPhoneVerified(savedData.isPhoneVerified as boolean);
+        if (savedData.province) setProvince(savedData.province as string);
+
+        if (savedData.dsDivision) {
+          pendingLocationUpdate.current = {
+            ds: savedData.dsDivision as string,
+            gn: (savedData.gnDivision as string) || undefined,
+          };
+        }
+        if (savedData.district) setDistrict(savedData.district as string);
+        if (savedData.city) setCity(savedData.city as string);
+        if (savedData.address) setAddress(savedData.address as string);
+        if (savedData.postalCode) setPostalCode(savedData.postalCode as string);
+        if (savedData.selectedCrops)
+          setSelectedCrops(savedData.selectedCrops as string[]);
+        if (savedData.govijanaSevaId)
+          setGovijanaSevaId(savedData.govijanaSevaId as string);
+        if (savedData.experience) setExperience(savedData.experience as string);
+        if (savedData.regions) setRegions(savedData.regions as string);
+        if (savedData.specificNeeds)
+          setSpecificNeeds(savedData.specificNeeds as string);
+        if (savedData.profilePicture)
+          setProfilePicture(savedData.profilePicture as string);
+
+        showSuccess("Your previous form data has been restored!");
+      }
+    };
+
+    loadSavedData();
+  }, [loadFormData, showSuccess]);
 
   const steps = ["Account", "Details", "Verification"];
 
@@ -617,17 +678,6 @@ const FarmerProfileSetup = () => {
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     InputLabelProps={{ shrink: true }}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <TextField
-                    fullWidth
-                    label="City / Town *"
-                    placeholder="Enter City"
-                    variant="outlined"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    InputLabelProps={{ shrink: true }}
                     slotProps={{
                       input: {
                         endAdornment: (
@@ -648,6 +698,17 @@ const FarmerProfileSetup = () => {
                         ),
                       },
                     }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="City / Town *"
+                    placeholder="Enter City"
+                    variant="outlined"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    InputLabelProps={{ shrink: true }}
                   />
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
@@ -1037,24 +1098,6 @@ const FarmerProfileSetup = () => {
                       setIsSubmitting(false);
                       return;
                     }
-                    // if (nicFiles.length < 2) {
-                    //   showError("Please upload both NIC front and back images");
-                    //   return;
-                    // }
-                    // if (!nicFrontImage || !nicBackImage) {
-                    //   showError(
-                    //     "NIC images could not be processed. Please try again.",
-                    //   );
-                    //   return;
-                    // }
-                    // if (!govijanaSevaPassbookImage) {
-                    //   showError("Please upload Govijana Seva Passbook image");
-                    //   return;
-                    // }
-                    // if (!gnCertificateImage) {
-                    //   showError("Please upload GN Certificate image");
-                    //   return;
-                    // }
 
                     const formattedPhone = phoneNumber.startsWith("+")
                       ? phoneNumber

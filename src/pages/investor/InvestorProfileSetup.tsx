@@ -40,12 +40,15 @@ import {
 } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Notification from "../../shared/components/Notification";
+import { useFormPersistence } from "../../shared/hooks/useFormPersistence";
+import { useNotification } from "../../shared/hooks/useNotification";
 
 const InvestorProfileSetup = () => {
   const navigate = useNavigate();
+  const { notification, showSuccess, hideNotification } = useNotification();
   const steps = ["Step 1", "Step 2", "Step 3"];
 
-  // Personal Information
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const [profilePictureFile, setProfilePictureFile] = useState<File | null>(
     null,
@@ -58,14 +61,12 @@ const InvestorProfileSetup = () => {
   const [age, setAge] = useState<number | null>(null);
   const [phoneNumber, setPhoneNumber] = useState("");
 
-  // Address Fields
   const [street, setStreet] = useState("");
   const [city, setCity] = useState("");
   const [province, setProvince] = useState("");
   const [district, setDistrict] = useState("");
   const [postalCode, setPostalCode] = useState("");
 
-  // Administrative Divisions
   const [dsDivision, setDsDivision] = useState("");
   const [gnDivision, setGnDivision] = useState("");
   const [dsDivisionsList, setDsDivisionsList] = useState<string[]>([]);
@@ -78,34 +79,19 @@ const InvestorProfileSetup = () => {
     gnNumber?: string;
   } | null>(null);
 
-  // Location Loading State
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
 
-  // Organization Information
   const [organizationName, setOrganizationName] = useState("");
   const [headOfficeLocation, setHeadOfficeLocation] = useState("");
   const [organizationContactNo, setOrganizationContactNo] = useState("");
   const [businessRegistrationNo, setBusinessRegistrationNo] = useState("");
   const [cropFocus, setCropFocus] = useState<string[]>([]);
 
-  // Documents
   const [nicFrontFile, setNicFrontFile] = useState<File | null>(null);
   const [nicBackFile, setNicBackFile] = useState<File | null>(null);
 
-  // Sri Lanka locations data
-  const sriLankaLocations: Record<string, string[]> = {
-    Central: ["Kandy", "Matale", "Nuwara Eliya"],
-    Eastern: ["Ampara", "Batticaloa", "Trincomalee"],
-    "North Central": ["Anuradhapura", "Polonnaruwa"],
-    Northern: ["Jaffna", "Kilinochchi", "Mannar", "Mullaitivu", "Vavuniya"],
-    "North Western": ["Kurunegala", "Puttalam"],
-    Sabaragamuwa: ["Kegalle", "Ratnapura"],
-    Southern: ["Galle", "Hambantota", "Matara"],
-    Uva: ["Badulla", "Monaragala"],
-    Western: ["Colombo", "Gampaha", "Kalutara"],
-  };
+  const sriLankaLocations = LocationService.getProvinceDistrictMap();
 
-  // Available crop types
   const cropTypes = [
     "Rice",
     "Tea",
@@ -121,7 +107,6 @@ const InvestorProfileSetup = () => {
     "Maize",
   ];
 
-  // Fetch DS Divisions when district changes
   useEffect(() => {
     const fetchDSDivisions = async () => {
       if (district) {
@@ -162,7 +147,6 @@ const InvestorProfileSetup = () => {
     fetchDSDivisions();
   }, [district]);
 
-  // Fetch GN Divisions when DS Division changes
   useEffect(() => {
     const fetchGNDivisions = async () => {
       if (dsDivision) {
@@ -204,7 +188,6 @@ const InvestorProfileSetup = () => {
     fetchGNDivisions();
   }, [dsDivision]);
 
-  // Auto-fetch postal code
   useEffect(() => {
     const fetchPostalCode = async () => {
       if (city && district && !postalCode) {
@@ -255,15 +238,13 @@ const InvestorProfileSetup = () => {
           console.log("Current location:", { latitude, longitude });
 
           try {
-            // Get location details from coordinates
+
             const details = await LocationService.getLocationDetails(
               latitude,
               longitude,
             );
             console.log("Location details:", details);
 
-            // Set pending update for DS/GN divisions BEFORE updating state
-            // This ensures the useEffect can pick up the pending values
             if (details.dsDivision || details.gnDivision) {
               pendingLocationUpdate.current = {
                 ds: details.dsDivision,
@@ -272,15 +253,12 @@ const InvestorProfileSetup = () => {
               };
             }
 
-            // Update address fields
-            // Keep the full street address as returned by the API
             if (details.address) {
               setStreet(details.address);
             }
             if (details.city) setCity(details.city);
             if (details.postalCode) setPostalCode(details.postalCode);
 
-            // Update province and district last to trigger DS/GN division fetch with pending values already set
             if (details.province) setProvince(details.province);
             if (details.district) setDistrict(details.district);
           } catch (error) {
@@ -400,6 +378,75 @@ const InvestorProfileSetup = () => {
     });
     navigate("/terms-and-conditions");
   };
+
+  const formData = {
+    profilePicture,
+    fullName,
+    nicNumber,
+    birthday,
+    gender,
+    age,
+    phoneNumber,
+    street,
+    city,
+    province,
+    district,
+    postalCode,
+    dsDivision,
+    gnDivision,
+    organizationName,
+    headOfficeLocation,
+    organizationContactNo,
+    businessRegistrationNo,
+    cropFocus,
+  };
+
+  const { loadFormData } = useFormPersistence("investor", formData);
+
+  useEffect(() => {
+    const loadSavedData = async () => {
+      const savedData = await loadFormData();
+      if (savedData) {
+        console.log("Loading saved investor form data...");
+
+        if (savedData.fullName) setFullName(savedData.fullName as string);
+        if (savedData.nicNumber) setNicNumber(savedData.nicNumber as string);
+        if (savedData.birthday) setBirthday(savedData.birthday as string);
+        if (savedData.gender) setGender(savedData.gender as "Male" | "Female");
+        if (savedData.age) setAge(savedData.age as number);
+        if (savedData.phoneNumber)
+          setPhoneNumber(savedData.phoneNumber as string);
+        if (savedData.street) setStreet(savedData.street as string);
+        if (savedData.city) setCity(savedData.city as string);
+        if (savedData.province) setProvince(savedData.province as string);
+
+        if (savedData.dsDivision) {
+          pendingLocationUpdate.current = {
+            ds: savedData.dsDivision as string,
+            gn: (savedData.gnDivision as string) || undefined,
+          };
+        }
+        if (savedData.district) setDistrict(savedData.district as string);
+        if (savedData.postalCode) setPostalCode(savedData.postalCode as string);
+        if (savedData.organizationName)
+          setOrganizationName(savedData.organizationName as string);
+        if (savedData.headOfficeLocation)
+          setHeadOfficeLocation(savedData.headOfficeLocation as string);
+        if (savedData.organizationContactNo)
+          setOrganizationContactNo(savedData.organizationContactNo as string);
+        if (savedData.businessRegistrationNo)
+          setBusinessRegistrationNo(savedData.businessRegistrationNo as string);
+        if (savedData.cropFocus) setCropFocus(savedData.cropFocus as string[]);
+        if (savedData.profilePicture)
+          setProfilePicture(savedData.profilePicture as string);
+
+        showSuccess("Your previous form data has been restored!");
+      }
+    };
+
+    loadSavedData();
+
+  }, []);
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
@@ -737,7 +784,7 @@ const InvestorProfileSetup = () => {
             </FormSection>
           </Grid>
 
-          {/* Right Section - Organization Info, NIC Upload, Expert Tip & Actions */}
+
           <Grid size={{ xs: 12, lg: 6 }}>
             <FormSection
               icon={<Business sx={{ color: "primary.main", mr: 1.5 }} />}
@@ -862,6 +909,14 @@ const InvestorProfileSetup = () => {
           </Grid>
         </Grid>
       </Container>
+
+      <Notification
+        open={notification.open}
+        message={notification.message}
+        severity={notification.severity}
+        duration={5000}
+        onClose={hideNotification}
+      />
     </Box>
   );
 };
