@@ -1,6 +1,5 @@
 import AswendLogo from "@/assets/Aswenna Logo.png";
 import { FileUploader, NicUploader, ProfileStepper } from "@/components";
-import { useFormPersistence } from "@/hooks/useFormPersistence";
 import {
   LocationService,
   registrationStore,
@@ -52,6 +51,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Notification from "../../shared/components/Notification";
+import { useFormPersistence } from "../../shared/hooks/useFormPersistence";
 import { useNotification } from "../../shared/hooks/useNotification";
 
 const FarmerProfileSetup = () => {
@@ -324,7 +324,6 @@ const FarmerProfileSetup = () => {
     }
   };
 
-  // Form persistence - auto-save form data to IndexedDB
   const formData = {
     profilePicture,
     fullName,
@@ -366,8 +365,7 @@ const FarmerProfileSetup = () => {
         if (savedData.isPhoneVerified)
           setIsPhoneVerified(savedData.isPhoneVerified as boolean);
         if (savedData.province) setProvince(savedData.province as string);
-        // Prime pendingLocationUpdate before setDistrict so the district useEffect
-        // restores DS/GN instead of resetting them to "".
+
         if (savedData.dsDivision) {
           pendingLocationUpdate.current = {
             ds: savedData.dsDivision as string,
@@ -394,8 +392,7 @@ const FarmerProfileSetup = () => {
     };
 
     loadSavedData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [loadFormData, showSuccess]);
 
   const steps = ["Account", "Details", "Verification"];
 
@@ -681,17 +678,6 @@ const FarmerProfileSetup = () => {
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     InputLabelProps={{ shrink: true }}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <TextField
-                    fullWidth
-                    label="City / Town *"
-                    placeholder="Enter City"
-                    variant="outlined"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    InputLabelProps={{ shrink: true }}
                     slotProps={{
                       input: {
                         endAdornment: (
@@ -712,6 +698,17 @@ const FarmerProfileSetup = () => {
                         ),
                       },
                     }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="City / Town *"
+                    placeholder="Enter City"
+                    variant="outlined"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    InputLabelProps={{ shrink: true }}
                   />
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
@@ -1101,24 +1098,6 @@ const FarmerProfileSetup = () => {
                       setIsSubmitting(false);
                       return;
                     }
-                    // if (nicFiles.length < 2) {
-                    //   showError("Please upload both NIC front and back images");
-                    //   return;
-                    // }
-                    // if (!nicFrontImage || !nicBackImage) {
-                    //   showError(
-                    //     "NIC images could not be processed. Please try again.",
-                    //   );
-                    //   return;
-                    // }
-                    // if (!govijanaSevaPassbookImage) {
-                    //   showError("Please upload Govijana Seva Passbook image");
-                    //   return;
-                    // }
-                    // if (!gnCertificateImage) {
-                    //   showError("Please upload GN Certificate image");
-                    //   return;
-                    // }
 
                     const formattedPhone = phoneNumber.startsWith("+")
                       ? phoneNumber

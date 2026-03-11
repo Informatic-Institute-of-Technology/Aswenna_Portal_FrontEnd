@@ -50,10 +50,13 @@ import { useJsApiLoader } from "@react-google-maps/api";
 import type { ChangeEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Notification from "../../shared/components/Notification";
 import { useFormPersistence } from "../../shared/hooks/useFormPersistence";
+import { useNotification } from "../../shared/hooks/useNotification";
 
 const LandownerProfileSetup = () => {
   const navigate = useNavigate();
+  const { notification, showSuccess, hideNotification } = useNotification();
   const steps = ["Step 1", "Step 2", "Step 3"];
 
   const { isLoaded } = useJsApiLoader({
@@ -275,7 +278,7 @@ const LandownerProfileSetup = () => {
                 "Available:",
                 gns.slice(0, 5).map((g) => g.name),
               );
-              // Set it anyway - it might be valid but not in the fetched list
+
               setLandGnDivision(pendingGn);
             }
             pendingLandLocationUpdate.current = null;
@@ -775,7 +778,6 @@ const LandownerProfileSetup = () => {
     navigate("/terms-and-conditions");
   };
 
-  // Form persistence - auto-save form data to IndexedDB
   const formData = {
     profilePicture,
     fullName,
@@ -806,14 +808,12 @@ const LandownerProfileSetup = () => {
 
   const { loadFormData } = useFormPersistence("landowner", formData);
 
-  // Load saved form data on mount
   useEffect(() => {
     const loadSavedData = async () => {
       const savedData = await loadFormData();
       if (savedData) {
         console.log("Loading saved landowner form data...");
 
-        // Load personal info
         if (savedData.fullName) setFullName(savedData.fullName as string);
         if (savedData.phoneNumber)
           setPhoneNumber(savedData.phoneNumber as string);
@@ -824,8 +824,7 @@ const LandownerProfileSetup = () => {
         if (savedData.street) setStreet(savedData.street as string);
         if (savedData.city) setCity(savedData.city as string);
         if (savedData.province) setProvince(savedData.province as string);
-        // Prime pendingLocationUpdate before setDistrict so the district useEffect
-        // restores DS/GN instead of resetting them to "".
+
         if (savedData.dsDivision) {
           pendingLocationUpdate.current = {
             ds: savedData.dsDivision as string,
@@ -835,12 +834,11 @@ const LandownerProfileSetup = () => {
         if (savedData.district) setDistrict(savedData.district as string);
         if (savedData.postalCode) setPostalCode(savedData.postalCode as string);
 
-        // Load land info
         if (savedData.landStreet) setLandStreet(savedData.landStreet as string);
         if (savedData.landCity) setLandCity(savedData.landCity as string);
         if (savedData.landProvince)
           setLandProvince(savedData.landProvince as string);
-        // Prime pendingLandLocationUpdate before setLandDistrict for the same reason.
+
         if (savedData.landDsDivision) {
           pendingLandLocationUpdate.current = {
             ds: savedData.landDsDivision as string,
@@ -860,12 +858,12 @@ const LandownerProfileSetup = () => {
         if (savedData.profilePicture)
           setProfilePicture(savedData.profilePicture as string);
 
-        alert("Your previous form data has been restored!");
+        showSuccess("Your previous form data has been restored!");
       }
     };
 
     loadSavedData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, []);
 
   return (
@@ -1557,6 +1555,14 @@ const LandownerProfileSetup = () => {
           </Typography>
         </Box>
       </Container>
+
+      <Notification
+        open={notification.open}
+        message={notification.message}
+        severity={notification.severity}
+        duration={5000}
+        onClose={hideNotification}
+      />
     </Box>
   );
 };

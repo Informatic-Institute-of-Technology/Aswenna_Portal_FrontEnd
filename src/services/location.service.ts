@@ -28,9 +28,6 @@ export interface LocationDetails {
   postalCode?: string;
 }
 
-// ---------------------------------------------------------------------------
-// HTTP helper — defined first so all ADM loaders below can reference it
-// ---------------------------------------------------------------------------
 const REQUEST_TIMEOUT = 10000;
 
 const fetchWithTimeout = async (
@@ -54,11 +51,6 @@ const fetchWithTimeout = async (
   }
 };
 
-// ---------------------------------------------------------------------------
-// ADM data — pre-built JSON served from /public/data/ (same origin, no CORS)
-//   ds-divisions.json  →  { [districtName]: string[] }
-//   gn-divisions.json  →  { [dsDivisionName]: { name: string; number: string }[] }
-// ---------------------------------------------------------------------------
 let _dsMap: Record<string, string[]> | null = null;
 let _gnMap: Record<string, { name: string; number: string }[]> | null = null;
 
@@ -83,9 +75,6 @@ const loadGnMap = async (): Promise<
   return _gnMap;
 };
 
-// ---------------------------------------------------------------------------
-// General helpers
-// ---------------------------------------------------------------------------
 const toTitleCase = (str: string): string => {
   if (!str) return "";
   return str.replace(
@@ -114,7 +103,6 @@ export const LocationService = {
   reverseGeocode: async (lat: number, lng: number): Promise<string> => {
     const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
     if (!googleApiKey) {
-      console.error("Google Maps API key not found");
       return "";
     }
 
@@ -127,20 +115,18 @@ export const LocationService = {
         return data.results[0].formatted_address;
       }
       return "";
-    } catch (error) {
-      console.error("Error reverse geocoding:", error);
+    } catch {
       return "";
     }
   },
 
   getDSDivisionsByDistrict: async (districtName: string): Promise<string[]> => {
     if (!districtName || districtName.trim() === "") {
-      console.warn("getDSDivisionsByDistrict: Empty district name provided");
       return [];
     }
     try {
       const dsMap = await loadDsMap();
-      // Try exact match first, then case-insensitive
+
       let list = dsMap[districtName];
       if (!list) {
         const lc = districtName.toLowerCase();
@@ -148,15 +134,11 @@ export const LocationService = {
         list = key ? dsMap[key] : [];
       }
       if (!list || list.length === 0) {
-        console.warn(
-          `ADM: No DS divisions found for district: "${districtName}"`,
-        );
         return [];
       }
-      console.log(`ADM: ${list.length} DS divisions for "${districtName}"`);
+
       return list;
-    } catch (error) {
-      console.error("Error in getDSDivisionsByDistrict:", error);
+    } catch {
       return [];
     }
   },
@@ -165,14 +147,11 @@ export const LocationService = {
     dsDivisionName: string,
   ): Promise<{ name: string; number: string }[]> => {
     if (!dsDivisionName || dsDivisionName.trim() === "") {
-      console.warn(
-        "getGNDivisionsByDSDivision: Empty DS division name provided",
-      );
       return [];
     }
     try {
       const gnMap = await loadGnMap();
-      // Try exact match first, then case-insensitive
+
       let list = gnMap[dsDivisionName];
       if (!list) {
         const lc = dsDivisionName.toLowerCase();
@@ -180,15 +159,11 @@ export const LocationService = {
         list = key ? gnMap[key] : [];
       }
       if (!list || list.length === 0) {
-        console.warn(
-          `ADM: No GN divisions found for DS division: "${dsDivisionName}"`,
-        );
         return [];
       }
-      console.log(`ADM: ${list.length} GN divisions for "${dsDivisionName}"`);
+
       return list;
-    } catch (error) {
-      console.error("Error in getGNDivisionsByDSDivision:", error);
+    } catch {
       return [];
     }
   },
@@ -200,19 +175,12 @@ export const LocationService = {
     const details: LocationDetails = {};
 
     if (!lat || !lon || isNaN(lat) || isNaN(lon)) {
-      console.error("Invalid coordinates provided:", { lat, lon });
       return details;
     }
 
     if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
-      console.error("Coordinates out of valid range:", { lat, lon });
       return details;
     }
-
-    console.log(`Fetching location details for coordinates: ${lat}, ${lon}`);
-
-    // NSDI spatial API is unavailable; province/district populated from Google Maps below.
-    // DS and GN division require manual selection from local JSON data.
 
     const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
     if (googleApiKey) {
@@ -261,21 +229,39 @@ export const LocationService = {
           const route = getComponent(primaryComponents, "route");
           const streetNumber = getComponent(primaryComponents, "street_number");
 
+          const allLevel3Candidates: string[] = [];
+          const allLevel4Candidates: string[] = [];
+          for (const result of googleData.results) {
+            for (const comp of result.address_components as AddressComponent[]) {
+              if (
+                comp.types.includes("administrative_area_level_3") &&
+                comp.long_name
+              ) {
+                const val = toTitleCase(comp.long_name.trim());
+                if (!allLevel3Candidates.includes(val))
+                  allLevel3Candidates.push(val);
+              }
+              if (
+                comp.types.includes("administrative_area_level_4") &&
+                comp.long_name
+              ) {
+                const val = toTitleCase(comp.long_name.trim());
+                if (!allLevel4Candidates.includes(val))
+                  allLevel4Candidates.push(val);
+              }
+            }
+          }
+
           let postalCode = "";
-          console.log("Searching for postal code in Google Maps results...");
+
           for (let i = 0; i < googleData.results.length; i++) {
             const result = googleData.results[i];
             const pc = getComponent(result.address_components, "postal_code");
             if (pc) {
               postalCode = pc;
-              console.log(`Found postal code in result ${i}: ${postalCode}`);
+
               break;
             }
-          }
-
-          if (!postalCode) {
-            console.warn("No postal code found in any Google Maps result");
-            console.log("Total results searched:", googleData.results.length);
           }
 
           const candidates = [
@@ -315,15 +301,7 @@ export const LocationService = {
               : route;
           }
 
-          console.log("Google Maps address data retrieved:", {
-            city: details.city,
-            postalCode: details.postalCode,
-            address: details.address,
-          });
-
           if (!details.postalCode) {
-            console.log("Attempting fallback postal code lookup...");
-
             if (details.city && details.district) {
               const fallbackPostalCode =
                 await LocationService.getPostalCodeByAddress(
@@ -332,9 +310,6 @@ export const LocationService = {
                 );
               if (fallbackPostalCode) {
                 details.postalCode = fallbackPostalCode;
-                console.log(
-                  `Found postal code via fallback (city+district): ${fallbackPostalCode}`,
-                );
               }
             }
 
@@ -343,9 +318,6 @@ export const LocationService = {
                 await LocationService.getPostalCodeByAddress(details.city);
               if (fallbackPostalCode) {
                 details.postalCode = fallbackPostalCode;
-                console.log(
-                  `Found postal code via fallback (city only): ${fallbackPostalCode}`,
-                );
               }
             }
 
@@ -357,9 +329,6 @@ export const LocationService = {
                 );
               if (fallbackPostalCode) {
                 details.postalCode = fallbackPostalCode;
-                console.log(
-                  `Found postal code via fallback (DS division): ${fallbackPostalCode}`,
-                );
               }
             }
 
@@ -383,24 +352,15 @@ export const LocationService = {
                       );
                       if (pc) {
                         details.postalCode = pc;
-                        console.log(
-                          `Found postal code via Google geocoding fallback: ${pc}`,
-                        );
+
                         break;
                       }
                     }
                   }
                 }
-              } catch (error) {
-                console.error(
-                  "Error in Google Maps geocoding fallback:",
-                  error,
-                );
+              } catch {
+                void 0;
               }
-            }
-
-            if (!details.postalCode) {
-              console.warn("Unable to determine postal code from any source");
             }
           }
 
@@ -422,9 +382,6 @@ export const LocationService = {
               details.province = toTitleCase(
                 provinceFromGoogle.replace(/\s*Province$/i, "").trim(),
               );
-              console.log(
-                `Using province from Google Maps: ${details.province}`,
-              );
             }
 
             if (
@@ -435,32 +392,127 @@ export const LocationService = {
               details.district = toTitleCase(
                 districtFromGoogle.replace(/\s*District$/i, "").trim(),
               );
-              console.log(
-                `Using district from Google Maps: ${details.district}`,
-              );
             }
 
-            // In Sri Lanka, administrative_area_level_3 = DS (Divisional Secretariat) Division
             if (
               !details.dsDivision &&
               administrativeAreaLevel3 &&
               isValidCity(administrativeAreaLevel3)
             ) {
               details.dsDivision = toTitleCase(administrativeAreaLevel3.trim());
-              console.log(`Google Maps → DS Division: ${details.dsDivision}`);
             }
           }
-        } else {
-          console.warn(
-            "Google Maps geocoding returned no results or error:",
-            googleData.status,
-          );
+
+          const district4Match =
+            details.district ||
+            toTitleCase(
+              (
+                getComponent(
+                  primaryComponents,
+                  "administrative_area_level_2",
+                ) ?? ""
+              )
+                .replace(/\s*District$/i, "")
+                .trim(),
+            );
+
+          if (district4Match) {
+            try {
+              const dsMap = await loadDsMap();
+              const dsKey = Object.keys(dsMap).find(
+                (k) => k.toLowerCase() === district4Match.toLowerCase(),
+              );
+              const dsListForDistrict = dsKey ? dsMap[dsKey] : [];
+
+              if (dsListForDistrict.length > 0) {
+                if (!details.dsDivision) {
+                  const normalise = (s: string) =>
+                    s.toLowerCase().replace(/[^a-z0-9]/g, "");
+                  for (const candidate of allLevel3Candidates) {
+                    const match = dsListForDistrict.find(
+                      (ds) => normalise(ds) === normalise(candidate),
+                    );
+                    if (match) {
+                      details.dsDivision = match;
+
+                      break;
+                    }
+                  }
+                }
+
+                if (!details.dsDivision) {
+                  const normalise = (s: string) =>
+                    s.toLowerCase().replace(/[^a-z0-9]/g, "");
+                  for (const candidate of allLevel3Candidates) {
+                    const match = dsListForDistrict.find(
+                      (ds) =>
+                        normalise(ds).includes(normalise(candidate)) ||
+                        normalise(candidate).includes(normalise(ds)),
+                    );
+                    if (match) {
+                      details.dsDivision = match;
+
+                      break;
+                    }
+                  }
+                }
+
+                if (details.dsDivision && !details.gnDivision) {
+                  try {
+                    const gnMap = await loadGnMap();
+                    const gnKey = Object.keys(gnMap).find(
+                      (k) =>
+                        k.toLowerCase() === details.dsDivision!.toLowerCase(),
+                    );
+                    const gnList = gnKey ? gnMap[gnKey] : [];
+
+                    if (gnList.length > 0) {
+                      const normalise = (s: string) =>
+                        s.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+                      for (const candidate of allLevel4Candidates) {
+                        const match = gnList.find(
+                          (gn) => normalise(gn.name) === normalise(candidate),
+                        );
+                        if (match) {
+                          details.gnDivision = match.name;
+                          details.gnNumber = match.number;
+
+                          break;
+                        }
+                      }
+
+                      if (!details.gnDivision) {
+                        for (const candidate of allLevel4Candidates) {
+                          const match = gnList.find(
+                            (gn) =>
+                              normalise(gn.name).includes(
+                                normalise(candidate),
+                              ) ||
+                              normalise(candidate).includes(normalise(gn.name)),
+                          );
+                          if (match) {
+                            details.gnDivision = match.name;
+                            details.gnNumber = match.number;
+
+                            break;
+                          }
+                        }
+                      }
+                    }
+                  } catch {
+                    void 0;
+                  }
+                }
+              }
+            } catch {
+              void 0;
+            }
+          }
         }
-      } catch (error) {
-        console.error("Error fetching Google Maps data:", error);
+      } catch {
+        void 0;
       }
-    } else {
-      console.warn("Google Maps API key not configured");
     }
 
     if (
@@ -474,13 +526,10 @@ export const LocationService = {
         const districtNum = Math.floor(parseInt(remainingDigits, 10) / 100);
         if (districtNum > 0 && districtNum <= 15) {
           details.city = `Colombo ${districtNum.toString().padStart(2, "0")}`;
-          console.log(`Updated Colombo district number: ${details.city}`);
         }
       }
     }
 
-    // Auto-detect DS division (and province/district fallback) via Nominatim reverse geocode.
-    // In Sri Lanka's OSM data: state = Province, state_district = District, county = DS Division.
     if (!details.dsDivision || !details.province || !details.district) {
       try {
         const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&addressdetails=1&zoom=14`;
@@ -498,7 +547,6 @@ export const LocationService = {
                 .replace(/\s*Province$/i, "")
                 .trim(),
             );
-            console.log(`Nominatim → Province: ${details.province}`);
           }
           if (!details.district && addr.state_district) {
             details.district = toTitleCase(
@@ -506,34 +554,89 @@ export const LocationService = {
                 .replace(/\s*District$/i, "")
                 .trim(),
             );
-            console.log(`Nominatim → District: ${details.district}`);
           }
-          // Try multiple OSM fields — Sri Lanka usage varies by area
+
           const nomDs =
             addr.county ||
             addr.municipality ||
             addr.administrative ||
             addr.quarter;
           if (!details.dsDivision && nomDs) {
-            details.dsDivision = toTitleCase(
+            const rawDs = toTitleCase(
               String(nomDs)
                 .replace(/\s*Divisional Secretariat.*$/i, "")
                 .trim(),
             );
-            console.log(`Nominatim → DS Division: ${details.dsDivision}`);
+
+            const districtKey = details.district || "";
+            if (districtKey) {
+              try {
+                const dsMap = await loadDsMap();
+                const dsKey = Object.keys(dsMap).find(
+                  (k) => k.toLowerCase() === districtKey.toLowerCase(),
+                );
+                const dsList = dsKey ? dsMap[dsKey] : [];
+                const normalise = (s: string) =>
+                  s.toLowerCase().replace(/[^a-z0-9]/g, "");
+                const matched = dsList.find(
+                  (ds) =>
+                    normalise(ds) === normalise(rawDs) ||
+                    normalise(ds).includes(normalise(rawDs)) ||
+                    normalise(rawDs).includes(normalise(ds)),
+                );
+                details.dsDivision = matched ?? rawDs;
+              } catch {
+                details.dsDivision = rawDs;
+              }
+            } else {
+              details.dsDivision = rawDs;
+            }
           }
-        } else {
-          console.warn(`Nominatim reverse geocode failed: ${nomRes.status}`);
+
+          if (!details.gnDivision && details.dsDivision) {
+            const gnCandidateRaw =
+              addr.suburb ||
+              addr.village ||
+              addr.hamlet ||
+              addr.neighbourhood ||
+              addr.quarter;
+            if (gnCandidateRaw) {
+              const gnCandidate = toTitleCase(String(gnCandidateRaw).trim());
+              try {
+                const gnMap = await loadGnMap();
+                const gnKey = Object.keys(gnMap).find(
+                  (k) => k.toLowerCase() === details.dsDivision!.toLowerCase(),
+                );
+                const gnList = gnKey ? gnMap[gnKey] : [];
+                const normalise = (s: string) =>
+                  s.toLowerCase().replace(/[^a-z0-9]/g, "");
+                const matched =
+                  gnList.find(
+                    (gn) => normalise(gn.name) === normalise(gnCandidate),
+                  ) ||
+                  gnList.find(
+                    (gn) =>
+                      normalise(gn.name).includes(normalise(gnCandidate)) ||
+                      normalise(gnCandidate).includes(normalise(gn.name)),
+                  );
+                if (matched) {
+                  details.gnDivision = matched.name;
+                  details.gnNumber = matched.number;
+                }
+              } catch {
+                void 0;
+              }
+            }
+          }
         }
-      } catch (e) {
-        console.warn("Nominatim reverse geocode error:", e);
+      } catch {
+        void 0;
       }
     }
 
     if (!isValidCity(details.city)) {
       if (details.dsDivision) {
         details.city = details.dsDivision;
-        console.log(`Using DS division as city fallback: ${details.city}`);
       }
     }
 
@@ -555,7 +658,6 @@ export const LocationService = {
     if (details.postalCode && details.postalCode.trim() !== "")
       finalDetails.postalCode = details.postalCode.trim();
 
-    console.log("Final location details:", finalDetails);
     return finalDetails;
   },
 
@@ -565,7 +667,6 @@ export const LocationService = {
   ): Promise<string> => {
     try {
       if (!city || city.trim() === "") {
-        console.warn("getPostalCodeByAddress: Empty city name provided");
         return "";
       }
 
@@ -575,8 +676,6 @@ export const LocationService = {
         queries.push(`${district}, ${city}, Sri Lanka`);
       }
       queries.push(`${city}, Sri Lanka`);
-
-      console.log("Trying Nominatim postal code lookup with queries:", queries);
 
       for (const query of queries) {
         try {
@@ -597,23 +696,18 @@ export const LocationService = {
             if (data && Array.isArray(data)) {
               for (const result of data) {
                 if (result.address && result.address.postcode) {
-                  console.log(
-                    `Postal code found via Nominatim: ${result.address.postcode} for query: ${query}`,
-                  );
                   return result.address.postcode;
                 }
               }
             }
           }
-        } catch (queryError) {
-          console.warn(`Nominatim query failed for: ${query}`, queryError);
+        } catch {
+          void 0;
         }
       }
 
-      console.warn("No postal code found in Nominatim for any query");
       return "";
-    } catch (error) {
-      console.error("Error in getPostalCodeByAddress:", error);
+    } catch {
       return "";
     }
   },
@@ -627,7 +721,6 @@ export const LocationService = {
     try {
       const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
       if (!googleApiKey) {
-        console.error("Google Maps API key not found for geocoding");
         return null;
       }
 
@@ -641,7 +734,6 @@ export const LocationService = {
       const address = addressParts.join(", ");
 
       if (!address || address === "Sri Lanka") {
-        console.warn("Insufficient address information for geocoding");
         return null;
       }
 
@@ -658,20 +750,15 @@ export const LocationService = {
 
       if (data.status === "OK" && data.results && data.results.length > 0) {
         const location = data.results[0].geometry.location;
-        console.log(`Geocoded address to: ${location.lat}, ${location.lng}`);
+
         return {
           lat: location.lat,
           lng: location.lng,
         };
       }
 
-      console.warn(
-        `Geocoding returned no results for: ${address}`,
-        data.status,
-      );
       return null;
-    } catch (error) {
-      console.error("Error in geocodeAddress:", error);
+    } catch {
       return null;
     }
   },
