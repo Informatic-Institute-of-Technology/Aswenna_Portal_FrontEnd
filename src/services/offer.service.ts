@@ -8,9 +8,9 @@ export const createDirectHarvestOffer = (
   payload: Partial<DirectHarvestOffer>,
 ) =>
   httpClient.post<DirectHarvestOffer>(
-    "/investor/offers/direct-harvest",
+    "/v1/investor-offer",
     payload,
   );
 
 export const createSponsorshipOffer = (payload: Partial<SponsorshipOffer>) =>
-  httpClient.post<SponsorshipOffer>("/investor/offers/sponsorship", payload);
+  httpClient.post<SponsorshipOffer>("/v1/investor-offer", payload);

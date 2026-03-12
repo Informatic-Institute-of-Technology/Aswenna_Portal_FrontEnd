@@ -5,10 +5,10 @@ export type OfferStatus = "active" | "pending" | "completed" | "cancelled";
 export type PaymentStatus = "pending" | "paid" | "overdue";
 
 export interface DirectHarvestOffer {
-  id: string;
+  id?: string;
   offerType: "direct-harvest";
 
-  investorName: string;
+  investor: string;
   projectTitle: string;
   companyName?: string;
   description: string;
@@ -20,8 +20,6 @@ export interface DirectHarvestOffer {
   cropVariety?: string;
   requiredQuantity: number;
   quantityUnit: "kg" | "tons" | "units";
-  qualityStandards?: string;
-  deliveryDeadline: string;
 
   preferredRegion?: string[];
   deliveryLocation: string;
@@ -31,26 +29,17 @@ export interface DirectHarvestOffer {
   expectedROI: number;
   currency: string;
 
-  startDate: string;
-  endDate: string;
-  offerDeadline: string;
-
-  paymentInstallments?: InvestorPaymentInstallment[];
+  expiredDate: string;
 
   status: OfferStatus;
   applicationsCount: number;
-  selectedFarmer?: FarmerMatch;
-  selectedLandOwner?: LandOwnerMatch;
-
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface SponsorshipOffer {
-  id: string;
+  id?: string;
   offerType: "sponsorship";
 
-  investorName: string;
+  investor: string;
   sponsorshipTitle: string;
   description: string;
 
@@ -66,29 +55,14 @@ export interface SponsorshipOffer {
   expectedROI: number;
   currency: string;
 
-  startDate: string;
-  endDate: string;
-  offerDeadline: string;
-
   supportType: ("capital" | "equipment" | "expertise" | "marketing")[];
-  minimumProjectDuration?: number;
-  maximumProjectDuration?: number;
 
   preferredRegions?: string[];
 
-  paymentInstallments?: InvestorPaymentInstallment[];
+  expiredDate: string;
 
   status: OfferStatus;
   applicationsCount: number;
-  selectedFarmer?: FarmerMatch;
-  selectedLandOwner?: LandOwnerMatch;
-
-  expectedHarvestValue?: number;
-  expectedCommission?: number;
-  actualCommission?: number;
-
-  createdAt: string;
-  updatedAt: string;
 }
 
 export type InvestorOffer = DirectHarvestOffer | SponsorshipOffer;

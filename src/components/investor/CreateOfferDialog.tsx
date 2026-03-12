@@ -8,7 +8,7 @@ import type {
   SponsorshipOffer,
 } from "@/types/investor.types";
 import { Dialog } from "@mui/material";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   DirectHarvestDetails,
   type DirectHarvestFormData,
@@ -45,12 +45,6 @@ const CreateOfferDialog = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const investorName = useMemo(() => {
-    if (!user) return "";
-    const fullName = `${user.firstName || ""} ${user.lastName || ""}`.trim();
-    return fullName || user.email || "Investor";
-  }, [user]);
-
   const handleSelectOfferType = (type: "DIRECT_HARVEST" | "SPONSORSHIP") => {
     setSelectedOfferType(type);
   };
@@ -67,32 +61,26 @@ const CreateOfferDialog = ({
   const handleDirectHarvestSubmit = (data: DirectHarvestFormData) => {
     const offer: Partial<DirectHarvestOffer> = {
       offerType: "direct-harvest",
-      investorName,
+      investor: user?._id || "",
       projectTitle: data.projectTitle,
-      cropType: data.cropName,
+      description: data.description,
       cropIcon: data.cropType || "🌱",
       backgroundImage: data.coverImage,
+      cropType: data.cropName,
       cropVariety: data.variety,
       requiredQuantity: data.quantity,
       quantityUnit: data.unit.toLowerCase() as "kg" | "tons",
       pricePerUnit: 0,
-      qualityStandards: undefined,
-      deliveryDeadline: "",
       deliveryLocation: data.deliveryDetails,
       totalBudget: 0,
       expectedROI: 0,
-      startDate: "",
-      endDate: "",
-      offerDeadline: "",
       currency: "LKR",
       preferredRegion:
         data.preferredRegions.length > 0 ? data.preferredRegions : undefined,
       companyName: data.companyName,
-      description: data.description,
       status: "pending",
       applicationsCount: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      expiredDate: data.expiryDate,
     };
     setPendingOffer({
       type: "DIRECT_HARVEST",
@@ -105,15 +93,14 @@ const CreateOfferDialog = ({
   const handleSponsorshipSubmit = (data: SponsorshipFormData) => {
     const offer: Partial<SponsorshipOffer> = {
       offerType: "sponsorship",
-      investorName,
+      investor: user?._id || "",
       sponsorshipTitle: data.projectTitle,
-      cropTypes: [data.cropType].filter(Boolean),
-      cropIcon: data.cropType || "🌱",
+      description: data.description,
+      cropTypes: [data.cropName].filter(Boolean),
+      cropIcon: data.cropIcon || "🌱",
       backgroundImage: data.coverImage,
       expectedROI: data.expectedROI,
-      startDate: data.startDate,
-      endDate: data.endDate,
-      offerDeadline: "",
+      currency: "LKR",
       preferredFarmingMethod:
         data.farmingMethod === "hydroponic"
           ? "organic"
@@ -123,7 +110,6 @@ const CreateOfferDialog = ({
       minimumInvestment: parseFloat(data.minBudget.replace(/,/g, "")) || 0,
       maximumInvestment: parseFloat(data.maxBudget.replace(/,/g, "")) || 0,
       commissionRate: data.commissionRate,
-      currency: "LKR",
       supportType: [
         data.supportType === "financial"
           ? "capital"
@@ -131,15 +117,11 @@ const CreateOfferDialog = ({
             ? "expertise"
             : "marketing",
       ] as ("capital" | "equipment" | "expertise" | "marketing")[],
-      minimumProjectDuration: undefined,
-      maximumProjectDuration: undefined,
       preferredRegions:
         data.preferredRegions.length > 0 ? data.preferredRegions : undefined,
-      description: data.description,
       status: "pending",
       applicationsCount: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      expiredDate: data.expiryDate,
     };
     setPendingOffer({
       type: "SPONSORSHIP",
