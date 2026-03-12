@@ -1,5 +1,3 @@
-
-
 export type OfferType = "direct-harvest" | "sponsorship";
 export type OfferStatus = "active" | "pending" | "completed" | "cancelled";
 export type PaymentStatus = "pending" | "paid" | "overdue";
@@ -161,7 +159,6 @@ export interface Agreement {
 }
 
 export interface InvestorStats {
-
   activeHarvestOrders: number;
   totalHarvestBudget: number;
   pendingDeliveries: number;
