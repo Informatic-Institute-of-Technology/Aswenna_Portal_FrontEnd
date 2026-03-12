@@ -38,6 +38,7 @@ export const useUserManagement = () => {
   });
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [deleteSuccess, setDeleteSuccess] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -174,6 +175,14 @@ export const useUserManagement = () => {
     const targetUser = confirmDialog.user;
     const action = confirmDialog.action;
     try {
+      if (action === "delete") {
+        await adminService.deleteUser(targetUser.id);
+        setUsers((prev) => prev.filter((u) => u.id !== targetUser.id));
+        setConfirmDialog({ open: false, action: null, user: null });
+        setDeleteSuccess(true);
+        return;
+      }
+
       const newStatus: string =
         action === "approve" || action === "reactivate"
           ? "Active"
@@ -247,6 +256,8 @@ export const useUserManagement = () => {
     setConfirmDialog,
     actionLoading,
     actionError,
+    deleteSuccess,
+    setDeleteSuccess,
     requestAction,
     handleConfirmAction,
     getStatusCategory,
