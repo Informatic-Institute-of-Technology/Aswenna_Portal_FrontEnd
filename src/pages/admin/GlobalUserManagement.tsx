@@ -1,9 +1,11 @@
 import { PersonAdd, Refresh } from "@mui/icons-material";
 import {
+  Alert,
   Box,
   Button,
   Chip,
   IconButton,
+  Snackbar,
   Tab,
   Tabs,
   Tooltip,
@@ -81,6 +83,8 @@ const GlobalUserManagement = () => {
     setConfirmDialog,
     actionLoading,
     actionError,
+    deleteSuccess,
+    setDeleteSuccess,
     requestAction,
     handleConfirmAction,
     refreshUsers,
@@ -358,6 +362,29 @@ const GlobalUserManagement = () => {
         onTabChange={setDetailTab}
         onClose={handleCloseDialog}
       />
+
+      <Snackbar
+        open={deleteSuccess}
+        autoHideDuration={4000}
+        onClose={() => setDeleteSuccess(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        sx={{ mt: 8 }}
+      >
+        <Alert
+          onClose={() => setDeleteSuccess(false)}
+          severity="error"
+          variant="filled"
+          elevation={6}
+          sx={{
+            width: "100%",
+            minWidth: "300px",
+            fontSize: "0.95rem",
+            "& .MuiAlert-message": { padding: "8px 0" },
+          }}
+        >
+          User Deleted Successfully
+        </Alert>
+      </Snackbar>
     </>
   );
 };

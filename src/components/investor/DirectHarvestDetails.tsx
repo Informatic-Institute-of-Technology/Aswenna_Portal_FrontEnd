@@ -20,6 +20,8 @@ interface DirectHarvestDetailsProps {
   onSubmit: (data: DirectHarvestFormData) => void;
   onSaveDraft: (data: DirectHarvestFormData) => void;
   initialData?: Partial<DirectHarvestFormData>;
+  submitLabel?: string;
+  headerLabel?: string;
 }
 
 export interface DirectHarvestFormData {
@@ -79,11 +81,16 @@ const CROP_EMOJIS = [
   "🫑",
 ];
 
+type CoverImage = { id: string; label: string; url: string };
+const coverImageList = coverImages as CoverImage[];
+
 export const DirectHarvestDetails: React.FC<DirectHarvestDetailsProps> = ({
   onBack,
   onSubmit,
   onSaveDraft,
   initialData,
+  submitLabel = "Create Harvest Offer",
+  headerLabel = "New Offer",
 }) => {
   const { user } = useAuth();
 
@@ -163,7 +170,9 @@ export const DirectHarvestDetails: React.FC<DirectHarvestDetailsProps> = ({
       </span>
     ) : null;
 
-  const selectedCover = coverImages.find((c) => c.id === formData.coverImage);
+  const selectedCover = coverImageList.find(
+    (c) => c.id === formData.coverImage,
+  );
 
   return (
     <div
@@ -182,7 +191,7 @@ export const DirectHarvestDetails: React.FC<DirectHarvestDetailsProps> = ({
         </button>
         <div className="flex-1 min-w-0">
           <p className="text-[10px] text-[#85a446] font-bold uppercase tracking-widest mb-0.5">
-            New Offer
+            {headerLabel}
           </p>
           <h2 className="text-white text-base font-bold leading-none">
             Direct Harvesting Offer
@@ -587,7 +596,7 @@ export const DirectHarvestDetails: React.FC<DirectHarvestDetailsProps> = ({
             )}
 
             <div className="grid grid-cols-5 gap-1.5">
-              {coverImages.map((image) => (
+              {coverImageList.map((image) => (
                 <div
                   key={image.id}
                   className={`relative rounded-lg overflow-hidden cursor-pointer aspect-square transition-all ${
@@ -629,7 +638,7 @@ export const DirectHarvestDetails: React.FC<DirectHarvestDetailsProps> = ({
           onClick={handleSubmitClick}
           className="flex items-center gap-2 bg-[#85a446] hover:bg-[#93b34e] active:scale-[0.98] text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all shadow-lg shadow-[#85a446]/20"
         >
-          Create Harvest Offer <ArrowForward style={{ fontSize: 18 }} />
+          {submitLabel} <ArrowForward style={{ fontSize: 18 }} />
         </button>
       </div>
     </div>

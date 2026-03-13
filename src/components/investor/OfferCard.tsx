@@ -302,7 +302,7 @@ const OfferCard = ({
               transition: "all 0.4s ease",
               "&:hover": {
                 transform: "scale(1.1)",
-                opacity: 0.8,
+                opacity: 0.75,
               },
             }}
           />
@@ -315,7 +315,7 @@ const OfferCard = ({
             right: 0,
             bottom: 0,
             background:
-              "linear-gradient(180deg, transparent 0%, var(--overlay-xl) 100%)",
+              "linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.75) 100%)",
           }}
         />
         <Box

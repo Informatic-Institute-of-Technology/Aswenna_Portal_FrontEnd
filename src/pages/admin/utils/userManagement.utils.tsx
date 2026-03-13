@@ -7,7 +7,8 @@ export type ActionType =
   | "reject"
   | "suspend"
   | "reactivate"
-  | "set_pending";
+  | "set_pending"
+  | "delete";
 
 export const roleIdToRole = (
   role: string | { _id: string; name: string },

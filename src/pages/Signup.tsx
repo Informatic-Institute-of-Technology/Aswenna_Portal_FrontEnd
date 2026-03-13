@@ -1,9 +1,9 @@
 import AswendLogo from "@/assets/Aswenna Logo.png";
 import farmerImage from "@/assets/farmer-signup.png";
-import { otpService } from "@/services";
+import { otpService, userService } from "@/services";
 import "@/styles/Signup.css";
 import { CircularProgress } from "@mui/material";
-import { Eye, EyeOff } from "lucide-react";
+import { CheckCircle, Eye, EyeOff } from "lucide-react";
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -17,7 +17,9 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [emailCheckLoading, setEmailCheckLoading] = useState(false);
   const [emailError, setEmailError] = useState("");
+  const [emailSuccess, setEmailSuccess] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const navigate = useNavigate();
@@ -80,9 +82,28 @@ const Signup = () => {
     return true;
   };
 
-  const handleEmailBlur = () => {
+  const handleEmailBlur = async () => {
     if (email) {
-      validateEmail(email);
+      const isFormatValid = validateEmail(email);
+      if (isFormatValid) {
+        setEmailCheckLoading(true);
+        setEmailSuccess(false);
+        try {
+          const isDuplicate = await userService.checkEmailDuplicate(email);
+          if (isDuplicate) {
+            setEmailError(
+              "This email is already registered. Please use a different email or log in.",
+            );
+            setEmailSuccess(false);
+          } else {
+            setEmailSuccess(true);
+          }
+        } catch {
+          showError("Failed to check email availability. Please try again.");
+        } finally {
+          setEmailCheckLoading(false);
+        }
+      }
     }
   };
 
@@ -101,6 +122,7 @@ const Signup = () => {
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setEmail(value);
+    setEmailSuccess(false);
     if (emailError && value) {
       validateEmail(value);
     }
@@ -156,6 +178,15 @@ const Signup = () => {
 
     setLoading(true);
     try {
+      const isDuplicate = await userService.checkEmailDuplicate(email);
+      if (isDuplicate) {
+        setEmailError(
+          "This email is already registered. Please use a different email or log in.",
+        );
+        setLoading(false);
+        return;
+      }
+
       await otpService.sendOTP(email);
 
       localStorage.setItem("temp_email", email);
@@ -205,18 +236,29 @@ const Signup = () => {
                 <label htmlFor="email" className="form-label">
                   Email Address
                 </label>
-                <input
-                  id="email"
-                  type="email"
-                  placeholder="e.g., farmer@example.com"
-                  value={email}
-                  onChange={handleEmailChange}
-                  onBlur={handleEmailBlur}
-                  className={`form-input ${emailError ? "error" : ""}`}
-                  autoComplete="email"
-                  aria-label="Email address"
-                  disabled={loading}
-                />
+                <div className="email-input-wrapper">
+                  <input
+                    id="email"
+                    type="email"
+                    placeholder="e.g., farmer@example.com"
+                    value={email}
+                    onChange={handleEmailChange}
+                    onBlur={handleEmailBlur}
+                    className={`form-input ${emailError ? "error" : ""} ${emailSuccess && !emailError ? "success" : ""}`}
+                    autoComplete="email"
+                    aria-label="Email address"
+                    disabled={loading || emailCheckLoading}
+                  />
+                  {emailCheckLoading && (
+                    <CircularProgress
+                      size={16}
+                      className="email-check-spinner"
+                    />
+                  )}
+                  {emailSuccess && !emailError && !emailCheckLoading && (
+                    <CheckCircle size={18} className="email-check-icon" />
+                  )}
+                </div>
                 {emailError && (
                   <span className="field-error">{emailError}</span>
                 )}

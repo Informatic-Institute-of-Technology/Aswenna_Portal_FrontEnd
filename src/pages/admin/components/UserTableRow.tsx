@@ -2,6 +2,7 @@ import type { GlobalUser } from "@/types/admin.types";
 import {
   Block,
   CheckCircle,
+  DeleteForever,
   Email,
   Pending,
   PersonOff,
@@ -13,6 +14,7 @@ import {
   Box,
   Button,
   Chip,
+  IconButton,
   MenuItem,
   Select,
   TableCell,
@@ -322,6 +324,26 @@ const UserTableRow = ({
               ),
             )}
           </Select>
+          {user.role !== "superadmin" && (
+            <Tooltip title="Delete User">
+              <IconButton
+                size="small"
+                onClick={() => onRequestAction("delete", user)}
+                sx={{
+                  color: "#ef4444",
+                  border: "1px solid #ef444455",
+                  borderRadius: 1.5,
+                  p: 0.5,
+                  "&:hover": {
+                    bgcolor: "#ef444418",
+                    borderColor: "#ef4444",
+                  },
+                }}
+              >
+                <DeleteForever sx={{ fontSize: 16 }} />
+              </IconButton>
+            </Tooltip>
+          )}
         </Box>
       </TableCell>
     </TableRow>

@@ -20,18 +20,19 @@ interface SponsorshipDetailsProps {
   onSubmit: (data: SponsorshipFormData) => void;
   onSaveDraft: (data: SponsorshipFormData) => void;
   initialData?: Partial<SponsorshipFormData>;
+  submitLabel?: string;
+  headerLabel?: string;
 }
 
 export interface SponsorshipFormData {
-  investorName: string;
   projectTitle: string;
   description: string;
   preferredRegions: string[];
-  cropType: string;
+  cropName: string;
+  cropIcon: string;
   coverImage: string;
   expectedROI: number;
-  startDate: string;
-  endDate: string;
+  expiryDate: string;
   minBudget: string;
   maxBudget: string;
   farmingMethod: "hydroponic" | "traditional" | "aquaponics";
@@ -80,11 +81,16 @@ const CROP_EMOJIS = [
   "🫑",
 ];
 
+type CoverImage = { id: string; label: string; url: string };
+const coverImageList = coverImages as CoverImage[];
+
 export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
   onBack,
   onSubmit,
   onSaveDraft,
   initialData,
+  submitLabel = "Create Investment Offer",
+  headerLabel = "New Offer",
 }) => {
   const { user } = useAuth();
 
@@ -101,15 +107,14 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
     "—";
 
   const [formData, setFormData] = useState<SponsorshipFormData>({
-    investorName: initialData?.investorName || fullName,
     projectTitle: initialData?.projectTitle || "",
     description: initialData?.description || "",
     preferredRegions: initialData?.preferredRegions || [],
-    cropType: initialData?.cropType || "",
+    cropName: initialData?.cropName || "",
+    cropIcon: initialData?.cropIcon || "",
     coverImage: initialData?.coverImage || "",
     expectedROI: initialData?.expectedROI || 0,
-    startDate: initialData?.startDate || "",
-    endDate: initialData?.endDate || "",
+    expiryDate: initialData?.expiryDate || "",
     minBudget: initialData?.minBudget || "",
     maxBudget: initialData?.maxBudget || "",
     farmingMethod: initialData?.farmingMethod || "traditional",
@@ -138,9 +143,9 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
     if (!formData.maxBudget.trim()) newErrors.maxBudget = "Required";
     if (!formData.expectedROI || formData.expectedROI <= 0)
       newErrors.expectedROI = "Must be > 0";
-    if (!formData.startDate) newErrors.startDate = "Required";
-    if (!formData.endDate) newErrors.endDate = "Required";
-    if (!formData.cropType) newErrors.cropType = "Select a crop icon";
+    if (!formData.expiryDate) newErrors.expiryDate = "Required";
+    if (!formData.cropName.trim()) newErrors.cropName = "Required";
+    if (!formData.cropIcon) newErrors.cropIcon = "Select a crop icon";
     if (!formData.coverImage) newErrors.coverImage = "Select a cover image";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -167,7 +172,9 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
       </span>
     ) : null;
 
-  const selectedCover = coverImages.find((c) => c.id === formData.coverImage);
+  const selectedCover = coverImageList.find(
+    (c) => c.id === formData.coverImage,
+  );
 
   return (
     <div
@@ -187,7 +194,7 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
         </button>
         <div className="flex-1 min-w-0">
           <p className="text-[10px] text-[#85a446] font-bold uppercase tracking-widest mb-0.5">
-            New Offer
+            {headerLabel}
           </p>
           <h2 className="text-white text-base font-bold leading-none">
             Investment Offer
@@ -446,48 +453,29 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
             </div>
           </div>
 
-          {/* Timeline */}
+          {/* Offer Expiry Date */}
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-1.5 h-5 rounded-full bg-[#85a446]" />
               <span className="text-sm text-slate-200 font-bold uppercase tracking-wider">
-                Timeline
+                Offer Expiry Date
               </span>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <label className="block">
-                <span className={labelCls}>Start Date</span>
-                <input
-                  className={
-                    (errors.startDate ? inputErrCls : inputCls) +
-                    " [color-scheme:dark] cursor-pointer"
-                  }
-                  type="date"
-                  min={new Date().toISOString().split("T")[0]}
-                  value={formData.startDate}
-                  onChange={(e) =>
-                    handleInputChange("startDate", e.target.value)
-                  }
-                />
-                {errMsg("startDate")}
-              </label>
-              <label className="block">
-                <span className={labelCls}>End Date</span>
-                <input
-                  className={
-                    (errors.endDate ? inputErrCls : inputCls) +
-                    " [color-scheme:dark] cursor-pointer"
-                  }
-                  type="date"
-                  min={
-                    formData.startDate || new Date().toISOString().split("T")[0]
-                  }
-                  value={formData.endDate}
-                  onChange={(e) => handleInputChange("endDate", e.target.value)}
-                />
-                {errMsg("endDate")}
-              </label>
-            </div>
+            <label className="block">
+              <input
+                className={
+                  (errors.expiryDate ? inputErrCls : inputCls) +
+                  " [color-scheme:dark] cursor-pointer"
+                }
+                type="date"
+                min={new Date().toISOString().split("T")[0]}
+                value={formData.expiryDate}
+                onChange={(e) =>
+                  handleInputChange("expiryDate", e.target.value)
+                }
+              />
+              {errMsg("expiryDate")}
+            </label>
           </div>
 
           {/* Farming & Support */}
@@ -610,31 +598,42 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
             <div className="flex items-center gap-2 mb-3">
               <div className="w-1.5 h-5 rounded-full bg-[#85a446]" />
               <span className="text-sm text-slate-200 font-bold uppercase tracking-wider">
-                Crop Icon
+                Crop Type &amp; Icon
               </span>
-              {formData.cropType && (
+              {formData.cropIcon && (
                 <span className="ml-auto text-xl leading-none">
-                  {formData.cropType}
+                  {formData.cropIcon}
                 </span>
               )}
             </div>
+            <label className="block mb-3">
+              <span className={labelCls}>Crop Name</span>
+              <input
+                className={errors.cropName ? inputErrCls : inputCls}
+                type="text"
+                placeholder="e.g. Basmati Rice"
+                value={formData.cropName}
+                onChange={(e) => handleInputChange("cropName", e.target.value)}
+              />
+              {errMsg("cropName")}
+            </label>
             <div className="grid grid-cols-5 gap-1.5">
               {CROP_EMOJIS.map((emoji) => (
                 <button
                   key={emoji}
                   type="button"
                   className={`text-xl h-11 flex items-center justify-center rounded-lg transition-all ${
-                    formData.cropType === emoji
+                    formData.cropIcon === emoji
                       ? "bg-[#85a446]/20 ring-2 ring-[#85a446] scale-105 shadow-lg shadow-[#85a446]/15"
                       : "bg-[#141414] hover:bg-[#85a446]/10"
                   }`}
-                  onClick={() => handleInputChange("cropType", emoji)}
+                  onClick={() => handleInputChange("cropIcon", emoji)}
                 >
                   {emoji}
                 </button>
               ))}
             </div>
-            {errMsg("cropType")}
+            {errMsg("cropIcon")}
           </div>
 
           {/* Cover Image */}
@@ -672,7 +671,7 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
             )}
 
             <div className="grid grid-cols-5 gap-1.5">
-              {coverImages.map((image) => (
+              {coverImageList.map((image) => (
                 <div
                   key={image.id}
                   className={`relative rounded-lg overflow-hidden cursor-pointer aspect-square transition-all ${
@@ -715,7 +714,7 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
           onClick={handleSubmitClick}
           className="flex items-center gap-2 bg-[#85a446] hover:bg-[#93b34e] active:scale-[0.98] text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all shadow-lg shadow-[#85a446]/20"
         >
-          Create Investment Offer <ArrowForward style={{ fontSize: 18 }} />
+          {submitLabel} <ArrowForward style={{ fontSize: 18 }} />
         </button>
       </div>
     </div>
