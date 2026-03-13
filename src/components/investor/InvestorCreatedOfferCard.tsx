@@ -18,7 +18,6 @@ import {
   Box,
   Card,
   CardContent,
-  CardMedia,
   Chip,
   Divider,
   IconButton,
@@ -100,124 +99,108 @@ const InvestorCreatedOfferCard = ({
         },
       }}
     >
-      <Box sx={{ position: "relative" }}>
-        <CardMedia
-          component="div"
-          sx={{
-            height: 150,
-            background: bgUrl
-              ? `url(${bgUrl}) center/cover`
-              : "linear-gradient(135deg, var(--color-olive) 0%, var(--color-olive-light) 100%)",
-          }}
-        />
+      <Box
+        sx={{
+          position: "relative",
+          height: 160,
+          background: bgUrl
+            ? `url(${bgUrl}) center/cover`
+            : "linear-gradient(135deg, var(--color-olive) 0%, var(--color-olive-light) 100%)",
+          overflow: "hidden",
+        }}
+      >
         <Box
           sx={{
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.70) 100%)",
+              "linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.75) 100%)",
           }}
         />
+
         <Box
           sx={{
-            position: "absolute",
-            top: 12,
-            left: 12,
-            width: 40,
-            height: 40,
-            borderRadius: "50%",
-            background: "rgba(255,255,255,0.15)",
-            backdropFilter: "blur(8px)",
+            position: "relative",
+            zIndex: 2,
+            p: 2,
+            height: "100%",
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "1.3rem",
-            border: "1px solid rgba(255,255,255,0.3)",
-            zIndex: 1,
-          }}
-        >
-          {offer.cropIcon}
-        </Box>
-        <Box
-          sx={{
-            position: "absolute",
-            top: 12,
-            right: 12,
-            display: "flex",
-            gap: 0.75,
             flexDirection: "column",
-            alignItems: "flex-end",
-            zIndex: 1,
+            justifyContent: "space-between",
           }}
         >
-          <Chip
-            label={isHarvest ? "Harvest Offer" : "Sponsorship"}
-            size="small"
-            sx={{
-              background: isHarvest
-                ? "rgba(76,175,80,0.85)"
-                : "rgba(33,150,243,0.85)",
-              color: "#fff",
-              fontWeight: 600,
-              fontSize: "0.68rem",
-              height: 22,
-              backdropFilter: "blur(4px)",
-            }}
-          />
-          <Chip
-            label="Awaiting Farmers"
-            size="small"
-            sx={{
-              background: "rgba(255,152,0,0.85)",
-              color: "#fff",
-              fontWeight: 600,
-              fontSize: "0.68rem",
-              height: 22,
-              backdropFilter: "blur(4px)",
-            }}
-          />
-        </Box>
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            px: 1.5,
-            pb: 1.25,
-            zIndex: 1,
-          }}
-        >
-          <Typography
-            variant="subtitle2"
-            sx={{
-              color: "#fff",
-              fontWeight: 700,
-              lineHeight: 1.3,
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
-              textShadow: "0 1px 4px rgba(0,0,0,0.6)",
-            }}
-          >
-            {title}
-          </Typography>
-          <Box
-            sx={{ display: "flex", alignItems: "center", gap: 0.4, mt: 0.3 }}
-          >
-            <Agriculture
-              sx={{ fontSize: 12, color: "rgba(255,255,255,0.8)" }}
+          <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap" }}>
+            <Chip
+              label={isHarvest ? "Harvest Offer" : "Sponsorship"}
+              size="small"
+              sx={{
+                background: isHarvest
+                  ? "rgba(76,175,80,0.85)"
+                  : "rgba(33,150,243,0.85)",
+                color: "#fff",
+                fontWeight: 600,
+                fontSize: "0.68rem",
+                letterSpacing: 0.3,
+                backdropFilter: "blur(10px)",
+              }}
             />
-            <Typography
-              variant="caption"
-              sx={{ color: "rgba(255,255,255,0.85)", fontSize: "0.7rem" }}
+            <Chip
+              label="Awaiting Farmers"
+              size="small"
+              sx={{
+                background: "rgba(255,152,0,0.85)",
+                color: "#fff",
+                fontWeight: 600,
+                fontSize: "0.68rem",
+                backdropFilter: "blur(10px)",
+              }}
+            />
+          </Box>
+
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <Box
+              sx={{
+                width: 48,
+                height: 48,
+                background: "var(--surface-light)",
+                backdropFilter: "blur(10px)",
+                borderRadius: 1.5,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "1.5rem",
+                flexShrink: 0,
+              }}
             >
-              {isHarvest ? hd?.cropType : (cd?.cropTypes ?? []).join(", ")}
-            </Typography>
+              {offer.cropIcon}
+            </Box>
+            <Box sx={{ minWidth: 0 }}>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 700,
+                  color: "var(--text-primary)",
+                  textShadow: "0 2px 4px var(--overlay-sm)",
+                  fontSize: "1.05rem",
+                  lineHeight: 1.2,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {title}
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{ color: "var(--text-on-dark)", fontSize: "0.75rem" }}
+              >
+                {isHarvest ? hd?.cropType : (cd?.cropTypes ?? []).join(", ")}
+              </Typography>
+            </Box>
           </Box>
         </Box>
       </Box>
+
 
       <CardContent sx={{ p: 2 }}>
         <Divider sx={{ mb: 1.5 }} />

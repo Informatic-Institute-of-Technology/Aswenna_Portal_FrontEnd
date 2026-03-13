@@ -284,14 +284,6 @@ const MyOffersPage = () => {
           }}
         >
           My Created Offers
-          <Typography
-            component="span"
-            variant="body2"
-            color="text.secondary"
-            sx={{ fontWeight: 400, ml: 1 }}
-          >
-            (Awaiting Farmer Responses)
-          </Typography>
         </Typography>
 
         {createdOffersLoading ? (
