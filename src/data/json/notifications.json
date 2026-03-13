@@ -116,7 +116,7 @@
   },
   {
     "id": "notif-009",
-    "userId": "usr-inv-002",
+    "userId": "69aa938c6610063a02adee58",
     "type": "approval_status",
     "title": "Request Accepted",
     "message": "Gamini Bandara accepted your partnership request for Spice Garden project",
@@ -131,7 +131,7 @@
   },
   {
     "id": "notif-010",
-    "userId": "usr-inv-002",
+    "userId": "69aa938c6610063a02adee58",
     "type": "financial_update",
     "title": "Profit Distribution",
     "message": "LKR 120,000 quarterly profit distributed from Mango Orchard investment",
@@ -145,7 +145,7 @@
   },
   {
     "id": "notif-011",
-    "userId": "usr-inv-001",
+    "userId": "69aa938c6610063a02adee58",
     "type": "request_status",
     "title": "New Farmer Request",
     "message": "Chamara Herath sent you a new sponsorship request for Mushroom Cultivation",
@@ -159,7 +159,7 @@
   },
   {
     "id": "notif-012",
-    "userId": "usr-inv-001",
+    "userId": "69aa938c6610063a02adee58",
     "type": "financial_update",
     "title": "Budget Updated",
     "message": "Project budget for Organic Herb Garden has been revised to LKR 850,000",
