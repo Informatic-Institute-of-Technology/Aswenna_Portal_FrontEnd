@@ -1,0 +1,174 @@
+[
+  {
+    "id": "notif-001",
+    "userId": "69aa938c6610063a02adee58",
+    "type": "approval_status",
+    "title": "Request Accepted",
+    "message": "Kamal Perera accepted your sponsorship offer for Paddy Cultivation Project",
+    "timestamp": "2026-03-13T14:30:00Z",
+    "read": false,
+    "meta": {
+      "requestId": "req-003",
+      "oldStatus": "pending",
+      "newStatus": "accepted",
+      "icon": "check_circle"
+    }
+  },
+  {
+    "id": "notif-002",
+    "userId": "69aa938c6610063a02adee58",
+    "type": "financial_update",
+    "title": "Investment Disbursed",
+    "message": "LKR 450,000 has been disbursed for the Organic Vegetable Farm project in Anuradhapura",
+    "timestamp": "2026-03-13T13:15:00Z",
+    "read": false,
+    "meta": {
+      "amount": 450000,
+      "currency": "LKR",
+      "projectName": "Organic Vegetable Farm"
+    }
+  },
+  {
+    "id": "notif-003",
+    "userId": "69aa938c6610063a02adee58",
+    "type": "request_status",
+    "title": "Request Under Review",
+    "message": "Your land lease request to Nimal Fernando is now being reviewed by the landowner",
+    "timestamp": "2026-03-13T11:45:00Z",
+    "read": false,
+    "meta": {
+      "requestId": "req-007",
+      "oldStatus": "pending_response",
+      "newStatus": "under_review"
+    }
+  },
+  {
+    "id": "notif-004",
+    "userId": "69aa938c6610063a02adee58",
+    "type": "approval_status",
+    "title": "Agreement Signed",
+    "message": "Sunil Rajapaksa signed the agreement for Coconut Plantation sponsorship",
+    "timestamp": "2026-03-13T09:20:00Z",
+    "read": false,
+    "meta": {
+      "requestId": "req-012",
+      "oldStatus": "pending_agreement",
+      "newStatus": "agreement_signed",
+      "icon": "handshake"
+    }
+  },
+  {
+    "id": "notif-005",
+    "userId": "69aa938c6610063a02adee58",
+    "type": "financial_update",
+    "title": "Revenue Share Received",
+    "message": "You received LKR 78,500 revenue share from the Cinnamon Export project",
+    "timestamp": "2026-03-12T18:00:00Z",
+    "read": true,
+    "meta": {
+      "amount": 78500,
+      "currency": "LKR",
+      "projectName": "Cinnamon Export"
+    }
+  },
+  {
+    "id": "notif-006",
+    "userId": "69aa938c6610063a02adee58",
+    "type": "approval_status",
+    "title": "Request Rejected",
+    "message": "Amal Silva declined your investment proposal for the Tea Plantation project",
+    "timestamp": "2026-03-12T15:30:00Z",
+    "read": true,
+    "meta": {
+      "requestId": "req-018",
+      "oldStatus": "under_review",
+      "newStatus": "rejected",
+      "icon": "cancel"
+    }
+  },
+  {
+    "id": "notif-007",
+    "userId": "69aa938c6610063a02adee58",
+    "type": "request_status",
+    "title": "Negotiation Started",
+    "message": "Priya Wickramasinghe wants to negotiate the terms of your harvest offer",
+    "timestamp": "2026-03-12T12:10:00Z",
+    "read": true,
+    "meta": {
+      "requestId": "req-021",
+      "oldStatus": "pending_response",
+      "newStatus": "negotiating"
+    }
+  },
+  {
+    "id": "notif-008",
+    "userId": "69aa938c6610063a02adee58",
+    "type": "financial_update",
+    "title": "Payment Pending",
+    "message": "LKR 250,000 payment is pending processing for the Rice Paddy project",
+    "timestamp": "2026-03-12T09:00:00Z",
+    "read": true,
+    "meta": {
+      "amount": 250000,
+      "currency": "LKR",
+      "projectName": "Rice Paddy"
+    }
+  },
+  {
+    "id": "notif-009",
+    "userId": "usr-inv-002",
+    "type": "approval_status",
+    "title": "Request Accepted",
+    "message": "Gamini Bandara accepted your partnership request for Spice Garden project",
+    "timestamp": "2026-03-13T10:00:00Z",
+    "read": false,
+    "meta": {
+      "requestId": "req-025",
+      "oldStatus": "pending",
+      "newStatus": "accepted",
+      "icon": "check_circle"
+    }
+  },
+  {
+    "id": "notif-010",
+    "userId": "usr-inv-002",
+    "type": "financial_update",
+    "title": "Profit Distribution",
+    "message": "LKR 120,000 quarterly profit distributed from Mango Orchard investment",
+    "timestamp": "2026-03-12T16:45:00Z",
+    "read": false,
+    "meta": {
+      "amount": 120000,
+      "currency": "LKR",
+      "projectName": "Mango Orchard"
+    }
+  },
+  {
+    "id": "notif-011",
+    "userId": "usr-inv-001",
+    "type": "request_status",
+    "title": "New Farmer Request",
+    "message": "Chamara Herath sent you a new sponsorship request for Mushroom Cultivation",
+    "timestamp": "2026-03-11T14:20:00Z",
+    "read": true,
+    "meta": {
+      "requestId": "req-030",
+      "oldStatus": null,
+      "newStatus": "new"
+    }
+  },
+  {
+    "id": "notif-012",
+    "userId": "usr-inv-001",
+    "type": "financial_update",
+    "title": "Budget Updated",
+    "message": "Project budget for Organic Herb Garden has been revised to LKR 850,000",
+    "timestamp": "2026-03-11T10:30:00Z",
+    "read": true,
+    "meta": {
+      "amount": 850000,
+      "currency": "LKR",
+      "projectName": "Organic Herb Garden"
+    }
+  }
+]

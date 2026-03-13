@@ -13,6 +13,9 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import LoadingAnimation from "../components/common/LoadingAnimation";
+import type { NotificationItem } from "../components/common/NotificationPopup";
+import NotificationPopup from "../components/common/NotificationPopup";
+import { notificationsData } from "../data/json";
 import {
   FarmerSidebar,
   InvestorSidebar,
@@ -29,6 +32,35 @@ const drawerWidth = 280;
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+
+  const [notifications, setNotifications] = useState<NotificationItem[]>(
+    (notificationsData as NotificationItem[]).filter(
+      (n) => n.userId === user?._id,
+    ),
+  );
+  
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  const handleNotificationClick = (
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleNotificationClose = () => {
+    setAnchorEl(null);
+  };
+  
+  const handleMarkAllAsRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  };
+
+  const handleMarkAsRead = (id: string) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
+    );
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -114,14 +146,23 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             </IconButton>
             <IconButton
               color="inherit"
+              onClick={handleNotificationClick}
               sx={{ border: "1px solid", borderColor: "divider" }}
             >
-              <Badge badgeContent={5} color="error">
+              <Badge badgeContent={unreadCount} color="error">
                 <Notifications />
               </Badge>
             </IconButton>
           </Box>
         </Toolbar>
+
+        <NotificationPopup
+          anchorEl={anchorEl}
+          onClose={handleNotificationClose}
+          notifications={notifications}
+          onMarkAllAsRead={handleMarkAllAsRead}
+          onMarkAsRead={handleMarkAsRead}
+        />
 
         {loading ? (
           <Container maxWidth="xl">

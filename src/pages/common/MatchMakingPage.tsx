@@ -3,15 +3,15 @@ const MatchMakingPage = () => {
     <>
       <div className="widget-card">
         <div className="widget-card-header">
-          <h2 className="widget-card-title">Match Making</h2>
+          <h2 className="widget-card-title">Smart Match Making</h2>
         </div>
         <div className="widget-card-content">
           <p>
-            AI-powered tool that suggests best investor matches and recommended
-            land.
+            AI-powered recommendations that connect investors, farmers, and
+            suitable land opportunities.
           </p>
           <div className="chart-placeholder" style={{ marginTop: "2rem" }}>
-            🤖 AI-powered matching system
+            🤖 Smart AI-powered matching system
           </div>
         </div>
       </div>
