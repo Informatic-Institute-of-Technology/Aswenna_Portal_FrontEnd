@@ -10,24 +10,52 @@ import {
 import FarmerJobCard from "../../components/farmer/FarmerJobCard";
 import InvestmentRequestCard from "../../components/investor/InvestmentRequestCard";
 import InvestmentRequestDialog from "../../components/investor/InvestmentRequestDialog";
+import HireFarmerDialog from "../../components/investor/HireFarmerDialog";
 import { farmerJobsData, investmentRequestsData } from "../../data/json";
 import { FarmerJobType } from "../../types/farmer.types";
+import Notification from "../../shared/components/Notification";
+import { getInvestorOffers } from "../../services/offer.service";
+import { useEffect } from "react";
 
 const OpportunitiesPage = () => {
-  const [activeTab, setActiveTab] = useState<"investments" | "hire">(
-    "investments",
-  );
-  const [selectedRequest, setSelectedRequest] =
-    useState<InvestmentRequest | null>(null);
+  const [activeTab, setActiveTab] = useState<"investments" | "hire">("investments");
+  const [selectedRequest, setSelectedRequest] = useState<InvestmentRequest | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const investmentRequests = (
-    investmentRequestsData as InvestmentRequest[]
-  ).filter((req) => req.status === "open");
+  // Hire Farmer State
+  const [hireDialogOpen, setHireDialogOpen] = useState(false);
+  const [selectedFarmerForHire, setSelectedFarmerForHire] = useState<FarmerJob | null>(null);
+  const [liveOffers, setLiveOffers] = useState<any[]>([]);
+
+  const [notification, setNotification] = useState<{ open: boolean, message: string }>({ open: false, message: "" });
+
+  useEffect(() => {
+    getInvestorOffers().then((res) => {
+      if (res.data) {
+        const mappedOffers = res.data
+          .filter(offer => offer.offerType === 'direct-harvest' && offer.status !== 'completed' && offer.status !== 'cancelled')
+          .map(offer => {
+            const details = (offer as any).harvestBaseDetails;
+            return {
+              id: offer._id,
+              projectTitle: details?.projectTitle || 'Untitled Harvest',
+              cropType: details?.cropType || 'Crop',
+              cropIcon: '🌾',
+              requiredQuantity: details?.requiredQuantity || 0,
+              quantityUnit: details?.quantityUnit || 'kg',
+              totalBudget: details?.totalBudget || 0,
+            };
+          });
+        setLiveOffers(mappedOffers);
+      }
+    }).catch(err => console.error("Failed to load offers", err));
+  }, []);
+
+  const investmentRequests = (investmentRequestsData as InvestmentRequest[]).filter((req) => req.status === "open");
 
   const allFarmerJobs = farmerJobsData as FarmerJob[];
   const farmerJobs = allFarmerJobs.filter(
-    (job) => job.jobType === FarmerJobType.COMMISSION && job.status === "OPEN",
+    (job) => job.jobType === FarmerJobType.COMMISSION && job.status === "OPEN"
   );
 
   const handleViewDetails = (request: InvestmentRequest) => {
@@ -42,6 +70,29 @@ const OpportunitiesPage = () => {
 
   const handleInvest = (id: string) => {
     console.log("Invest in request:", id);
+  };
+
+  const handleOpenHireDialog = (farmer: FarmerJob) => {
+    setSelectedFarmerForHire(farmer);
+    setHireDialogOpen(true);
+  };
+
+  const handleCloseHireDialog = () => {
+    setHireDialogOpen(false);
+    setSelectedFarmerForHire(null);
+  };
+
+  const handleHireSubmit = (farmer: FarmerJob, offer: any) => {
+    setNotification({
+      open: true,
+      message: `The Project ${offer.projectTitle} ${farmer.farmerName} has been requested`
+    });
+    setHireDialogOpen(false);
+    setSelectedFarmerForHire(null);
+  };
+
+  const handleCloseNotification = () => {
+    setNotification(prev => ({ ...prev, open: false }));
   };
 
   const tabs: TabItem[] = [
@@ -148,6 +199,7 @@ const OpportunitiesPage = () => {
                     job={job}
                     onViewMore={(job) => console.log("View job:", job)}
                     onConnect={(job) => console.log("Connect to job:", job)}
+                    onHire={handleOpenHireDialog}
                   />
                 ))}
               </Box>
@@ -173,12 +225,27 @@ const OpportunitiesPage = () => {
         )}
       </Box>
 
-      {/* Investment Request Details Dialog */}
       <InvestmentRequestDialog
         request={selectedRequest}
         open={dialogOpen}
         onClose={handleCloseDialog}
         onInvest={handleInvest}
+      />
+
+      <HireFarmerDialog
+        open={hireDialogOpen}
+        onClose={handleCloseHireDialog}
+        farmer={selectedFarmerForHire}
+        offers={liveOffers}
+        onSubmit={handleHireSubmit}
+      />
+
+      <Notification
+        open={notification.open}
+        message={notification.message}
+        severity="success"
+        duration={5000}
+        onClose={handleCloseNotification}
       />
     </>
   );

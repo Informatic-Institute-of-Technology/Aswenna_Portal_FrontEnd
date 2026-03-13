@@ -39,7 +39,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       (n) => n.userId === user?._id,
     ),
   );
-  
+
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const handleNotificationClick = (
@@ -51,7 +51,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const handleNotificationClose = () => {
     setAnchorEl(null);
   };
-  
+
   const handleMarkAllAsRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
