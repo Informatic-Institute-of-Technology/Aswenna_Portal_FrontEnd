@@ -1,11 +1,32 @@
+import {
+  Add,
+  Agriculture,
+  AttachMoney,
+  History,
+  Inbox,
+  Landscape,
+  NotificationsActive,
+  PendingActions,
+  PriorityHigh,
+  Send,
+  Tune,
+  Verified,
+} from "@mui/icons-material";
+import {
+  Avatar,
+  Box,
+  Button,
+  Chip,
+  Divider,
+  Stack,
+  Tab,
+  Tabs,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 import {
   ConnectionJourney,
-  FilterChip,
-  QuickActions,
   RequestCard,
-  SectionHeader,
-  TabNavigation,
 } from "../../components/investor/requests";
 import agreementsPendingData from "../../data/json/agreementsPending.json";
 import farmerRequestsData from "../../data/json/farmerRequests.json";
@@ -38,10 +59,6 @@ interface RequestData {
   tags: Array<{ label: string; variant: "primary" | "secondary" }>;
   description: string;
   timestamp: string;
-  totalInvestment?: string;
-  investmentAmount?: string;
-  expectedROI?: string;
-  duration?: string;
   journeySteps: Array<{
     title: string;
     description: string;
@@ -53,726 +70,854 @@ interface RequestData {
   highlighted: boolean;
 }
 
+const SubNavPill = ({
+  label,
+  icon,
+  count,
+  active,
+  onClick,
+}: {
+  label: string;
+  icon: React.ReactNode;
+  count: number;
+  active: boolean;
+  onClick: () => void;
+}) => (
+  <Box
+    onClick={onClick}
+    sx={{
+      display: "flex",
+      alignItems: "center",
+      gap: 1,
+      px: 2,
+      py: 1,
+      borderRadius: "20px",
+      cursor: "pointer",
+      transition: "all 0.2s",
+      background: active ? "#27272A" : "transparent",
+      "&:hover": {
+        background: active ? "#27272A" : "rgba(255,255,255,0.04)",
+      },
+    }}
+  >
+    <Box sx={{ color: active ? "#F4F4F5" : "#A1A1AA", display: "flex" }}>
+      {icon}
+    </Box>
+    <Typography
+      variant="body2"
+      sx={{
+        fontWeight: active ? 700 : 500,
+        color: active ? "#F4F4F5" : "#A1A1AA",
+        fontSize: "0.82rem",
+      }}
+    >
+      {label}
+    </Typography>
+    <Box
+      sx={{
+        minWidth: 22,
+        height: 22,
+        borderRadius: "11px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: active ? "#3F3F46" : "rgba(255,255,255,0.06)",
+        px: 0.75,
+      }}
+    >
+      <Typography
+        variant="caption"
+        sx={{
+          fontSize: "0.65rem",
+          fontWeight: 700,
+          color: active ? "#F4F4F5" : "#A1A1AA",
+        }}
+      >
+        {count}
+      </Typography>
+    </Box>
+  </Box>
+);
+
+const SentCard = ({
+  request,
+  isSelected,
+  onClick,
+}: {
+  request: RequestData;
+  isSelected: boolean;
+  onClick: () => void;
+}) => {
+  const statusColorMap: Record<string, { bg: string; text: string }> = {
+    accepted: { text: "#34D399", bg: "#064E3B" },
+    rejected: { text: "#F87171", bg: "#7F1D1D" },
+    under_review: { text: "#60a5fa", bg: "rgba(96,165,250,0.15)" },
+    pending_response: { text: "#FBBF24", bg: "#4B330B" },
+    negotiating: { text: "#c084fc", bg: "rgba(192,132,252,0.15)" },
+  };
+  const iconMap: Record<string, string> = {
+    accepted: "check_circle",
+    rejected: "block",
+    under_review: "schedule",
+    pending_response: "pending",
+    negotiating: "auto_awesome",
+  };
+  const icon = iconMap[request.statusBadge.variant] ?? "pending";
+  const statusStyle = statusColorMap[request.statusBadge.variant] ?? {
+    text: "#94a3b8",
+    bg: "rgba(148,163,184,0.15)",
+  };
+  const isLandowner = request.recipientType === "landowner";
+
+  return (
+    <Box
+      onClick={onClick}
+      sx={{
+        borderRadius: 2.5,
+        border: "1px solid",
+        borderColor: isSelected ? "rgba(163, 230, 53, 0.3)" : "#27272A",
+        background: isSelected ? "rgba(163, 230, 53, 0.05)" : "#18181B",
+        p: 2,
+        cursor: "pointer",
+        transition: "all 0.25s",
+        "&:hover": {
+          transform: "translateY(-2px)",
+          borderColor: "rgba(255,255,255,0.12)",
+        },
+        position: "relative",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1.5,
+          mb: 1.25,
+          pl: 1,
+        }}
+      >
+        <Avatar
+          sx={{
+            width: 40,
+            height: 40,
+            background: "#262626",
+            fontWeight: 800,
+            fontSize: "0.85rem",
+            color: "#cbd5e1",
+            flexShrink: 0,
+          }}
+        >
+          {request.farmerInitials}
+        </Avatar>
+
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: 800, fontSize: "0.85rem", color: "#F4F4F5" }}
+          >
+            {request.farmerName}
+          </Typography>
+          <Typography
+            variant="caption"
+            sx={{ color: "#A1A1AA", fontSize: "0.72rem" }}
+          >
+            {isLandowner ? "Landowner" : "Farmer"} • {request.location}
+          </Typography>
+        </Box>
+
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 0.5,
+            px: 1.25,
+            py: 0.45,
+            borderRadius: 1.5,
+            background: statusStyle.bg,
+          }}
+        >
+          <span
+            className="material-icons"
+            style={{ fontSize: 13, color: statusStyle.text }}
+          >
+            {icon}
+          </span>
+          <Typography
+            variant="caption"
+            sx={{
+              fontWeight: 800,
+              color: statusStyle.text,
+              fontSize: "0.68rem",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {request.statusBadge.label}
+          </Typography>
+        </Box>
+      </Box>
+
+      <Typography
+        variant="caption"
+        sx={{
+          color: "#A1A1AA",
+          fontSize: "0.74rem",
+          display: "-webkit-box",
+          WebkitLineClamp: 1,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden",
+          mb: 1.25,
+          pl: 1,
+        }}
+      >
+        {request.description}
+      </Typography>
+
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          pl: 1,
+        }}
+      >
+        <Typography
+          variant="caption"
+          sx={{ color: "#71717A", fontSize: "0.67rem", fontWeight: 500 }}
+        >
+          {request.timestamp}
+        </Typography>
+        <Stack direction="row" spacing={0.75}>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={(e) => e.stopPropagation()}
+            sx={{
+              fontSize: "0.67rem",
+              fontWeight: 600,
+              textTransform: "none",
+              borderRadius: 1.5,
+              borderColor: "rgba(255,255,255,0.12)",
+              color: "#94a3b8",
+              py: 0.35,
+              minWidth: 0,
+              px: 1.25,
+              "&:hover": {
+                borderColor: `${statusStyle.text}45`,
+                color: statusStyle.text,
+              },
+            }}
+          >
+            View
+          </Button>
+          {request.statusBadge.variant === "accepted" ? (
+            <Button
+              size="small"
+              variant="contained"
+              onClick={(e) => e.stopPropagation()}
+              sx={{
+                fontSize: "0.67rem",
+                fontWeight: 800,
+                textTransform: "none",
+                borderRadius: 1.5,
+                py: 0.35,
+                px: 1.25,
+                minWidth: 0,
+                background: `linear-gradient(135deg, #85a446 0%, #aed95c 100%)`,
+                color: "#fff",
+                boxShadow: "0 2px 8px rgba(133,164,70,0.35)",
+              }}
+            >
+              Message
+            </Button>
+          ) : (
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={(e) => e.stopPropagation()}
+              sx={{
+                fontSize: "0.67rem",
+                fontWeight: 700,
+                textTransform: "none",
+                borderRadius: 1.5,
+                py: 0.35,
+                px: 1.25,
+                minWidth: 0,
+                borderColor: "#f87171",
+                color: "#f87171",
+                "&:hover": {
+                  background: "rgba(248,113,113,0.1)",
+                  borderColor: "#f87171",
+                },
+              }}
+            >
+              Withdraw
+            </Button>
+          )}
+        </Stack>
+      </Box>
+    </Box>
+  );
+};
+
 const RequestsPage = () => {
-  const [activeTab, setActiveTab] = useState("incoming");
-  const [sentRequestsRecipientFilter, setSentRequestsRecipientFilter] =
-    useState<"landowner" | "farmer">("landowner");
+  const [activeTab, setActiveTab] = useState<"incoming" | "sent" | "history">(
+    "incoming",
+  );
+  const [incomingSubTab, setIncomingSubTab] = useState<
+    "agreements" | "farmer-requests"
+  >("agreements");
+  const [sentFilter, setSentFilter] = useState<"landowner" | "farmer">(
+    "landowner",
+  );
   const [selectedRequest, setSelectedRequest] = useState<RequestData | null>(
     null,
   );
-  const [isAgreementsExpanded, setIsAgreementsExpanded] = useState(true);
-  const [isFarmerRequestsExpanded, setIsFarmerRequestsExpanded] =
-    useState(true);
 
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
-    setSelectedRequest(null); // Clear selection when switching tabs
+  const handleTabChange = (_: unknown, val: string) => {
+    setActiveTab(val as typeof activeTab);
+    setSelectedRequest(null);
   };
-
-  const handleUploadAgreement = () => {
-    console.log("Upload agreement clicked");
-  };
-
-  const handleQuickAction = (action: string) => {
-    console.log(`Quick action: ${action}`);
-  };
-
-  const handleSelectRequest = (request: RequestData) => {
-    setSelectedRequest(request);
-  };
+  const handleUploadAgreement = () => console.log("Upload agreement");
+  const handleSelect = (r: RequestData) =>
+    setSelectedRequest((prev) => (prev?.id === r.id ? null : r));
 
   const journeySteps =
-    selectedRequest?.journeySteps.map((step) => {
-      if (step.status === "active" && step.icon === "upload_file") {
-        return {
-          ...step,
-          uploadArea: {
-            text: "Click to upload PDF",
-            onUpload: handleUploadAgreement,
-          },
-        };
-      }
-      return step;
-    }) || [];
+    selectedRequest?.journeySteps.map((step) =>
+      step.status === "active" && step.icon === "upload_file"
+        ? {
+            ...step,
+            uploadArea: {
+              text: "Click to upload PDF",
+              onUpload: handleUploadAgreement,
+            },
+          }
+        : step,
+    ) ?? [];
 
-  const tabs = [
-    {
-      label: "Incoming Requests",
-      badge: agreementsPendingData.length + farmerRequestsData.length,
-      active: activeTab === "incoming",
-      onClick: () => handleTabChange("incoming"),
-    },
-    {
-      label: "My Sent Requests",
-      badge: sentRequestsData.length,
-      active: activeTab === "sent",
-      onClick: () => handleTabChange("sent"),
-    },
-    {
-      label: "History",
-      active: activeTab === "history",
-      onClick: () => handleTabChange("history"),
-    },
-  ];
-
-  const quickActions =
-    activeTab === "sent"
-      ? [
-          {
-            icon: "article",
-            label: "View Land Post",
-            onClick: () => handleQuickAction("view-land"),
-            color: "var(--color-info-blue)",
-          },
-          {
-            icon: "message",
-            label: "Message",
-            onClick: () => handleQuickAction("message"),
-            disabled: selectedRequest?.statusBadge.variant !== "accepted",
-          },
-        ]
-      : [
-          {
-            icon: "message",
-            label: "Message",
-            onClick: () => handleQuickAction("message"),
-          },
-          {
-            icon: "videocam",
-            label: "Schedule Call",
-            onClick: () => handleQuickAction("videocam"),
-          },
-          {
-            icon: "summarize",
-            label: "Notes",
-            onClick: () => handleQuickAction("summarize"),
-          },
-          {
-            icon: "block",
-            label: "Reject",
-            color: "var(--color-overdue)",
-            onClick: () => handleQuickAction("reject"),
-          },
-        ];
+  const totalIncoming =
+    agreementsPendingData.length + farmerRequestsData.length;
+  const totalSent = sentRequestsData.length;
+  const sentLandowners = (sentRequestsData as RequestData[]).filter(
+    (r) => r.recipientType === "landowner",
+  );
+  const sentFarmers = (sentRequestsData as RequestData[]).filter(
+    (r) => r.recipientType === "farmer",
+  );
 
   return (
-    <>
-      <div
-        style={{
-          background: "linear-gradient(145deg, var(--bg-subtle) 0%, var(--bg-overlay) 100%)",
-        }}
-        className="text-gray-300 font-sans h-full flex flex-col overflow-hidden transition-colors duration-200"
-      >
-        <div className="flex-1 overflow-hidden flex flex-col">
-          <div className="px-8 py-6 pb-2">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Requests Management
-                </h2>
-                <div className="flex items-center mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  <span className="font-medium text-primary mr-1">
-                    12 Actions Needed
-                  </span>
-                  <span>
-                    • Categorized farmer inquiries and pending agreements.
-                  </span>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <button className="flex items-center px-4 py-2 bg-primary hover:bg-primary-dark text-black text-sm font-bold rounded-lg shadow hover:shadow-primary/20 transition-all">
-                  <span className="material-icons-outlined text-lg mr-2">
-                    add
-                  </span>
-                  New Inquiry
-                </button>
-              </div>
-            </div>
-            <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <TabNavigation tabs={tabs} />
-              <div className="flex space-x-2 overflow-x-auto no-scrollbar py-1">
-                <FilterChip
-                  icon="priority_high"
-                  label="Urgent"
-                  variant="urgent"
-                />
-                <FilterChip
-                  icon="attach_money"
-                  label="High-Value"
-                  variant="high-value"
-                />
-                <FilterChip
-                  icon="verified"
-                  label="Verified"
-                  variant="verified"
-                />
-              </div>
-            </div>
-          </div>
-          <div className="flex-1 overflow-hidden flex flex-col lg:flex-row">
-            <div className="flex-1 overflow-y-auto p-6 pt-2 space-y-8">
-              {/* Incoming Requests Tab Content */}
-              {activeTab === "incoming" && (
-                <div className="space-y-6">
-                  {/* Agreements Pending Section */}
-                  <section
-                    style={{
-                      background:
-                        "linear-gradient(145deg, var(--bg-subtle) 0%, var(--bg-overlay) 100%)",
-                      border: "1px solid var(--color-olive-muted-strong)",
-                    }}
-                    className="rounded-2xl p-4"
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <SectionHeader
-                        title="Agreements Pending"
-                        icon="pending_actions"
-                        badge={{
-                          label: String(agreementsPendingData.length),
-                          variant: "primary",
-                        }}
-                        withGradientBar
-                      />
-                      <button
-                        onClick={() =>
-                          setIsAgreementsExpanded(!isAgreementsExpanded)
-                        }
-                        className="text-gray-400 hover:text-white transition-colors"
-                      >
-                        <span className="material-icons">
-                          {isAgreementsExpanded ? "expand_less" : "expand_more"}
-                        </span>
-                      </button>
-                    </div>
-                    {isAgreementsExpanded && (
-                      <div className="grid grid-cols-1 gap-4">
-                        {(agreementsPendingData as RequestData[]).map(
-                          (agreement) => (
-                            <div
-                              key={agreement.id}
-                              onClick={() => handleSelectRequest(agreement)}
-                              className="cursor-pointer"
-                            >
-                              <RequestCard
-                                type="agreement"
-                                name={agreement.farmerName}
-                                avatarUrl={agreement.farmerAvatar || undefined}
-                                avatarInitials={agreement.farmerInitials}
-                                location={agreement.location}
-                                statusBadge={agreement.statusBadge}
-                                tags={agreement.tags}
-                                description={agreement.description}
-                                timestamp={agreement.timestamp}
-                                primaryAction={{
-                                  label: "Upload Agreement",
-                                  icon: "upload_file",
-                                  onClick: handleUploadAgreement,
-                                }}
-                                highlighted={agreement.highlighted}
-                                isSelected={
-                                  selectedRequest?.id === agreement.id
-                                }
-                              />
-                            </div>
-                          ),
-                        )}
-                      </div>
-                    )}
-                  </section>
-
-                  <section
-                    style={{
-                      background:
-                        "linear-gradient(145deg, var(--bg-subtle) 0%, var(--bg-overlay) 100%)",
-                      border: "1px solid var(--color-olive-muted-strong)",
-                    }}
-                    className="rounded-2xl p-4"
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <SectionHeader
-                        title="Initial Farmer Requests"
-                        icon="inbox"
-                        badge={{ label: String(farmerRequestsData.length) }}
-                        withGradientBar
-                      />
-                      <button
-                        onClick={() =>
-                          setIsFarmerRequestsExpanded(!isFarmerRequestsExpanded)
-                        }
-                        className="text-gray-400 hover:text-white transition-colors"
-                      >
-                        <span className="material-icons">
-                          {isFarmerRequestsExpanded
-                            ? "expand_less"
-                            : "expand_more"}
-                        </span>
-                      </button>
-                    </div>
-                    {isFarmerRequestsExpanded && (
-                      <div className="space-y-4">
-                        {(farmerRequestsData as RequestData[]).map(
-                          (request) => (
-                            <div
-                              key={request.id}
-                              onClick={() => handleSelectRequest(request)}
-                              className="cursor-pointer"
-                            >
-                              <RequestCard
-                                type="farmer-request"
-                                name={request.farmerName}
-                                avatarUrl={request.farmerAvatar || undefined}
-                                avatarInitials={request.farmerInitials}
-                                location={request.location}
-                                isVerified={request.isVerified}
-                                statusBadge={request.statusBadge}
-                                tags={request.tags}
-                                description={request.description}
-                                timestamp={request.timestamp}
-                                primaryAction={{
-                                  label: "Review Request",
-                                  onClick: () => console.log("Review"),
-                                }}
-                                highlighted={request.highlighted}
-                                isSelected={selectedRequest?.id === request.id}
-                              />
-                            </div>
-                          ),
-                        )}
-                      </div>
-                    )}
-                  </section>
-                </div>
-              )}
-
-              {activeTab === "sent" && (
-                <div className="space-y-4">
-                  <div className="flex border-b border-gray-200 dark:border-zinc-800 mb-6">
-                    <button
-                      onClick={() =>
-                        setSentRequestsRecipientFilter("landowner")
-                      }
-                      className={`relative flex items-center pb-3 px-4 text-sm font-semibold transition-colors ${
-                        sentRequestsRecipientFilter === "landowner"
-                          ? "text-primary-dark dark:text-primary"
-                          : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                      }`}
-                    >
-                      <span className="material-icons-outlined mr-2 text-lg">
-                        landscape
-                      </span>
-                      Landowners
-                      <span
-                        className={`ml-2 text-xs px-2 py-0.5 rounded-full ${
-                          sentRequestsRecipientFilter === "landowner"
-                            ? "bg-primary/10 text-primary-dark dark:text-primary"
-                            : "bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-400"
-                        }`}
-                      >
-                        {
-                          (sentRequestsData as RequestData[]).filter(
-                            (r) => r.recipientType === "landowner",
-                          ).length
-                        }
-                      </span>
-                      {sentRequestsRecipientFilter === "landowner" && (
-                        <span
-                          className="absolute bottom-0 left-0 right-0 h-0.5"
-                          style={{
-                            backgroundColor: "var(--color-brand-primary)",
-                            marginBottom: "-1px",
-                          }}
-                        ></span>
-                      )}
-                    </button>
-                    <button
-                      onClick={() => setSentRequestsRecipientFilter("farmer")}
-                      className={`relative flex items-center pb-3 px-4 text-sm font-semibold transition-colors ${
-                        sentRequestsRecipientFilter === "farmer"
-                          ? "text-primary-dark dark:text-primary"
-                          : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                      }`}
-                    >
-                      <span className="material-icons-outlined mr-2 text-lg">
-                        agriculture
-                      </span>
-                      Farmers
-                      <span
-                        className={`ml-2 text-xs px-2 py-0.5 rounded-full ${
-                          sentRequestsRecipientFilter === "farmer"
-                            ? "bg-primary/10 text-primary-dark dark:text-primary"
-                            : "bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-400"
-                        }`}
-                      >
-                        {
-                          (sentRequestsData as RequestData[]).filter(
-                            (r) => r.recipientType === "farmer",
-                          ).length
-                        }
-                      </span>
-                      {sentRequestsRecipientFilter === "farmer" && (
-                        <span
-                          className="absolute bottom-0 left-0 right-0 h-0.5"
-                          style={{
-                            backgroundColor: "var(--color-olive)",
-                            marginBottom: "-1px",
-                          }}
-                        ></span>
-                      )}
-                    </button>
-                  </div>
-
-                  {sentRequestsRecipientFilter === "landowner" && (
-                    <section className="bg-gray-50 dark:bg-surface-dark/30 rounded-2xl border border-transparent dark:border-gray-700/10 p-4">
-                      <div className="flex items-center justify-between mb-4 sticky top-0 py-2 z-10">
-                        <h3 className="text-sm uppercase tracking-wide text-gray-500 dark:text-gray-300 font-bold flex items-center gap-2">
-                          <span className="material-icons text-primary text-lg">
-                            outbox
-                          </span>
-                          Landowner Connection Requests
-                          <span className="bg-primary/10 dark:bg-primary/20 text-primary-dark dark:text-primary text-xs px-2 py-0.5 rounded-full ml-1 border border-primary/10 dark:border-primary/10">
-                            {/* {(sentRequestsData as any[]).filter((r: any) => r.recipientType === 'landowner').length} */}
-                            {
-                              sentRequestsData.filter(
-                                (r) => r.recipientType === "landowner",
-                              ).length
-                            }
-                          </span>
-                        </h3>
-                      </div>
-                      <div className="space-y-4">
-                        {sentRequestsData
-                          .filter(
-                            (request) => request.recipientType === "landowner",
-                          )
-                          .map((request) => (
-                            <div
-                              key={request.id}
-                              onClick={() =>
-                                handleSelectRequest(request as RequestData)
-                              }
-                              className={`bg-surface-light dark:bg-surface-card rounded-xl p-5 shadow-sm transition-all cursor-pointer ${
-                                selectedRequest?.id === request.id
-                                  ? "border-2 border-primary/30 dark:border-primary/20 shadow-lg"
-                                  : "border border-gray-200/50 dark:border-gray-700/20 hover:border-green-500/50 dark:hover:border-green-500/30"
-                              }`}
-                            >
-                              <div className="flex justify-between items-start mb-3">
-                                <div className="flex items-center gap-3">
-                                  <div className="w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center text-orange-600 dark:text-orange-400 text-lg font-bold border border-orange-200/50 dark:border-orange-900/10">
-                                    {request.farmerInitials}
-                                  </div>
-                                  <div>
-                                    <h4 className="text-sm font-bold text-gray-900 dark:text-white">
-                                      {request.farmerName}
-                                    </h4>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                                      {request.recipientType === "landowner"
-                                        ? "Landowner"
-                                        : "Farmer"}{" "}
-                                      • {request.location}
-                                    </p>
-                                  </div>
-                                </div>
-                                <span
-                                  style={{
-                                    background: request.statusBadge.color
-                                      ? `${request.statusBadge.color}20`
-                                      : "#fef3c720",
-                                    color:
-                                      request.statusBadge.color || "var(--color-pending)",
-                                    border: request.statusBadge.color
-                                      ? `1px solid ${request.statusBadge.color}10`
-                                      : "1px solid var(--color-pending)10",
-                                  }}
-                                  className="px-2.5 py-1 rounded text-xs font-semibold flex items-center"
-                                >
-                                  <span className="material-icons text-[14px] mr-1">
-                                    {request.statusBadge.variant === "accepted"
-                                      ? "check_circle"
-                                      : request.statusBadge.variant ===
-                                          "rejected"
-                                        ? "block"
-                                        : request.statusBadge.variant ===
-                                            "under_review"
-                                          ? "schedule"
-                                          : "pending"}
-                                  </span>
-                                  {request.statusBadge.label}
-                                </span>
-                              </div>
-                              <div className="mb-4">
-                                {request.tags &&
-                                  request.tags.length > 0 &&
-                                  request.tags[0].label !== "Sent to Farmer" &&
-                                  request.tags[0].label !==
-                                    "Sent to Landowner" && (
-                                    <div className="p-3 bg-gray-50 dark:bg-zinc-900/50 rounded-lg border border-gray-100/50 dark:border-gray-700/10 mb-3">
-                                      <div className="flex items-center gap-2 mb-1">
-                                        <span className="material-icons text-gray-400 text-sm">
-                                          landscape
-                                        </span>
-                                        <h5 className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                                          {request.tags[0].label}
-                                        </h5>
-                                      </div>
-                                      <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
-                                        Ref #{request.id} • Posted on{" "}
-                                        {request.timestamp}
-                                      </p>
-                                    </div>
-                                  )}
-                                <p className="text-sm text-gray-600 dark:text-gray-300">
-                                  {request.description}
-                                </p>
-                              </div>
-                              <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-border-dark">
-                                <div className="text-xs text-gray-400">
-                                  Sent: {request.timestamp}
-                                </div>
-                                <div className="flex gap-2">
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      console.log("View Post");
-                                    }}
-                                    className="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-md transition-colors border border-gray-200 dark:border-zinc-700"
-                                  >
-                                    View Post
-                                  </button>
-                                  {request.statusBadge.variant ===
-                                  "accepted" ? (
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        console.log("Message");
-                                      }}
-                                      className="px-3 py-1.5 text-xs font-medium text-black bg-primary hover:bg-primary-dark rounded-md shadow-sm shadow-primary/20 transition-colors font-bold flex items-center"
-                                    >
-                                      <span className="material-icons text-[14px] mr-1">
-                                        chat
-                                      </span>{" "}
-                                      Message
-                                    </button>
-                                  ) : (
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        console.log("Withdraw");
-                                      }}
-                                      className="px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-md border border-red-100 dark:border-red-900/20 transition-colors"
-                                    >
-                                      Withdraw Request
-                                    </button>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                      </div>
-                    </section>
-                  )}
-
-                  {/* Farmer Requests Section */}
-                  {sentRequestsRecipientFilter === "farmer" && (
-                    <section className="bg-gray-50 dark:bg-surface-dark/30 rounded-2xl border border-transparent dark:border-gray-700/10 p-4">
-                      <div className="flex items-center justify-between mb-4 sticky top-0 py-2 z-10">
-                        <h3 className="text-sm uppercase tracking-wide text-gray-500 dark:text-gray-300 font-bold flex items-center gap-2">
-                          <span className="material-icons text-blue-500 text-lg">
-                            engineering
-                          </span>
-                          Farmer Connection Requests
-                          <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs px-2 py-0.5 rounded-full ml-1 border border-blue-200/50 dark:border-blue-900/10">
-                            {
-                              (sentRequestsData as RequestData[]).filter(
-                                (r) => r.recipientType === "farmer",
-                              ).length
-                            }
-                          </span>
-                        </h3>
-                      </div>
-                      <div className="space-y-4">
-                        {(sentRequestsData as RequestData[])
-                          .filter(
-                            (request) => request.recipientType === "farmer",
-                          )
-                          .map((request) => (
-                            <div
-                              key={request.id}
-                              onClick={() =>
-                                handleSelectRequest(request as RequestData)
-                              }
-                              className={`bg-surface-light dark:bg-surface-card rounded-xl p-5 shadow-sm transition-all cursor-pointer ${
-                                selectedRequest?.id === request.id
-                                  ? "border-2 border-primary/30 dark:border-primary/20 shadow-lg"
-                                  : "border border-gray-200/50 dark:border-gray-700/20 hover:border-blue-400/50 dark:hover:border-blue-500/30"
-                              }`}
-                            >
-                              <div className="flex justify-between items-start mb-3">
-                                <div className="flex items-center gap-3">
-                                  <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 text-lg font-bold border border-blue-200/50 dark:border-blue-900/10">
-                                    {request.farmerInitials}
-                                  </div>
-                                  <div>
-                                    <h4 className="text-sm font-bold text-gray-900 dark:text-white">
-                                      {request.farmerName}
-                                    </h4>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                                      {request.recipientType === "landowner"
-                                        ? "Landowner"
-                                        : "Farmer"}{" "}
-                                      • {request.location}
-                                    </p>
-                                  </div>
-                                </div>
-                                <span
-                                  style={{
-                                    background: request.statusBadge.color
-                                      ? `${request.statusBadge.color}20`
-                                      : "var(--color-info-blue)20",
-                                    color:
-                                      request.statusBadge.color || "var(--color-info-blue)",
-                                    border: request.statusBadge.color
-                                      ? `1px solid ${request.statusBadge.color}10`
-                                      : "1px solid var(--color-info-blue)10",
-                                  }}
-                                  className="px-2.5 py-1 rounded text-xs font-semibold flex items-center"
-                                >
-                                  <span className="material-icons text-[14px] mr-1">
-                                    {request.statusBadge.variant === "accepted"
-                                      ? "check_circle"
-                                      : request.statusBadge.variant ===
-                                          "rejected"
-                                        ? "block"
-                                        : request.statusBadge.variant ===
-                                            "under_review"
-                                          ? "schedule"
-                                          : "pending"}
-                                  </span>
-                                  {request.statusBadge.label}
-                                </span>
-                              </div>
-                              <div className="mb-4">
-                                {request.tags &&
-                                  request.tags.length > 0 &&
-                                  request.tags[0].label !== "Sent to Farmer" &&
-                                  request.tags[0].label !==
-                                    "Sent to Landowner" && (
-                                    <div className="p-3 bg-gray-50 dark:bg-zinc-900/50 rounded-lg border border-gray-100/50 dark:border-gray-700/10 mb-3">
-                                      <div className="flex items-center gap-2 mb-1">
-                                        <span className="material-icons text-gray-400 text-sm">
-                                          work_outline
-                                        </span>
-                                        <h5 className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                                          {request.tags[0].label}
-                                        </h5>
-                                      </div>
-                                      <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
-                                        Ref #{request.id} • Proposal Sent{" "}
-                                        {request.timestamp}
-                                      </p>
-                                    </div>
-                                  )}
-                                <p className="text-sm text-gray-600 dark:text-gray-300">
-                                  {request.description}
-                                </p>
-                              </div>
-                              <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-border-dark">
-                                <div className="text-xs text-gray-400">
-                                  Sent: {request.timestamp}
-                                </div>
-                                <div className="flex gap-2">
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      console.log("View Job");
-                                    }}
-                                    className="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-md transition-colors border border-gray-200 dark:border-zinc-700"
-                                  >
-                                    View Job
-                                  </button>
-                                  {request.statusBadge.variant ===
-                                  "accepted" ? (
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        console.log("Message");
-                                      }}
-                                      className="px-3 py-1.5 text-xs font-medium text-black bg-primary hover:bg-primary-dark rounded-md shadow-sm shadow-primary/20 transition-colors font-bold flex items-center"
-                                    >
-                                      <span className="material-icons text-[14px] mr-1">
-                                        chat
-                                      </span>{" "}
-                                      Message
-                                    </button>
-                                  ) : (
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        console.log("Revoke");
-                                      }}
-                                      className="px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-md border border-red-100 dark:border-red-900/20 transition-colors"
-                                    >
-                                      Revoke Offer
-                                    </button>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                      </div>
-                    </section>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Right Sidebar */}
-            <div
-              style={{
-                background: "linear-gradient(145deg, var(--bg-subtle) 0%, var(--bg-overlay) 100%)",
-                borderLeft: "1px solid var(--color-olive-glow)",
+    <Box
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+        background: "#09090B",
+      }}
+    >
+      <Box sx={{ px: 4, pt: 4, pb: 0, flexShrink: 0 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            mb: 3,
+          }}
+        >
+          <Box>
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 900,
+                color: "#f1f5f9",
+                mb: 0.75,
+                letterSpacing: -0.3,
               }}
-              className="w-full lg:w-[400px] xl:w-[450px] flex flex-col overflow-y-auto z-10"
             >
-              {selectedRequest && activeTab === "incoming" && (
-                <>
-                  <ConnectionJourney
-                    requestId={selectedRequest.id}
-                    farmerName={selectedRequest.farmerName}
-                    steps={journeySteps}
-                  />
-                  <QuickActions
-                    actions={quickActions}
-                    insight={{
-                      text: selectedRequest.insight,
+              Requests Management
+            </Typography>
+            <Stack direction="row" alignItems="center" spacing={1.25}>
+              <NotificationsActive sx={{ fontSize: 15, color: "#fb923c" }} />
+              <Typography
+                variant="caption"
+                sx={{ color: "#fb923c", fontWeight: 800, fontSize: "0.8rem" }}
+              >
+                {totalIncoming} Actions Needed
+              </Typography>
+              <Typography variant="caption" sx={{ color: "#71717A" }}>
+                •
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{ color: "#A1A1AA", fontSize: "0.78rem" }}
+              >
+                Categorized farmer inquiries and pending agreements
+              </Typography>
+            </Stack>
+          </Box>
+
+          <Button
+            startIcon={<Add />}
+            variant="contained"
+            sx={{
+              background: "linear-gradient(135deg, #85a446 0%, #aed95c 100%)",
+              color: "#fff",
+              fontWeight: 800,
+              borderRadius: 2,
+              px: 2.5,
+              py: 1,
+              textTransform: "none",
+              boxShadow: "0 4px 16px rgba(133,164,70,0.35)",
+              "&:hover": {
+                boxShadow: "0 6px 22px rgba(133,164,70,0.45)",
+                transform: "translateY(-2px)",
+              },
+              transition: "all 0.25s ease",
+            }}
+          >
+            New Inquiry
+          </Button>
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Tabs
+            value={activeTab}
+            onChange={handleTabChange}
+            sx={{
+              minHeight: 44,
+              "& .MuiTabs-indicator": {
+                background: "#A3E635",
+                height: 3,
+                borderRadius: "3px 3px 0 0",
+              },
+              "& .MuiTab-root": {
+                textTransform: "none",
+                fontWeight: 600,
+                fontSize: "0.83rem",
+                color: "#A1A1AA",
+                minHeight: 44,
+                px: 2,
+                "&.Mui-selected": { color: "#F4F4F5", fontWeight: 700 },
+              },
+            }}
+          >
+            <Tab
+              value="incoming"
+              label={
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <Inbox sx={{ fontSize: 17 }} />
+                  <span>Incoming Requests</span>
+                  <Chip
+                    label={totalIncoming}
+                    size="small"
+                    sx={{
+                      height: 19,
+                      fontSize: "0.65rem",
+                      fontWeight: 800,
+                      bgcolor: "rgba(251,146,60,0.2)",
+                      color: "#fb923c",
+                      border: "1px solid rgba(251,146,60,0.4)",
+                      minWidth: 24,
                     }}
                   />
-                </>
+                </Stack>
+              }
+            />
+            <Tab
+              value="sent"
+              label={
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <Send sx={{ fontSize: 16 }} />
+                  <span>My Sent Requests</span>
+                  <Chip
+                    label={totalSent}
+                    size="small"
+                    sx={{
+                      height: 19,
+                      fontSize: "0.65rem",
+                      fontWeight: 700,
+                      bgcolor: "rgba(255,255,255,0.08)",
+                      color: "#E2E8F0",
+                      minWidth: 24,
+                    }}
+                  />
+                </Stack>
+              }
+            />
+            <Tab
+              value="history"
+              label={
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <History sx={{ fontSize: 17 }} />
+                  <span>History</span>
+                </Stack>
+              }
+            />
+          </Tabs>
+
+          <Stack direction="row" spacing={1}>
+            {[
+              {
+                label: "Urgent",
+                icon: <PriorityHigh sx={{ fontSize: 12 }} />,
+                color: "#f87171",
+                bg: "rgba(248,113,113,0.1)",
+                border: "rgba(248,113,113,0.35)",
+              },
+              {
+                label: "High-Value",
+                icon: <AttachMoney sx={{ fontSize: 12 }} />,
+                color: "#fbbf24",
+                bg: "rgba(251,191,36,0.1)",
+                border: "rgba(251,191,36,0.35)",
+              },
+              {
+                label: "Verified",
+                icon: <Verified sx={{ fontSize: 12 }} />,
+                color: "#aed95c",
+                bg: "rgba(174,217,92,0.1)",
+                border: "rgba(174,217,92,0.35)",
+              },
+            ].map(({ label, icon, color, bg, border }) => (
+              <Chip
+                key={label}
+                icon={<Box sx={{ color, display: "flex" }}>{icon}</Box>}
+                label={label}
+                size="small"
+                sx={{
+                  fontSize: "0.7rem",
+                  fontWeight: 700,
+                  height: 26,
+                  cursor: "pointer",
+                  background: bg,
+                  color,
+                  border: `1.5px solid ${border}`,
+                  "&:hover": { opacity: 0.8 },
+                  "& .MuiChip-icon": { ml: 0.75 },
+                }}
+              />
+            ))}
+          </Stack>
+        </Box>
+      </Box>
+
+      <Divider sx={{ borderColor: "rgba(255,255,255,0.07)", mt: 0 }} />
+
+      <Box sx={{ flex: 1, overflow: "hidden", display: "flex" }}>
+        <Box
+          sx={{
+            flex: 1,
+            overflowY: "auto",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {activeTab === "incoming" && (
+            <Box
+              sx={{ p: 3, display: "flex", flexDirection: "column", gap: 3 }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1.25,
+                  p: 0.5,
+                  borderRadius: "24px",
+                  background: "transparent",
+                  border: "1px solid #27272A",
+                  width: "fit-content",
+                }}
+              >
+                <SubNavPill
+                  label="Agreements Pending"
+                  icon={<PendingActions sx={{ fontSize: 16 }} />}
+                  count={agreementsPendingData.length}
+                  active={incomingSubTab === "agreements"}
+                  onClick={() => {
+                    setIncomingSubTab("agreements");
+                    setSelectedRequest(null);
+                  }}
+                />
+                <SubNavPill
+                  label="Initial Farmer Requests"
+                  icon={<Inbox sx={{ fontSize: 16 }} />}
+                  count={farmerRequestsData.length}
+                  active={incomingSubTab === "farmer-requests"}
+                  onClick={() => {
+                    setIncomingSubTab("farmer-requests");
+                    setSelectedRequest(null);
+                  }}
+                />
+              </Box>
+
+              {incomingSubTab === "agreements" && (
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                    <Box
+                      sx={{
+                        width: 4,
+                        height: 20,
+                        borderRadius: 2,
+                        background:
+                          "linear-gradient(180deg, #fb923c 0%, #f59e0b 100%)",
+                      }}
+                    />
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: 800,
+                        color: "#fb923c",
+                        fontSize: "0.82rem",
+                        letterSpacing: 0.5,
+                      }}
+                    >
+                      AGREEMENTS AWAITING YOUR ACTION
+                    </Typography>
+                    <Chip
+                      label={agreementsPendingData.length}
+                      size="small"
+                      sx={{
+                        height: 20,
+                        fontSize: "0.65rem",
+                        fontWeight: 800,
+                        bgcolor: "rgba(251,146,60,0.15)",
+                        color: "#fb923c",
+                        border: "1px solid rgba(251,146,60,0.4)",
+                      }}
+                    />
+                  </Box>
+                  {(agreementsPendingData as RequestData[]).map((a) => (
+                    <div key={a.id} onClick={() => handleSelect(a)}>
+                      <RequestCard
+                        type="agreement"
+                        name={a.farmerName}
+                        avatarUrl={a.farmerAvatar || undefined}
+                        avatarInitials={a.farmerInitials}
+                        location={a.location}
+                        statusBadge={a.statusBadge}
+                        tags={a.tags}
+                        description={a.description}
+                        timestamp={a.timestamp}
+                        primaryAction={{
+                          label: "Upload Agreement",
+                          icon: "upload_file",
+                          onClick: handleUploadAgreement,
+                        }}
+                        highlighted={a.highlighted}
+                        isSelected={selectedRequest?.id === a.id}
+                      />
+                    </div>
+                  ))}
+                </Box>
               )}
-              {selectedRequest && activeTab === "sent" && (
-                <>
-                  <ConnectionJourney
-                    requestId={selectedRequest.id}
-                    farmerName={selectedRequest.farmerName}
-                    steps={journeySteps}
-                  />
-                  <QuickActions
-                    actions={quickActions}
-                    withdrawAction={{
-                      label: "Withdraw Request",
-                      onClick: () => handleQuickAction("withdraw"),
-                    }}
-                    insight={{
-                      text: `${selectedRequest.recipientType === "landowner" ? "Landowners" : "Farmers"} in ${selectedRequest.location} typically respond within 48 hours. Ensure your investor profile is 100% complete to increase acceptance chances.`,
-                    }}
-                  />
-                </>
+
+              {incomingSubTab === "farmer-requests" && (
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                    <Box
+                      sx={{
+                        width: 4,
+                        height: 20,
+                        borderRadius: 2,
+                        background:
+                          "linear-gradient(180deg, #aed95c 0%, #85a446 100%)",
+                      }}
+                    />
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: 800,
+                        color: "#aed95c",
+                        fontSize: "0.82rem",
+                        letterSpacing: 0.5,
+                      }}
+                    >
+                      INCOMING FARMER REQUESTS
+                    </Typography>
+                    <Chip
+                      label={farmerRequestsData.length}
+                      size="small"
+                      sx={{
+                        height: 20,
+                        fontSize: "0.65rem",
+                        fontWeight: 800,
+                        bgcolor: "rgba(174,217,92,0.12)",
+                        color: "#aed95c",
+                        border: "1px solid rgba(174,217,92,0.35)",
+                      }}
+                    />
+                  </Box>
+                  {(farmerRequestsData as RequestData[]).map((r) => (
+                    <div key={r.id} onClick={() => handleSelect(r)}>
+                      <RequestCard
+                        type="farmer-request"
+                        name={r.farmerName}
+                        avatarUrl={r.farmerAvatar || undefined}
+                        avatarInitials={r.farmerInitials}
+                        location={r.location}
+                        isVerified={r.isVerified}
+                        statusBadge={r.statusBadge}
+                        tags={r.tags}
+                        description={r.description}
+                        timestamp={r.timestamp}
+                        primaryAction={{
+                          label: "Review Request",
+                          onClick: () => console.log("Review"),
+                        }}
+                        highlighted={r.highlighted}
+                        isSelected={selectedRequest?.id === r.id}
+                      />
+                    </div>
+                  ))}
+                </Box>
               )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
+            </Box>
+          )}
+
+          {activeTab === "sent" && (
+            <Box sx={{ p: 3 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1.25,
+                  p: 0.5,
+                  mb: 3,
+                  borderRadius: "24px",
+                  background: "transparent",
+                  border: "1px solid #27272A",
+                  width: "fit-content",
+                }}
+              >
+                <SubNavPill
+                  label="Landowners"
+                  icon={<Landscape sx={{ fontSize: 16 }} />}
+                  count={sentLandowners.length}
+                  active={sentFilter === "landowner"}
+                  onClick={() => setSentFilter("landowner")}
+                />
+                <SubNavPill
+                  label="Farmers"
+                  icon={<Agriculture sx={{ fontSize: 16 }} />}
+                  count={sentFarmers.length}
+                  active={sentFilter === "farmer"}
+                  onClick={() => setSentFilter("farmer")}
+                />
+              </Box>
+
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                  <Box
+                    sx={{
+                      width: 4,
+                      height: 20,
+                      borderRadius: 2,
+                      background:
+                        sentFilter === "landowner"
+                          ? "linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%)"
+                          : "linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%)",
+                    }}
+                  />
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontWeight: 800,
+                      color: sentFilter === "landowner" ? "#fbbf24" : "#60a5fa",
+                      fontSize: "0.82rem",
+                      letterSpacing: 0.5,
+                    }}
+                  >
+                    {sentFilter === "landowner"
+                      ? "LANDOWNER CONNECTION REQUESTS"
+                      : "FARMER CONNECTION REQUESTS"}
+                  </Typography>
+                </Box>
+                {(sentFilter === "landowner"
+                  ? sentLandowners
+                  : sentFarmers
+                ).map((r) => (
+                  <SentCard
+                    key={r.id}
+                    request={r}
+                    isSelected={selectedRequest?.id === r.id}
+                    onClick={() => handleSelect(r)}
+                  />
+                ))}
+              </Box>
+            </Box>
+          )}
+          {activeTab === "history" && (
+            <Box
+              sx={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                py: 14,
+                gap: 1.5,
+                opacity: 0.3,
+              }}
+            >
+              <History sx={{ fontSize: 52 }} />
+              <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                No History Yet
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Completed and archived requests will appear here.
+              </Typography>
+            </Box>
+          )}
+        </Box>
+        <Box
+          sx={{
+            width: { lg: 370, xl: 410 },
+            flexShrink: 0,
+            borderLeft: "1px solid rgba(255,255,255,0.07)",
+            overflowY: "auto",
+            display: { xs: "none", lg: "flex" },
+            flexDirection: "column",
+            background: "#0a0a0a",
+          }}
+        >
+          {selectedRequest ? (
+            <ConnectionJourney
+              requestId={selectedRequest.id}
+              farmerName={selectedRequest.farmerName}
+              steps={journeySteps}
+            />
+          ) : (
+            <Box
+              sx={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                p: 4,
+                gap: 1.5,
+                opacity: 0.25,
+              }}
+            >
+              <Tune sx={{ fontSize: 42 }} />
+              <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                Select a request
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                align="center"
+              >
+                Click any card to view the connection journey.
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      </Box>
+    </Box>
   );
 };
 
