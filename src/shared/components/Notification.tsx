@@ -10,11 +10,6 @@ export interface NotificationProps {
   onClose: () => void;
 }
 
-/**
- * Reusable Notification Component using Material-UI Snackbar
- * Displays notifications for success, error, warning, or info messages
- * Automatically closes after specified duration (default 5 seconds)
- */
 const Notification = ({
   open,
   message,

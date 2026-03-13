@@ -20,6 +20,8 @@ interface SponsorshipDetailsProps {
   onSubmit: (data: SponsorshipFormData) => void;
   onSaveDraft: (data: SponsorshipFormData) => void;
   initialData?: Partial<SponsorshipFormData>;
+  submitLabel?: string;
+  headerLabel?: string;
 }
 
 export interface SponsorshipFormData {
@@ -84,6 +86,8 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
   onSubmit,
   onSaveDraft,
   initialData,
+  submitLabel = "Create Investment Offer",
+  headerLabel = "New Offer",
 }) => {
   const { user } = useAuth();
 
@@ -185,7 +189,7 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
         </button>
         <div className="flex-1 min-w-0">
           <p className="text-[10px] text-[#85a446] font-bold uppercase tracking-widest mb-0.5">
-            New Offer
+            {headerLabel}
           </p>
           <h2 className="text-white text-base font-bold leading-none">
             Investment Offer
@@ -195,18 +199,16 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
           {["Offer Details", "Review & Publish"].map((label, i) => (
             <div
               key={i}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all ${
-                i === 0
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all ${i === 0
                   ? "bg-[#85a446] text-white shadow-lg shadow-[#85a446]/25"
                   : "bg-white/[0.05] text-slate-500"
-              }`}
+                }`}
             >
               <span
-                className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold ${
-                  i === 0
+                className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold ${i === 0
                     ? "bg-white/25 text-white"
                     : "bg-white/10 text-slate-500"
-                }`}
+                  }`}
               >
                 {i + 1}
               </span>
@@ -322,21 +324,19 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
                           onClick={() => {
                             const next = selected
                               ? formData.preferredRegions.filter(
-                                  (d) => d !== district,
-                                )
+                                (d) => d !== district,
+                              )
                               : [...formData.preferredRegions, district];
                             handleInputChange("preferredRegions", next);
                           }}
-                          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all text-left ${
-                            selected
+                          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all text-left ${selected
                               ? "bg-[#85a446]/20 text-[#85a446]"
                               : "text-slate-400 hover:bg-white/[0.05] hover:text-slate-200"
-                          }`}
+                            }`}
                         >
                           <span
-                            className={`w-3.5 h-3.5 rounded-sm shrink-0 flex items-center justify-center ${
-                              selected ? "bg-[#85a446]" : "bg-white/10"
-                            }`}
+                            className={`w-3.5 h-3.5 rounded-sm shrink-0 flex items-center justify-center ${selected ? "bg-[#85a446]" : "bg-white/10"
+                              }`}
                           >
                             {selected && (
                               <Check
@@ -489,11 +489,10 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
                         onClick={() =>
                           handleInputChange("farmingMethod", method)
                         }
-                        className={`flex-1 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide transition-all ${
-                          formData.farmingMethod === method
+                        className={`flex-1 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide transition-all ${formData.farmingMethod === method
                             ? "bg-[#85a446] text-white shadow-lg shadow-[#85a446]/20"
                             : "bg-[#141414] text-slate-400 hover:text-slate-200 hover:bg-white/[0.07]"
-                        }`}
+                          }`}
                       >
                         {method === "hydroponic"
                           ? "Hydroponic"
@@ -514,11 +513,10 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
                         key={type}
                         type="button"
                         onClick={() => handleInputChange("supportType", type)}
-                        className={`flex-1 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide transition-all ${
-                          formData.supportType === type
+                        className={`flex-1 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide transition-all ${formData.supportType === type
                             ? "bg-[#85a446] text-white shadow-lg shadow-[#85a446]/20"
                             : "bg-[#141414] text-slate-400 hover:text-slate-200 hover:bg-white/[0.07]"
-                        }`}
+                          }`}
                       >
                         {type === "financial"
                           ? "Financial"
@@ -613,11 +611,10 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
                 <button
                   key={emoji}
                   type="button"
-                  className={`text-xl h-11 flex items-center justify-center rounded-lg transition-all ${
-                    formData.cropIcon === emoji
+                  className={`text-xl h-11 flex items-center justify-center rounded-lg transition-all ${formData.cropIcon === emoji
                       ? "bg-[#85a446]/20 ring-2 ring-[#85a446] scale-105 shadow-lg shadow-[#85a446]/15"
                       : "bg-[#141414] hover:bg-[#85a446]/10"
-                  }`}
+                    }`}
                   onClick={() => handleInputChange("cropIcon", emoji)}
                 >
                   {emoji}
@@ -665,11 +662,10 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
               {coverImages.map((image) => (
                 <div
                   key={image.id}
-                  className={`relative rounded-lg overflow-hidden cursor-pointer aspect-square transition-all ${
-                    formData.coverImage === image.id
+                  className={`relative rounded-lg overflow-hidden cursor-pointer aspect-square transition-all ${formData.coverImage === image.id
                       ? "ring-2 ring-[#85a446] ring-offset-1 ring-offset-[#0a0a0a]"
                       : "opacity-60 hover:opacity-90"
-                  }`}
+                    }`}
                   onClick={() => handleInputChange("coverImage", image.id)}
                 >
                   <img
@@ -705,7 +701,7 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
           onClick={handleSubmitClick}
           className="flex items-center gap-2 bg-[#85a446] hover:bg-[#93b34e] active:scale-[0.98] text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all shadow-lg shadow-[#85a446]/20"
         >
-          Create Investment Offer <ArrowForward style={{ fontSize: 18 }} />
+          {submitLabel} <ArrowForward style={{ fontSize: 18 }} />
         </button>
       </div>
     </div>

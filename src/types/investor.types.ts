@@ -2,6 +2,77 @@ export type OfferType = "direct-harvest" | "sponsorship";
 export type OfferStatus = "active" | "pending" | "completed" | "cancelled";
 export type PaymentStatus = "pending" | "paid" | "overdue";
 
+export interface InvestorRef {
+  _id: string;
+  fullName: string;
+  email: string;
+}
+
+export interface HarvestBaseDetails {
+  projectTitle: string;
+  cropType: string;
+  cropVariety?: string;
+  requiredQuantity: number;
+  quantityUnit: string;
+  pricePerUnit: number;
+  deliveryLocation: string;
+  totalBudget: number;
+  companyName?: string;
+  preferredRegion: string[];
+}
+
+export interface CommissionDetails {
+  sponsorshipTitle: string;
+  cropTypes: string[];
+  preferredFarmingMethod?: "organic" | "conventional" | "mixed";
+  minimumInvestment: number;
+  maximumInvestment: number;
+  commissionRate: number;
+  supportType: ("capital" | "equipment" | "expertise" | "marketing")[];
+  preferredRegions: string[];
+}
+
+interface OfferAPIBase {
+  _id: string;
+  investor: InvestorRef;
+  description: string;
+  cropIcon: string;
+  backgroundImage: string;
+  expectedROI: number;
+  currency: string;
+  expiredDate: string;
+  status: OfferStatus;
+  applicationsCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DirectHarvestOfferAPI extends OfferAPIBase {
+  offerType: "direct-harvest";
+  harvestBaseDetails: HarvestBaseDetails;
+}
+
+export interface SponsorshipOfferAPI extends OfferAPIBase {
+  offerType: "sponsorship";
+  commissionDetails: CommissionDetails;
+}
+
+export type InvestorOfferAPI = DirectHarvestOfferAPI | SponsorshipOfferAPI;
+
+export interface PaginatedOffersResponse {
+  data: InvestorOfferAPI[];
+  pagination: {
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+    limit: number;
+    nextPage: number;
+    page: number;
+    prevPage: number;
+    totalDocs: number;
+    totalPages: number;
+  };
+}
+
 export interface DirectHarvestOffer {
   id?: string;
   offerType: "direct-harvest";
@@ -102,11 +173,11 @@ export interface LandOwnerMatch {
 export interface ProjectProgress {
   offerId: string;
   currentPhase:
-    | "planning"
-    | "planting"
-    | "growing"
-    | "harvesting"
-    | "completed";
+  | "planning"
+  | "planting"
+  | "growing"
+  | "harvesting"
+  | "completed";
   progressPercentage: number;
   startDate: string;
   expectedEndDate: string;
@@ -147,12 +218,12 @@ export interface Agreement {
     additionalTerms?: Record<string, string | number | boolean>;
   };
   status:
-    | "draft"
-    | "pending-signature"
-    | "signed"
-    | "active"
-    | "completed"
-    | "terminated";
+  | "draft"
+  | "pending-signature"
+  | "signed"
+  | "active"
+  | "completed"
+  | "terminated";
   createdAt: string;
   signedAt?: string;
   documentUrl?: string;
