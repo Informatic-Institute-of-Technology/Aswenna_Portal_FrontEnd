@@ -3,7 +3,6 @@ import {
   AccountBalance,
   AccountCircle,
   AttachMoney,
-  BarChart as BarChartIcon,
   BusinessCenter,
   Description,
   Home,
@@ -56,14 +55,9 @@ const InvestorSidebar = () => {
       path: `${basePath}/dashboard/requests`,
     },
     {
-      text: "ROI / Market Analysis",
+      text: "Smart Match Making",
       icon: <TrendingUp />,
-      path: `${basePath}/dashboard/roi-analysis`,
-    },
-    {
-      text: "Profitability Charts",
-      icon: <BarChartIcon />,
-      path: `${basePath}/dashboard/profitability`,
+      path: `${basePath}/dashboard/smart-match-making`,
     },
   ];
 
