@@ -119,8 +119,9 @@ function AppRoutes() {
             <Route path="my-offers" element={<MyOffersPage />} />
             <Route path="land-search" element={<LandOwnersPage />} />
             <Route path="requests" element={<RequestsPage />} />
+            <Route path="smart-match-making" element={<MatchMakingPage />} />
             <Route path="roi-analysis" element={<MatchMakingPage />} />
-            <Route path="profitability" element={<Dashboard />} />
+            <Route path="profitability" element={<MatchMakingPage />} />
             <Route path="finance-ledger" element={<FinanceLedgerPage />} />
             <Route
               path="payment-pipeline"

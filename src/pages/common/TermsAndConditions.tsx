@@ -1,5 +1,6 @@
 import AswendLogo from "@/assets/Aswenna Logo.png";
 import {
+  formPersistenceService,
   registrationService,
   registrationStore,
   type RegistrationResponse,
@@ -83,6 +84,9 @@ const TermsAndConditions = () => {
       localStorage.removeItem("temp_password");
       localStorage.removeItem("email_verified");
       registrationStore.clear();
+
+      // Clear form persistence data from IndexedDB
+      await formPersistenceService.clearAllFormData();
 
       setShowSuccessDialog(true);
 

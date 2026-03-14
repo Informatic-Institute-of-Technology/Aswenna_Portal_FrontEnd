@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate-divisions": "node scripts/generate-divisions.cjs"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -17,8 +18,7 @@
     "@mui/system": "^7.3.7",
     "@react-google-maps/api": "^2.20.8",
     "bootstrap": "^5.3.8",
-    "html2canvas": "^1.4.1",
-    "jspdf": "^4.1.0",
+    "date-fns": "^4.1.0",
     "lucide-react": "^0.562.0",
     "react": "^19.2.0",
     "react-bootstrap": "^2.10.10",

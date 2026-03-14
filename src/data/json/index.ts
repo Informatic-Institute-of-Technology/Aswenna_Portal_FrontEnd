@@ -9,6 +9,6 @@ export { default as directHarvestOffersData } from './directHarvestOffers.json';
 export { default as farmerJobsData } from './farmerJobs.json';
 export { default as farmerProjectsData } from './farmerProjects.json';
 export { default as investmentRequestsData } from './investmentRequests.json';
+export { default as notificationsData } from './notifications.json';
 export { default as pendingProjectsData } from './pendingProjects.json';
 export { default as sponsorshipOffersData } from './sponsorshipOffers.json';
-

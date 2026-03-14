@@ -59,6 +59,13 @@ class UserService {
     );
     return this.mapUserResponse(response);
   }
+  async checkEmailDuplicate(email: string): Promise<boolean> {
+    const response = await httpClient.get<{ exists: boolean }>(
+      `/v1/user/email/${encodeURIComponent(email)}/duplicate-check`,
+    );
+    return response.exists;
+  }
+
   async getCurrentUser(): Promise<User | null> {
     try {
       const storedUser = localStorage.getItem("user");

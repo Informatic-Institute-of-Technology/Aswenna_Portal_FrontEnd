@@ -1,30 +1,105 @@
+import {
+  Agriculture,
+  CheckCircle,
+  DoDisturb,
+  FileUpload,
+  HourglassEmpty,
+  LocationOn,
+  NotificationsActive,
+  RateReview,
+  Schedule,
+  Verified,
+} from "@mui/icons-material";
+import {
+  Avatar,
+  Box,
+  Button,
+  Chip,
+  Divider,
+  Stack,
+  Typography,
+} from "@mui/material";
+
 interface RequestCardProps {
-  type: 'agreement' | 'farmer-request' | 'sent-request';
+  type: "agreement" | "farmer-request" | "sent-request";
   name: string;
   avatarUrl?: string;
   avatarInitials?: string;
   location: string;
   statusBadge: {
     label: string;
-    variant: 'action' | 'pending' | 'review' | 'new' | 'accepted' | 'rejected' | 'pending_response' | 'under_review' | 'negotiating';
+    variant:
+      | "action"
+      | "pending"
+      | "review"
+      | "new"
+      | "accepted"
+      | "rejected"
+      | "pending_response"
+      | "under_review"
+      | "negotiating";
     color?: string;
   };
-  tags?: { label: string; variant: 'primary' | 'secondary' }[];
+  tags?: { label: string; variant: "primary" | "secondary" }[];
   description: string;
   timestamp: string;
-  primaryAction: {
-    label: string;
-    icon?: string;
-    onClick: () => void;
-  };
-  secondaryAction?: {
-    label: string;
-    onClick: () => void;
-  };
+  primaryAction: { label: string; icon?: string; onClick: () => void };
+  secondaryAction?: { label: string; onClick: () => void };
   isVerified?: boolean;
   highlighted?: boolean;
   isSelected?: boolean;
 }
+
+const STATUS_STYLE: Record<
+  string,
+  { text: string; bg: string; Icon: React.ElementType }
+> = {
+  action: {
+    text: "#FBBF24", 
+    bg: "#4B330B", 
+    Icon: NotificationsActive,
+  },
+  pending: {
+    text: "#FBBF24",
+    bg: "#4B330B",
+    Icon: HourglassEmpty,
+  },
+  review: {
+    text: "#FBBF24",
+    bg: "#4B330B",
+    Icon: RateReview,
+  },
+  new: {
+    text: "#94a3b8",
+    bg: "rgba(148,163,184,0.15)",
+    Icon: Schedule,
+  },
+  accepted: {
+    text: "#34D399",
+    bg: "#064E3B",
+    Icon: CheckCircle,
+  },
+  rejected: {
+    text: "#F87171",
+    bg: "#7F1D1D", 
+    Icon: DoDisturb,
+  },
+  pending_response: {
+    text: "#FBBF24",
+    bg: "#4B330B",
+    Icon: Schedule,
+  },
+  under_review: {
+    text: "#60a5fa",
+    bg: "rgba(96,165,250,0.15)",
+    Icon: RateReview,
+  },
+  negotiating: {
+    text: "#c084fc",
+    bg: "rgba(192,132,252,0.15)",
+    Icon: Schedule,
+  },
+};
 
 const RequestCard = ({
   type,
@@ -41,216 +116,229 @@ const RequestCard = ({
   isVerified = false,
   isSelected = false,
 }: RequestCardProps) => {
-  const getStatusStyles = () => {
-    // If custom color is provided, use it
-    if (statusBadge.color) {
-      return {
-        background: `${statusBadge.color}20`,
-        color: statusBadge.color,
-        border: `1px solid ${statusBadge.color}40`,
-        backdropFilter: 'blur(10px)',
-      };
-    }
-
-    switch (statusBadge.variant) {
-      case 'action':
-        return {
-          background: 'var(--color-olive-muted-strong)',
-          color: 'var(--color-olive-light)',
-          border: '1px solid var(--color-olive-glow)',
-          backdropFilter: 'blur(10px)',
-        };
-      case 'pending':
-        return {
-          background: 'var(--color-olive-glow-sm)',
-          color: 'var(--color-olive-light)',
-          border: '1px solid var(--color-olive-glow)',
-          backdropFilter: 'blur(10px)',
-        };
-      case 'review':
-        return {
-          background: 'var(--color-warning-bg)',
-          color: 'var(--color-amber)',
-          border: '1px solid var(--color-warning-border)',
-        };
-      case 'new':
-        return {
-          background: 'var(--surface-muted)',
-          color: 'var(--text-secondary)',
-          border: '1px solid var(--surface-light)',
-        };
-      case 'accepted':
-        return {
-          background: 'var(--color-success-bg)',
-          color: 'var(--color-success)',
-          border: '1px solid var(--color-success-border)',
-        };
-      case 'rejected':
-        return {
-          background: 'var(--color-error-bg)',
-          color: 'var(--color-overdue)',
-          border: '1px solid var(--color-overdue-border)',
-        };
-      case 'pending_response':
-        return {
-          background: 'var(--color-warning-bg)',
-          color: 'var(--color-pending)',
-          border: '1px solid var(--color-pending-border)',
-        };
-      case 'under_review':
-        return {
-          background: 'var(--color-info-blue-muted)',
-          color: 'var(--color-info-blue)',
-          border: '1px solid var(--color-info-blue-border)',
-        };
-      case 'negotiating':
-        return {
-          background: 'var(--color-warning-bg)',
-          color: 'var(--color-pending)',
-          border: '1px solid var(--color-pending-border)',
-        };
-      default:
-        return {};
-    }
-  };
-
-  const cardStyle = isSelected
-    ? {
-        background: 'linear-gradient(145deg, var(--color-nature-deep) 0%, var(--color-nature-mid) 100%)',
-        border: '2px solid var(--color-olive-glow)',
-        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-        boxShadow: '0 0 25px var(--color-olive-glow)',
-      }
-    : {
-        background: 'linear-gradient(145deg, var(--bg-subtle) 0%, var(--bg-overlay) 100%)',
-        border: '1px solid var(--color-olive-muted-strong)',
-        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-      };
-
-  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isSelected) return; // Don't apply hover effect if already selected
-    e.currentTarget.style.transform = 'translateY(-4px)';
-    e.currentTarget.style.borderColor = 'var(--color-olive-glow)';
-  };
-
-  const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isSelected) return; // Keep selected state
-    e.currentTarget.style.transform = 'translateY(0)';
-    e.currentTarget.style.boxShadow = '';
-    e.currentTarget.style.borderColor = 'var(--color-olive-muted-strong)';
-  };
+  const ss = STATUS_STYLE[statusBadge.variant] ?? STATUS_STYLE.new;
+  const StatusIcon = ss.Icon;
+  const isAgreement = type === "agreement";
 
   return (
-    <div
-      style={cardStyle}
-      className="rounded-xl p-5 shadow-lg relative cursor-pointer"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+    <Box
+      sx={{
+        borderRadius: 2.5,
+        overflow: "hidden",
+        background: isSelected ? "rgba(163, 230, 53, 0.05)" : "#18181B",
+        border: "1px solid",
+        borderColor: isSelected ? "rgba(163, 230, 53, 0.3)" : "#27272A",
+        transition: "all 0.25s cubic-bezier(0.4,0,0.2,1)",
+        "&:hover": {
+          borderColor: "rgba(255,255,255,0.12)",
+          transform: "translateY(-2px)",
+        },
+        position: "relative",
+      }}
     >
-      <div className="flex justify-between items-start mb-3">
-        <div className="flex items-center gap-3">
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          pl: 3,
+          pr: 2,
+          pt: 2,
+          pb: 1,
+        }}
+      >
+        <Box
+          sx={{ display: "flex", alignItems: "center", gap: 1.5, minWidth: 0 }}
+        >
           {avatarUrl ? (
-            <img
-              alt={name}
-              className="w-12 h-12 rounded-full object-cover border border-gray-200 dark:border-gray-700"
-              src={avatarUrl}
-            />
+            <Avatar src={avatarUrl} alt={name} sx={{ width: 44, height: 44 }} />
           ) : (
-            <div
-              style={{
-                background: 'linear-gradient(135deg, var(--color-olive) 0%, var(--color-olive-light) 100%)',
-                border: '2px solid var(--color-olive-glow)',
+            <Avatar
+              sx={{
+                width: 44,
+                height: 44,
+                background: "#262626",
+                fontWeight: 800,
+                fontSize: "0.95rem",
+                color: "#cbd5e1",
               }}
-              className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold"
             >
               {avatarInitials}
-            </div>
+            </Avatar>
           )}
-          <div>
-            <h4 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              {name}
+
+          <Box sx={{ minWidth: 0 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.6 }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  fontWeight: 800,
+                  color: "#F4F4F5",
+                  fontSize: "0.9rem",
+                  lineHeight: 1.2,
+                }}
+              >
+                {name}
+              </Typography>
               {isVerified && (
-                <span className="material-icons text-green-500 text-sm" title="Verified Farmer">
-                  verified
-                </span>
+                <Verified sx={{ fontSize: 15, color: "#4ade80" }} />
               )}
-            </h4>
-            <p className="text-xs text-gray-500 dark:text-gray-400">{location}</p>
-          </div>
-        </div>
-        <span
-          style={getStatusStyles()}
-          className={`px-2.5 py-1 rounded text-xs font-semibold ${statusBadge.variant === 'action' ? 'animate-pulse' : ''}`}
+            </Box>
+            <Box
+              sx={{ display: "flex", alignItems: "center", gap: 0.4, mt: 0.25 }}
+            >
+              <LocationOn sx={{ fontSize: 12, color: "#A1A1AA" }} />
+              <Typography
+                variant="caption"
+                sx={{ color: "#A1A1AA", fontSize: "0.72rem" }}
+              >
+                {location}
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 0.6,
+            px: 1.25,
+            py: 0.55,
+            borderRadius: 1.5,
+            background: ss.bg,
+            flexShrink: 0,
+          }}
         >
-          {statusBadge.label}
-        </span>
-      </div>
+          <StatusIcon sx={{ fontSize: 13, color: ss.text }} />
+          <Typography
+            variant="caption"
+            sx={{
+              fontWeight: 800,
+              color: ss.text,
+              fontSize: "0.7rem",
+              whiteSpace: "nowrap",
+              letterSpacing: 0.3,
+            }}
+          >
+            {statusBadge.label}
+          </Typography>
+        </Box>
+      </Box>
 
       {tags.length > 0 && (
-        <div className="mb-4">
-          <div className="flex flex-wrap gap-2 mb-2">
-            {tags.map((tag, index) => (
-              <span
-                key={index}
-                style={
-                  tag.variant === 'primary'
-                    ? {
-                        background: 'var(--color-olive-glow-sm)',
-                        color: 'var(--color-olive-light)',
-                        border: '1px solid var(--color-olive-glow)',
-                      }
-                    : {}
-                }
-                className={
-                  tag.variant === 'secondary'
-                    ? 'text-xs px-2 py-1 bg-gray-100 dark:bg-zinc-800 rounded text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-border-dark'
-                    : 'text-xs px-2 py-1 rounded font-medium'
-                }
-              >
-                {tag.label}
-              </span>
+        <Box sx={{ pl: 3, pr: 2, pb: 1 }}>
+          <Stack direction="row" flexWrap="wrap" gap={0.75}>
+            {tags.map((tag, i) => (
+              <Chip
+                key={i}
+                label={tag.label}
+                size="small"
+                sx={{
+                  height: 22,
+                  fontSize: "0.68rem",
+                  fontWeight: 700,
+                  background: "#3F3F46",
+                  color: "#F4F4F5",
+                  border: "1px solid #4B5563",
+                }}
+              />
             ))}
-          </div>
-        </div>
+          </Stack>
+        </Box>
       )}
 
-      <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-4">{description}</p>
+      <Typography
+        variant="body2"
+        sx={{
+          p: "0 16px 14px 24px",
+          fontSize: "0.82rem",
+          lineHeight: 1.65,
+          color: "#A1A1AA",
+          display: "-webkit-box",
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden",
+        }}
+      >
+        {description}
+      </Typography>
 
-      <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-border-dark">
-        <div className="text-xs text-gray-400">{timestamp}</div>
-        <div className="flex gap-2 w-full sm:w-auto">
+      <Divider sx={{ borderColor: "#27272A", mx: 3 }} />
+
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          pl: 3,
+          pr: 2,
+          py: 1.5,
+        }}
+      >
+        <Typography
+          variant="caption"
+          sx={{ color: "#71717A", fontSize: "0.7rem", fontWeight: 500 }}
+        >
+          {timestamp}
+        </Typography>
+
+        <Stack direction="row" spacing={1}>
           {secondaryAction && (
-            <button
+            <Button
+              size="small"
+              variant="outlined"
               onClick={secondaryAction.onClick}
-              className="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-md transition-colors"
+              sx={{
+                fontSize: "0.72rem",
+                fontWeight: 600,
+                textTransform: "none",
+                borderRadius: 1.5,
+                borderColor: "rgba(255,255,255,0.12)",
+                color: "#94a3b8",
+                py: 0.5,
+                "&:hover": {
+                  borderColor: "rgba(255,255,255,0.3)",
+                  color: "#fff",
+                },
+              }}
             >
               {secondaryAction.label}
-            </button>
+            </Button>
           )}
-          <button
-            onClick={primaryAction.onClick}
-            style={{
-              background: type === 'agreement'
-                ? 'linear-gradient(135deg, var(--color-olive) 0%, var(--color-olive-light) 100%)'
-                : undefined,
-              boxShadow: type === 'agreement'
-                ? '0 4px 12px var(--color-olive-glow)'
-                : '0 2px 8px var(--color-olive-glow)',
-            }}
-            className={
-              type === 'agreement'
-                ? 'flex-1 sm:flex-none flex items-center justify-center px-4 py-2 text-xs font-bold text-white hover:opacity-90 rounded-lg transition-all transform active:scale-95'
-                : 'px-3 py-1.5 text-xs font-medium text-white bg-primary hover:bg-primary-dark rounded-md shadow-sm transition-all font-bold'
+
+          <Button
+            size="small"
+            variant="contained"
+            startIcon={
+              isAgreement ? (
+                <FileUpload sx={{ fontSize: 14 }} />
+              ) : (
+                <Agriculture sx={{ fontSize: 14 }} />
+              )
             }
+            onClick={primaryAction.onClick}
+            sx={{
+              fontSize: "0.72rem",
+              fontWeight: 800,
+              textTransform: "none",
+              borderRadius: 1.5,
+              py: 0.55,
+              background: "linear-gradient(135deg, #85a446 0%, #aed95c 100%)",
+              color: "#fff",
+              boxShadow: "0 3px 12px rgba(133,164,70,0.35)",
+              "&:hover": {
+                boxShadow: "0 5px 18px rgba(133,164,70,0.45)",
+                transform: "translateY(-1px)",
+              },
+              transition: "all 0.2s ease",
+            }}
           >
-            {primaryAction.icon && (
-              <span className="material-icons text-[16px] mr-2">{primaryAction.icon}</span>
-            )}
             {primaryAction.label}
-          </button>
-        </div>
-      </div>
-    </div>
+          </Button>
+        </Stack>
+      </Box>
+    </Box>
   );
 };
 

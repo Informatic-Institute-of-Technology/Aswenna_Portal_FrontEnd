@@ -2,6 +2,7 @@ import type { GlobalUser } from "@/types/admin.types";
 import {
   Block,
   CheckCircleOutline,
+  DeleteForever,
   Pending,
   PersonOff,
 } from "@mui/icons-material";
@@ -62,6 +63,12 @@ const ACTION_CONFIGS: Record<ActionType, ActionConfig> = {
     body: "This will move the user back to Pending status, awaiting review.",
     color: "#f59e0b",
     icon: <Pending sx={{ fontSize: 40, color: "#f59e0b" }} />,
+  },
+  delete: {
+    title: "Delete User",
+    body: "This will permanently delete this user and all associated data. This action cannot be undone.",
+    color: "#dc2626",
+    icon: <DeleteForever sx={{ fontSize: 40, color: "#dc2626" }} />,
   },
 };
 

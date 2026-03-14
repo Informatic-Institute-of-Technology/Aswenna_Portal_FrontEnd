@@ -410,6 +410,16 @@ class AdminService {
       throw error;
     }
   }
+
+  async deleteUser(userId: string): Promise<void> {
+    try {
+      await httpClient.delete<unknown>(`/v1/user/${userId}`);
+      console.log("Deleted user:", userId);
+    } catch (error) {
+      console.error("Failed to delete user:", error);
+      throw error;
+    }
+  }
 }
 
 export const adminService = new AdminService();
