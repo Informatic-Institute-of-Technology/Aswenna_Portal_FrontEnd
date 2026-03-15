@@ -793,128 +793,15 @@ const MyProjectsPage = () => {
               </Card>
             </div>
           ))}
-
-          {/* Add New Project Card */}
-          <div className="col-12 col-md-6 col-lg-4">
-            <Card
-              onClick={handleOpenDialog}
-              sx={{
-                height: "100%",
-                minHeight: 450,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "transparent",
-                border: "2px dashed rgba(255,255,255,0.15)",
-                cursor: "pointer",
-                transition: "all 0.3s ease",
-                "&:hover": {
-                  borderColor: "#6B8E23",
-                  backgroundColor: "rgba(107, 142, 35, 0.05)",
-                },
-              }}
-            >
-              <CardContent sx={{ textAlign: "center" }}>
-                <Box
-                  sx={{
-                    width: 64,
-                    height: 64,
-                    borderRadius: "50%",
-                    border: "2px dashed rgba(255,255,255,0.25)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    mx: "auto",
-                    mb: 2,
-                  }}
-                >
-                  <AddIcon
-                    sx={{ color: "rgba(255,255,255,0.4)", fontSize: 32 }}
-                  />
-                </Box>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    color: "rgba(255,255,255,0.6)",
-                    fontWeight: 500,
-                    mb: 0.5,
-                  }}
-                >
-                  Add New Project
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ color: "rgba(255,255,255,0.35)" }}
-                >
-                  Create a new farming opportunity
-                </Typography>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </Box>
 
-      {/* Stats Section */}
-      <Card
-        sx={{
-          backgroundColor: "#111a11",
-          border: "1px solid rgba(76, 175, 80, 0.15)",
-          borderRadius: 3,
-        }}
-      >
-        <CardContent sx={{ py: 3, px: 4 }}>
-          <Grid container spacing={2}>
-            {stats.map((stat, index) => (
-              <Grid
-                size={{ xs: 6, md: 3 }}
-                key={index}
-                sx={{
-                  borderRight:
-                    index < stats.length - 1
-                      ? { md: "1px solid rgba(255,255,255,0.08)" }
-                      : "none",
-                  textAlign: "center",
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: "rgba(255,255,255,0.4)",
-                    fontSize: "0.65rem",
-                    letterSpacing: "0.5px",
-                    display: "block",
-                    mb: 1,
-                  }}
-                >
-                  {stat.label}
-                </Typography>
-                <Typography
-                  variant="h4"
-                  sx={{ color: "#fff", fontWeight: 600, fontSize: "2rem" }}
-                >
-                  {stat.value}
-                  {stat.unit && (
-                    <Typography
-                      component="span"
-                      sx={{
-                        fontSize: "0.875rem",
-                        color: "rgba(255,255,255,0.5)",
-                        ml: 0.5,
-                        fontWeight: 400,
-                      }}
-                    >
-                      {stat.unit}
-                    </Typography>
-                  )}
-                </Typography>
-              </Grid>
-            ))}
-          </Grid>
-        </CardContent>
-      </Card>
-
       {/* Create Offer Dialog */}
-      <CreateOfferDialog open={dialogOpen} onClose={handleCloseDialog} />
+      <CreateOfferDialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        onSubmit={handleCreateProject}
+      />
 
       {/* Project Details Dialog */}
       <ProjectDetailsDialog
@@ -941,6 +828,7 @@ const MyProjectsPage = () => {
                   selectedProject.investmentType === "harvest"
                     ? "Harvest-Based"
                     : "Commission-Based",
+                costBreakdown: selectedProject.costBreakdown,
               }
             : null
         }
