@@ -1,5 +1,7 @@
 import { useState } from "react";
-import CreateOfferDialog from "@/pages/farmer/JobCreation";
+import CreateOfferDialog, {
+  type FarmerJobCreationPayload,
+} from "../farmer/JobCreation";
 import ProjectDetailsDialog from "../../components/farmer/ProjectDetailsDialog";
 import {
   Box,
@@ -14,7 +16,6 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import Grid from "@mui/material/Grid";
 import {
   Add as AddIcon,
   Agriculture,
@@ -22,6 +23,12 @@ import {
   LocationOn,
   Visibility,
 } from "@mui/icons-material";
+
+interface ProjectCostBreakdownItem {
+  category: string;
+  description: string;
+  amount: number;
+}
 
 interface Project {
   id: number;
