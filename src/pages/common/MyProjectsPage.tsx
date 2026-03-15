@@ -588,9 +588,7 @@ const MyProjectsPage = () => {
                             border: "2px solid #1f1f1f",
                           }}
                         >
-                          <Agriculture
-                            sx={{ fontSize: 12, color: "white" }}
-                          />
+                          <Agriculture sx={{ fontSize: 12, color: "white" }} />
                         </Box>
                       </Box>
                       <Box sx={{ flex: 1 }}>
@@ -613,15 +611,10 @@ const MyProjectsPage = () => {
                           >
                             Farmer
                           </Typography>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: "#666" }}
-                          >
+                          <Typography variant="caption" sx={{ color: "#666" }}>
                             •
                           </Typography>
-                          <LocationOn
-                            sx={{ fontSize: 12, color: "#808080" }}
-                          />
+                          <LocationOn sx={{ fontSize: 12, color: "#808080" }} />
                           <Typography
                             variant="caption"
                             color="text.secondary"
@@ -687,9 +680,7 @@ const MyProjectsPage = () => {
                               border: "2px solid #1f1f1f",
                             }}
                           >
-                            <Landscape
-                              sx={{ fontSize: 10, color: "white" }}
-                            />
+                            <Landscape sx={{ fontSize: 10, color: "white" }} />
                           </Box>
                         </Box>
                         <Box sx={{ flex: 1 }}>
