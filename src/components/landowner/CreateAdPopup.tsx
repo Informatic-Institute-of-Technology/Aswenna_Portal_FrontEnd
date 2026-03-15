@@ -1,15 +1,20 @@
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
-  Button,
-  Box,
-  IconButton,
-  MenuItem,
-} from "@mui/material";
+import { useAuth } from "@/Context/useAuth";
+import { profileService } from "@/services/profile.service";
 import CloseIcon from "@mui/icons-material/Close";
-import { useState } from "react";
+import {
+  Alert,
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  IconButton,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { useEffect, useMemo, useState } from "react";
 
 interface CreateAdPopupProps {
   open: boolean;
@@ -29,9 +34,6 @@ const fieldStyle = {
   "& .MuiInput-underline:after": {
     borderBottom: "2px solid #6e8b3d",
   },
-  "& .MuiSelect-icon": {
-    color: "#e0e0e0",
-  },
 };
 
 const Label = ({ text }: { text: string }) => (
@@ -41,17 +43,43 @@ const Label = ({ text }: { text: string }) => (
 );
 
 const CreateAdPopup = ({ open, onClose }: CreateAdPopupProps) => {
+  const { user } = useAuth();
+
   const [formData, setFormData] = useState({
-    location: "",
-    fromDate: "",
-    toDate: "",
-    soilType: "",
+    landId: "",
     additionalInfo: "",
-    landArea: "",
-    rentalAmount: "",
-    landHistory: "",
-    photo: null as File | null,
+    photos: [] as File[],
   });
+  const [landIdTouched, setLandIdTouched] = useState(false);
+
+  const profileSetupData = useMemo(() => profileService.getProfileSetupData(), []);
+  const registeredLandInfo = profileSetupData?.landInfo;
+
+  const registeredLandId = useMemo(() => {
+    if (!user?._id) {
+      return "";
+    }
+
+    const normalized = user._id.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    return `LAND-${normalized.slice(-6)}`;
+  }, [user?._id]);
+
+  const isLandMatched =
+    formData.landId.trim().toUpperCase() === registeredLandId && Boolean(registeredLandInfo);
+
+  const canSubmit =
+    isLandMatched && formData.additionalInfo.trim().length > 0 && formData.photos.length > 0;
+
+  useEffect(() => {
+    if (!open) {
+      setFormData({
+        landId: "",
+        additionalInfo: "",
+        photos: [],
+      });
+      setLandIdTouched(false);
+    }
+  }, [open]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -62,45 +90,29 @@ const CreateAdPopup = ({ open, onClose }: CreateAdPopupProps) => {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
+    const files = e.target.files;
+    if (files?.length) {
       setFormData((prev) => ({
         ...prev,
-        photo: file,
+        photos: Array.from(files),
       }));
     }
   };
 
   const handleSubmit = () => {
-  const handleInputChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    console.log("Form submitted:", formData);
-    onClose();
+    if (!canSubmit) {
+      return;
     }
+
+    console.log("Land ad submitted:", {
+      landId: formData.landId,
+      autoFilledLandDetails: registeredLandInfo,
+      additionalInfo: formData.additionalInfo,
+      photos: formData.photos.map((file) => file.name),
+    });
+
+    onClose();
   };
-
-  const soilTypes = [
-    { value: "clay", label: "Clay" },
-    { value: "sandy", label: "Sandy" },
-    { value: "loamy", label: "Loamy" },
-    { value: "silty", label: "Silty" },
-    { value: "peaty", label: "Peaty" },
-    { value: "chalky", label: "Chalky" },
-    { value: "gravel", label: "Gravel" },
-    { value: "other", label: "Other" },
-  ];
-
-  const landHistoryOptions = [
-    { value: "organic-previous", label: "Previously Used for Organic Farming" },
-    {
-      value: "conventional-previous",
-      label: "Previously Used for Conventional Farming",
-    },
-    { value: "uncultivated", label: "Uncultivated Land" },
-    { value: "crop-rotation", label: "Crop Rotation Practiced" },
-    { value: "fallow", label: "Fallow Land" },
-  ];
 
   return (
     <Dialog
@@ -126,13 +138,45 @@ const CreateAdPopup = ({ open, onClose }: CreateAdPopupProps) => {
           fontWeight: 600,
         }}
       >
-        Create an Ad
+        Create Land Ad
         <IconButton onClick={onClose} sx={{ color: "#fff" }}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
 
+      <Divider sx={{ borderColor: "rgba(255,255,255,0.08)" }} />
+
       <DialogContent>
+        <Typography sx={{ color: "#a6a6a6", fontSize: "0.9rem", mb: 2 }}>
+          Enter your land ID to fetch your registered land details automatically.
+        </Typography>
+
+        {registeredLandInfo ? (
+          <Alert
+            severity="info"
+            sx={{
+              mb: 3,
+              backgroundColor: "rgba(59, 130, 246, 0.12)",
+              color: "#dbeafe",
+              "& .MuiAlert-icon": { color: "#93c5fd" },
+            }}
+          >
+            Your registered land ID: <strong>{registeredLandId}</strong>
+          </Alert>
+        ) : (
+          <Alert
+            severity="warning"
+            sx={{
+              mb: 3,
+              backgroundColor: "rgba(245, 158, 11, 0.12)",
+              color: "#fde68a",
+              "& .MuiAlert-icon": { color: "#f59e0b" },
+            }}
+          >
+            Registered land details not found. Complete landowner profile setup first.
+          </Alert>
+        )}
+
         <Box
           sx={{
             display: "grid",
@@ -142,108 +186,77 @@ const CreateAdPopup = ({ open, onClose }: CreateAdPopupProps) => {
           }}
         >
           <Box>
-            <Label text="Location" />
+            <Label text="Land ID" />
             <TextField
-              name="location"
+              name="landId"
               variant="standard"
               fullWidth
               sx={fieldStyle}
-              value={formData.location}
+              value={formData.landId}
               onChange={handleInputChange}
-              placeholder="Add location"
+              onBlur={() => setLandIdTouched(true)}
+              placeholder="Enter land ID"
+            />
+            {landIdTouched && formData.landId && !isLandMatched && (
+              <Typography sx={{ color: "#fca5a5", fontSize: "0.75rem", mt: 1 }}>
+                Land ID does not match your registered land.
+              </Typography>
+            )}
+          </Box>
+
+          <Box>
+            <Label text="Location" />
+            <TextField
+              variant="standard"
+              fullWidth
+              sx={fieldStyle}
+              value={
+                isLandMatched
+                  ? `${registeredLandInfo?.landStreet || ""}, ${registeredLandInfo?.landCity || ""}`
+                  : ""
+              }
+              placeholder="Auto-filled from registration"
+              InputProps={{ readOnly: true }}
             />
           </Box>
 
           <Box>
             <Label text="Land Area" />
             <TextField
-              name="landArea"
               variant="standard"
               fullWidth
               sx={fieldStyle}
-              value={formData.landArea}
-              onChange={handleInputChange}
-              placeholder="Land Area"
-            />
-          </Box>
-
-          <Box>
-            <Label text="Available Period" />
-            <TextField
-              name="availablePeriod"
-              variant="standard"
-              fullWidth
-              sx={fieldStyle}
-              value={formData.fromDate}
-              onChange={handleInputChange}
-              placeholder="Available Period"
-            />
-          </Box>
-
-          <Box>
-            <Label text="Rental Amount" />
-            <TextField
-              name="rentalAmount"
-              variant="standard"
-              fullWidth
-              sx={fieldStyle}
-              value={formData.rentalAmount}
-              onChange={handleInputChange}
-              placeholder="Enter Amount"
+              value={isLandMatched ? registeredLandInfo?.landSize || "" : ""}
+              placeholder="Auto-filled from registration"
+              InputProps={{ readOnly: true }}
             />
           </Box>
 
           <Box>
             <Label text="Soil Type" />
             <TextField
+              variant="standard"
               fullWidth
-              select
-              placeholder="select soil type"
-              name="soilType"
-              value={formData.soilType}
-              onChange={handleInputChange}
-              size="small"
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "8px",
-                  backgroundColor: "#ffffff",
-                },
-              }}
-            >
-              {soilTypes.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
+              sx={fieldStyle}
+              value={isLandMatched ? registeredLandInfo?.soilType || "" : ""}
+              placeholder="Auto-filled from registration"
+              InputProps={{ readOnly: true }}
+            />
           </Box>
 
           <Box>
-            <Label text="Land History" />
+            <Label text="Rental Expectation" />
             <TextField
+              variant="standard"
               fullWidth
-              select
-              placeholder="Select"
-              name="landHistory"
-              value={formData.landHistory}
-              onChange={handleInputChange}
-              size="small"
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "8px",
-                  backgroundColor: "#ffffff",
-                },
-              }}
-            >
-              {landHistoryOptions.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
+              sx={fieldStyle}
+              value={isLandMatched ? registeredLandInfo?.rentalExpectation || "" : ""}
+              placeholder="Auto-filled from registration"
+              InputProps={{ readOnly: true }}
+            />
           </Box>
 
-          <Box>
+          <Box sx={{ gridColumn: { xs: "1 / -1", md: "1 / -1" } }}>
             <Label text="Additional Information" />
             <TextField
               name="additionalInfo"
@@ -252,14 +265,14 @@ const CreateAdPopup = ({ open, onClose }: CreateAdPopupProps) => {
               sx={fieldStyle}
               value={formData.additionalInfo}
               onChange={handleInputChange}
-              placeholder="Additional info"
+              placeholder="Enter additional details for this advertisement"
               multiline
-              rows={2}
+              rows={3}
             />
           </Box>
 
-          <Box>
-            <Label text="Upload a Photo" />
+          <Box sx={{ gridColumn: { xs: "1 / -1", md: "1 / -1" } }}>
+            <Label text="Upload Photos" />
             <Box
               sx={{
                 border: "1px dashed #ccc",
@@ -284,11 +297,14 @@ const CreateAdPopup = ({ open, onClose }: CreateAdPopupProps) => {
                 id="photo-upload"
                 type="file"
                 accept="image/*"
+                multiple
                 onChange={handleFileChange}
                 style={{ display: "none" }}
               />
               <div style={{ color: "#666", fontSize: "14px" }}>
-                {formData.photo ? formData.photo.name : "No file chosen"}
+                {formData.photos.length > 0
+                  ? `${formData.photos.length} photo(s) selected`
+                  : "No files chosen"}
               </div>
               <div
                 style={{
@@ -297,30 +313,37 @@ const CreateAdPopup = ({ open, onClose }: CreateAdPopupProps) => {
                   marginTop: "4px",
                 }}
               >
-                Click to upload or drag and drop
+                Click to upload photos
               </div>
             </Box>
           </Box>
         </Box>
 
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 5 }}>
+        <DialogActions sx={{ justifyContent: "center", mt: 3 }}>
           <Button
             variant="contained"
             onClick={handleSubmit}
+            disabled={!canSubmit}
             sx={{
-              backgroundColor: "#6e8b3d",
+              background: "linear-gradient(135deg, #6B8E23 0%, #8FA887 100%)",
+              boxShadow: "0 4px 12px rgba(107, 142, 35, 0.3)",
               px: 8,
               py: 1.2,
               borderRadius: "10px",
               fontWeight: 600,
+              color: "#fff",
               "&:hover": {
-                backgroundColor: "#5d7633",
+                opacity: 0.9,
+              },
+              "&.Mui-disabled": {
+                background: "rgba(255,255,255,0.15)",
+                color: "rgba(255,255,255,0.45)",
               },
             }}
           >
             Save
           </Button>
-        </Box>
+        </DialogActions>
       </DialogContent>
     </Dialog>
   );
