@@ -117,7 +117,7 @@ const MyLandAdsPage = () => {
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">My Land Ads</h2>
                 <div className="flex items-center mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  <span className="font-medium text-primary mr-1">{landAds.length} Active Records</span>
+                  <span className="font-medium text-[#f59e0b] mr-1">{landAds.length} Active Records</span>
                   <span>• Manage location, pricing, season availability, and reuse.</span>
                 </div>
               </div>
@@ -125,7 +125,11 @@ const MyLandAdsPage = () => {
               <div className="flex gap-2">
                 <button
                   onClick={() => setOpen(true)}
-                  className="flex items-center px-4 py-2 bg-primary hover:bg-primary-dark text-black text-sm font-bold rounded-lg shadow hover:shadow-primary/20 transition-all"
+                  style={{
+                    background: 'linear-gradient(135deg, #6B8E23 0%, #8FA887 100%)',
+                    boxShadow: '0 4px 12px rgba(184, 243, 67, 0.3)',
+                  }}
+                  className="flex items-center px-4 py-2 text-white text-sm font-bold rounded-lg shadow transition-all hover:opacity-90"
                 >
                   <span className="material-icons-outlined text-lg mr-2">add</span>
                   Create New Land Ad
@@ -273,7 +277,11 @@ const MyLandAdsPage = () => {
                             ) : (
                               <button
                                 onClick={() => (isOpen ? handleEdit(ad.id) : handleCreateNewSeason(ad.id))}
-                                className="flex-1 px-3 py-2 text-xs font-bold text-black bg-primary hover:bg-primary-dark rounded-md shadow-sm shadow-primary/20 transition-colors flex items-center justify-center"
+                                style={{
+                                  background: 'linear-gradient(135deg, #6B8E23 0%, #8FA887 100%)',
+                                  boxShadow: '0 2px 8px rgba(107, 142, 35, 0.3)',
+                                }}
+                                className="flex-1 px-3 py-2 text-xs font-bold text-white rounded-md transition-colors flex items-center justify-center hover:opacity-90"
                               >
                                 <span className="material-icons text-[16px] mr-2">
                                   {isOpen ? 'edit' : 'refresh'}

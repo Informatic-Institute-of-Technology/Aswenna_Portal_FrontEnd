@@ -250,7 +250,7 @@ const ReceivedRequestsPage = () => {
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Received Requests</h2>
                 <div className="flex items-center mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  <span className="font-medium text-primary mr-1">{pendingRequests.length} Pending</span>
+                  <span className="font-medium text-[#f59e0b] mr-1">{pendingRequests.length} Pending</span>
                   <span>• Incoming investor proposals for your land ads.</span>
                 </div>
               </div>

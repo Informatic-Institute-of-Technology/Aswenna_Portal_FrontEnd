@@ -230,15 +230,15 @@ const RequestCard = ({
           <button
             onClick={primaryAction.onClick}
             style={{
-              background: type === 'agreement'
+              background: type === 'agreement' || type === 'landowner-request'
                 ? 'linear-gradient(135deg, #6B8E23 0%, #8FA887 100%)'
                 : undefined,
-              boxShadow: type === 'agreement'
+              boxShadow: type === 'agreement' || type === 'landowner-request'
                 ? '0 4px 12px rgba(107, 142, 35, 0.3)'
                 : '0 2px 8px rgba(107, 142, 35, 0.3)',
             }}
             className={
-              type === 'agreement'
+              type === 'agreement' || type === 'landowner-request'
                 ? 'flex-1 sm:flex-none flex items-center justify-center px-4 py-2 text-xs font-bold text-white hover:opacity-90 rounded-lg transition-all transform active:scale-95'
                 : 'px-3 py-1.5 text-xs font-medium text-white bg-primary hover:bg-primary-dark rounded-md shadow-sm transition-all font-bold'
             }
