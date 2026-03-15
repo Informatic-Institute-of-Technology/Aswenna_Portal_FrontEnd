@@ -210,6 +210,41 @@ const MyProjectsPage = () => {
     setSelectedProject(null);
   };
 
+  const handleCreateProject = (payload: FarmerJobCreationPayload) => {
+    const generatedId = Date.now();
+    const costBreakdown = payload.costBreakdown.map((item: any) => ({
+      category: item.category,
+      description: item.description,
+      amount: item.estimatedCost,
+    }));
+
+    const newProject: Project = {
+      id: generatedId,
+      name: payload.projectName,
+      cropType: formatCropLabel(payload.cropType),
+      cropIcon: getCropIcon(payload.cropType),
+      status: "IN REVIEW",
+      investmentStatus:
+        payload.offerType === "harvest"
+          ? "Funding Requested"
+          : "Commission Review",
+      fundingPercentage: payload.offerType === "harvest" ? 0 : undefined,
+      progress: 5,
+      landArea: payload.expectedLandArea ?? 0,
+      budget: payload.totalInvestmentRequired,
+      expectedROI: payload.commissionPercentage ?? 20,
+      startDate: payload.effectiveDateFrom,
+      endDate: payload.effectiveDateTo || undefined,
+      location: payload.location,
+      investmentType: payload.offerType,
+      farmerName: "Current Farmer",
+      farmerImage: "",
+      costBreakdown,
+    };
+
+    setProjectList((previousProjects) => [newProject, ...previousProjects]);
+  };
+
   return (
     <Box sx={{ p: 3, minHeight: "100vh", backgroundColor: "#0a0f0a" }}>
       {/* Header Section */}
@@ -278,7 +313,7 @@ const MyProjectsPage = () => {
         </Typography>
 
         <div className="row g-4">
-          {projects.map((project) => (
+          {projectList.map((project) => (
             <div key={project.id} className="col-12 col-md-6 col-lg-4">
               <Card
                 sx={{
@@ -345,9 +380,7 @@ const MyProjectsPage = () => {
                     }}
                   >
                     {/* Status Badge */}
-                    <Box
-                      sx={{ display: "flex", gap: 1, alignItems: "center" }}
-                    >
+                    <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                       <Chip
                         label={project.status}
                         color={getStatusColor(project.status) as any}
