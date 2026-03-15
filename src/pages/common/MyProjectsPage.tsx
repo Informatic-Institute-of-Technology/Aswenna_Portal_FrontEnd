@@ -55,9 +55,10 @@ interface Project {
   farmerName: string;
   farmerImage: string;
   landownerName?: string;
+  costBreakdown?: ProjectCostBreakdownItem[];
 }
 
-const projects: Project[] = [
+const initialProjects: Project[] = [
   {
     id: 1,
     name: "Premium Rice Cultivation",
@@ -129,15 +130,6 @@ const projects: Project[] = [
   },
 ];
 
-// TODO: Fetch stats dynamically from API
-// API endpoint: GET /api/farmer/project-stats
-const stats = [
-  { label: "TOTAL ACTIVE PROJECTS", value: "12" },
-  { label: "TOTAL LAND UNDER MANAGEMENT", value: "42.5", unit: "Acres" },
-  { label: "PENDING INVESTORS", value: "08" },
-  { label: "UPCOMING HARVESTS", value: "03" },
-];
-
 // TODO: Fetch projects dynamically from API
 // API endpoint: GET /api/farmer/projects
 
@@ -171,9 +163,33 @@ const getStatusColor = (status: string) => {
   }
 };
 
+const getCropIcon = (cropType: string) => {
+  const iconMap: Record<string, string> = {
+    rice: "🌾",
+    tea: "🍵",
+    pepper: "🌿",
+    vegetables: "🥕",
+    fruits: "🍎",
+    coconut: "🥥",
+  };
+
+  return iconMap[cropType.toLowerCase()] ?? "🌱";
+};
+
+const formatCropLabel = (cropType: string) =>
+  cropType
+    .split(" ")
+    .map((word) =>
+      word.length > 0
+        ? word[0].toUpperCase() + word.slice(1).toLowerCase()
+        : word,
+    )
+    .join(" ");
+
 const MyProjectsPage = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [projectList, setProjectList] = useState<Project[]>(initialProjects);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   const handleOpenDialog = () => {
