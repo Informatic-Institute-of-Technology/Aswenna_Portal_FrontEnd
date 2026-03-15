@@ -1,5 +1,6 @@
 import { ProtectedRoute, PublicRoute } from "@/components";
 import { AuthProvider } from "@/Context/AuthContext";
+import { useAuth } from "@/Context/useAuth";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { Suspense, lazy } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
@@ -28,11 +29,11 @@ const InvestorsPage = lazy(() => import("./common/InvestorsPage"));
 const LandOwnersPage = lazy(() => import("./common/LandOwnersPage"));
 const MatchMakingPage = lazy(() => import("./common/MatchMakingPage"));
 const AgreementPage = lazy(() => import("./common/AgreementPage"));
-const AgreementOnboarding = lazy(() => import("./common/AgreementOnboarding"));
 
 const MyOffersPage = lazy(() => import("./investor/MyOffersPage"));
 const OpportunitiesPage = lazy(() => import("./investor/OpportunitiesPage"));
-const RequestsPage = lazy(() => import("./investor/RequestsPage"));
+const InvestorRequestsPage = lazy(() => import("./investor/RequestsPage"));
+const FarmerRequestsPage = lazy(() => import("./farmer/RequestsPage"));
 const FinanceLedgerPage = lazy(() => import("./investor/FinanceLedgerPage"));
 const PaymentControlCenterPage = lazy(
   () => import("./investor/payment/PaymentControlCenterPage"),
