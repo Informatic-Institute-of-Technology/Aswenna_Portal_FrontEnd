@@ -75,9 +75,9 @@ const FarmerSidebar = () => {
       path: `${basePath}/dashboard/crop-jobs`,
     },
     {
-      text: "Purchase Requisitions",
+      text: "Requests",
       icon: <ReqIcon />,
-      path: `${basePath}/dashboard/requisitions`,
+      path: `${basePath}/dashboard/requests`,
     },
   ];
 
