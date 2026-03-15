@@ -287,9 +287,39 @@ const ProjectDetailsDialog = ({
     budget: 250500,
     expectedROI: 28,
     investmentType: "Harvest-Based",
+    costBreakdown: undefined,
   };
 
-  const disbursedAmount = 138000;
+  const budgetBreakdown = projectData.costBreakdown?.length
+    ? projectData.costBreakdown
+        .filter((category) => category.amount > 0)
+        .map((category, index) => ({
+          name: category.category,
+          description: category.description,
+          amount: category.amount,
+          color: breakdownColorPalette[index % breakdownColorPalette.length],
+        }))
+    : sampleBudgetCategories;
+
+  const totalBudget = budgetBreakdown.reduce(
+    (total, category) => total + category.amount,
+    0,
+  );
+
+  const effectiveBudget = totalBudget > 0 ? totalBudget : projectData.budget;
+
+  const budgetBreakdownWithPercentages = budgetBreakdown.map((category) => ({
+    ...category,
+    percentage:
+      effectiveBudget > 0
+        ? Math.round((category.amount / effectiveBudget) * 100)
+        : 0,
+  }));
+
+  const disbursedAmount = Math.min(
+    Math.round(projectData.budget * 0.55),
+    projectData.budget,
+  );
   const remainingBalance = projectData.budget - disbursedAmount;
   const totalMilestones = 8;
   const completedMilestones = 5;
@@ -908,27 +938,15 @@ const ProjectDetailsDialog = ({
                     variant="subtitle1"
                     sx={{ color: "#fff", fontWeight: 600 }}
                   >
-                    Budget Breakdown by Category
+                    Cost Breakdown by Category
                   </Typography>
                 </Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                  <Typography variant="body2" sx={{ color: "#808080" }}>
-                    Total Budget: {formatCurrency(250000)}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: "#4CAF50",
-                      cursor: "pointer",
-                      "&:hover": { textDecoration: "underline" },
-                    }}
-                  >
-                    View All (7) ↓
-                  </Typography>
-                </Box>
+                <Typography variant="body2" sx={{ color: "#808080" }}>
+                  Total Budget: {formatCurrency(effectiveBudget)}
+                </Typography>
               </Box>
 
-              {sampleBudgetCategories.map((category, index) => (
+              {budgetBreakdownWithPercentages.map((category, index) => (
                 <Box key={index} sx={{ mb: 2.5 }}>
                   <Box
                     sx={{
