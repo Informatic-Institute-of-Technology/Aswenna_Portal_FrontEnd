@@ -8,11 +8,12 @@ import { FarmerSidebar, InvestorSidebar, LandOwnerSidebar, SuperAdminSidebar } f
 
 interface DashboardLayoutProps {
   children: ReactNode;
+  showTopBar?: boolean;
 }
 
 const drawerWidth = 280;
 
-const DashboardLayout = ({ children }: DashboardLayoutProps) => {
+const DashboardLayout = ({ children, showTopBar = true }: DashboardLayoutProps) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
 
@@ -71,37 +72,39 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
+          p: showTopBar ? 3 : 0,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
         }}
       >
-        <Toolbar
-          sx={{
-            px: { xs: 2, sm: 3 },
-            mb: 3,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-          }}
-        >
-          <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>
-            {getDashboardTitle()}
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <IconButton color="inherit" sx={{ border: '1px solid', borderColor: 'divider' }}>
-              <Badge badgeContent={3} color="error">
-                <Mail />
-              </Badge>
-            </IconButton>
-            <IconButton color="inherit" sx={{ border: '1px solid', borderColor: 'divider' }}>
-              <Badge badgeContent={5} color="error">
-                <Notifications />
-              </Badge>
-            </IconButton>
-          </Box>
-        </Toolbar>
+        {showTopBar && (
+          <Toolbar
+            sx={{
+              px: { xs: 2, sm: 3 },
+              mb: 3,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderBottom: '1px solid',
+              borderColor: 'divider',
+            }}
+          >
+            <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>
+              {getDashboardTitle()}
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <IconButton color="inherit" sx={{ border: '1px solid', borderColor: 'divider' }}>
+                <Badge badgeContent={3} color="error">
+                  <Mail />
+                </Badge>
+              </IconButton>
+              <IconButton color="inherit" sx={{ border: '1px solid', borderColor: 'divider' }}>
+                <Badge badgeContent={5} color="error">
+                  <Notifications />
+                </Badge>
+              </IconButton>
+            </Box>
+          </Toolbar>
+        )}
 
         {loading ? (
           <Container maxWidth="xl">

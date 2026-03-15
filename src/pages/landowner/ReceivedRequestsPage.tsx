@@ -1,25 +1,14 @@
-import DashboardLayout from "@/layouts/DashboardLayout";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import ChatIcon from "@mui/icons-material/Chat";
-import CloseIcon from "@mui/icons-material/Close";
-import StarIcon from "@mui/icons-material/Star";
-import VerifiedIcon from "@mui/icons-material/Verified";
+import DashboardLayout from '@/layouts/DashboardLayout';
+import { useMemo, useState } from 'react';
 import {
-  Avatar,
-  Box,
-  Button,
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Divider,
-  Stack,
-  Typography,
-} from "@mui/material";
-import { useMemo, useState } from "react";
+  ConnectionJourney,
+  FilterChip,
+  QuickActions,
+  RequestCard,
+  SectionHeader,
+} from '../../components/investor/requests';
 
-type RequestStatus = "pending" | "approved" | "declined";
+type RequestStatus = 'pending' | 'approved' | 'declined';
 
 interface LandRequest {
   request_id: string;
@@ -48,83 +37,83 @@ interface LandRequest {
 const requestData: { requests: LandRequest[] } = {
   requests: [
     {
-      request_id: "REQ-7721",
-      ad_id: "LAND-001",
-      land_name: "Green Valley Plantation",
+      request_id: 'REQ-7721',
+      ad_id: 'LAND-001',
+      land_name: 'Green Valley Plantation',
       investor_info: {
-        id: "INV-552",
-        name: "Alex Sterling",
+        id: 'INV-552',
+        name: 'Alex Sterling',
         rating: 4.9,
         is_verified: true,
-        company: "EcoHarvest Ventures",
+        company: 'EcoHarvest Ventures',
       },
       financials: {
         landowner_asking_price: 25000.0,
-        currency: "LKR",
+        currency: 'LKR',
       },
       proposal_details: {
-        project_type: "Organic Berries",
-        duration: "15 months",
+        project_type: 'Organic Berries',
+        duration: '15 months',
         description:
           "We plan to implement high-tech drip irrigation for a sustainable strawberry farm.",
       },
-      status: "pending",
-      timestamp: "2026-02-14T09:30:00Z",
+      status: 'pending',
+      timestamp: '2026-02-14T09:30:00Z',
     },
     {
-      request_id: "REQ-7722",
-      ad_id: "LAND-002",
-      land_name: "Green Valley Plantation",
+      request_id: 'REQ-7722',
+      ad_id: 'LAND-002',
+      land_name: 'Green Valley Plantation',
       investor_info: {
-        id: "INV-400",
-        name: "Samantha Gunarathne",
+        id: 'INV-400',
+        name: 'Samantha Gunarathne',
         rating: 4.4,
         is_verified: true,
-        company: "Samantha Agro",
+        company: 'Samantha Agro',
       },
       financials: {
         landowner_asking_price: 25000.0,
-        currency: "LKR",
+        currency: 'LKR',
       },
       proposal_details: {
-        project_type: "Green Veg",
-        duration: "12 months",
+        project_type: 'Green Veg',
+        duration: '12 months',
         description:
           "We plan to implement high-tech drip irrigation for a sustainable green vegetables farm.",
       },
-      status: "pending",
-      timestamp: "2026-02-14T09:30:00Z",
+      status: 'pending',
+      timestamp: '2026-02-14T09:30:00Z',
     },
     {
-      request_id: "REQ-7723",
-      ad_id: "LAND-005",
-      land_name: "Green Valley Plantation",
+      request_id: 'REQ-7723',
+      ad_id: 'LAND-005',
+      land_name: 'Green Valley Plantation',
       investor_info: {
-        id: "INV-708",
-        name: "Dinesh Keerthirathne",
+        id: 'INV-708',
+        name: 'Dinesh Keerthirathne',
         rating: 4.0,
         is_verified: true,
-        company: "EcoHarvest Ventures",
+        company: 'EcoHarvest Ventures',
       },
       financials: {
         landowner_asking_price: 25000.0,
-        currency: "LKR",
+        currency: 'LKR',
       },
       proposal_details: {
-        project_type: "Fruits",
-        duration: "8 months",
+        project_type: 'Fruits',
+        duration: '8 months',
         description:
           "We plan to implement high-tech drip irrigation for a sustainable fruits farm.",
       },
-      status: "pending",
-      timestamp: "2026-02-14T09:30:00Z",
+      status: 'pending',
+      timestamp: '2026-02-14T09:30:00Z',
     },
   ],
 };
 
 const formatMoney = (value: number, currency: string) => {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
     currency,
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
@@ -132,35 +121,45 @@ const formatMoney = (value: number, currency: string) => {
 };
 
 const formatTimestamp = (dateString: string) => {
-  return new Date(dateString).toLocaleString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
+  return new Date(dateString).toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   });
+};
+
+const getInitials = (name: string) =>
+  name
+    .split(' ')
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+
+const toStatusBadge = (status: RequestStatus) => {
+  switch (status) {
+    case 'approved':
+      return { label: 'Approved', variant: 'accepted' as const, color: '#10b981' };
+    case 'declined':
+      return { label: 'Declined', variant: 'rejected' as const, color: '#ef4444' };
+    case 'pending':
+    default:
+      return { label: 'Pending Review', variant: 'pending_response' as const, color: '#f59e0b' };
+  }
 };
 
 const ReceivedRequestsPage = () => {
   const [requests, setRequests] = useState<LandRequest[]>(requestData.requests);
-  const [selectedRequest, setSelectedRequest] = useState<LandRequest | null>(
-    null,
-  );
-  const [detailOpen, setDetailOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<LandRequest | null>(null);
 
   const pendingRequests = useMemo(
-    () => requests.filter((request) => request.status === "pending"),
+    () => requests.filter((request) => request.status === 'pending'),
     [requests],
   );
 
-  const handleOpenDetails = (request: LandRequest) => {
-    setSelectedRequest(request);
-    setDetailOpen(true);
-  };
-
-  const handleCloseDetails = () => {
-    setDetailOpen(false);
-  };
+  const selectedCurrency = selectedRequest?.financials.currency ?? 'LKR';
 
   const handleStatusChange = (requestId: string, newStatus: RequestStatus) => {
     setRequests((prevRequests) =>
@@ -170,255 +169,212 @@ const ReceivedRequestsPage = () => {
           : request,
       ),
     );
+
     if (selectedRequest?.request_id === requestId) {
-      setSelectedRequest({ ...selectedRequest, status: newStatus });
+      if (newStatus === 'pending') {
+        setSelectedRequest({ ...selectedRequest, status: newStatus });
+      } else {
+        setSelectedRequest(null);
+      }
     }
   };
 
-  const selectedCurrency = selectedRequest?.financials.currency ?? "LKR";
+  const handleSelectRequest = (request: LandRequest) => {
+    setSelectedRequest(request);
+  };
+
+  const handleQuickAction = (action: string) => {
+    console.log(`Landowner quick action: ${action}`);
+  };
+
+  const journeySteps = selectedRequest
+    ? [
+        {
+          title: 'Request Received',
+          description: `Proposal submitted by ${selectedRequest.investor_info.name}`,
+          timestamp: formatTimestamp(selectedRequest.timestamp),
+          status: 'completed' as const,
+          icon: 'check',
+        },
+        {
+          title: 'Review Proposal',
+          description: `${selectedRequest.proposal_details.project_type} • ${selectedRequest.proposal_details.duration}`,
+          status: 'active' as const,
+          icon: 'visibility',
+        },
+        {
+          title: 'Decision',
+          description: 'Approve or decline this incoming request',
+          status: 'pending' as const,
+          icon: '3',
+        },
+      ]
+    : [];
+
+  const quickActions = selectedRequest
+    ? [
+        {
+          icon: 'chat',
+          label: 'Message Investor',
+          onClick: () => handleQuickAction('message-investor'),
+        },
+        {
+          icon: 'description',
+          label: 'View Ad',
+          onClick: () => handleQuickAction('view-ad'),
+        },
+        {
+          icon: 'check_circle',
+          label: 'Approve',
+          color: '#22c55e',
+          onClick: () => handleStatusChange(selectedRequest.request_id, 'approved'),
+        },
+        {
+          icon: 'cancel',
+          label: 'Decline',
+          color: '#ef4444',
+          onClick: () => handleStatusChange(selectedRequest.request_id, 'declined'),
+        },
+      ]
+    : [];
 
   return (
-    <DashboardLayout>
-      <Box className="container-fluid" sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-          Received Requests
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Review and manage proposals from investors interested in your land.
-          You can compare offers, view investor profiles, and message them
-          directly to finalize details.
-        </Typography>
-      </Box>
-
-      <Stack spacing={2.5}>
-        {pendingRequests.map((request) => {
-          const { financials, investor_info } = request;
-
-          return (
-            <Box
-              key={request.request_id}
-              sx={{
-                border: "1px solid",
-                borderColor: "divider",
-                borderRadius: 2,
-                p: 2,
-                background: "rgba(255, 255, 255, 0.02)",
-              }}
-            >
-              <Stack
-                direction={{ xs: "column", md: "row" }}
-                justifyContent="space-between"
-                spacing={2}
-              >
-                <Box>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                    New proposal for {request.land_name}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mt: 0.5 }}
-                  >
-                    Received from {investor_info.name} •{" "}
-                    {formatTimestamp(request.timestamp)}
-                  </Typography>
-                </Box>
-
-                <Stack direction="row" spacing={1.2} alignItems="center">
-                  <Button
-                    variant="outlined"
-                    onClick={() => handleOpenDetails(request)}
-                  >
-                    View Details
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="success"
-                    onClick={() =>
-                      handleStatusChange(request.request_id, "approved")
-                    }
-                  >
-                    Approve
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="error"
-                    onClick={() =>
-                      handleStatusChange(request.request_id, "declined")
-                    }
-                  >
-                    Decline
-                  </Button>
-                </Stack>
-              </Stack>
-            </Box>
-          );
-        })}
-      </Stack>
-
-      {pendingRequests.length === 0 && (
-        <Box
-          sx={{
-            mt: 2,
-            textAlign: "center",
-            p: 6,
-            borderRadius: 2,
-            border: "2px dashed",
-            borderColor: "divider",
-            background: "rgba(255, 255, 255, 0.02)",
-          }}
-        >
-          <Typography variant="h6" sx={{ mb: 1 }}>
-            No Pending Proposals
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            New investor requests will appear here.
-          </Typography>
-        </Box>
-      )}
-
-      <Dialog
-        open={detailOpen}
-        onClose={handleCloseDetails}
-        fullWidth
-        maxWidth="md"
+    <DashboardLayout showTopBar={false}>
+      <div
+        style={{ background: 'linear-gradient(145deg, #2a2a2a 0%, #1f1f1f 100%)' }}
+        className="text-gray-300 font-sans h-full flex flex-col overflow-hidden transition-colors duration-200"
       >
-        <DialogTitle
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            pr: 1,
-          }}
-        >
-          Proposal Details
-          <Button
-            size="small"
-            onClick={handleCloseDetails}
-            startIcon={<CloseIcon />}
-          ></Button>
-        </DialogTitle>
-        {selectedRequest && (
-          <>
-            <DialogContent dividers>
-              <Stack spacing={3}>
-                <Box>
-                  <Typography
-                    variant="subtitle2"
-                    color="text.secondary"
-                    sx={{ mb: 1 }}
-                  >
-                    Investor Identity
-                  </Typography>
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <Avatar sx={{ width: 56, height: 56 }}>
-                      {selectedRequest.investor_info.name
-                        .split(" ")
-                        .map((part) => part[0])
-                        .join("")
-                        .slice(0, 2)}
-                    </Avatar>
-                    <Box>
-                      <Stack direction="row" spacing={1} alignItems="center">
-                        <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                          {selectedRequest.investor_info.name}
-                        </Typography>
-                        {selectedRequest.investor_info.is_verified && (
-                          <Chip
-                            icon={<VerifiedIcon />}
-                            label="Verified"
-                            color="success"
-                            size="small"
-                          />
-                        )}
-                      </Stack>
-                      <Typography variant="body2" color="text.secondary">
-                        {selectedRequest.investor_info.company}
-                      </Typography>
-                      <Stack
-                        direction="row"
-                        spacing={0.5}
-                        alignItems="center"
-                        sx={{ mt: 0.5 }}
+        <div className="flex-1 overflow-hidden flex flex-col">
+          <div className="px-8 py-6 pb-2">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Received Requests</h2>
+                <div className="flex items-center mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  <span className="font-medium text-primary mr-1">{pendingRequests.length} Pending</span>
+                  <span>• Incoming investor proposals for your land ads.</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="text-sm font-semibold text-gray-200">Incoming Requests Only</div>
+              <div className="flex space-x-2 overflow-x-auto no-scrollbar py-1">
+                <FilterChip icon="priority_high" label="Pending" variant="urgent" />
+                <FilterChip icon="attach_money" label="High-Value" variant="high-value" />
+                <FilterChip icon="verified" label="Verified" variant="verified" />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex-1 overflow-hidden flex flex-col lg:flex-row">
+            <div className="flex-1 overflow-y-auto p-6 pt-2 space-y-8">
+              <section
+                style={{
+                  background: 'linear-gradient(145deg, rgba(42, 42, 42, 0.6) 0%, rgba(31, 31, 31, 0.6) 100%)',
+                  border: '1px solid rgba(107, 142, 35, 0.2)',
+                }}
+                className="rounded-2xl p-4"
+              >
+                <SectionHeader
+                  title="Incoming Investor Requests"
+                  icon="inbox"
+                  badge={{ label: String(pendingRequests.length), variant: 'primary' }}
+                  withGradientBar
+                />
+
+                {pendingRequests.length > 0 ? (
+                  <div className="space-y-4">
+                    {pendingRequests.map((request) => (
+                      <div
+                        key={request.request_id}
+                        onClick={() => handleSelectRequest(request)}
+                        className="cursor-pointer"
                       >
-                        <StarIcon color="warning" fontSize="small" />
-                        <Typography variant="body2">
-                          {selectedRequest.investor_info.rating.toFixed(1)} /
-                          5.0
-                        </Typography>
-                      </Stack>
-                    </Box>
-                  </Stack>
-                </Box>
-
-                <Divider />
-
-                <Box>
-                  <Stack spacing={1}>
-                    <Typography variant="body1">
-                      Asking Price:{" "}
-                      <strong>
-                        {formatMoney(
-                          selectedRequest.financials.landowner_asking_price,
-                          selectedCurrency,
-                        )}
-                      </strong>
-                    </Typography>
-                  </Stack>
-                </Box>
-
-                <Divider />
-
-                <Box>
-                  <Typography
-                    variant="subtitle2"
-                    color="text.secondary"
-                    sx={{ mb: 1 }}
+                        <RequestCard
+                          type="landowner-request"
+                          name={request.investor_info.name}
+                          avatarInitials={getInitials(request.investor_info.name)}
+                          location={request.land_name}
+                          isVerified={request.investor_info.is_verified}
+                          statusBadge={toStatusBadge(request.status)}
+                          tags={[
+                            {
+                              label: request.investor_info.company,
+                              variant: 'primary',
+                            },
+                            {
+                              label: `${formatMoney(request.financials.landowner_asking_price, request.financials.currency)} asking`,
+                              variant: 'secondary',
+                            },
+                          ]}
+                          description={request.proposal_details.description}
+                          timestamp={formatTimestamp(request.timestamp)}
+                          primaryAction={{
+                            label: 'Review Request',
+                            icon: 'visibility',
+                            onClick: () => handleSelectRequest(request),
+                          }}
+                          isSelected={selectedRequest?.request_id === request.request_id}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      background: 'rgba(42, 42, 42, 0.4)',
+                      border: '1px dashed rgba(107, 142, 35, 0.35)',
+                    }}
+                    className="rounded-xl p-8 text-center"
                   >
-                    Project Proposal
-                  </Typography>
-                  <Typography variant="body2" sx={{ mb: 0.7 }}>
-                    <strong>Type:</strong>{" "}
-                    {selectedRequest.proposal_details.project_type}
-                  </Typography>
-                  <Typography variant="body2" sx={{ mb: 1.2 }}>
-                    <strong>Duration:</strong>{" "}
-                    {selectedRequest.proposal_details.duration}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {selectedRequest.proposal_details.description}
-                  </Typography>
-                </Box>
-              </Stack>
-            </DialogContent>
+                    <p className="text-lg font-semibold text-gray-200">No Pending Proposals</p>
+                    <p className="text-sm text-gray-400 mt-1">New investor requests will appear here.</p>
+                  </div>
+                )}
+              </section>
+            </div>
 
-            <DialogActions sx={{ p: 2 }}>
-              <Button
-                color="success"
-                variant="contained"
-                startIcon={<CheckCircleIcon />}
-                onClick={() =>
-                  handleStatusChange(selectedRequest.request_id, "approved")
-                }
-              >
-                Approve Request
-              </Button>
-              <Button
-                color="error"
-                variant="contained"
-                onClick={() =>
-                  handleStatusChange(selectedRequest.request_id, "declined")
-                }
-              >
-                Decline
-              </Button>
-              <Button variant="contained" startIcon={<ChatIcon />}>
-                Chat with Investor
-              </Button>
-            </DialogActions>
-          </>
-        )}
-      </Dialog>
+            <div
+              style={{
+                background: 'linear-gradient(145deg, #2a2a2a 0%, #1f1f1f 100%)',
+                borderLeft: '1px solid rgba(107, 142, 35, 0.3)',
+              }}
+              className="w-full lg:w-[400px] xl:w-[450px] flex flex-col overflow-y-auto z-10"
+            >
+              {selectedRequest ? (
+                <>
+                  <ConnectionJourney
+                    requestId={selectedRequest.request_id}
+                    farmerName={selectedRequest.investor_info.name}
+                    steps={journeySteps}
+                  />
+                  <QuickActions
+                    actions={quickActions}
+                    insight={{
+                      text: `${selectedRequest.investor_info.company} has a ${selectedRequest.investor_info.rating.toFixed(1)}/5 rating. Asking price is ${formatMoney(selectedRequest.financials.landowner_asking_price, selectedCurrency)} for ${selectedRequest.proposal_details.duration}.`,
+                    }}
+                  />
+                </>
+              ) : (
+                <div className="p-6">
+                  <div
+                    style={{
+                      background: 'rgba(107, 142, 35, 0.08)',
+                      border: '1px solid rgba(107, 142, 35, 0.25)',
+                    }}
+                    className="rounded-xl p-5"
+                  >
+                    <h4 className="text-base font-semibold text-gray-100 mb-2">Select a Request</h4>
+                    <p className="text-sm text-gray-400">
+                      Choose an incoming request to view its journey and actions.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </DashboardLayout>
   );
 };

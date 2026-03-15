@@ -1,5 +1,5 @@
 interface RequestCardProps {
-  type: 'agreement' | 'farmer-request' | 'sent-request';
+  type: 'agreement' | 'farmer-request' | 'sent-request' | 'landowner-request';
   name: string;
   avatarUrl?: string;
   avatarInitials?: string;
