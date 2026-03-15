@@ -22,7 +22,6 @@ const OpportunitiesPage = () => {
   const [selectedRequest, setSelectedRequest] = useState<InvestmentRequest | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  // Hire Farmer State
   const [hireDialogOpen, setHireDialogOpen] = useState(false);
   const [selectedFarmerForHire, setSelectedFarmerForHire] = useState<FarmerJob | null>(null);
   const [liveOffers, setLiveOffers] = useState<any[]>([]);

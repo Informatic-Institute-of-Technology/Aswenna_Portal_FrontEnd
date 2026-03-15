@@ -183,14 +183,20 @@ export const useUserManagement = () => {
         return;
       }
 
-      const newStatus: string =
-        action === "approve" || action === "reactivate"
-          ? "Active"
-          : action === "suspend"
-            ? "Suspended"
-            : action === "reject"
-              ? "Inactive"
-              : "PENDING";
+      const newStatus: string = (() => {
+        switch (action) {
+          case "approve":
+          case "reactivate":
+            return "Active";
+          case "suspend":
+            return "Suspended";
+          case "reject":
+            return "Inactive";
+          case "set_pending":
+          default:
+            return "Pending";
+        }
+      })();
 
       const patched = await adminService.updateUserStatus(
         targetUser.id,
