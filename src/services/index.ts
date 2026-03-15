@@ -9,6 +9,15 @@ export {
   type FormData,
   type UserRole,
 } from "./formPersistence.service";
+export {
+  createFarmerAd,
+  deleteFarmerAd,
+  getFarmerAdsByUser,
+  type CreateFarmerAdPayload,
+  type FarmerAdCostBreakdownItem,
+  type FarmerOfferType,
+  updateFarmerAd,
+} from "./farmerAds.service";
 export { HttpClient, httpClient } from "./httpClient";
 export { LocationService } from "./location.service";
 export {
