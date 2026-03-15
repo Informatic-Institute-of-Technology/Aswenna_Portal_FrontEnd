@@ -72,9 +72,12 @@ const CreateAdPopup = ({ open, onClose }: CreateAdPopupProps) => {
   };
 
   const handleSubmit = () => {
-    // Handle form submission logic here
+  const handleInputChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     console.log("Form submitted:", formData);
     onClose();
+    }
   };
 
   const soilTypes = [
