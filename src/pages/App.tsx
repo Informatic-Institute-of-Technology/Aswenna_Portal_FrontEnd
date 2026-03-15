@@ -72,6 +72,16 @@ const PageLoader = () => (
   </div>
 );
 
+const RequestsRoute = () => {
+  const { user } = useAuth();
+
+  if (user?.role === "farmer") {
+    return <FarmerRequestsPage />;
+  }
+
+  return <InvestorRequestsPage />;
+};
+
 function AppRoutes() {
   usePageTitle();
 
@@ -115,11 +125,10 @@ function AppRoutes() {
             <Route path="match-making" element={<MatchMakingPage />} />
             <Route path="opportunities" element={<OpportunitiesPage />} />
             <Route path="agreement" element={<AgreementPage />} />
-            <Route path="agreement-onboarding" element={<AgreementOnboarding />} />
 
             <Route path="my-offers" element={<MyOffersPage />} />
             <Route path="land-search" element={<LandOwnersPage />} />
-            <Route path="requests" element={<RequestsPage />} />
+            <Route path="requests" element={<RequestsRoute />} />
             <Route path="smart-match-making" element={<MatchMakingPage />} />
             <Route path="roi-analysis" element={<MatchMakingPage />} />
             <Route path="profitability" element={<MatchMakingPage />} />
