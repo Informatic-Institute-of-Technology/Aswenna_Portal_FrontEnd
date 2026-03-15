@@ -40,6 +40,11 @@ interface ProjectDetailsDialogProps {
     budget: number;
     expectedROI: number;
     investmentType: string;
+    costBreakdown?: Array<{
+      category: string;
+      description?: string;
+      amount: number;
+    }>;
   } | null;
 }
 
@@ -128,27 +133,33 @@ const sampleBudgetCategories = [
   {
     name: "Labor & Workforce",
     amount: 62500,
-    percentage: 25,
     color: "#ff6b35",
   },
   {
     name: "Fertilizers & Nutrients",
     amount: 42500,
-    percentage: 17,
     color: "#f9a825",
   },
   {
     name: "Irrigation & Water Management",
     amount: 37500,
-    percentage: 15,
     color: "#ff9800",
   },
   {
     name: "Seeds & Planting Materials",
     amount: 35000,
-    percentage: 14,
     color: "#4CAF50",
   },
+];
+
+const breakdownColorPalette = [
+  "#ff6b35",
+  "#f9a825",
+  "#ff9800",
+  "#4CAF50",
+  "#26a69a",
+  "#29b6f6",
+  "#ab47bc",
 ];
 
 const samplePayments = [
