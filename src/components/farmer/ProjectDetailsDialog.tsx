@@ -1005,7 +1005,9 @@ const ProjectDetailsDialog = ({
                 variant="body2"
                 sx={{ color: "#808080", textAlign: "center", mt: 2 }}
               >
-                Showing top 4 categories • 3 more categories available
+                Showing {budgetBreakdownWithPercentages.length} cost item
+                {budgetBreakdownWithPercentages.length === 1 ? "" : "s"} in this
+                project
               </Typography>
             </Box>
 
