@@ -131,7 +131,7 @@
   },
   {
     "id": "notif-010",
-    "userId": "69aa938c6610063a02adee58",
+    "userId": "69b68ddc365c678a5b9547e7",
     "type": "financial_update",
     "title": "Profit Distribution",
     "message": "LKR 120,000 quarterly profit distributed from Mango Orchard investment",
@@ -145,7 +145,7 @@
   },
   {
     "id": "notif-011",
-    "userId": "69aa938c6610063a02adee58",
+    "userId": "69b68ddc365c678a5b9547e7",
     "type": "request_status",
     "title": "New Farmer Request",
     "message": "Chamara Herath sent you a new sponsorship request for Mushroom Cultivation",
