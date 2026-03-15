@@ -49,7 +49,7 @@ export const mapApiUserToGlobalUser = (user: ApiUser): GlobalUser => {
     isVerified,
     isActive: true,
     apiStatus:
-      user.status || user.statues || (isVerified ? "Active" : "PENDING"),
+      user.status || user.statues || (isVerified ? "Active" : "Pending"),
     address:
       user.address ||
       user.personalInfo?.district ||
