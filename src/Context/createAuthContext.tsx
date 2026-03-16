@@ -2,6 +2,31 @@ import { createContext } from "react";
 
 export type UserRole = "farmer" | "investor" | "landowner" | "superadmin";
 
+export interface InvestorProfile {
+  organizationName?: string;
+  registrationNo?: string;
+  companyAddress?: string;
+  organizationPhoneNumber?: string;
+  dsDivision?: string;
+  gnDivision?: string;
+  cropFocus?: string[];
+}
+
+export interface RoleInfo {
+  _id?: string;
+  name?: string;
+  description?: string;
+}
+
+export interface UploadedMedia {
+  url?: string;
+  filename?: string;
+  fileSize?: string;
+  mimeType?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface User {
   _id: string | null;
   firstName: string | null;
@@ -21,6 +46,10 @@ export interface User {
   updatedAt: string | null;
   __v: number | null;
   role?: UserRole;
+  roleInfo?: RoleInfo | null;
+  status?: string | null;
+  termsAccepted?: boolean | null;
+  investor?: InvestorProfile | null;
   personalInfo?: {
     nicNumber?: string;
     gender?: string;
@@ -31,9 +60,9 @@ export interface User {
     province?: string;
     postalCode?: string;
     district?: string;
-    profilePicture?: string | { url?: string; filename?: string } | null;
-    nicFrontImage?: { url?: string; filename?: string } | null;
-    nicBackImage?: { url?: string; filename?: string } | null;
+    profilePicture?: string | UploadedMedia | null;
+    nicFrontImage?: UploadedMedia | null;
+    nicBackImage?: UploadedMedia | null;
   } | null;
 }
 

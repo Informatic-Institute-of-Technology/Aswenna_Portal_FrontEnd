@@ -1,4 +1,5 @@
 import type { User, UserRole } from "@/Context/createAuthContext";
+import { config } from "@/core/config";
 import { decryptToken } from "@/utils";
 import { httpClient } from "./httpClient";
 import { setAuthHeader, setCsrfToken } from "./tokenStore";
@@ -32,6 +33,16 @@ export interface UserApiResponse {
   createdAt: string | null;
   updatedAt: string | null;
   __v: number | null;
+  status?: string | null;
+  termsAccepted?: boolean | null;
+  role?:
+    | string
+    | {
+        _id?: string;
+        name?: string;
+        description?: string;
+      }
+    | null;
   personalInfo?: {
     nicNumber?: string;
     gender?: string;
@@ -46,7 +57,100 @@ export interface UserApiResponse {
     nicFrontImage?: { url?: string; filename?: string } | null;
     nicBackImage?: { url?: string; filename?: string } | null;
   } | null;
+  investor?: {
+    organizationName?: string;
+    registrationNo?: string;
+    companyAddress?: string;
+    organizationPhoneNumber?: string;
+    dsDivision?: string;
+    gnDivision?: string;
+    cropFocus?: string | string[];
+  } | null;
 }
+
+const normalizeCropFocus = (value: unknown): string[] => {
+  if (Array.isArray(value)) {
+    return value
+      .filter((item): item is string => typeof item === "string")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  if (typeof value === "string") {
+    return value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+};
+
+const deriveRoleFromProfile = (
+  roleValue: UserApiResponse["role"],
+): UserRole | undefined => {
+  const roleName =
+    typeof roleValue === "string"
+      ? roleValue
+      : typeof roleValue === "object" && roleValue
+        ? roleValue.name
+        : undefined;
+
+  const normalized = roleName?.toLowerCase();
+  if (
+    normalized === "farmer" ||
+    normalized === "investor" ||
+    normalized === "landowner" ||
+    normalized === "superadmin"
+  ) {
+    return normalized;
+  }
+
+  return undefined;
+};
+
+type ProfilePictureApiValue =
+  | string
+  | {
+      url?: string;
+      filename?: string;
+      [key: string]: unknown;
+    }
+  | null
+  | undefined;
+
+type UploadedMediaApiValue =
+  | {
+      url?: string;
+      filename?: string;
+      [key: string]: unknown;
+    }
+  | null
+  | undefined;
+
+const resolveProfilePicture = (
+  value: ProfilePictureApiValue,
+): ProfilePictureApiValue => {
+  if (!value || typeof value === "string") return value;
+  if (value.url || !value.filename) return value;
+
+  return {
+    ...value,
+    url: `${config.storage.baseUrl}/${value.filename}`,
+  };
+};
+
+const resolveUploadedMedia = (
+  value: UploadedMediaApiValue,
+): UploadedMediaApiValue => {
+  if (!value) return value;
+  if (value.url || !value.filename) return value;
+
+  return {
+    ...value,
+    url: `${config.storage.baseUrl}/${value.filename}`,
+  };
+};
 
 export type AuthBroadcastMessage =
   | { type: "LOGIN"; role: string | undefined }
@@ -233,6 +337,21 @@ class AuthService {
         `/v1/user/${userId}`,
       );
 
+      const mappedPersonalInfo = userProfile.personalInfo
+        ? {
+            ...userProfile.personalInfo,
+            profilePicture: resolveProfilePicture(
+              userProfile.personalInfo.profilePicture,
+            ),
+            nicFrontImage: resolveUploadedMedia(
+              userProfile.personalInfo.nicFrontImage,
+            ),
+            nicBackImage: resolveUploadedMedia(
+              userProfile.personalInfo.nicBackImage,
+            ),
+          }
+        : null;
+
       const userData: User = {
         _id: userProfile._id || null,
         firstName: userProfile.firstName || null,
@@ -253,8 +372,20 @@ class AuthService {
         createdAt: userProfile.createdAt || null,
         updatedAt: userProfile.updatedAt || null,
         __v: userProfile.__v ?? null,
-        role: userRole as UserRole,
-        personalInfo: userProfile.personalInfo ?? null,
+        role: (userRole as UserRole) ?? deriveRoleFromProfile(userProfile.role),
+        roleInfo:
+          typeof userProfile.role === "object" && userProfile.role
+            ? userProfile.role
+            : null,
+        status: userProfile.status ?? null,
+        termsAccepted: userProfile.termsAccepted ?? null,
+        investor: userProfile.investor
+          ? {
+              ...userProfile.investor,
+              cropFocus: normalizeCropFocus(userProfile.investor.cropFocus),
+            }
+          : null,
+        personalInfo: mappedPersonalInfo,
       };
 
       const sessionId = crypto.randomUUID();

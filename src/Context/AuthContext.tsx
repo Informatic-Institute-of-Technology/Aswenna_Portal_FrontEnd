@@ -131,10 +131,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setSessionId(null);
   };
 
-  const updateUser = async (updatedUser: User) => {
+  const updateUser = useCallback(async (updatedUser: User) => {
     setUser(updatedUser);
     await authService.updateSessionUser(updatedUser);
-  };
+  }, []);
 
   return (
     <AuthContext.Provider
