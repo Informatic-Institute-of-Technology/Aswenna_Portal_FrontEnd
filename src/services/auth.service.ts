@@ -68,6 +68,13 @@ export interface UserApiResponse {
   } | null;
 }
 
+const ROLE_ID_MAP: Record<string, UserRole> = {
+  "696e40fda4f896e9f40c8b93": "farmer",
+  "696e6163b558abe269548099": "investor",
+  "696e616db558abe26954809c": "landowner",
+  "696f008a3e12fb6fd9ed945b": "superadmin",
+};
+
 const normalizeCropFocus = (value: unknown): string[] => {
   if (Array.isArray(value)) {
     return value
@@ -95,6 +102,12 @@ const deriveRoleFromProfile = (
       : typeof roleValue === "object" && roleValue
         ? roleValue.name
         : undefined;
+  const roleId =
+    typeof roleValue === "object" && roleValue
+      ? roleValue._id
+      : typeof roleValue === "string"
+        ? roleValue
+        : undefined;
 
   const normalized = roleName?.toLowerCase();
   if (
@@ -104,6 +117,10 @@ const deriveRoleFromProfile = (
     normalized === "superadmin"
   ) {
     return normalized;
+  }
+
+  if (roleId && ROLE_ID_MAP[roleId]) {
+    return ROLE_ID_MAP[roleId];
   }
 
   return undefined;
