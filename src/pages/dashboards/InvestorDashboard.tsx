@@ -46,14 +46,14 @@ const InvestorDashboard = () => {
           <Card>
             <CardHeaderWithIcon
               icon={BarChartIcon}
-              title="Profitability Charts"
+              title="Profitability Overview"
               action={<Chip label="Live" size="small" color="primary" />}
             />
             <CardContent>
               <PlaceholderWidget
                 icon="📊"
-                title="Historical Price Charts & Predictions"
-                description="Upcoming season price forecasts and profitability analysis"
+                title="Historical Price Insights & Predictions"
+                description="Upcoming season price forecasts and profitability summary"
               />
             </CardContent>
           </Card>

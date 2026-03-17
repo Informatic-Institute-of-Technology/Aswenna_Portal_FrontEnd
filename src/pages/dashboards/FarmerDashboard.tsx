@@ -137,8 +137,8 @@ const FarmerDashboard = () => {
             <CardContent>
               <PlaceholderWidget
                 icon="📊"
-                title="Funding Status Chart"
-                description="Budget secured vs. Required budget visualization"
+                title="Funding Status Overview"
+                description="Budget secured vs. required budget summary"
               />
             </CardContent>
           </Card>
@@ -226,7 +226,7 @@ const FarmerDashboard = () => {
             <CardContent>
               <PlaceholderWidget
                 icon="📈"
-                title="Crop Price Graphs and Market Trends"
+                title="Crop Price Insights and Market Trends"
                 description="Real-time market data and price predictions"
               />
             </CardContent>
