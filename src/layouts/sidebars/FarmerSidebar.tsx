@@ -3,6 +3,7 @@ import {
   AccountCircle,
   Agriculture as AgriIcon,
   BarChart as BarChartIcon,
+  Gavel,
   Handshake,
   Home,
   Landscape,
@@ -51,6 +52,11 @@ const FarmerSidebar = () => {
       path: `${basePath}/dashboard/land-owners`,
     },
     {
+      text: "Agreement",
+      icon: <Gavel />,
+      path: `${basePath}/dashboard/agreement`,
+    },
+    {
       text: "Match Making",
       icon: <Handshake />,
       path: `${basePath}/dashboard/match-making`,
@@ -69,9 +75,9 @@ const FarmerSidebar = () => {
       path: `${basePath}/dashboard/crop-jobs`,
     },
     {
-      text: "Purchase Requisitions",
+      text: "Requests",
       icon: <ReqIcon />,
-      path: `${basePath}/dashboard/requisitions`,
+      path: `${basePath}/dashboard/requests`,
     },
   ];
 

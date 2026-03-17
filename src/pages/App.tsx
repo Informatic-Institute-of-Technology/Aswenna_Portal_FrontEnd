@@ -1,5 +1,6 @@
 import { ProtectedRoute, PublicRoute } from "@/components";
 import { AuthProvider } from "@/Context/AuthContext";
+import { useAuth } from "@/Context/useAuth";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { Suspense, lazy } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
@@ -27,10 +28,12 @@ const MyProjectsPage = lazy(() => import("./common/MyProjectsPage"));
 const InvestorsPage = lazy(() => import("./common/InvestorsPage"));
 const LandOwnersPage = lazy(() => import("./common/LandOwnersPage"));
 const MatchMakingPage = lazy(() => import("./common/MatchMakingPage"));
+const AgreementPage = lazy(() => import("./common/AgreementPage"));
 
 const MyOffersPage = lazy(() => import("./investor/MyOffersPage"));
 const OpportunitiesPage = lazy(() => import("./investor/OpportunitiesPage"));
-const RequestsPage = lazy(() => import("./investor/RequestsPage"));
+const InvestorRequestsPage = lazy(() => import("./investor/RequestsPage"));
+const FarmerRequestsPage = lazy(() => import("./farmer/RequestsPage"));
 const FinanceLedgerPage = lazy(() => import("./investor/FinanceLedgerPage"));
 const PaymentControlCenterPage = lazy(
   () => import("./investor/payment/PaymentControlCenterPage"),
@@ -68,6 +71,16 @@ const PageLoader = () => (
     <p>Loading...</p>
   </div>
 );
+
+const RequestsRoute = () => {
+  const { user } = useAuth();
+
+  if (user?.role === "farmer") {
+    return <FarmerRequestsPage />;
+  }
+
+  return <InvestorRequestsPage />;
+};
 
 function AppRoutes() {
   usePageTitle();
@@ -111,10 +124,11 @@ function AppRoutes() {
             <Route path="land-owners" element={<LandOwnersPage />} />
             <Route path="match-making" element={<MatchMakingPage />} />
             <Route path="opportunities" element={<OpportunitiesPage />} />
+            <Route path="agreement" element={<AgreementPage />} />
 
             <Route path="my-offers" element={<MyOffersPage />} />
             <Route path="land-search" element={<LandOwnersPage />} />
-            <Route path="requests" element={<RequestsPage />} />
+            <Route path="requests" element={<RequestsRoute />} />
             <Route path="smart-match-making" element={<MatchMakingPage />} />
             <Route path="roi-analysis" element={<MatchMakingPage />} />
             <Route path="profitability" element={<MatchMakingPage />} />
