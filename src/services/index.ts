@@ -5,6 +5,11 @@ export {
 } from "./admin.service";
 export { authService } from "./auth.service";
 export {
+  chatService,
+  type ChatMessage,
+  type Conversation,
+} from "./chat.service";
+export {
   formPersistenceService,
   type FormData,
   type UserRole,

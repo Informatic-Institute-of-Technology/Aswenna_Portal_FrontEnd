@@ -12,6 +12,13 @@ type RoleApiValue =
   | null
   | undefined;
 
+const ROLE_ID_MAP: Record<string, UserRole> = {
+  "696e40fda4f896e9f40c8b93": "farmer",
+  "696e6163b558abe269548099": "investor",
+  "696e616db558abe26954809c": "landowner",
+  "696f008a3e12fb6fd9ed945b": "superadmin",
+};
+
 const normalizeCropFocus = (value: unknown): string[] => {
   if (Array.isArray(value)) {
     return value
@@ -37,6 +44,12 @@ const deriveRole = (role: RoleApiValue): UserRole | undefined => {
       : typeof role === "object" && role
         ? role.name
         : undefined;
+  const roleId =
+    typeof role === "object" && role
+      ? role._id
+      : typeof role === "string"
+        ? role
+        : undefined;
 
   const normalized = roleName?.toLowerCase();
   if (
@@ -46,6 +59,10 @@ const deriveRole = (role: RoleApiValue): UserRole | undefined => {
     normalized === "superadmin"
   ) {
     return normalized;
+  }
+
+  if (roleId && ROLE_ID_MAP[roleId]) {
+    return ROLE_ID_MAP[roleId];
   }
 
   return undefined;

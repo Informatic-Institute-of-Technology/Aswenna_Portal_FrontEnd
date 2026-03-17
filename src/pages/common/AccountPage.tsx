@@ -1,3 +1,4 @@
+import type { UserRole } from "@/Context";
 import { useAuth } from "@/Context/useAuth";
 import {
   LocationService,
@@ -195,6 +196,43 @@ const areFormDataEqual = (left: ProfileFormData, right: ProfileFormData) =>
   JSON.stringify(createComparableFormData(left)) ===
   JSON.stringify(createComparableFormData(right));
 
+const resolveUserRole = (
+  user: ReturnType<typeof useAuth>["user"],
+): string | undefined => {
+  const normalizedRole = user?.role?.toLowerCase();
+  if (normalizedRole) return normalizedRole;
+
+  const normalizedRoleInfo = user?.roleInfo?.name?.toLowerCase();
+  if (normalizedRoleInfo) return normalizedRoleInfo;
+
+  if (user?.investor) return "investor";
+
+  return undefined;
+};
+
+interface AccountSectionConfig {
+  personalInfo: boolean;
+  investorFields: boolean;
+  kycDocuments: boolean;
+}
+
+const ROLE_SECTION_CONFIG: Record<UserRole, AccountSectionConfig> = {
+  farmer: { personalInfo: true, investorFields: false, kycDocuments: true },
+  investor: { personalInfo: true, investorFields: true, kycDocuments: true },
+  landowner: { personalInfo: true, investorFields: false, kycDocuments: true },
+  superadmin: {
+    personalInfo: false,
+    investorFields: false,
+    kycDocuments: false,
+  },
+};
+
+const DEFAULT_SECTION_CONFIG: AccountSectionConfig = {
+  personalInfo: false,
+  investorFields: false,
+  kycDocuments: false,
+};
+
 const AccountPage = () => {
   const { user, updateUser } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -254,6 +292,19 @@ const AccountPage = () => {
     );
   }, [formData, initialFormData]);
 
+  const resolvedRole = useMemo(() => resolveUserRole(user), [user]);
+  const sectionConfig = useMemo<AccountSectionConfig>(
+    () =>
+      resolvedRole
+        ? (ROLE_SECTION_CONFIG[resolvedRole as UserRole] ??
+          DEFAULT_SECTION_CONFIG)
+        : DEFAULT_SECTION_CONFIG,
+    [resolvedRole],
+  );
+  const showExtendedProfileFields = sectionConfig.personalInfo;
+  const showInvestorFields = sectionConfig.investorFields;
+  const showKycFields = sectionConfig.kycDocuments;
+
   useEffect(() => {
     if (!user || isDirty) return;
 
@@ -269,6 +320,12 @@ const AccountPage = () => {
   }, [isDirty, user]);
 
   useEffect(() => {
+    if (!showInvestorFields) {
+      setDsDivisionsList([]);
+      setGnDivisionsList([]);
+      return;
+    }
+
     const district = formData.personalInfo.district;
     const currentDs = formData.investor.dsDivision;
 
@@ -314,9 +371,18 @@ const AccountPage = () => {
     return () => {
       cancelled = true;
     };
-  }, [formData.investor.dsDivision, formData.personalInfo.district]);
+  }, [
+    formData.investor.dsDivision,
+    formData.personalInfo.district,
+    showInvestorFields,
+  ]);
 
   useEffect(() => {
+    if (!showInvestorFields) {
+      setGnDivisionsList([]);
+      return;
+    }
+
     const currentDs = formData.investor.dsDivision;
     const currentGn = formData.investor.gnDivision;
 
@@ -355,7 +421,11 @@ const AccountPage = () => {
     return () => {
       cancelled = true;
     };
-  }, [formData.investor.dsDivision, formData.investor.gnDivision]);
+  }, [
+    formData.investor.dsDivision,
+    formData.investor.gnDivision,
+    showInvestorFields,
+  ]);
 
   useEffect(() => {
     const fetchFreshProfile = async () => {
@@ -443,11 +513,13 @@ const AccountPage = () => {
         province: value,
         district: "",
       },
-      investor: {
-        ...prev.investor,
-        dsDivision: "",
-        gnDivision: "",
-      },
+      investor: showInvestorFields
+        ? {
+            ...prev.investor,
+            dsDivision: "",
+            gnDivision: "",
+          }
+        : prev.investor,
     }));
     setDsDivisionsList([]);
     setGnDivisionsList([]);
@@ -460,11 +532,13 @@ const AccountPage = () => {
         ...prev.personalInfo,
         district: value,
       },
-      investor: {
-        ...prev.investor,
-        dsDivision: "",
-        gnDivision: "",
-      },
+      investor: showInvestorFields
+        ? {
+            ...prev.investor,
+            dsDivision: "",
+            gnDivision: "",
+          }
+        : prev.investor,
     }));
     setGnDivisionsList([]);
   };
@@ -517,11 +591,13 @@ const AccountPage = () => {
               district: details.district || prev.personalInfo.district,
               postalCode: details.postalCode || prev.personalInfo.postalCode,
             },
-            investor: {
-              ...prev.investor,
-              dsDivision: details.dsDivision || prev.investor.dsDivision,
-              gnDivision: details.gnDivision || prev.investor.gnDivision,
-            },
+            investor: showInvestorFields
+              ? {
+                  ...prev.investor,
+                  dsDivision: details.dsDivision || prev.investor.dsDivision,
+                  gnDivision: details.gnDivision || prev.investor.gnDivision,
+                }
+              : prev.investor,
           }));
         } catch {
           setError("Failed to fetch location details. Please try again.");
@@ -555,13 +631,14 @@ const AccountPage = () => {
           : formData.personalInfo.age
         : undefined;
 
-      const currentRole = (user.role || "").toLowerCase();
-      const isInvestor = currentRole === "investor" || !!user.investor;
-
       const updatePayload: UpdateUserProfileDTO = {
         fullName: formData.fullName.trim(),
         phoneNumber: formData.phoneNumber,
-        personalInfo: {
+        address: formData.personalInfo.address,
+      };
+
+      if (showExtendedProfileFields) {
+        updatePayload.personalInfo = {
           ...(user.personalInfo || {}),
           address: formData.personalInfo.address,
           nicNumber: formData.personalInfo.nicNumber,
@@ -574,10 +651,10 @@ const AccountPage = () => {
           district: formData.personalInfo.district,
           province: formData.personalInfo.province,
           postalCode: formData.personalInfo.postalCode,
-        },
-      };
+        };
+      }
 
-      if (isInvestor) {
+      if (showInvestorFields) {
         updatePayload.investor = {
           ...(user.investor || {}),
           ...formData.investor,
@@ -681,6 +758,20 @@ const AccountPage = () => {
   const statusLabel = user?.status || "Active";
   const nicFrontUrl = user?.personalInfo?.nicFrontImage?.url;
   const nicBackUrl = user?.personalInfo?.nicBackImage?.url;
+  const accountIdLabel =
+    user?._id?.substring(0, 12).toUpperCase() || "INV-93BC6510";
+  const joinDateLabel = user?.createdAt
+    ? new Date(user.createdAt).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "Oct 12, 2023";
+  const roleLabel = resolvedRole
+    ? `${resolvedRole.charAt(0).toUpperCase()}${resolvedRole.slice(1)}`
+    : "Member";
+  const statusColor =
+    statusLabel.toLowerCase() === "active" ? "#4ade80" : "#f59e0b";
 
   return (
     <Box
@@ -708,14 +799,36 @@ const AccountPage = () => {
       )}
 
       <form onSubmit={handleSubmit}>
-        <Card elevation={0} sx={cardStyle}>
+        <Card
+          elevation={0}
+          sx={{
+            ...cardStyle,
+            position: "relative",
+            overflow: "hidden",
+            borderRadius: 3,
+            border: "1px solid rgba(255,255,255,0.08)",
+            background:
+              "linear-gradient(145deg, rgba(13,18,16,0.98) 0%, rgba(10,13,12,0.98) 55%, rgba(15,24,18,0.98) 100%)",
+            mb: { xs: 1.5, sm: 1.75, md: 2 },
+            "&::after": {
+              content: '""',
+              position: "absolute",
+              inset: 0,
+              pointerEvents: "none",
+              background:
+                "radial-gradient(90% 130% at 100% 0%, rgba(74,222,128,0.15) 0%, rgba(74,222,128,0) 55%)",
+            },
+          }}
+        >
           <CardContent
             sx={{
-              p: { xs: 1.5, sm: 2, md: 2.5 },
+              position: "relative",
+              zIndex: 1,
+              p: { xs: 1.75, sm: 2.25, md: 2.75 },
               display: "flex",
-              flexDirection: { xs: "column", sm: "row" },
-              alignItems: { xs: "flex-start", sm: "center" },
-              gap: { xs: 1.25, sm: 2 },
+              flexDirection: { xs: "column", md: "row" },
+              alignItems: { xs: "flex-start", md: "center" },
+              gap: { xs: 1.5, sm: 2, md: 2.5 },
             }}
           >
             <Box position="relative">
@@ -731,67 +844,121 @@ const AccountPage = () => {
               <Box
                 sx={{
                   position: "absolute",
-                  bottom: 0,
-                  right: 0,
-                  bgcolor: "#4ade80",
-                  width: 20,
-                  height: 20,
+                  bottom: 2,
+                  right: 2,
+                  bgcolor: statusColor,
+                  width: 16,
+                  height: 16,
                   borderRadius: "50%",
                   border: "2px solid #1A1D1A",
+                  boxShadow: `0 0 0 4px ${
+                    statusColor === "#4ade80"
+                      ? "rgba(74,222,128,0.15)"
+                      : "rgba(245,158,11,0.15)"
+                  }`,
                 }}
               />
             </Box>
-            <Box sx={{ flexGrow: 1 }}>
-              <Stack direction="row" alignItems="center" gap={1.25} mb={0.75}>
-                <Typography variant="h5" sx={{ fontWeight: 600 }}>
+            <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                alignItems={{ xs: "flex-start", sm: "center" }}
+                gap={1}
+                mb={0.75}
+              >
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontWeight: 700,
+                    letterSpacing: "0.01em",
+                    lineHeight: 1.2,
+                  }}
+                >
                   {formData.fullName || "User"}
                 </Typography>
-                <Chip
-                  label={`• ${statusLabel}`}
-                  size="small"
-                  sx={{
-                    bgcolor: "rgba(74, 222, 128, 0.1)",
-                    color: "#4ade80",
-                    fontWeight: 600,
-                    border: "1px solid rgba(74, 222, 128, 0.2)",
-                  }}
-                />
+                <Stack direction="row" alignItems="center" gap={0.8}>
+                  <Chip
+                    label={statusLabel}
+                    size="small"
+                    sx={{
+                      bgcolor:
+                        statusColor === "#4ade80"
+                          ? "rgba(74, 222, 128, 0.12)"
+                          : "rgba(245,158,11,0.12)",
+                      color: statusColor,
+                      fontWeight: 700,
+                      border: `1px solid ${
+                        statusColor === "#4ade80"
+                          ? "rgba(74, 222, 128, 0.35)"
+                          : "rgba(245,158,11,0.35)"
+                      }`,
+                    }}
+                  />
+                  <Chip
+                    label={roleLabel}
+                    size="small"
+                    sx={{
+                      bgcolor: "rgba(255,255,255,0.04)",
+                      color: "rgba(255,255,255,0.78)",
+                      border: "1px solid rgba(255,255,255,0.12)",
+                      fontWeight: 600,
+                    }}
+                  />
+                </Stack>
               </Stack>
               <Typography
                 variant="body2"
                 sx={{
-                  color: "text.secondary",
-                  mb: 0.5,
+                  color: "rgba(255,255,255,0.68)",
+                  mb: 1.25,
                   wordBreak: "break-word",
+                  fontSize: { xs: "0.86rem", sm: "0.9rem" },
                 }}
               >
                 {user?.email || ""}
               </Typography>
               <Stack
                 direction={{ xs: "column", sm: "row" }}
-                gap={{ xs: 0.5, sm: 2 }}
+                gap={{ xs: 1, sm: 1.25 }}
               >
-                <Box>
-                  <Typography variant="caption" color="text.secondary">
+                <Box
+                  sx={{
+                    px: 1.25,
+                    py: 1,
+                    borderRadius: 1.5,
+                    bgcolor: "rgba(255,255,255,0.03)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    minWidth: { sm: 200 },
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "rgba(255,255,255,0.52)", letterSpacing: 0.5 }}
+                  >
                     ACCOUNT ID
                   </Typography>
-                  <Typography variant="body2" fontWeight={600}>
-                    {user?._id?.substring(0, 12).toUpperCase() ||
-                      "INV-93BC6510"}
+                  <Typography variant="body2" sx={{ fontWeight: 700, mt: 0.25 }}>
+                    {accountIdLabel}
                   </Typography>
                 </Box>
-                <Box>
-                  <Typography variant="caption" color="text.secondary">
+                <Box
+                  sx={{
+                    px: 1.25,
+                    py: 1,
+                    borderRadius: 1.5,
+                    bgcolor: "rgba(255,255,255,0.03)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    minWidth: { sm: 170 },
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "rgba(255,255,255,0.52)", letterSpacing: 0.5 }}
+                  >
                     JOIN DATE
                   </Typography>
-                  <Typography variant="body2" fontWeight={600}>
-                    {user?.createdAt
-                      ? new Date(user.createdAt).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })
-                      : "Oct 12, 2023"}
+                  <Typography variant="body2" sx={{ fontWeight: 700, mt: 0.25 }}>
+                    {joinDateLabel}
                   </Typography>
                 </Box>
               </Stack>
@@ -835,9 +1002,12 @@ const AccountPage = () => {
                     endAdornment: (
                       <Typography
                         variant="caption"
-                        sx={{ color: "#4ade80", fontWeight: "bold" }}
+                        sx={{
+                          color: user?.emailVerified ? "#4ade80" : "#f59e0b",
+                          fontWeight: "bold",
+                        }}
                       >
-                        VERIFIED
+                        {user?.emailVerified ? "VERIFIED" : "PENDING"}
                       </Typography>
                     ),
                   }}
@@ -852,53 +1022,57 @@ const AccountPage = () => {
                   sx={inputStyle}
                 />
               </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <FormField
-                  label="NIC Number"
-                  name="personalInfo.nicNumber"
-                  value={formData.personalInfo.nicNumber}
-                  onChange={() => {}}
-                  disabled
-                  sx={inputStyle}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 4 }}>
-                <FormField
-                  label="Gender"
-                  name="personalInfo.gender"
-                  value={formData.personalInfo.gender}
-                  onChange={() => {}}
-                  disabled
-                  sx={inputStyle}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 4 }}>
-                <FormField
-                  type="date"
-                  label="Birthday"
-                  name="personalInfo.birthday"
-                  value={formData.personalInfo.birthday}
-                  onChange={() => {}}
-                  disabled
-                  InputLabelProps={{ shrink: true }}
-                  sx={inputStyle}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 4 }}>
-                <FormField
-                  label="Age"
-                  name="personalInfo.age"
-                  value={
-                    formData.personalInfo.age !== "" &&
-                    formData.personalInfo.age !== undefined
-                      ? `${formData.personalInfo.age} years`
-                      : ""
-                  }
-                  onChange={() => {}}
-                  disabled
-                  sx={inputStyle}
-                />
-              </Grid>
+              {showExtendedProfileFields && (
+                <>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <FormField
+                      label="NIC Number"
+                      name="personalInfo.nicNumber"
+                      value={formData.personalInfo.nicNumber}
+                      onChange={() => {}}
+                      disabled
+                      sx={inputStyle}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 4 }}>
+                    <FormField
+                      label="Gender"
+                      name="personalInfo.gender"
+                      value={formData.personalInfo.gender}
+                      onChange={() => {}}
+                      disabled
+                      sx={inputStyle}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 4 }}>
+                    <FormField
+                      type="date"
+                      label="Birthday"
+                      name="personalInfo.birthday"
+                      value={formData.personalInfo.birthday}
+                      onChange={() => {}}
+                      disabled
+                      InputLabelProps={{ shrink: true }}
+                      sx={inputStyle}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 4 }}>
+                    <FormField
+                      label="Age"
+                      name="personalInfo.age"
+                      value={
+                        formData.personalInfo.age !== "" &&
+                        formData.personalInfo.age !== undefined
+                          ? `${formData.personalInfo.age} years`
+                          : ""
+                      }
+                      onChange={() => {}}
+                      disabled
+                      sx={inputStyle}
+                    />
+                  </Grid>
+                </>
+              )}
             </Grid>
           </CardContent>
         </Card>
@@ -948,440 +1122,463 @@ const AccountPage = () => {
                   sx={inputStyle}
                 />
               </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <FormControl fullWidth>
-                  <InputLabel shrink sx={{ color: "#888" }}>
-                    Province
-                  </InputLabel>
-                  <Select
-                    value={formData.personalInfo.province}
-                    onChange={(event) =>
-                      handleProvinceChange(event.target.value)
-                    }
-                    displayEmpty
-                    label="Province"
-                    notched
-                    sx={inputStyle}
-                  >
-                    <MenuItem value="" disabled>
-                      Select Province
-                    </MenuItem>
-                    {Object.keys(sriLankaLocations).map((province) => (
-                      <MenuItem key={province} value={province}>
-                        {province}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <FormControl
-                  fullWidth
-                  disabled={!formData.personalInfo.province}
-                >
-                  <InputLabel shrink sx={{ color: "#888" }}>
-                    District
-                  </InputLabel>
-                  <Select
-                    value={formData.personalInfo.district}
-                    onChange={(event) =>
-                      handleDistrictChange(event.target.value)
-                    }
-                    displayEmpty
-                    label="District"
-                    notched
-                    sx={inputStyle}
-                  >
-                    <MenuItem value="" disabled>
-                      Select District
-                    </MenuItem>
-                    {(
-                      sriLankaLocations[formData.personalInfo.province] || []
-                    ).map((district) => (
-                      <MenuItem key={district} value={district}>
-                        {district}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <FormControl
-                  fullWidth
-                  disabled={!formData.personalInfo.district}
-                >
-                  <InputLabel shrink sx={{ color: "#888" }}>
-                    DS Division
-                  </InputLabel>
-                  <Select
-                    value={formData.investor.dsDivision}
-                    onChange={(event) =>
-                      handleDsDivisionChange(event.target.value)
-                    }
-                    displayEmpty
-                    label="DS Division"
-                    notched
-                    sx={inputStyle}
-                  >
-                    <MenuItem value="" disabled>
-                      Select DS Division
-                    </MenuItem>
-                    {dsDivisionsList.map((division) => (
-                      <MenuItem key={division} value={division}>
-                        {division}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <FormControl fullWidth disabled={!formData.investor.dsDivision}>
-                  <InputLabel shrink sx={{ color: "#888" }}>
-                    GN Division
-                  </InputLabel>
-                  <Select
-                    value={formData.investor.gnDivision}
-                    onChange={(event) =>
-                      handleGnDivisionChange(event.target.value)
-                    }
-                    displayEmpty
-                    label="GN Division"
-                    notched
-                    sx={inputStyle}
-                  >
-                    <MenuItem value="" disabled>
-                      Select GN Division
-                    </MenuItem>
-                    {gnDivisionsList.map((division) => (
-                      <MenuItem key={division.number} value={division.name}>
-                        {division.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <FormField
-                  label="City"
-                  name="personalInfo.city"
-                  value={formData.personalInfo.city}
-                  onChange={handleChange}
-                  sx={inputStyle}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <FormField
-                  label="Postal Code"
-                  name="personalInfo.postalCode"
-                  value={formData.personalInfo.postalCode}
-                  onChange={handleChange}
-                  sx={inputStyle}
-                />
-              </Grid>
-            </Grid>
-          </CardContent>
-        </Card>
-
-        <Card elevation={0} sx={cardStyle}>
-          <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 2.25 } }}>
-            <Typography
-              variant="subtitle1"
-              sx={{
-                fontWeight: 600,
-                mb: 1.5,
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <BusinessCenter sx={{ mr: 1, color: "#4ade80" }} /> Professional
-              Details
-            </Typography>
-            <Grid container spacing={{ xs: 1.5, sm: 1.75, md: 2 }}>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <FormField
-                  label="Organization Name"
-                  name="investor.organizationName"
-                  value={formData.investor.organizationName}
-                  onChange={handleChange}
-                  sx={inputStyle}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <FormField
-                  label="Registration No"
-                  name="investor.registrationNo"
-                  value={formData.investor.registrationNo}
-                  onChange={handleChange}
-                  sx={inputStyle}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <FormField
-                  label="Organization Phone"
-                  name="investor.organizationPhoneNumber"
-                  value={formData.investor.organizationPhoneNumber}
-                  onChange={handleChange}
-                  sx={inputStyle}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <FormField
-                  label="Company Address"
-                  name="investor.companyAddress"
-                  value={formData.investor.companyAddress}
-                  onChange={handleChange}
-                  sx={inputStyle}
-                />
-              </Grid>
-            </Grid>
-          </CardContent>
-        </Card>
-
-        <Card elevation={0} sx={cardStyle}>
-          <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 2.25 } }}>
-            <Typography
-              variant="subtitle1"
-              sx={{
-                fontWeight: 600,
-                mb: 1.5,
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <FavoriteBorder sx={{ mr: 1, color: "#4ade80" }} /> Investment
-              Preferences
-            </Typography>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{ mb: 1.5, display: "block" }}
-            >
-              Crop Focus (Multi-select)
-            </Typography>
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-              {cropFocusItems.map((crop) => (
-                <Chip
-                  key={crop}
-                  label={crop}
-                  sx={{
-                    bgcolor: "rgba(74, 222, 128, 0.1)",
-                    color: "#4ade80",
-                    border: "1px solid rgba(74, 222, 128, 0.3)",
-                    borderRadius: "4px",
-                    "&:hover": { bgcolor: "rgba(74, 222, 128, 0.2)" },
-                    "& .MuiChip-deleteIcon": {
-                      color: "#4ade80",
-                      "&:hover": { color: "#86efac" },
-                    },
-                  }}
-                  onDelete={() => handleRemoveCropFocus(crop)}
-                />
-              ))}
-              {isAddingCrop ? (
-                <Stack
-                  direction={{ xs: "column", sm: "row" }}
-                  spacing={1}
-                  sx={{ width: { xs: "100%", sm: "auto" } }}
-                >
-                  <TextField
-                    size="small"
-                    placeholder="Add crop focus"
-                    value={newCropValue}
-                    onChange={(event) => setNewCropValue(event.target.value)}
-                    onKeyDown={handleNewCropKeyDown}
-                    autoFocus
-                    sx={{
-                      minWidth: { xs: "100%", sm: 180 },
-                      ...inputStyle,
-                      "& .MuiInputBase-input::placeholder": {
-                        color: "#777",
-                        opacity: 1,
-                      },
-                    }}
-                  />
-                  <Stack direction="row" spacing={1}>
-                    <Button
-                      variant="contained"
-                      onClick={handleAddCropFocus}
-                      sx={{
-                        bgcolor: "#4ade80",
-                        color: "#000",
-                        fontWeight: 600,
-                        "&:hover": { bgcolor: "#22c55e" },
-                      }}
+              {showExtendedProfileFields && (
+                <>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <FormControl fullWidth>
+                      <InputLabel shrink sx={{ color: "#888" }}>
+                        Province
+                      </InputLabel>
+                      <Select
+                        value={formData.personalInfo.province}
+                        onChange={(event) =>
+                          handleProvinceChange(event.target.value)
+                        }
+                        displayEmpty
+                        label="Province"
+                        notched
+                        sx={inputStyle}
+                      >
+                        <MenuItem value="" disabled>
+                          Select Province
+                        </MenuItem>
+                        {Object.keys(sriLankaLocations).map((province) => (
+                          <MenuItem key={province} value={province}>
+                            {province}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <FormControl
+                      fullWidth
+                      disabled={!formData.personalInfo.province}
                     >
-                      Add
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      onClick={() => {
-                        setIsAddingCrop(false);
-                        setNewCropValue("");
-                      }}
+                      <InputLabel shrink sx={{ color: "#888" }}>
+                        District
+                      </InputLabel>
+                      <Select
+                        value={formData.personalInfo.district}
+                        onChange={(event) =>
+                          handleDistrictChange(event.target.value)
+                        }
+                        displayEmpty
+                        label="District"
+                        notched
+                        sx={inputStyle}
+                      >
+                        <MenuItem value="" disabled>
+                          Select District
+                        </MenuItem>
+                        {(
+                          sriLankaLocations[formData.personalInfo.province] ||
+                          []
+                        ).map((district) => (
+                          <MenuItem key={district} value={district}>
+                            {district}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  {showInvestorFields && (
+                    <>
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <FormControl
+                          fullWidth
+                          disabled={!formData.personalInfo.district}
+                        >
+                          <InputLabel shrink sx={{ color: "#888" }}>
+                            DS Division
+                          </InputLabel>
+                          <Select
+                            value={formData.investor.dsDivision}
+                            onChange={(event) =>
+                              handleDsDivisionChange(event.target.value)
+                            }
+                            displayEmpty
+                            label="DS Division"
+                            notched
+                            sx={inputStyle}
+                          >
+                            <MenuItem value="" disabled>
+                              Select DS Division
+                            </MenuItem>
+                            {dsDivisionsList.map((division) => (
+                              <MenuItem key={division} value={division}>
+                                {division}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <FormControl
+                          fullWidth
+                          disabled={!formData.investor.dsDivision}
+                        >
+                          <InputLabel shrink sx={{ color: "#888" }}>
+                            GN Division
+                          </InputLabel>
+                          <Select
+                            value={formData.investor.gnDivision}
+                            onChange={(event) =>
+                              handleGnDivisionChange(event.target.value)
+                            }
+                            displayEmpty
+                            label="GN Division"
+                            notched
+                            sx={inputStyle}
+                          >
+                            <MenuItem value="" disabled>
+                              Select GN Division
+                            </MenuItem>
+                            {gnDivisionsList.map((division) => (
+                              <MenuItem
+                                key={division.number}
+                                value={division.name}
+                              >
+                                {division.name}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                    </>
+                  )}
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <FormField
+                      label="City"
+                      name="personalInfo.city"
+                      value={formData.personalInfo.city}
+                      onChange={handleChange}
+                      sx={inputStyle}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <FormField
+                      label="Postal Code"
+                      name="personalInfo.postalCode"
+                      value={formData.personalInfo.postalCode}
+                      onChange={handleChange}
+                      sx={inputStyle}
+                    />
+                  </Grid>
+                </>
+              )}
+            </Grid>
+          </CardContent>
+        </Card>
+
+        {showInvestorFields && (
+          <>
+            <Card elevation={0} sx={cardStyle}>
+              <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 2.25 } }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: 600,
+                    mb: 1.5,
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <BusinessCenter sx={{ mr: 1, color: "#4ade80" }} />
+                  Professional Details
+                </Typography>
+                <Grid container spacing={{ xs: 1.5, sm: 1.75, md: 2 }}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <FormField
+                      label="Organization Name"
+                      name="investor.organizationName"
+                      value={formData.investor.organizationName}
+                      onChange={handleChange}
+                      sx={inputStyle}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <FormField
+                      label="Registration No"
+                      name="investor.registrationNo"
+                      value={formData.investor.registrationNo}
+                      onChange={handleChange}
+                      sx={inputStyle}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <FormField
+                      label="Organization Phone"
+                      name="investor.organizationPhoneNumber"
+                      value={formData.investor.organizationPhoneNumber}
+                      onChange={handleChange}
+                      sx={inputStyle}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <FormField
+                      label="Company Address"
+                      name="investor.companyAddress"
+                      value={formData.investor.companyAddress}
+                      onChange={handleChange}
+                      sx={inputStyle}
+                    />
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+
+            <Card elevation={0} sx={cardStyle}>
+              <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 2.25 } }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: 600,
+                    mb: 1.5,
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <FavoriteBorder sx={{ mr: 1, color: "#4ade80" }} />
+                  Investment Preferences
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ mb: 1.5, display: "block" }}
+                >
+                  Crop Focus (Multi-select)
+                </Typography>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                  {cropFocusItems.map((crop) => (
+                    <Chip
+                      key={crop}
+                      label={crop}
                       sx={{
-                        borderColor: "#333",
-                        color: "#fff",
-                        "&:hover": {
-                          borderColor: "#555",
-                          bgcolor: "rgba(255,255,255,0.05)",
+                        bgcolor: "rgba(74, 222, 128, 0.1)",
+                        color: "#4ade80",
+                        border: "1px solid rgba(74, 222, 128, 0.3)",
+                        borderRadius: "4px",
+                        "&:hover": { bgcolor: "rgba(74, 222, 128, 0.2)" },
+                        "& .MuiChip-deleteIcon": {
+                          color: "#4ade80",
+                          "&:hover": { color: "#86efac" },
                         },
                       }}
+                      onDelete={() => handleRemoveCropFocus(crop)}
+                    />
+                  ))}
+                  {isAddingCrop ? (
+                    <Stack
+                      direction={{ xs: "column", sm: "row" }}
+                      spacing={1}
+                      sx={{ width: { xs: "100%", sm: "auto" } }}
                     >
-                      Cancel
-                    </Button>
-                  </Stack>
-                </Stack>
-              ) : (
-                <Chip
-                  label="+ Add More"
-                  sx={{
-                    bgcolor: "#2A2D2A",
-                    color: "#fff",
-                    borderRadius: "4px",
-                    "&:hover": { bgcolor: "#333" },
-                  }}
-                  onClick={() => setIsAddingCrop(true)}
-                />
-              )}
-            </Box>
-          </CardContent>
-        </Card>
+                      <TextField
+                        size="small"
+                        placeholder="Add crop focus"
+                        value={newCropValue}
+                        onChange={(event) =>
+                          setNewCropValue(event.target.value)
+                        }
+                        onKeyDown={handleNewCropKeyDown}
+                        autoFocus
+                        sx={{
+                          minWidth: { xs: "100%", sm: 180 },
+                          ...inputStyle,
+                          "& .MuiInputBase-input::placeholder": {
+                            color: "#777",
+                            opacity: 1,
+                          },
+                        }}
+                      />
+                      <Stack direction="row" spacing={1}>
+                        <Button
+                          variant="contained"
+                          onClick={handleAddCropFocus}
+                          sx={{
+                            bgcolor: "#4ade80",
+                            color: "#000",
+                            fontWeight: 600,
+                            "&:hover": { bgcolor: "#22c55e" },
+                          }}
+                        >
+                          Add
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          onClick={() => {
+                            setIsAddingCrop(false);
+                            setNewCropValue("");
+                          }}
+                          sx={{
+                            borderColor: "#333",
+                            color: "#fff",
+                            "&:hover": {
+                              borderColor: "#555",
+                              bgcolor: "rgba(255,255,255,0.05)",
+                            },
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      </Stack>
+                    </Stack>
+                  ) : (
+                    <Chip
+                      label="+ Add More"
+                      sx={{
+                        bgcolor: "#2A2D2A",
+                        color: "#fff",
+                        borderRadius: "4px",
+                        "&:hover": { bgcolor: "#333" },
+                      }}
+                      onClick={() => setIsAddingCrop(true)}
+                    />
+                  )}
+                </Box>
+              </CardContent>
+            </Card>
+          </>
+        )}
 
-        <Card elevation={0} sx={cardStyle}>
-          <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 2.25 } }}>
-            <Typography
-              variant="subtitle1"
-              sx={{
-                fontWeight: 600,
-                mb: 1.5,
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <VerifiedUser sx={{ mr: 1, color: "#4ade80" }} /> Document
-              Verification (KYC)
-            </Typography>
-            <Box
-              sx={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: { xs: 1.5, sm: 2 },
-                alignItems: "flex-start",
-              }}
-            >
-              <Box sx={{ flex: { xs: "1 1 100%", md: "0 0 auto" } }}>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ mb: 1, display: "block" }}
-                >
-                  NIC Front
-                </Typography>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: { xs: "center", md: "flex-start" },
-                  }}
-                >
+        {showKycFields && (
+          <Card elevation={0} sx={cardStyle}>
+            <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 2.25 } }}>
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  fontWeight: 600,
+                  mb: 1.5,
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <VerifiedUser sx={{ mr: 1, color: "#4ade80" }} /> Document
+                Verification (KYC)
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: { xs: 1.5, sm: 2 },
+                  alignItems: "flex-start",
+                }}
+              >
+                <Box sx={{ flex: { xs: "1 1 100%", md: "0 0 auto" } }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ mb: 1, display: "block" }}
+                  >
+                    NIC Front
+                  </Typography>
                   <Box
                     sx={{
-                      width: "auto",
-                      aspectRatio: documentAspectRatios.front,
-                      height: { xs: 150, sm: 180, md: 200 },
-                      maxWidth: "100%",
-                      border: "2px dashed #333",
-                      borderRadius: 2,
                       display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      bgcolor: "#111213",
-                      overflow: "hidden",
-                      p: nicFrontUrl ? 1 : 0,
+                      justifyContent: { xs: "center", md: "flex-start" },
                     }}
                   >
-                    {nicFrontUrl ? (
-                      <Box
-                        component="img"
-                        src={nicFrontUrl}
-                        alt="NIC Front"
-                        onLoad={(
-                          event: React.SyntheticEvent<HTMLImageElement>,
-                        ) => handleDocumentImageLoad("front", event)}
-                        sx={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "contain",
-                          objectPosition: "center",
-                          borderRadius: 1,
-                          bgcolor: "#fff",
-                        }}
-                      />
-                    ) : (
-                      <Typography variant="body2" color="text.secondary">
-                        Upload Front
-                      </Typography>
-                    )}
+                    <Box
+                      sx={{
+                        width: "auto",
+                        aspectRatio: documentAspectRatios.front,
+                        height: { xs: 150, sm: 180, md: 200 },
+                        maxWidth: "100%",
+                        border: "2px dashed #333",
+                        borderRadius: 2,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        bgcolor: "#111213",
+                        overflow: "hidden",
+                        p: nicFrontUrl ? 1 : 0,
+                      }}
+                    >
+                      {nicFrontUrl ? (
+                        <Box
+                          component="img"
+                          src={nicFrontUrl}
+                          alt="NIC Front"
+                          onLoad={(
+                            event: React.SyntheticEvent<HTMLImageElement>,
+                          ) => handleDocumentImageLoad("front", event)}
+                          sx={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                            objectPosition: "center",
+                            borderRadius: 1,
+                            bgcolor: "#fff",
+                          }}
+                        />
+                      ) : (
+                        <Typography variant="body2" color="text.secondary">
+                          Upload Front
+                        </Typography>
+                      )}
+                    </Box>
+                  </Box>
+                </Box>
+                <Box sx={{ flex: { xs: "1 1 100%", md: "0 0 auto" } }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ mb: 1, display: "block" }}
+                  >
+                    NIC Back
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: { xs: "center", md: "flex-start" },
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: "auto",
+                        aspectRatio: documentAspectRatios.back,
+                        height: { xs: 150, sm: 180, md: 200 },
+                        maxWidth: "100%",
+                        border: "2px dashed #333",
+                        borderRadius: 2,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        bgcolor: "#111213",
+                        overflow: "hidden",
+                        p: nicBackUrl ? 1 : 0,
+                      }}
+                    >
+                      {nicBackUrl ? (
+                        <Box
+                          component="img"
+                          src={nicBackUrl}
+                          alt="NIC Back"
+                          onLoad={(
+                            event: React.SyntheticEvent<HTMLImageElement>,
+                          ) => handleDocumentImageLoad("back", event)}
+                          sx={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                            objectPosition: "center",
+                            borderRadius: 1,
+                            bgcolor: "#fff",
+                          }}
+                        />
+                      ) : (
+                        <Typography variant="body2" color="text.secondary">
+                          Upload Back
+                        </Typography>
+                      )}
+                    </Box>
                   </Box>
                 </Box>
               </Box>
-              <Box sx={{ flex: { xs: "1 1 100%", md: "0 0 auto" } }}>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ mb: 1, display: "block" }}
-                >
-                  NIC Back
-                </Typography>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: { xs: "center", md: "flex-start" },
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: "auto",
-                      aspectRatio: documentAspectRatios.back,
-                      height: { xs: 150, sm: 180, md: 200 },
-                      maxWidth: "100%",
-                      border: "2px dashed #333",
-                      borderRadius: 2,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      bgcolor: "#111213",
-                      overflow: "hidden",
-                      p: nicBackUrl ? 1 : 0,
-                    }}
-                  >
-                    {nicBackUrl ? (
-                      <Box
-                        component="img"
-                        src={nicBackUrl}
-                        alt="NIC Back"
-                        onLoad={(
-                          event: React.SyntheticEvent<HTMLImageElement>,
-                        ) => handleDocumentImageLoad("back", event)}
-                        sx={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "contain",
-                          objectPosition: "center",
-                          borderRadius: 1,
-                          bgcolor: "#fff",
-                        }}
-                      />
-                    ) : (
-                      <Typography variant="body2" color="text.secondary">
-                        Upload Back
-                      </Typography>
-                    )}
-                  </Box>
-                </Box>
-              </Box>
-            </Box>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         {isDirty && (
           <Box
