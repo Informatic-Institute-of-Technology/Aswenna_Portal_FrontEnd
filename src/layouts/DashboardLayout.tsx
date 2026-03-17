@@ -8,12 +8,11 @@ import { FarmerSidebar, InvestorSidebar, LandOwnerSidebar, SuperAdminSidebar } f
 
 interface DashboardLayoutProps {
   children: ReactNode;
-  showTopBar?: boolean;
 }
 
 const drawerWidth = 280;
 
-const DashboardLayout = ({ children, showTopBar = true }: DashboardLayoutProps) => {
+const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
 
@@ -72,12 +71,11 @@ const DashboardLayout = ({ children, showTopBar = true }: DashboardLayoutProps) 
         component="main"
         sx={{
           flexGrow: 1,
-          p: showTopBar ? 3 : 0,
+          p: 3,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
         }}
       >
-        {showTopBar && (
-          <Toolbar
+        <Toolbar
             sx={{
               px: { xs: 2, sm: 3 },
               mb: 3,
@@ -104,7 +102,6 @@ const DashboardLayout = ({ children, showTopBar = true }: DashboardLayoutProps) 
               </IconButton>
             </Box>
           </Toolbar>
-        )}
 
         {loading ? (
           <Container maxWidth="xl">

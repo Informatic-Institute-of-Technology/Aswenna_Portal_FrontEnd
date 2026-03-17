@@ -106,7 +106,7 @@ const MyLandAdsPage = () => {
   };
 
   return (
-    <DashboardLayout showTopBar={false}>
+    <DashboardLayout>
       <div
         style={{ background: 'linear-gradient(145deg, #2a2a2a 0%, #1f1f1f 100%)' }}
         className="text-gray-300 font-sans h-full flex flex-col overflow-hidden transition-colors duration-200"
