@@ -22,7 +22,7 @@
     "investorName": "Smart Agri Investments",
     "investorAmount": 250000,
     "landownerName": "Perera Estates",
-    "landownerId": "69aa70e96610063a02adedae",
+    "landownerId": "69b03f9e25196bfa57d0978e",
     "riskLevel": "LOW",
     "riskStatus": "No Issues",
     "milestones": [
@@ -312,7 +312,7 @@
         "rating": 4.8
       },
       {
-        "id": "69aa70e96610063a02adedae",
+        "id": "69b03f9e25196bfa57d0978e",
         "name": "Perera Estates",
         "role": "landowner",
         "email": "contact@pereraestates.lk",
@@ -351,7 +351,7 @@
     "investorName": "Green Valley Investors",
     "investorAmount": 180000,
     "landownerName": "Highland Farms",
-    "landownerId": "69aa70e96610063a02adedae",
+    "landownerId": "69b03f9e25196bfa57d0978e",
     "riskLevel": "MEDIUM",
     "riskStatus": "Weather concerns",
     "milestones": [
@@ -586,7 +586,7 @@
         "rating": 4.9
       },
       {
-        "id": "69aa70e96610063a02adedae",
+        "id": "69b03f9e25196bfa57d0978e",
         "name": "Highland Farms",
         "role": "landowner",
         "email": "contact@highlandfarms.lk",
@@ -625,7 +625,7 @@
     "investorName": "Smart Agri Investments",
     "investorAmount": 320000,
     "landownerName": "Silva Estates",
-    "landownerId": "69aa70e96610063a02adedae",
+    "landownerId": "69b03f9e25196bfa57d0978e",
     "riskLevel": "LOW",
     "riskStatus": "Successfully Completed",
     "milestones": [
@@ -889,7 +889,7 @@
         "rating": 4.8
       },
       {
-        "id": "69aa70e96610063a02adedae",
+        "id": "69b03f9e25196bfa57d0978e",
         "name": "Silva Estates",
         "role": "landowner",
         "email": "contact@silvaestates.lk",
@@ -926,7 +926,7 @@
     "investorName": "Spice Trade International",
     "investorAmount": 420000,
     "landownerName": "Kumara Holdings",
-    "landownerId": "69aa70e96610063a02adedae",
+    "landownerId": "69b03f9e25196bfa57d0978e",
     "riskLevel": "LOW",
     "riskStatus": "Successfully Completed",
     "milestones": [
@@ -1187,7 +1187,7 @@
         "rating": 4.9
       },
       {
-        "id": "69aa70e96610063a02adedae",
+        "id": "69b03f9e25196bfa57d0978e",
         "name": "Kumara Holdings",
         "role": "landowner",
         "email": "contact@kumaraholdings.lk",

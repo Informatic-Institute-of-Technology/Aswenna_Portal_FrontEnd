@@ -1,111 +1,236 @@
-import { Add, Edit, Landscape, Visibility } from "@mui/icons-material";
 import {
-  Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardMedia,
-  Chip,
-  Stack,
-  Typography,
-} from "@mui/material";
-import { useState } from "react";
-import CreateAdPopup from "../../components/landowner/CreateAdPopup";
-
-interface LandAd {
-  id: number;
-  location: string;
-  landArea: string;
-  soilType: string;
-  rentalAmount: string;
-  availablePeriod: string;
-  image: string;
-  status: "open" | "allocated" | "expired";
-  projectName?: string;
-}
-
-const StatusLabel = ({ status }: { status: LandAd["status"] }) => {
-  const statusConfig: Record<
-    LandAd["status"],
-    { label: string; color: "success" | "warning" | "default" }
-  > = {
-    allocated: {
-      label: "Allocated to Active Project",
-      color: "default",
-    },
-    open: {
-      label: "Open for New Projects",
-      color: "success",
-    },
-    expired: {
-      label: "Project Completed (Expired)",
-      color: "warning",
-    },
-  };
-
-  const config = statusConfig[status];
-
-  return (
-    <Chip
-      label={config.label}
-      color={config.color}
-      size="small"
-      sx={{ fontWeight: 600 }}
-    />
-  );
-};
+  CreateAdPopup,
+  type LandOfferDraft,
+  type LandownerOfferPrefill,
+} from "@/components/landowner";
+import { useAuth } from "@/Context/useAuth";
+import { Add, BarChart, Folder, Landscape } from "@mui/icons-material";
+import { Box, Button, Typography } from "@mui/material";
+import { useMemo, useState } from "react";
+import type { OfferCardProps } from "../../components/investor";
+import { OfferCard, ProjectDetailsDialog } from "../../components/investor";
+import {
+  comprehensiveProjectsData,
+  pendingProjectsData,
+} from "../../data/json";
 
 const MyLandAdsPage = () => {
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
-  const [landAds] = useState<LandAd[]>([
-    {
-      id: 1,
-      location: "North Valley Farm",
-      landArea: "25 acres",
-      soilType: "Loamy",
-      rentalAmount: "LKR 50,000",
-      availablePeriod: "Mar 2026 - Dec 2026",
-      image:
-        "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=500",
-      status: "open",
-    },
-    {
-      id: 2,
-      location: "Sunrise Fields",
-      landArea: "15 acres",
-      soilType: "Clay",
-      rentalAmount: "LKR 35,000",
-      availablePeriod: "Apr 2026 - Nov 2026",
-      image:
-        "https://images.unsplash.com/photo-1500076656116-558758c991c1?w=500",
-      status: "allocated",
-      projectName: "Organic Wheat Cultivation",
-    },
-    {
-      id: 3,
-      location: "Green Meadows",
-      landArea: "30 acres",
-      soilType: "Sandy",
-      rentalAmount: "LKR 45,000",
-      availablePeriod: "Jan 2026 - Aug 2026",
-      image:
-        "https://images.unsplash.com/photo-1464226180484-05a7a0c82715?w=500",
-      status: "expired",
-      projectName: "Rice Cultivation",
-    },
-  ]);
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [createdLandAds, setCreatedLandAds] = useState<OfferCardProps[]>([]);
+  const [selectedProject, setSelectedProject] = useState<OfferCardProps | null>(
+    null,
+  );
 
-  const handleEdit = (adId: number) => {
-    console.log("Edit ad:", adId);
+  const scopedLandownerId = (user?._id || "").toLowerCase();
+
+  const allRelatedProjects = useMemo(() => {
+    const projects = comprehensiveProjectsData as (OfferCardProps & {
+      landownerId?: string;
+    })[];
+
+    return projects.filter((project) => {
+      const normalizedLandownerId = (project.landownerId || "").toLowerCase();
+      return normalizedLandownerId === scopedLandownerId;
+    });
+  }, [scopedLandownerId]);
+
+  const pendingLandAds = useMemo(() => {
+    const projects = pendingProjectsData as (OfferCardProps & {
+      landownerId?: string;
+    })[];
+
+    const filteredServerPending = projects.filter((project) => {
+      const normalizedLandownerId = (project.landownerId || "").toLowerCase();
+
+      return normalizedLandownerId === scopedLandownerId;
+    });
+
+    return [...createdLandAds, ...filteredServerPending];
+  }, [createdLandAds, scopedLandownerId]);
+
+  const allProjects = useMemo(() => {
+    return allRelatedProjects;
+  }, [allRelatedProjects]);
+
+  const landownerPrefillData = useMemo<
+    LandownerOfferPrefill | undefined
+  >(() => {
+    if (!scopedLandownerId) return undefined;
+
+    const projects = allRelatedProjects;
+    const referenceProject = projects[0];
+
+    const landownerPartyMember =
+      projects
+        .flatMap((project) => project.partyMembers || [])
+        .find((member) => member.role === "landowner") || null;
+
+    const landImages = Array.from(
+      new Set(
+        projects
+          .map((project) => project.backgroundImage)
+          .filter((image): image is string => Boolean(image)),
+      ),
+    );
+
+    const rentalAmounts = projects.flatMap((project) =>
+      (project.landRentals || []).map((rental) => rental.amount),
+    );
+    const suggestedMonthlyRental =
+      rentalAmounts.length > 0
+        ? Math.round(
+            rentalAmounts.reduce((sum, amount) => sum + amount, 0) /
+              rentalAmounts.length,
+          )
+        : undefined;
+
+    const suggestedLandArea =
+      projects.flatMap((project) => project.landRentals || [])[0]?.landArea ||
+      "";
+
+    return {
+      landownerId: scopedLandownerId,
+      landownerName:
+        landownerPartyMember?.name ||
+        referenceProject?.landownerName ||
+        user?.fullName ||
+        "Landowner",
+      landownerImage: landownerPartyMember?.image,
+      location:
+        landownerPartyMember?.location?.split(",")[0] ||
+        referenceProject?.location,
+      district: referenceProject?.district,
+      province: referenceProject?.province,
+      coordinates:
+        landownerPartyMember?.coordinates || referenceProject?.coordinates,
+      specialization: landownerPartyMember?.specialization,
+      rating: landownerPartyMember?.rating,
+      suggestedMonthlyRental,
+      suggestedLandArea,
+      landImages,
+    };
+  }, [allRelatedProjects, scopedLandownerId, user?.fullName]);
+
+  const activeProjects = useMemo(
+    () => allProjects.filter((project) => project.status === "active"),
+    [allProjects],
+  );
+
+  const pastProjects = useMemo(
+    () => allProjects.filter((project) => project.status === "completed"),
+    [allProjects],
+  );
+
+  const handleViewDetails = (id: string) => {
+    const project = [
+      ...pendingLandAds,
+      ...activeProjects,
+      ...pastProjects,
+    ].find((item) => item.id === id);
+
+    if (project) {
+      setSelectedProject(project);
+      setDetailsDialogOpen(true);
+    }
   };
 
-  const handleCreateNewSeason = (adId: number) => {
-    console.log("Start new season from expired ad:", adId);
-  };
+  const handleCreateLandOffer = (offer: LandOfferDraft) => {
+    const uniqueId = `land-ad-${Date.now()}`;
+    const today = new Date().toISOString().split("T")[0];
+    const startDate = offer.availableFrom || today;
 
-  const handleViewDetails = (adId: number) => {
-    console.log("View details:", adId);
+    const newPendingProject: OfferCardProps = {
+      id: uniqueId,
+      projectId: `LAND-${Date.now().toString().slice(-6)}`,
+      projectName: offer.title,
+      cropType: "Land Rental",
+      cropIcon: offer.landIcon || "🏞️",
+      farmerName: "Awaiting Match",
+      farmerImage:
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
+      location: offer.location || `${offer.district}, ${offer.province}`,
+      district: offer.district,
+      province: offer.province,
+      coordinates: offer.coordinates,
+      expectedROI: 0,
+      status: "pending",
+      startDate,
+      endDate: offer.availableTo || undefined,
+      backgroundImage: offer.coverImage,
+      landownerName: offer.landownerName,
+      landownerId: offer.landownerId,
+      investmentType: "harvest",
+      riskLevel: "LOW",
+      riskStatus: "Awaiting investor applications",
+      milestones: [
+        {
+          id: `${uniqueId}-M1`,
+          title: "Land Offer Published",
+          description:
+            "Land offer is published and awaiting investor or farmer interest.",
+          progress: 0,
+          status: "pending",
+          startDate,
+          endDate: offer.availableTo || startDate,
+          payment: offer.monthlyRental,
+          tasks: {
+            total: 1,
+            completed: 0,
+          },
+        },
+      ],
+      payments: [
+        {
+          id: `${uniqueId}-P1`,
+          milestoneId: `${uniqueId}-M1`,
+          amount: offer.monthlyRental,
+          dueDate: startDate,
+          status: "pending",
+          description: "Monthly land rental",
+        },
+      ],
+      landRentals: [
+        {
+          id: `${uniqueId}-R1`,
+          landArea: offer.landArea || "N/A",
+          month: new Date(startDate).toLocaleDateString("en-US", {
+            month: "long",
+            year: "numeric",
+          }),
+          dueDate: startDate,
+          amount: offer.monthlyRental,
+          status: "pending",
+        },
+      ],
+      financialBreakdown: [
+        {
+          category: "Monthly Land Rental",
+          amount: offer.monthlyRental,
+          type: "expense",
+        },
+      ],
+      partyMembers: [
+        {
+          id: offer.landownerId || scopedLandownerId,
+          name: offer.landownerName || user?.fullName || "Landowner",
+          role: "landowner",
+          email: user?.email || "not-provided@aswenna.lk",
+          phone: user?.phoneNumber || "N/A",
+          image: offer.landownerImage || "",
+          location:
+            offer.location ||
+            `${offer.district || ""}, ${offer.province || ""}`,
+          coordinates: offer.coordinates,
+          specialization: offer.landownerSpecialization,
+          rating: offer.landownerRating,
+        },
+      ],
+    };
+
+    setCreatedLandAds((prev) => [newPendingProject, ...prev]);
+    setOpen(false);
   };
 
   return (
@@ -128,7 +253,7 @@ const MyLandAdsPage = () => {
               onClick={() => setOpen(true)}
               sx={{ px: 2.5, py: 1.2, borderRadius: 2, fontWeight: 600 }}
             >
-              Create New Land Ad
+              Create New Land Offer
             </Button>
           </div>
         </div>
@@ -147,181 +272,26 @@ const MyLandAdsPage = () => {
               content: '""',
               width: 4,
               height: 24,
-              background: "linear-gradient(180deg, var(--color-olive) 0%, var(--color-olive-light) 100%)",
+              background:
+                "linear-gradient(180deg, var(--color-olive) 0%, var(--color-olive-light) 100%)",
               borderRadius: 1,
             },
           }}
         >
-          Land Advertisement Cards
+          Pending Land Ads
         </Typography>
 
-        {landAds.length > 0 ? (
+        {pendingLandAds.length > 0 ? (
           <div className="row g-4">
-            {landAds.map((ad) => {
-              const isAllocated = ad.status === "allocated";
-              const isOpen = ad.status === "open";
-              const isExpired = ad.status === "expired";
-
-              return (
-                <div key={ad.id} className="col-12 col-md-6 col-lg-4">
-                  <Card
-                    sx={{
-                      height: "100%",
-                      display: "flex",
-                      flexDirection: "column",
-                      background:
-                        "linear-gradient(145deg, var(--bg-subtle) 0%, var(--bg-overlay) 100%)",
-                      transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                      opacity: isAllocated ? 0.72 : 1,
-                      "&:hover": isAllocated
-                        ? undefined
-                        : {
-                            transform: "translateY(-8px)",
-                            boxShadow:
-                              "0 20px 40px var(--overlay-md), 0 0 20px var(--color-olive-muted)",
-                          },
-                    }}
-                  >
-                    <Box sx={{ position: "relative", height: 160 }}>
-                      <CardMedia
-                        component="img"
-                        image={ad.image}
-                        alt={ad.location}
-                        sx={{ height: "100%", opacity: 0.7 }}
-                      />
-                      <Box
-                        sx={{
-                          position: "absolute",
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          background:
-                            "linear-gradient(180deg, transparent 0%, var(--overlay-xl) 100%)",
-                        }}
-                      />
-                      <Box sx={{ position: "absolute", top: 12, left: 12 }}>
-                        <StatusLabel status={ad.status} />
-                      </Box>
-                      <Box sx={{ position: "absolute", right: 12, bottom: 12 }}>
-                        <Chip
-                          label={`${ad.rentalAmount} / season`}
-                          size="small"
-                          sx={{
-                            fontWeight: 600,
-                            bgcolor: "var(--overlay-xl)",
-                            color: "var(--text-primary)",
-                          }}
-                        />
-                      </Box>
-                    </Box>
-
-                    <CardContent sx={{ flexGrow: 1 }}>
-                      <Stack
-                        direction="row"
-                        justifyContent="space-between"
-                        alignItems="center"
-                        spacing={1.5}
-                        sx={{ mb: 1.5 }}
-                      >
-                        <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                          {ad.location}
-                        </Typography>
-                        <Chip
-                          label={ad.landArea}
-                          size="small"
-                          variant="outlined"
-                        />
-                      </Stack>
-
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ mb: 0.75 }}
-                      >
-                        Soil Type: {ad.soilType}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ mb: 1.5 }}
-                      >
-                        Available Period: {ad.availablePeriod}
-                      </Typography>
-
-                      {(isAllocated || isExpired) && ad.projectName && (
-                        <Box
-                          sx={{
-                            p: 1.5,
-                            borderRadius: 1.5,
-                            background: "var(--surface-tint)",
-                            border: "1px solid",
-                            borderColor: "divider",
-                          }}
-                        >
-                          <Typography variant="caption" color="text.secondary">
-                            Linked Project
-                          </Typography>
-                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                            {ad.projectName}
-                          </Typography>
-                        </Box>
-                      )}
-
-                      {isExpired && (
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ mt: 1.5, display: "block" }}
-                        >
-                          This ad is enabled for viewing and reuse, but editing
-                          is not allowed.
-                        </Typography>
-                      )}
-                    </CardContent>
-
-                    <CardActions sx={{ px: 2, pb: 2, pt: 0, gap: 1 }}>
-                      {isOpen && (
-                        <Button
-                          fullWidth
-                          variant="contained"
-                          startIcon={<Edit />}
-                          onClick={() => handleEdit(ad.id)}
-                        >
-                          Edit Details
-                        </Button>
-                      )}
-
-                      {isExpired && (
-                        <Button
-                          fullWidth
-                          variant="contained"
-                          onClick={() => handleCreateNewSeason(ad.id)}
-                        >
-                          Create New Season
-                        </Button>
-                      )}
-
-                      {isAllocated && (
-                        <Button fullWidth variant="outlined" disabled>
-                          Allocated (Card Locked)
-                        </Button>
-                      )}
-
-                      {!isAllocated && (
-                        <Button
-                          variant="outlined"
-                          startIcon={<Visibility />}
-                          onClick={() => handleViewDetails(ad.id)}
-                        >
-                          View
-                        </Button>
-                      )}
-                    </CardActions>
-                  </Card>
-                </div>
-              );
-            })}
+            {pendingLandAds.map((project) => (
+              <div key={project.id} className="col-12 col-md-6 col-lg-4">
+                <OfferCard
+                  {...project}
+                  viewMode="landowner"
+                  onViewDetails={handleViewDetails}
+                />
+              </div>
+            ))}
           </div>
         ) : (
           <Box
@@ -338,7 +308,7 @@ const MyLandAdsPage = () => {
               <Landscape sx={{ fontSize: 40, opacity: 0.5 }} />
             </Typography>
             <Typography variant="h6" sx={{ mb: 1 }}>
-              No Land Ads Yet
+              No Pending Land Ads
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Create your first land ad to start connecting with investors.
@@ -347,7 +317,155 @@ const MyLandAdsPage = () => {
         )}
       </section>
 
-      <CreateAdPopup open={open} onClose={() => setOpen(false)} />
+      <hr
+        style={{
+          margin: "3rem 0",
+          border: "none",
+          height: 1,
+          background:
+            "linear-gradient(90deg, transparent, var(--border-medium), transparent)",
+        }}
+      />
+
+      <section className="mb-5">
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: 700,
+            mb: 3,
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            "&::before": {
+              content: '""',
+              width: 4,
+              height: 24,
+              background:
+                "linear-gradient(180deg, var(--color-olive) 0%, var(--color-olive-light) 100%)",
+              borderRadius: 1,
+            },
+          }}
+        >
+          Active Projects
+        </Typography>
+
+        {activeProjects.length > 0 ? (
+          <div className="row g-4">
+            {activeProjects.map((project) => (
+              <div key={project.id} className="col-12 col-md-6 col-lg-4">
+                <OfferCard
+                  {...project}
+                  viewMode="landowner"
+                  onViewDetails={handleViewDetails}
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <Box
+            sx={{
+              textAlign: "center",
+              p: 6,
+              background: "var(--surface-tint)",
+              borderRadius: 2,
+              border: "2px dashed",
+              borderColor: "divider",
+            }}
+          >
+            <Typography variant="h4" sx={{ mb: 1, opacity: 0.5 }}>
+              <BarChart sx={{ fontSize: 40, opacity: 0.5 }} />
+            </Typography>
+            <Typography variant="h6" sx={{ mb: 1 }}>
+              No Active Projects
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Active projects linked to your land ads will appear here.
+            </Typography>
+          </Box>
+        )}
+      </section>
+
+      <hr
+        style={{
+          margin: "3rem 0",
+          border: "none",
+          height: 1,
+          background:
+            "linear-gradient(90deg, transparent, var(--border-medium), transparent)",
+        }}
+      />
+
+      <section>
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: 700,
+            mb: 3,
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            "&::before": {
+              content: '""',
+              width: 4,
+              height: 24,
+              background:
+                "linear-gradient(180deg, var(--color-olive) 0%, var(--color-olive-light) 100%)",
+              borderRadius: 1,
+            },
+          }}
+        >
+          Past Projects
+        </Typography>
+
+        {pastProjects.length > 0 ? (
+          <div className="row g-4">
+            {pastProjects.map((project) => (
+              <div key={project.id} className="col-12 col-md-6 col-lg-4">
+                <OfferCard
+                  {...project}
+                  viewMode="landowner"
+                  onViewDetails={handleViewDetails}
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <Box
+            sx={{
+              textAlign: "center",
+              p: 6,
+              background: "var(--surface-tint)",
+              borderRadius: 2,
+              border: "2px dashed",
+              borderColor: "divider",
+            }}
+          >
+            <Typography variant="h4" sx={{ mb: 1, opacity: 0.5 }}>
+              <Folder sx={{ fontSize: 40, opacity: 0.5 }} />
+            </Typography>
+            <Typography variant="h6" sx={{ mb: 1 }}>
+              No Past Projects
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Your completed projects will appear here.
+            </Typography>
+          </Box>
+        )}
+      </section>
+
+      <ProjectDetailsDialog
+        open={detailsDialogOpen}
+        onClose={() => setDetailsDialogOpen(false)}
+        project={selectedProject}
+        viewMode="landowner"
+      />
+
+      <CreateAdPopup
+        open={open}
+        onClose={() => setOpen(false)}
+        onSubmit={handleCreateLandOffer}
+        prefillData={landownerPrefillData}
+      />
     </>
   );
 };

@@ -20,7 +20,6 @@ import { useNavigate } from "react-router-dom";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
-// Mock agreement data - TODO: Fetch from API
 const agreementData = {
   projectId: "GH-RICE-042",
   serialNo: "AGR-2024-0892-GH",
