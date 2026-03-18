@@ -224,10 +224,20 @@ class AdminService {
   async getAllUsers(
     page: number = 1,
     limit: number = 100,
+    query?: string,
   ): Promise<UsersResponse> {
     try {
+      const params = new URLSearchParams({
+        page: String(page),
+        limit: String(limit),
+      });
+
+      if (query && query.trim()) {
+        params.set("query", query.trim());
+      }
+
       const response = await httpClient.get<UsersResponse>(
-        `/v1/user?page=${page}&limit=${limit}`,
+        `/v1/user?${params.toString()}`,
       );
       console.log("Fetched users:", response);
       return response;

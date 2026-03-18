@@ -243,6 +243,7 @@ const InboxPage = () => {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const conversationsListRef = useRef<HTMLDivElement>(null);
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const {
@@ -252,14 +253,16 @@ const InboxPage = () => {
     typingByConversationId,
     connectionStatus,
     loadingConversations,
+    hasMoreConversations,
     setActiveConversation,
+    loadConversations,
+    loadMoreConversations,
     openDirectConversation,
     sendTextMessage,
     setTyping,
     markRead,
     addGroupMember,
     removeGroupMember,
-    loadConversations,
   } = useChatStore({
     currentUserId,
     onUnauthorized: logout,
@@ -275,36 +278,40 @@ const InboxPage = () => {
   );
 
   useEffect(() => {
-    if (!currentUserId) return;
+    if (!currentUserId || conversations.length === 0) return;
 
-    const participantIds = [
-      ...new Set(
-        conversations
-          .flatMap((conversation) =>
-            conversation.members
-              .map((member) => getMemberUserId(member))
-              .filter((id): id is string => !!id && id !== currentUserId),
-          )
-          .filter(Boolean),
-      ),
-    ];
+    setConvUserMap((prev) => {
+      const next = new Map(prev);
 
-    if (participantIds.length === 0) return;
+      conversations.forEach((conversation) => {
+        conversation.members.forEach((member) => {
+          const memberId = getMemberUserId(member);
+          const memberDisplay = getMemberDisplay(member);
 
-    (async () => {
-      try {
-        const resp = await adminService.getAllUsers(1, 20);
-        const map = new Map<string, ApiUser>();
-        resp.data.forEach((u) => {
-          if (participantIds.includes(u._id)) {
-            map.set(u._id, u);
-          }
+          if (!memberId || memberId === currentUserId || !memberDisplay) return;
+          if (next.has(memberId)) return;
+
+          next.set(memberId, {
+            _id: memberId,
+            fullName: memberDisplay.fullName,
+            email: memberDisplay.email || "",
+            emailVerified: false,
+            phoneNumber: "",
+            phoneNumberVerified: false,
+            role: "user",
+            permissions: [],
+            createdBy: "",
+            updatedBy: "",
+            meta: [],
+            createdAt: "",
+            updatedAt: "",
+            __v: 0,
+          });
         });
-        setConvUserMap(map);
-      } catch (err) {
-        console.error("Failed to load conversation participants:", err);
-      }
-    })();
+      });
+
+      return next;
+    });
   }, [conversations, currentUserId]);
 
   const doSearch = useCallback(
@@ -317,24 +324,17 @@ const InboxPage = () => {
       }
       setSearching(true);
       try {
-        const resp = await adminService.getAllUsers(1, 20);
-        const normalizedQuery = query.trim().toLowerCase();
+        const resp = await adminService.getAllUsers(1, 20, query.trim());
 
-        const filtered = resp.data
-          .filter((u) => u._id !== currentUserId)
-          .filter((u) => {
-            const name = (u.fullName || "").toLowerCase();
-            const email = (u.email || "").toLowerCase();
-            const address = (u.address || "").toLowerCase();
-            return (
-              name.includes(normalizedQuery) ||
-              email.includes(normalizedQuery) ||
-              address.includes(normalizedQuery)
-            );
-          });
+        const filtered = resp.data.filter((u) => u._id !== currentUserId);
 
-        setSearchResults(filtered.slice(0, 20));
-        setSearchTotal(filtered.length);
+        setSearchResults(filtered);
+        setSearchTotal(
+          Math.max(
+            resp.pagination?.totalDocs || filtered.length,
+            filtered.length,
+          ),
+        );
       } catch (err) {
         console.error("Search failed:", err);
         setSearchResults([]);
@@ -458,6 +458,25 @@ const InboxPage = () => {
       ? getOtherMemberDisplay(currentConversation)
       : null;
 
+  const handleConversationsScroll = useCallback(() => {
+    if (isSearching) return;
+
+    const container = conversationsListRef.current;
+    if (!container || loadingConversations || !hasMoreConversations) return;
+
+    const remaining =
+      container.scrollHeight - container.scrollTop - container.clientHeight;
+
+    if (remaining < 120) {
+      loadMoreConversations();
+    }
+  }, [
+    hasMoreConversations,
+    isSearching,
+    loadMoreConversations,
+    loadingConversations,
+  ]);
+
   const selectConversation = async (conversation: Conversation) => {
     await setActiveConversation(conversation._id);
 
@@ -479,8 +498,7 @@ const InboxPage = () => {
     }
 
     try {
-      const users = await adminService.getAllUsers(1, 20);
-      const matched = users.data.find((u) => u._id === otherUserId) || null;
+      const matched = await adminService.getUserById(otherUserId);
       if (matched) {
         setConvUserMap((prev) => {
           const next = new Map(prev);
@@ -706,7 +724,23 @@ const InboxPage = () => {
             </div>
           </div>
 
-          <div className="chat-conv-list">{renderLeftContent()}</div>
+          <div
+            ref={conversationsListRef}
+            className="chat-conv-list"
+            onScroll={handleConversationsScroll}
+          >
+            {renderLeftContent()}
+            {!isSearching &&
+              loadingConversations &&
+              conversations.length > 0 && (
+                <div
+                  className="chat-section-label"
+                  style={{ textAlign: "center" }}
+                >
+                  Loading...
+                </div>
+              )}
+          </div>
         </div>
 
         <div

@@ -23,8 +23,10 @@ interface UseChatStoreResult {
   typingByConversationId: Record<string, string[]>;
   connectionStatus: ConnectionStatus;
   loadingConversations: boolean;
+  hasMoreConversations: boolean;
   loadingMessages: boolean;
   loadConversations: () => Promise<void>;
+  loadMoreConversations: () => Promise<void>;
   openDirectConversation: (peerUserId: string) => Promise<string | null>;
   setActiveConversation: (conversationId: string | null) => Promise<void>;
   sendTextMessage: (content: string) => Promise<void>;
@@ -134,9 +136,12 @@ export const useChatStore = ({
   const [connectionStatus, setConnectionStatus] =
     useState<ConnectionStatus>("disconnected");
   const [loadingConversations, setLoadingConversations] = useState(false);
+  const [hasMoreConversations, setHasMoreConversations] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState(false);
+  const [conversationPage, setConversationPage] = useState(1);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activeConversationRef = useRef<string | null>(null);
+  const initializedUserRef = useRef<string | null>(null);
 
   const handleError = useCallback(
     (error: unknown) => {
@@ -157,25 +162,52 @@ export const useChatStore = ({
 
     setLoadingConversations(true);
     try {
-      const [meConversations, userConversations] = await Promise.all([
-        chatApi.listMyConversations(1, 20),
-        chatApi.listConversationsByUser(currentUserId, 1, 20),
-      ]);
+      const meConversations = await chatApi.listMyConversations(1, 20);
 
-      const merged = [...meConversations.items];
-      userConversations.items.forEach((conversation) => {
-        if (!merged.some((item) => item._id === conversation._id)) {
-          merged.push(conversation);
-        }
-      });
-
-      setConversations(sortConversations(merged));
+      setConversations(sortConversations(meConversations.items));
+      setConversationPage(1);
+      setHasMoreConversations(
+        meConversations.page < meConversations.totalPages,
+      );
     } catch (error) {
       handleError(error);
     } finally {
       setLoadingConversations(false);
     }
   }, [currentUserId, handleError]);
+
+  const loadMoreConversations = useCallback(async () => {
+    if (!currentUserId || loadingConversations || !hasMoreConversations) return;
+
+    setLoadingConversations(true);
+    try {
+      const nextPage = conversationPage + 1;
+      const nextConversations = await chatApi.listMyConversations(nextPage, 20);
+
+      setConversations((prev) => {
+        const existingIds = new Set(prev.map((item) => item._id));
+        const appended = nextConversations.items.filter(
+          (item) => !existingIds.has(item._id),
+        );
+        return sortConversations([...prev, ...appended]);
+      });
+
+      setConversationPage(nextPage);
+      setHasMoreConversations(
+        nextConversations.page < nextConversations.totalPages,
+      );
+    } catch (error) {
+      handleError(error);
+    } finally {
+      setLoadingConversations(false);
+    }
+  }, [
+    conversationPage,
+    currentUserId,
+    handleError,
+    hasMoreConversations,
+    loadingConversations,
+  ]);
 
   const refreshMessages = useCallback(
     async (conversationId: string) => {
@@ -433,8 +465,11 @@ export const useChatStore = ({
   useEffect(() => {
     if (!currentUserId) return;
 
-    ensureConnected();
-    loadConversations();
+    if (initializedUserRef.current !== currentUserId) {
+      initializedUserRef.current = currentUserId;
+      ensureConnected();
+      loadConversations();
+    }
 
     const offNew = chatSocket.on("message:new", (message) => {
       setMessagesByConversationId((prev) => ({
@@ -544,8 +579,10 @@ export const useChatStore = ({
     typingByConversationId: stableTypingByConversationId,
     connectionStatus,
     loadingConversations,
+    hasMoreConversations,
     loadingMessages,
     loadConversations,
+    loadMoreConversations,
     openDirectConversation,
     setActiveConversation,
     sendTextMessage,
