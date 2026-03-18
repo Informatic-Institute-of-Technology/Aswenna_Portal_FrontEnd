@@ -67,6 +67,7 @@ const getMemberDisplay = (member: Conversation["members"][number]) => {
       id: member.userId._id || "",
       fullName: member.userId.fullName || "User",
       email: member.userId.email || "",
+      profilePicture: member.userId.personalInfo?.profilePicture,
     };
   }
 
@@ -75,6 +76,7 @@ const getMemberDisplay = (member: Conversation["members"][number]) => {
       id: member.user._id,
       fullName: member.user.fullName || "User",
       email: member.user.email || "",
+      profilePicture: undefined,
     };
   }
 
@@ -333,6 +335,9 @@ const InboxPage = () => {
             createdAt: "",
             updatedAt: "",
             __v: 0,
+            personalInfo: memberDisplay.profilePicture
+              ? { profilePicture: memberDisplay.profilePicture }
+              : undefined,
           });
         });
       });
@@ -897,7 +902,9 @@ const InboxPage = () => {
                             >
                               {formatTime(msg.createdAt)}
                               {isSent &&
-                              readBy.some((readerId) => readerId !== currentUserId)
+                              readBy.some(
+                                (readerId) => readerId !== currentUserId,
+                              )
                                 ? " • Read"
                                 : ""}
                             </div>

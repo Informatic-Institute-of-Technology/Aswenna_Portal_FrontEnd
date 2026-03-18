@@ -9,6 +9,15 @@ export interface ConversationMember {
         _id?: string;
         fullName?: string;
         email?: string;
+        personalInfo?: {
+          profilePicture?:
+            | string
+            | {
+                filename?: string;
+                url?: string;
+              }
+            | null;
+        };
       };
   role?: ConversationMemberRole;
   joinedAt?: string;
