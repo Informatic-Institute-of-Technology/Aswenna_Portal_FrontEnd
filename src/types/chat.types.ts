@@ -3,7 +3,13 @@ export type ConversationKind = "direct" | "group";
 export type ConversationMemberRole = "owner" | "admin" | "member";
 
 export interface ConversationMember {
-  userId: string;
+  userId:
+    | string
+    | {
+        _id?: string;
+        fullName?: string;
+        email?: string;
+      };
   role?: ConversationMemberRole;
   joinedAt?: string;
   user?: {

@@ -53,6 +53,34 @@ const getInitials = (name: string) =>
     .map((w) => w[0]?.toUpperCase() || "")
     .join("");
 
+const getMemberUserId = (member: Conversation["members"][number]): string => {
+  if (typeof member.userId === "string") return member.userId;
+  if (member.userId && typeof member.userId === "object") {
+    return member.userId._id || "";
+  }
+  return member.user?._id || "";
+};
+
+const getMemberDisplay = (member: Conversation["members"][number]) => {
+  if (member.userId && typeof member.userId === "object") {
+    return {
+      id: member.userId._id || "",
+      fullName: member.userId.fullName || "User",
+      email: member.userId.email || "",
+    };
+  }
+
+  if (member.user?._id) {
+    return {
+      id: member.user._id,
+      fullName: member.user.fullName || "User",
+      email: member.user.email || "",
+    };
+  }
+
+  return null;
+};
+
 const formatTime = (iso: string) => {
   const d = new Date(iso);
   const now = new Date();
@@ -76,6 +104,36 @@ const formatDayLabel = (iso: string) => {
   if (diffDays === 1) return "YESTERDAY";
   return d.toLocaleDateString([], {
     weekday: "long",
+    month: "short",
+    day: "numeric",
+  });
+};
+
+const formatConversationDateTime = (iso: string) => {
+  const d = new Date(iso);
+  const now = new Date();
+
+  const isToday =
+    d.getDate() === now.getDate() &&
+    d.getMonth() === now.getMonth() &&
+    d.getFullYear() === now.getFullYear();
+
+  if (isToday) {
+    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  }
+
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+
+  const isYesterday =
+    d.getDate() === yesterday.getDate() &&
+    d.getMonth() === yesterday.getMonth() &&
+    d.getFullYear() === yesterday.getFullYear();
+
+  if (isYesterday) return "Yesterday";
+
+  return d.toLocaleDateString([], {
+    year: "numeric",
     month: "short",
     day: "numeric",
   });
@@ -224,7 +282,7 @@ const InboxPage = () => {
         conversations
           .flatMap((conversation) =>
             conversation.members
-              .map((member) => member.userId || member.user?._id)
+              .map((member) => getMemberUserId(member))
               .filter((id): id is string => !!id && id !== currentUserId),
           )
           .filter(Boolean),
@@ -383,10 +441,22 @@ const InboxPage = () => {
 
   const getOtherUserId = (conversation: Conversation) => {
     const otherMember = conversation.members.find(
-      (member) => (member.userId || member.user?._id) !== currentUserId,
+      (member) => getMemberUserId(member) !== currentUserId,
     );
-    return otherMember?.userId || otherMember?.user?._id || "";
+    return otherMember ? getMemberUserId(otherMember) : "";
   };
+
+  const getOtherMemberDisplay = (conversation: Conversation) => {
+    const otherMember = conversation.members.find(
+      (member) => getMemberUserId(member) !== currentUserId,
+    );
+    return otherMember ? getMemberDisplay(otherMember) : null;
+  };
+
+  const activeDirectOtherDisplay =
+    currentConversation?.type === "direct"
+      ? getOtherMemberDisplay(currentConversation)
+      : null;
 
   const selectConversation = async (conversation: Conversation) => {
     await setActiveConversation(conversation._id);
@@ -529,7 +599,7 @@ const InboxPage = () => {
                 <div className="chat-conv-right">
                   {conv.lastMessageAt && (
                     <span className="chat-conv-time">
-                      {formatTime(conv.lastMessageAt)}
+                      {formatConversationDateTime(conv.lastMessageAt)}
                     </span>
                   )}
                 </div>
@@ -539,7 +609,9 @@ const InboxPage = () => {
 
           const otherId = getOtherUserId(conv);
           const other = convUserMap.get(otherId);
-          if (!other) return null;
+          const otherFromConversation = getOtherMemberDisplay(conv);
+          const displayName =
+            other?.fullName || otherFromConversation?.fullName || "User";
           return (
             <div
               key={conv._id}
@@ -547,18 +619,40 @@ const InboxPage = () => {
               onClick={() => selectConversation(conv)}
             >
               <div className="chat-avatar">
-                <UserAvatar user={other} />
+                {other ? (
+                  <UserAvatar user={other} />
+                ) : (
+                  <div
+                    style={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: "50%",
+                      border: "2px solid var(--border-base)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: "var(--surface-200)",
+                      fontSize: 12,
+                      fontWeight: 700,
+                      flexShrink: 0,
+                    }}
+                  >
+                    {getInitials(displayName)}
+                  </div>
+                )}
                 <div className="chat-avatar-online" />
               </div>
               <div className="chat-conv-meta">
-                <div className="chat-conv-name">{other.fullName}</div>
-                <div
-                  className="chat-conv-sub"
-                  style={{ textTransform: "capitalize" }}
-                >
-                  {getRoleName(other.role)}
-                  {other.address ? ` • ${other.address}` : ""}
-                </div>
+                <div className="chat-conv-name">{displayName}</div>
+                {other && (
+                  <div
+                    className="chat-conv-sub"
+                    style={{ textTransform: "capitalize" }}
+                  >
+                    {getRoleName(other.role)}
+                    {other.address ? ` • ${other.address}` : ""}
+                  </div>
+                )}
                 {conv.lastMessageText && (
                   <div className="chat-conv-last">{conv.lastMessageText}</div>
                 )}
@@ -566,7 +660,7 @@ const InboxPage = () => {
               <div className="chat-conv-right">
                 {conv.lastMessageAt && (
                   <span className="chat-conv-time">
-                    {formatTime(conv.lastMessageAt)}
+                    {formatConversationDateTime(conv.lastMessageAt)}
                   </span>
                 )}
               </div>
@@ -654,6 +748,7 @@ const InboxPage = () => {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div className="chat-thread-name">
                     {activeUser?.fullName ||
+                      activeDirectOtherDisplay?.fullName ||
                       currentConversation?.name ||
                       "Group Conversation"}
                   </div>
