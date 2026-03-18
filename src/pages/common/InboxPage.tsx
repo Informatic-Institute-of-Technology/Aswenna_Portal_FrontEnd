@@ -110,8 +110,17 @@ const getMessageSenderName = (message: Message): string => {
   return "User";
 };
 
+const toValidDate = (value: string | undefined | null): Date | null => {
+  if (!value || typeof value !== "string") return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return date;
+};
+
 const formatTime = (iso: string) => {
-  const d = new Date(iso);
+  const d = toValidDate(iso);
+  if (!d) return "";
+
   const now = new Date();
   const isToday =
     d.getDate() === now.getDate() &&
@@ -126,7 +135,9 @@ const formatTime = (iso: string) => {
 };
 
 const formatDayLabel = (iso: string) => {
-  const d = new Date(iso);
+  const d = toValidDate(iso);
+  if (!d) return "RECENT";
+
   const now = new Date();
   const diffDays = Math.floor((now.getTime() - d.getTime()) / 86400000);
   if (diffDays === 0) return "TODAY";
@@ -139,7 +150,9 @@ const formatDayLabel = (iso: string) => {
 };
 
 const formatConversationDateTime = (iso: string) => {
-  const d = new Date(iso);
+  const d = toValidDate(iso);
+  if (!d) return "";
+
   const now = new Date();
 
   const isToday =
@@ -445,7 +458,10 @@ const InboxPage = () => {
     const groups: { label: string; msgs: Message[] }[] = [];
     let lastDay = "";
     for (const m of msgs) {
-      const day = new Date(m.createdAt).toDateString();
+      const parsedDate = toValidDate(m.createdAt);
+      const day = parsedDate
+        ? parsedDate.toDateString()
+        : `fallback-${m._id || m.clientTempId || "msg"}`;
       if (day !== lastDay) {
         groups.push({ label: formatDayLabel(m.createdAt), msgs: [] });
         lastDay = day;
