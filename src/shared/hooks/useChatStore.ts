@@ -107,11 +107,41 @@ const getReadByUserIds = (readBy: Message["readBy"]): string[] => {
     .filter((id): id is string => !!id);
 };
 
+const resolveMessageTimestamp = (message: Message): string => {
+  const createdAt =
+    typeof message.createdAt === "string" ? message.createdAt : "";
+
+  if (createdAt) {
+    const createdAtDate = new Date(createdAt);
+    if (!Number.isNaN(createdAtDate.getTime())) {
+      return createdAtDate.toISOString();
+    }
+  }
+
+  const updatedAt = (message as { updatedAt?: string }).updatedAt;
+  if (typeof updatedAt === "string" && updatedAt) {
+    const updatedAtDate = new Date(updatedAt);
+    if (!Number.isNaN(updatedAtDate.getTime())) {
+      return updatedAtDate.toISOString();
+    }
+  }
+
+  return new Date().toISOString();
+};
+
 const normalizeMessage = (message: Message): Message => ({
   ...message,
   senderId: getMessageSenderId(message.senderId),
+  content: typeof message.content === "string" ? message.content : "",
   readBy: getReadByUserIds(message.readBy),
+  createdAt: resolveMessageTimestamp(message),
 });
+
+const shouldIgnoreIncomingMessage = (message: Message): boolean => {
+  if (!message._id || !message.conversationId) return true;
+  if (message.type === "text" && !message.content.trim()) return true;
+  return false;
+};
 
 const reconcileOptimistic = (
   messages: Message[],
@@ -493,11 +523,17 @@ export const useChatStore = ({
     }
 
     const offNew = chatSocket.on("message:new", (message) => {
+      const normalizedMessage = normalizeMessage(message);
+
+      if (shouldIgnoreIncomingMessage(normalizedMessage)) {
+        return;
+      }
+
       setMessagesByConversationId((prev) => ({
         ...prev,
-        [message.conversationId]: reconcileOptimistic(
-          prev[message.conversationId] || [],
-          message,
+        [normalizedMessage.conversationId]: reconcileOptimistic(
+          prev[normalizedMessage.conversationId] || [],
+          normalizedMessage,
           currentUserId,
         ),
       }));
@@ -505,11 +541,11 @@ export const useChatStore = ({
       setConversations((prev) =>
         sortConversations(
           prev.map((conversation) =>
-            conversation._id === message.conversationId
+            conversation._id === normalizedMessage.conversationId
               ? {
                   ...conversation,
-                  lastMessageText: message.content,
-                  lastMessageAt: message.createdAt,
+                  lastMessageText: normalizedMessage.content,
+                  lastMessageAt: normalizedMessage.createdAt,
                 }
               : conversation,
           ),
@@ -518,11 +554,22 @@ export const useChatStore = ({
     });
 
     const offSent = chatSocket.on("message:sent", (message) => {
+      const normalizedMessage = normalizeMessage(message);
+
+      if (getMessageSenderId(normalizedMessage.senderId) !== currentUserId) {
+        return;
+      }
+
+      if (shouldIgnoreIncomingMessage(normalizedMessage)) {
+        console.warn("[chat][store] ignored message:sent payload", message);
+        return;
+      }
+
       setMessagesByConversationId((prev) => ({
         ...prev,
-        [message.conversationId]: reconcileOptimistic(
-          prev[message.conversationId] || [],
-          message,
+        [normalizedMessage.conversationId]: reconcileOptimistic(
+          prev[normalizedMessage.conversationId] || [],
+          normalizedMessage,
           currentUserId,
         ),
       }));
