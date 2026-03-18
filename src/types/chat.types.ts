@@ -33,11 +33,27 @@ export interface Conversation {
 export interface Message {
   _id: string;
   conversationId: string;
-  senderId: string;
+  senderId:
+    | string
+    | {
+        _id?: string;
+        fullName?: string;
+        email?: string;
+      };
   content: string;
   type: "text" | string;
   createdAt: string;
-  readBy: string[];
+  readBy: Array<
+    | string
+    | {
+        userId:
+          | string
+          | {
+              _id?: string;
+            };
+        readAt?: string;
+      }
+  >;
   clientTempId?: string;
   status?: "sending" | "sent" | "failed";
 }

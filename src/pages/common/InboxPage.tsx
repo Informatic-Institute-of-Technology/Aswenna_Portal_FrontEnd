@@ -81,6 +81,33 @@ const getMemberDisplay = (member: Conversation["members"][number]) => {
   return null;
 };
 
+const getMessageSenderId = (message: Message): string => {
+  if (typeof message.senderId === "string") return message.senderId;
+  return message.senderId?._id || "";
+};
+
+const getReadByUserIds = (message: Message): string[] => {
+  if (!Array.isArray(message.readBy)) return [];
+
+  return message.readBy
+    .map((entry) => {
+      if (typeof entry === "string") return entry;
+      if (!entry || typeof entry !== "object") return "";
+
+      const userId = entry.userId;
+      if (typeof userId === "string") return userId;
+      return userId?._id || "";
+    })
+    .filter((id): id is string => !!id);
+};
+
+const getMessageSenderName = (message: Message): string => {
+  if (typeof message.senderId === "object" && message.senderId?.fullName) {
+    return message.senderId.fullName;
+  }
+  return "User";
+};
+
 const formatTime = (iso: string) => {
   const d = new Date(iso);
   const now = new Date();
@@ -372,10 +399,8 @@ const InboxPage = () => {
     const unreadIncomingIds = messages
       .filter(
         (message) =>
-          message.senderId !== currentUserId &&
-          !(Array.isArray(message.readBy) ? message.readBy : []).includes(
-            currentUserId,
-          ),
+          getMessageSenderId(message) !== currentUserId &&
+          !getReadByUserIds(message).includes(currentUserId),
       )
       .map((message) => message._id);
 
@@ -830,18 +855,37 @@ const InboxPage = () => {
                       <div className="chat-day-divider-line" />
                     </div>
                     {group.msgs.map((msg, messageIndex) => {
-                      const isSent = msg.senderId === currentUserId;
-                      const readBy = Array.isArray(msg.readBy)
-                        ? msg.readBy
-                        : [];
+                      const isSent = getMessageSenderId(msg) === currentUserId;
+                      const readBy = getReadByUserIds(msg);
+                      const senderName = getMessageSenderName(msg);
                       return (
                         <div
                           key={`${msg._id || msg.clientTempId || "msg"}-${msg.createdAt}-${messageIndex}`}
                           className={`chat-msg-row${isSent ? " sent" : ""}`}
                         >
-                          {!isSent && activeUser && (
-                            <UserAvatar user={activeUser} size={26} />
-                          )}
+                          {!isSent &&
+                            (activeUser ? (
+                              <UserAvatar user={activeUser} size={26} />
+                            ) : (
+                              <div
+                                style={{
+                                  width: 26,
+                                  height: 26,
+                                  borderRadius: "50%",
+                                  border: "1px solid var(--border-base)",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  background: "var(--surface-200)",
+                                  fontSize: 10,
+                                  fontWeight: 700,
+                                  flexShrink: 0,
+                                }}
+                                title={senderName}
+                              >
+                                {getInitials(senderName)}
+                              </div>
+                            ))}
                           <div>
                             <div
                               className={`chat-bubble ${isSent ? "sent" : "received"}`}
@@ -852,7 +896,10 @@ const InboxPage = () => {
                               className={`chat-bubble-time${!isSent ? " from-left" : ""}`}
                             >
                               {formatTime(msg.createdAt)}
-                              {isSent && readBy.length > 1 ? " • Read" : ""}
+                              {isSent &&
+                              readBy.some((readerId) => readerId !== currentUserId)
+                                ? " • Read"
+                                : ""}
                             </div>
                           </div>
                         </div>

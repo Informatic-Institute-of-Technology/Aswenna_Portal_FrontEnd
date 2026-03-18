@@ -87,9 +87,30 @@ const upsertConversation = (
   return sortConversations(next);
 };
 
+const getMessageSenderId = (senderId: Message["senderId"]): string => {
+  if (typeof senderId === "string") return senderId;
+  return senderId?._id || "";
+};
+
+const getReadByUserIds = (readBy: Message["readBy"]): string[] => {
+  if (!Array.isArray(readBy)) return [];
+
+  return readBy
+    .map((entry) => {
+      if (typeof entry === "string") return entry;
+      if (!entry || typeof entry !== "object") return "";
+
+      const userId = entry.userId;
+      if (typeof userId === "string") return userId;
+      return userId?._id || "";
+    })
+    .filter((id): id is string => !!id);
+};
+
 const normalizeMessage = (message: Message): Message => ({
   ...message,
-  readBy: Array.isArray(message.readBy) ? message.readBy : [],
+  senderId: getMessageSenderId(message.senderId),
+  readBy: getReadByUserIds(message.readBy),
 });
 
 const reconcileOptimistic = (
@@ -102,7 +123,7 @@ const reconcileOptimistic = (
   const optimisticIndex = messages.findIndex(
     (item) =>
       item.status === "sending" &&
-      item.senderId === currentUserId &&
+      getMessageSenderId(item.senderId) === currentUserId &&
       item.content === normalizedIncoming.content,
   );
 
@@ -389,7 +410,7 @@ export const useChatStore = ({
       setMessagesByConversationId((prev) => ({
         ...prev,
         [conversationId]: (prev[conversationId] || []).map((message) => {
-          const readBy = Array.isArray(message.readBy) ? message.readBy : [];
+          const readBy = getReadByUserIds(message.readBy);
 
           const shouldMark =
             !messageIds ||
@@ -538,19 +559,11 @@ export const useChatStore = ({
             ids.includes(message._id)
               ? {
                   ...message,
-                  readBy: (Array.isArray(message.readBy)
-                    ? message.readBy
-                    : []
-                  ).includes(currentUserId)
-                    ? Array.isArray(message.readBy)
-                      ? message.readBy
-                      : []
-                    : [
-                        ...(Array.isArray(message.readBy)
-                          ? message.readBy
-                          : []),
-                        currentUserId,
-                      ],
+                  readBy: getReadByUserIds(message.readBy).includes(
+                    currentUserId,
+                  )
+                    ? getReadByUserIds(message.readBy)
+                    : [...getReadByUserIds(message.readBy), currentUserId],
                 }
               : message,
         ),
