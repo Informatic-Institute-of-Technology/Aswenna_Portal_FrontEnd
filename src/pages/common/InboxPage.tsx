@@ -2,6 +2,8 @@ import { useAuth } from "@/Context/useAuth";
 import { adminService, type ApiUser } from "@/services/admin.service";
 import type { Conversation, Message } from "@/types/chat.types";
 import {
+  Check,
+  CheckCheck,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -285,7 +287,7 @@ const InboxPage = () => {
   );
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const conversationsListRef = useRef<HTMLDivElement>(null);
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -447,9 +449,12 @@ const InboxPage = () => {
     await sendTextMessage(inputText);
     setTyping(false);
     setInputText("");
+    if (inputRef.current) {
+      inputRef.current.style.height = "auto";
+    }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
@@ -838,15 +843,32 @@ const InboxPage = () => {
                     className="chat-thread-sub"
                     style={{ textTransform: "capitalize" }}
                   >
-                    {activeUser
-                      ? `${getRoleName(activeUser.role)}${activeUser.address ? ` • ${activeUser.address}` : ""}`
-                      : `group • ${currentConversation?.members.length || 0} members`}
-                    {activeTypingNames.length > 0
-                      ? ` • ${activeTypingNames.join(", ")} typing...`
-                      : ""}
-                    {connectionStatus !== "connected"
-                      ? ` • ${connectionStatus}`
-                      : ""}
+                    {activeTypingNames.length > 0 ? (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 6,
+                          color: "var(--color-brand-primary)",
+                        }}
+                      >
+                        <div className="typing-dots">
+                          <span className="dot"></span>
+                          <span className="dot"></span>
+                          <span className="dot"></span>
+                        </div>
+                        {activeTypingNames.join(", ")} typing...
+                      </div>
+                    ) : (
+                      <>
+                        {activeUser
+                          ? `${getRoleName(activeUser.role)}${activeUser.address ? ` • ${activeUser.address}` : ""}`
+                          : `group • ${currentConversation?.members.length || 0} members`}
+                        {connectionStatus !== "connected"
+                          ? ` • ${connectionStatus}`
+                          : ""}
+                      </>
+                    )}
                   </div>
                 </div>
                 <button
@@ -881,51 +903,96 @@ const InboxPage = () => {
                       const isSent = getMessageSenderId(msg) === currentUserId;
                       const readBy = getReadByUserIds(msg);
                       const senderName = getMessageSenderName(msg);
+
+                      const prevMsg = group.msgs[messageIndex - 1];
+                      const nextMsg = group.msgs[messageIndex + 1];
+                      const prevIsSame =
+                        prevMsg &&
+                        getMessageSenderId(prevMsg) === getMessageSenderId(msg);
+                      const nextIsSame =
+                        nextMsg &&
+                        getMessageSenderId(nextMsg) === getMessageSenderId(msg);
+                      const isFirstInSequence = !prevIsSame;
+                      const isLastInSequence = !nextIsSame;
+
+                      const isRead =
+                        isSent &&
+                        readBy.some((readerId) => readerId !== currentUserId);
+
                       return (
                         <div
                           key={`${msg._id || msg.clientTempId || "msg"}-${msg.createdAt}-${messageIndex}`}
-                          className={`chat-msg-row${isSent ? " sent" : ""}`}
+                          className={`chat-msg-row${isSent ? " sent" : ""}${isLastInSequence ? " last-in-seq" : ""}${isFirstInSequence ? " first-in-seq" : ""}`}
                         >
-                          {!isSent &&
-                            (activeUser ? (
-                              <UserAvatar user={activeUser} size={26} />
-                            ) : (
-                              <div
-                                style={{
-                                  width: 26,
-                                  height: 26,
-                                  borderRadius: "50%",
-                                  border: "1px solid var(--border-base)",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  background: "var(--surface-200)",
-                                  fontSize: 10,
-                                  fontWeight: 700,
-                                  flexShrink: 0,
-                                }}
-                                title={senderName}
-                              >
-                                {getInitials(senderName)}
-                              </div>
-                            ))}
-                          <div>
+                          {!isSent && (
                             <div
-                              className={`chat-bubble ${isSent ? "sent" : "received"}`}
+                              className="chat-msg-avatar-wrapper"
+                              style={{ width: 26, flexShrink: 0 }}
+                            >
+                              {isLastInSequence &&
+                                (activeUser ? (
+                                  <UserAvatar
+                                    user={activeUser}
+                                    size={26}
+                                    showBorder={false}
+                                  />
+                                ) : (
+                                  <div
+                                    style={{
+                                      width: 26,
+                                      height: 26,
+                                      borderRadius: "50%",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                      background: "var(--surface-200)",
+                                      fontSize: 10,
+                                      fontWeight: 700,
+                                      flexShrink: 0,
+                                    }}
+                                    title={senderName}
+                                  >
+                                    {getInitials(senderName)}
+                                  </div>
+                                ))}
+                            </div>
+                          )}
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: isSent ? "flex-end" : "flex-start",
+                              maxWidth: "75%",
+                            }}
+                          >
+                            <div
+                              className={`chat-bubble ${isSent ? "sent" : "received"} ${isFirstInSequence ? "first" : ""} ${isLastInSequence ? "last" : ""}`}
                             >
                               {msg.content}
                             </div>
-                            <div
-                              className={`chat-bubble-time${!isSent ? " from-left" : ""}`}
-                            >
-                              {formatTime(msg.createdAt)}
-                              {isSent &&
-                              readBy.some(
-                                (readerId) => readerId !== currentUserId,
-                              )
-                                ? " • Read"
-                                : ""}
-                            </div>
+                            {isLastInSequence && (
+                              <div
+                                className={`chat-bubble-time${!isSent ? " from-left" : ""}`}
+                              >
+                                {formatTime(msg.createdAt)}
+                                {isSent && (
+                                  <span
+                                    className="chat-read-receipt"
+                                    style={{ marginLeft: 4 }}
+                                  >
+                                    {isRead ? (
+                                      <CheckCheck
+                                        size={12}
+                                        className="text-brand-primary"
+                                        color="currentColor"
+                                      />
+                                    ) : (
+                                      <Check size={12} />
+                                    )}
+                                  </span>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                       );
@@ -939,15 +1006,20 @@ const InboxPage = () => {
                 <button className="chat-icon-btn" title="Attach">
                   <Paperclip size={15} />
                 </button>
-                <input
+                <textarea
                   ref={inputRef}
                   className="chat-text-input"
                   placeholder="Type a message..."
+                  rows={1}
                   value={inputText}
                   onChange={(e) => {
                     const value = e.target.value;
                     setInputText(value);
                     setTyping(value.trim().length > 0);
+                    // auto-resize
+                    e.target.style.height = "auto";
+                    e.target.style.height =
+                      Math.min(e.target.scrollHeight, 120) + "px";
                   }}
                   onKeyDown={handleKeyDown}
                   onBlur={() => setTyping(false)}
