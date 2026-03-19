@@ -12,6 +12,7 @@ export interface TypingUpdatePayload {
 export interface MessageReadPayload {
   conversationId: string;
   messageIds?: string[];
+  userId?: string;
 }
 
 type ServerEvents = {
@@ -22,6 +23,9 @@ type ServerEvents = {
   "typing:update": (payload: TypingUpdatePayload) => void;
   "message:read": (payload: MessageReadPayload) => void;
   "message:read:ack": (payload: MessageReadPayload) => void;
+  connect: () => void;
+  disconnect: () => void;
+  reconnect: () => void;
 };
 
 const toSocketBaseUrl = (apiBaseUrl: string): string =>
@@ -59,6 +63,11 @@ class ChatSocketService {
         Authorization: authorizationHeader,
       },
       withCredentials: true,
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      timeout: 20000,
     });
 
     this.bindCoreListeners();
@@ -93,6 +102,12 @@ class ChatSocketService {
 
   private bindCoreListeners(): void {
     if (!this.socket) return;
+
+    this.socket.on("connect", () => this.emitLocal("connect", undefined));
+    this.socket.on("disconnect", () => this.emitLocal("disconnect", undefined));
+    this.socket.io.on("reconnect", () =>
+      this.emitLocal("reconnect", undefined),
+    );
 
     this.socket.on(
       "conversation:joined",

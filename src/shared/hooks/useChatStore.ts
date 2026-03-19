@@ -298,8 +298,13 @@ export const useChatStore = ({
       await chatSocket.connect();
       setConnectionStatus("connected");
     } catch (error) {
-      setConnectionStatus("error");
-      handleError(error);
+      // Socket.io will automatically keep retrying, so we show it as "connecting" in the background
+      setConnectionStatus("connecting");
+      // Optionally suppress the hard error dialog so it doesn't annoy the user
+      console.warn(
+        "Socket connection failed. Retrying in background...",
+        error,
+      );
     }
   }, [handleError]);
 
@@ -561,6 +566,19 @@ export const useChatStore = ({
       loadConversations();
     }
 
+    const offConnect = chatSocket.on("connect", () =>
+      setConnectionStatus("connected"),
+    );
+    const offDisconnect = chatSocket.on("disconnect", () =>
+      setConnectionStatus("disconnected"),
+    );
+    const offReconnect = chatSocket.on("reconnect", () => {
+      setConnectionStatus("connected");
+      if (activeConversationRef.current) {
+        chatSocket.joinConversation(activeConversationRef.current);
+      }
+    });
+
     const offNew = chatSocket.on("message:new", (message) => {
       const normalizedMessage = normalizeMessage(message);
 
@@ -638,25 +656,34 @@ export const useChatStore = ({
       const ids = payload.messageIds || [];
       if (ids.length === 0) return;
 
+      // If backend provides the userId of who read it, use it.
+      // Otherwise, infer it: if we receive 'message:read', it implies the peer read it.
+      // We look up the message to see who sent it. If we sent it, and someone read it,
+      // and we don't know who (group chat without userId), we just put "peer" so it turns blue.
+      const fallbackReaderId = payload.userId || "peer";
+
       setMessagesByConversationId((prev) => ({
         ...prev,
         [payload.conversationId]: (prev[payload.conversationId] || []).map(
-          (message) =>
-            ids.includes(message._id)
-              ? {
-                  ...message,
-                  readBy: getReadByUserIds(message.readBy).includes(
-                    currentUserId,
-                  )
-                    ? getReadByUserIds(message.readBy)
-                    : [...getReadByUserIds(message.readBy), currentUserId],
-                }
-              : message,
+          (message) => {
+            if (!ids.includes(message._id)) return message;
+
+            const readBy = getReadByUserIds(message.readBy);
+            if (readBy.includes(fallbackReaderId)) return message;
+
+            return {
+              ...message,
+              readBy: [...message.readBy, fallbackReaderId],
+            };
+          },
         ),
       }));
     });
 
     return () => {
+      offConnect();
+      offDisconnect();
+      offReconnect();
       offNew();
       offSent();
       offTyping();

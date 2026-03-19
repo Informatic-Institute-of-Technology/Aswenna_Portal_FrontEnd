@@ -749,8 +749,69 @@ const InboxPage = () => {
       <div className="chat-layout">
         <div className={`chat-sidebar ${leftOpen ? "open" : "closed"}`}>
           <div className="chat-sidebar-header">
-            <div className="chat-sidebar-title">Conversations</div>
+            <div
+              className="chat-sidebar-title"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              Conversations
+              <div
+                className="connection-status-badge"
+                title={`Status: ${connectionStatus}`}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  fontSize: "10px",
+                  fontWeight: "normal",
+                  textTransform: "uppercase",
+                  color:
+                    connectionStatus === "connected"
+                      ? "var(--color-brand-primary)"
+                      : connectionStatus === "connecting"
+                        ? "var(--color-warning, #f59e0b)"
+                        : "var(--color-danger)",
+                  backgroundColor: "var(--bg-elevated)",
+                  padding: "2px 8px",
+                  borderRadius: "12px",
+                  border: "1px solid var(--border-base)",
+                }}
+              >
+                <div
+                  style={{
+                    width: "6px",
+                    height: "6px",
+                    borderRadius: "50%",
+                    backgroundColor:
+                      connectionStatus === "connected"
+                        ? "var(--color-brand-primary)"
+                        : connectionStatus === "connecting"
+                          ? "var(--color-warning, #f59e0b)"
+                          : "var(--color-danger)",
+                    boxShadow:
+                      connectionStatus === "connected"
+                        ? "0 0 6px var(--color-brand-primary)"
+                        : "none",
+                    animation:
+                      connectionStatus === "connecting"
+                        ? "pulse 1.5s infinite"
+                        : "none",
+                  }}
+                />
+                {connectionStatus}
+              </div>
+            </div>
             <div className="chat-search-wrap">
+              <style>
+                {`@keyframes pulse {
+                  0% { opacity: 0.5; }
+                  50% { opacity: 1; }
+                  100% { opacity: 0.5; }
+                }`}
+              </style>
               <Search size={13} className="chat-search-icon" />
               <input
                 type="text"
@@ -864,9 +925,6 @@ const InboxPage = () => {
                         {activeUser
                           ? `${getRoleName(activeUser.role)}${activeUser.address ? ` • ${activeUser.address}` : ""}`
                           : `group • ${currentConversation?.members.length || 0} members`}
-                        {connectionStatus !== "connected"
-                          ? ` • ${connectionStatus}`
-                          : ""}
                       </>
                     )}
                   </div>
