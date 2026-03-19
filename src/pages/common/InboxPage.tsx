@@ -13,6 +13,7 @@ import {
   Search,
   Send,
   Smile,
+  Trash2,
   User,
   X,
 } from "lucide-react";
@@ -303,6 +304,7 @@ const InboxPage = () => {
     sendTextMessage,
     setTyping,
     markRead,
+    deleteConversation,
     addGroupMember,
     removeGroupMember,
   } = useChatStore({
@@ -1217,6 +1219,25 @@ const InboxPage = () => {
                           </button>
                         </div>
                       )}
+
+                      <button
+                        className="chat-danger-btn"
+                        disabled={!currentConversation}
+                        onClick={async () => {
+                          if (!currentConversation) return;
+
+                          const confirmed = window.confirm(
+                            "Delete this conversation permanently?",
+                          );
+                          if (!confirmed) return;
+
+                          await deleteConversation(currentConversation._id);
+                          setActiveUser(null);
+                        }}
+                      >
+                        <Trash2 size={14} />
+                        Delete Conversation
+                      </button>
                     </div>
                   </div>
                 )}

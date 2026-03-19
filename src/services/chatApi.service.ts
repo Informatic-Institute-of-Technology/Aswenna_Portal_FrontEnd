@@ -121,6 +121,10 @@ class ChatApiService {
     );
   }
 
+  async deleteConversation(conversationId: string): Promise<void> {
+    await authClient.delete<unknown>(`/v1/conversations/${conversationId}`);
+  }
+
   async getMessages(
     conversationId: string,
     page: number = 1,

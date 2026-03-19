@@ -36,6 +36,7 @@ interface UseChatStoreResult {
     name: string,
     memberIds: string[],
   ) => Promise<string | null>;
+  deleteConversation: (conversationId: string) => Promise<void>;
   addGroupMember: (
     conversationId: string,
     userId: string,
@@ -478,6 +479,44 @@ export const useChatStore = ({
     [handleError, setActiveConversation],
   );
 
+  const deleteConversation = useCallback(
+    async (conversationId: string) => {
+      if (!conversationId) return;
+
+      try {
+        if (activeConversationRef.current === conversationId) {
+          chatSocket.leaveConversation(conversationId);
+        }
+
+        await chatApi.deleteConversation(conversationId);
+
+        setConversations((prev) =>
+          prev.filter((conversation) => conversation._id !== conversationId),
+        );
+
+        setMessagesByConversationId((prev) => {
+          const next = { ...prev };
+          delete next[conversationId];
+          return next;
+        });
+
+        setTypingByConversationId((prev) => {
+          const next = { ...prev };
+          delete next[conversationId];
+          return next;
+        });
+
+        if (activeConversationRef.current === conversationId) {
+          activeConversationRef.current = null;
+          setActiveConversationId(null);
+        }
+      } catch (error) {
+        handleError(error);
+      }
+    },
+    [handleError],
+  );
+
   const addGroupMember = useCallback(
     async (
       conversationId: string,
@@ -649,6 +688,7 @@ export const useChatStore = ({
     setTyping,
     markRead,
     createGroupConversation,
+    deleteConversation,
     addGroupMember,
     removeGroupMember,
     refreshActiveMessages,
