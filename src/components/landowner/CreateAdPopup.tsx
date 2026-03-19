@@ -280,7 +280,6 @@ const CreateAdPopup = ({
       open={open}
       onClose={onClose}
       maxWidth={false}
-      fullWidth
       PaperProps={{
         sx: {
           bgcolor: "transparent",
