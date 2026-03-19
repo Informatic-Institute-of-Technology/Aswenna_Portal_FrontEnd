@@ -6,20 +6,38 @@
  */
 
 export const FarmerJobType = {
-  HARVEST_CAPITAL: 'HARVEST_CAPITAL',
-  COMMISSION: 'COMMISSION'
+  HARVEST_CAPITAL: "HARVEST_CAPITAL",
+  COMMISSION: "COMMISSION",
 } as const;
 
-export type FarmerJobType = typeof FarmerJobType[keyof typeof FarmerJobType];
+export type FarmerJobType = (typeof FarmerJobType)[keyof typeof FarmerJobType];
 
 export const JobStatus = {
-  OPEN: 'OPEN',
-  IN_PROGRESS: 'IN_PROGRESS',
-  COMPLETED: 'COMPLETED',
-  CLOSED: 'CLOSED'
+  OPEN: "OPEN",
+  IN_PROGRESS: "IN_PROGRESS",
+  COMPLETED: "COMPLETED",
+  CLOSED: "CLOSED",
 } as const;
 
-export type JobStatus = typeof JobStatus[keyof typeof JobStatus];
+export type JobStatus = (typeof JobStatus)[keyof typeof JobStatus];
+
+/**
+ * Cost breakdown item for project funding requests
+ */
+export interface CostBreakdownItem {
+  category: string;
+  description: string;
+  estimatedCost: number;
+}
+
+/**
+ * Milestone breakdown item for project funding requests
+ */
+export interface MilestoneBreakdownItem {
+  milestone: string;
+  description: string;
+  estimatedAmount: number;
+}
 
 /**
  * Budget breakdown item for harvest capital requests
@@ -40,7 +58,7 @@ export interface PaymentInstallment {
   amount: number;
   dueDate: string; // ISO date
   milestone: string; // e.g., "Project Start", "Mid-season", "Harvest"
-  status?: 'pending' | 'paid' | 'overdue';
+  status?: "pending" | "paid" | "overdue";
   paidDate?: string;
 }
 
@@ -54,49 +72,68 @@ export interface InvestmentRequest {
   farmerId: string;
   farmerName: string;
   farmerImage?: string;
+  coverImageUrl?: string;
   farmerExperience?: number;
   farmerRating?: number;
-  
+
+  // Offer Type
+  offerType?: "harvest" | "commission";
+
   // Project Details
   projectTitle: string;
   description: string;
   cropType: string;
+  cropIcon?: string;
   cropVariety?: string;
-  landSize: number;
-  landSizeUnit: 'acres' | 'hectares';
+  landSize?: number;
+  landSizeUnit?: "acres" | "hectares";
   location: string;
-  district: string;
-  province: string;
-  
-  // Cost Breakdown (automatically calculated total)
-  costBreakdown: BudgetItem[];
-  totalInvestmentRequired: number; // Auto-calculated from costBreakdown
-  
-  // Investment Terms
+  preferredRegions?: string[];
+  district?: string;
+  province?: string;
+
+  // Cost & Milestone Breakdown
+  costBreakdown?: CostBreakdownItem[];
+  milestoneBreakdown?: MilestoneBreakdownItem[];
+  totalInvestmentRequired: number;
+
+  // Investment Terms (Harvest-based)
   fundingDeadline: string; // Last date to accept funding
-  installmentSchedule: PaymentInstallment[]; // 3 to 6 installments
-  expectedDuration: number; // in months
-  expectedYield: string;
+  installmentSchedule?: PaymentInstallment[]; // 3 to 6 installments
+  expectedDuration?: number; // in months
+  expectedYield?: string;
   expectedROI: number; // percentage
-  
+
+  // Commission-based Terms
+  commissionPercentage?: number;
+  investmentAmount?: number;
+  numberOfInstallments?: number;
+  expectedLandArea?: number;
+
   // Investor Details (null until accepted)
   investorId?: string;
   investorName?: string;
   investorCommissionRate?: number; // Investor adds this before accepting
   acceptedAt?: string;
-  
+
   // Status
-  status: 'open' | 'funded' | 'in-progress' | 'completed' | 'cancelled';
-  
+  status:
+    | "open"
+    | "funded"
+    | "in-progress"
+    | "completed"
+    | "cancelled"
+    | "draft";
+
   // Additional Details
-  farmingMethod: 'organic' | 'conventional' | 'mixed';
+  farmingMethod?: "organic" | "conventional" | "mixed";
   certifications?: string[];
   previousExperience?: string;
   collateral?: string;
-  
+
   // Metadata
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 /**
@@ -148,7 +185,7 @@ export interface CommissionJob extends BaseFarmerJob {
   jobType: typeof FarmerJobType.COMMISSION;
   serviceType: string; // harvesting, planting, maintenance, etc.
   rate: number;
-  rateType: 'HOURLY' | 'DAILY' | 'PROJECT' | 'PER_ACRE';
+  rateType: "HOURLY" | "DAILY" | "PROJECT" | "PER_ACRE";
   availability: string;
   skills: string[];
   yearsOfExperience: number;
