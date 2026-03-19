@@ -579,6 +579,38 @@ export const useChatStore = ({
       }
     });
 
+    const offSync = chatSocket.on("conversation:sync", (payload) => {
+      if (process.env.NODE_ENV === "development") {
+        console.log("[chat][store] received conversation:sync", payload);
+      }
+      if (payload.action === "created") {
+        // Fetch conversations again to get the new one.
+        loadConversations();
+      } else if (payload.action === "deleted") {
+        const conversationId = payload.conversationId;
+        setConversations((prev) =>
+          prev.filter((conversation) => conversation._id !== conversationId),
+        );
+
+        setMessagesByConversationId((prev) => {
+          const next = { ...prev };
+          delete next[conversationId];
+          return next;
+        });
+
+        setTypingByConversationId((prev) => {
+          const next = { ...prev };
+          delete next[conversationId];
+          return next;
+        });
+
+        if (activeConversationRef.current === conversationId) {
+          activeConversationRef.current = null;
+          setActiveConversationId(null);
+        }
+      }
+    });
+
     const offNew = chatSocket.on("message:new", (message) => {
       const normalizedMessage = normalizeMessage(message);
 
@@ -684,6 +716,7 @@ export const useChatStore = ({
       offConnect();
       offDisconnect();
       offReconnect();
+      offSync();
       offNew();
       offSent();
       offTyping();
