@@ -233,13 +233,12 @@ class AdminService {
       });
 
       if (query && query.trim()) {
-        params.set("query", query.trim());
+        params.set("search", query.trim());
       }
 
       const response = await httpClient.get<UsersResponse>(
         `/v1/user?${params.toString()}`,
       );
-      console.log("Fetched users:", response);
       return response;
     } catch (error) {
       console.error("Failed to fetch users:", error);

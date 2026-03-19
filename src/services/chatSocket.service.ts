@@ -15,9 +15,15 @@ export interface MessageReadPayload {
   userId?: string;
 }
 
+export interface ConversationSyncPayload {
+  action: "created" | "deleted";
+  conversationId: string;
+}
+
 type ServerEvents = {
   "conversation:joined": (payload: { conversationId: string }) => void;
   "conversation:left": (payload: { conversationId: string }) => void;
+  "conversation:sync": (payload: ConversationSyncPayload) => void;
   "message:new": (payload: Message) => void;
   "message:sent": (payload: Message) => void;
   "typing:update": (payload: TypingUpdatePayload) => void;
@@ -116,6 +122,9 @@ class ChatSocketService {
     );
     this.socket.on("conversation:left", (payload: { conversationId: string }) =>
       this.emitLocal("conversation:left", payload),
+    );
+    this.socket.on("conversation:sync", (payload: ConversationSyncPayload) =>
+      this.emitLocal("conversation:sync", payload),
     );
     this.socket.on("message:new", (payload: Message) =>
       this.emitLocal("message:new", payload),
