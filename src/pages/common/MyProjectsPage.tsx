@@ -840,13 +840,7 @@ const MyProjectsPage = () => {
     void refreshProjectsFromApi();
   }, [refreshProjectsFromApi]);
 
-  const hasActiveProject = selectActiveProjects(projectList).length > 0;
-
   const handleOpenDialog = () => {
-    if (hasActiveProject) {
-      return;
-    }
-
     setDialogOpen(true);
   };
 
@@ -1899,26 +1893,11 @@ const MyProjectsPage = () => {
             Create Farming Opportunity and view the status of your current
             farming plans.
           </Typography>
-          {hasActiveProject && (
-            <Typography
-              variant="caption"
-              sx={{
-                display: "block",
-                mt: 0.8,
-                color: "#fbbf24",
-                fontWeight: 600,
-              }}
-            >
-              Only one active project is allowed. Complete the current active
-              project before creating a new one.
-            </Typography>
-          )}
         </Box>
         <Button
           variant="outlined"
           startIcon={<AddIcon />}
           onClick={handleOpenDialog}
-          disabled={hasActiveProject}
           sx={{
             borderColor: "rgba(255,255,255,0.3)",
             color: "#fff",
