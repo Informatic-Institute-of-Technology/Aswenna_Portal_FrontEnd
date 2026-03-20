@@ -43,3 +43,24 @@ jobs:
       run: |
         echo "Build completed successfully!"
         ls -la dist/
+
+  deploy-to-azure:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/DEVELOPMENT' && github.event_name == 'push'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: dist
+        path: dist
+
+    - name: Deploy to Azure App Service
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: portal-aswenna-prod
+        publish-profile: ${{ secrets.AZURE_CREDENTIALS }}
+        package: dist
