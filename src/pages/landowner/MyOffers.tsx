@@ -794,7 +794,7 @@ const MyLandAdsPage = () => {
                 <CreateOfferButton
                   onClick={handleCreateAd}
                   label="Create New Ad"
-                  disabled={hasActiveLandProject}
+                  // disabled={hasActiveLandProject}
                 />
               </span>
             </Tooltip>
