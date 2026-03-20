@@ -1,14 +1,10 @@
 import { useAuth } from "@/Context/useAuth";
 import {
   AccountCircle,
-  Agriculture as AgriIcon,
   BarChart as BarChartIcon,
-  Gavel,
   Handshake,
   Home,
-  Landscape,
   Mail,
-  People,
   ShoppingCart as ReqIcon,
   Settings,
   TrendingUp,
@@ -42,37 +38,14 @@ const FarmerSidebar = () => {
       path: `${basePath}/dashboard/my-projects`,
     },
     {
-      text: "Investors",
-      icon: <People />,
-      path: `${basePath}/dashboard/investors`,
-    },
-    {
-      text: "Land Owners",
-      icon: <Landscape />,
-      path: `${basePath}/dashboard/land-owners`,
-    },
-    {
-      text: "Agreement",
-      icon: <Gavel />,
-      path: `${basePath}/dashboard/agreement`,
+      text: "Opportunities",
+      icon: <TrendingUp />,
+      path: `${basePath}/dashboard/opportunities`,
     },
     {
       text: "Match Making",
       icon: <Handshake />,
       path: `${basePath}/dashboard/match-making`,
-    },
-    {
-      text: "Opportunities",
-      icon: <TrendingUp />,
-      path: `${basePath}/dashboard/opportunities`,
-    },
-  ];
-
-  const operationsItems = [
-    {
-      text: "Crop Jobs",
-      icon: <AgriIcon />,
-      path: `${basePath}/dashboard/crop-jobs`,
     },
     {
       text: "Requests",
@@ -127,42 +100,6 @@ const FarmerSidebar = () => {
 
       <List sx={{ flex: 1, py: 2 }}>
         {menuItems.map((item) => (
-          <ListItemButton
-            key={item.path}
-            selected={location.pathname === item.path}
-            onClick={() => navigate(item.path)}
-          >
-            <ListItemIcon
-              sx={{
-                color:
-                  location.pathname === item.path ? "primary.main" : "inherit",
-              }}
-            >
-              {item.icon}
-            </ListItemIcon>
-            <ListItemText primary={item.text} />
-          </ListItemButton>
-        ))}
-      </List>
-
-      <Divider />
-
-      <Box sx={{ px: 2, pt: 1.5, pb: 0.5 }}>
-        <Typography
-          variant="caption"
-          sx={{
-            color: "primary.main",
-            fontWeight: 700,
-            textTransform: "uppercase",
-            letterSpacing: 1,
-            fontSize: 10,
-          }}
-        >
-          Operations
-        </Typography>
-      </Box>
-      <List sx={{ py: 0 }}>
-        {operationsItems.map((item) => (
           <ListItemButton
             key={item.path}
             selected={location.pathname === item.path}
