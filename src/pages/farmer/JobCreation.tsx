@@ -725,8 +725,6 @@ const CreateOfferDialog = ({
     }>,
   ) => {
     if (
-      !formData.projectName.trim() ||
-      !formData.description.trim() ||
       !formData.cropType.trim() ||
       !formData.farmingMethods.trim() ||
       !formData.expiryDate
@@ -734,7 +732,17 @@ const CreateOfferDialog = ({
       return "Please complete all required project details before creating the job.";
     }
 
-    if (!formData.cropIcon || !formData.coverImage) {
+    if (
+      offerType === "harvest" &&
+      (!formData.projectName.trim() || !formData.description.trim())
+    ) {
+      return "Please complete all required project details before creating the job.";
+    }
+
+    if (
+      offerType === "harvest" &&
+      (!formData.cropIcon || !formData.coverImage)
+    ) {
       return "Please select a crop icon and a cover image before creating the job.";
     }
 
@@ -858,12 +866,33 @@ const CreateOfferDialog = ({
           ? formData.selectedRegions[0]
           : landLocation || "Not specified";
 
+    const resolvedProjectName =
+      offerType === "commission"
+        ? formData.projectName.trim() ||
+          `${formData.cropType.trim() || "Farming"} Commission Project`
+        : formData.projectName.trim();
+
+    const resolvedProjectDescription =
+      offerType === "commission"
+        ? formData.description.trim() || "Commission-based farming project."
+        : formData.description.trim();
+
+    const resolvedCropIcon =
+      offerType === "commission"
+        ? formData.cropIcon || CROP_EMOJIS[0]
+        : formData.cropIcon;
+
+    const resolvedCoverImage =
+      offerType === "commission"
+        ? formData.coverImage || coverImageList[0]?.id || ""
+        : formData.coverImage;
+
     const payload: FarmerJobCreationPayload = {
       offerType,
-      projectName: formData.projectName.trim(),
+      projectName: resolvedProjectName,
       cropType: formData.cropType,
-      cropIcon: formData.cropIcon,
-      coverImage: formData.coverImage,
+      cropIcon: resolvedCropIcon,
+      coverImage: resolvedCoverImage,
       effectiveDateFrom:
         offerType === "harvest"
           ? formData.effectiveDateFrom
@@ -876,7 +905,7 @@ const CreateOfferDialog = ({
       landLocation,
       farmingMethods: formData.farmingMethods,
       agreementType: formData.agreementType,
-      description: formData.description.trim(),
+      description: resolvedProjectDescription,
       selectedRegions:
         offerType === "commission" ? formData.selectedRegions : [],
       expectedHarvest:
@@ -1360,27 +1389,31 @@ const CreateOfferDialog = ({
               </Box>
 
               <Box sx={{ display: "flex", flexDirection: "column", gap: 2.2 }}>
-                <TextField
-                  label="Project Name"
-                  value={formData.projectName}
-                  onChange={handleInputChange("projectName")}
-                  placeholder="e.g., Anuradhapura Paddy Cycle Q3"
-                  fullWidth
-                  required
-                  sx={textFieldStyles}
-                />
+                {offerType === "harvest" && (
+                  <>
+                    <TextField
+                      label="Project Name"
+                      value={formData.projectName}
+                      onChange={handleInputChange("projectName")}
+                      placeholder="e.g., Anuradhapura Paddy Cycle Q3"
+                      fullWidth
+                      required
+                      sx={textFieldStyles}
+                    />
 
-                <TextField
-                  label="Description"
-                  value={formData.description}
-                  onChange={handleInputChange("description")}
-                  placeholder="Describe project scope, outcomes, and investor expectations"
-                  multiline
-                  rows={3}
-                  fullWidth
-                  required
-                  sx={textFieldStyles}
-                />
+                    <TextField
+                      label="Description"
+                      value={formData.description}
+                      onChange={handleInputChange("description")}
+                      placeholder="Describe project scope, outcomes, and investor expectations"
+                      multiline
+                      rows={3}
+                      fullWidth
+                      required
+                      sx={textFieldStyles}
+                    />
+                  </>
+                )}
 
                 {offerType === "harvest" ? (
                   <TextField
@@ -1477,21 +1510,15 @@ const CreateOfferDialog = ({
                     gap: 2,
                   }}
                 >
-                  <FormControl fullWidth required sx={selectStyles}>
-                    <InputLabel>Crop Type</InputLabel>
-                    <Select
-                      value={formData.cropType}
-                      onChange={handleInputChange("cropType")}
-                      label="Crop Type"
-                    >
-                      <MenuItem value="rice">Rice</MenuItem>
-                      <MenuItem value="tea">Tea</MenuItem>
-                      <MenuItem value="pepper">Pepper</MenuItem>
-                      <MenuItem value="vegetables">Vegetables</MenuItem>
-                      <MenuItem value="fruits">Fruits</MenuItem>
-                      <MenuItem value="coconut">Coconut</MenuItem>
-                    </Select>
-                  </FormControl>
+                  <TextField
+                    label="Crop Type"
+                    value={formData.cropType}
+                    onChange={handleInputChange("cropType")}
+                    placeholder="e.g., Rice, Tea, Vegetables"
+                    fullWidth
+                    required
+                    sx={textFieldStyles}
+                  />
 
                   <FormControl fullWidth required sx={selectStyles}>
                     <InputLabel>Farming Methods</InputLabel>
@@ -2249,202 +2276,210 @@ const CreateOfferDialog = ({
             </Box>
           </Box>
 
-          <Box
-            sx={{
-              borderRadius: 2,
-              p: 2,
-              border: "1px solid rgba(255,255,255,0.1)",
-              bgcolor: "rgba(255,255,255,0.02)",
-            }}
-          >
-            <Typography
-              sx={{
-                color: "#CBD5E1",
-                fontWeight: 800,
-                fontSize: "0.82rem",
-                textTransform: "uppercase",
-                letterSpacing: 0.75,
-                mb: 1.2,
-              }}
-            >
-              Crop Icon
-            </Typography>
-
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
-                gap: 0.8,
-              }}
-            >
-              {CROP_EMOJIS.map((emoji) => (
-                <Button
-                  key={emoji}
-                  onClick={() => handleCropIconSelect(emoji)}
-                  sx={{
-                    minWidth: 0,
-                    p: 0,
-                    height: 44,
-                    borderRadius: 1.5,
-                    fontSize: "1.2rem",
-                    bgcolor:
-                      formData.cropIcon === emoji
-                        ? "rgba(133,164,70,0.22)"
-                        : "#141414",
-                    border:
-                      formData.cropIcon === emoji
-                        ? "1px solid rgba(133,164,70,0.85)"
-                        : "1px solid rgba(255,255,255,0.08)",
-                    color: "#E2E8F0",
-                    "&:hover": {
-                      bgcolor: "rgba(133,164,70,0.12)",
-                    },
-                  }}
-                >
-                  {emoji}
-                </Button>
-              ))}
-            </Box>
-          </Box>
-
-          <Box
-            sx={{
-              borderRadius: 2,
-              p: 2,
-              border: "1px solid rgba(255,255,255,0.1)",
-              bgcolor: "rgba(255,255,255,0.02)",
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                mb: 1.25,
-              }}
-            >
-              <Typography
-                sx={{
-                  color: "#CBD5E1",
-                  fontWeight: 800,
-                  fontSize: "0.82rem",
-                  textTransform: "uppercase",
-                  letterSpacing: 0.75,
-                }}
-              >
-                Cover Image
-              </Typography>
-              <Button
-                startIcon={<Upload sx={{ fontSize: 14 }} />}
-                size="small"
-                sx={{
-                  ml: "auto",
-                  color: "#A3E635",
-                  textTransform: "none",
-                  fontWeight: 700,
-                  fontSize: "0.68rem",
-                  minWidth: 0,
-                  px: 0.75,
-                  py: 0.2,
-                }}
-              >
-                Upload
-              </Button>
-            </Box>
-
-            {selectedCover && (
+          {offerType === "harvest" && (
+            <>
               <Box
                 sx={{
-                  position: "relative",
-                  width: "100%",
-                  aspectRatio: "16 / 9",
-                  borderRadius: 1.5,
-                  overflow: "hidden",
-                  mb: 1.5,
+                  borderRadius: 2,
+                  p: 2,
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  bgcolor: "rgba(255,255,255,0.02)",
+                }}
+              >
+                <Typography
+                  sx={{
+                    color: "#CBD5E1",
+                    fontWeight: 800,
+                    fontSize: "0.82rem",
+                    textTransform: "uppercase",
+                    letterSpacing: 0.75,
+                    mb: 1.2,
+                  }}
+                >
+                  Crop Icon
+                </Typography>
+
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
+                    gap: 0.8,
+                  }}
+                >
+                  {CROP_EMOJIS.map((emoji) => (
+                    <Button
+                      key={emoji}
+                      onClick={() => handleCropIconSelect(emoji)}
+                      sx={{
+                        minWidth: 0,
+                        p: 0,
+                        height: 44,
+                        borderRadius: 1.5,
+                        fontSize: "1.2rem",
+                        bgcolor:
+                          formData.cropIcon === emoji
+                            ? "rgba(133,164,70,0.22)"
+                            : "#141414",
+                        border:
+                          formData.cropIcon === emoji
+                            ? "1px solid rgba(133,164,70,0.85)"
+                            : "1px solid rgba(255,255,255,0.08)",
+                        color: "#E2E8F0",
+                        "&:hover": {
+                          bgcolor: "rgba(133,164,70,0.12)",
+                        },
+                      }}
+                    >
+                      {emoji}
+                    </Button>
+                  ))}
+                </Box>
+              </Box>
+
+              <Box
+                sx={{
+                  borderRadius: 2,
+                  p: 2,
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  bgcolor: "rgba(255,255,255,0.02)",
                 }}
               >
                 <Box
-                  component="img"
-                  src={selectedCover.url}
-                  alt={selectedCover.label}
-                  sx={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
-                <Box
                   sx={{
-                    position: "absolute",
-                    inset: 0,
-                    background:
-                      "linear-gradient(180deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.62) 100%)",
-                  }}
-                />
-                <Typography
-                  sx={{
-                    position: "absolute",
-                    left: 10,
-                    bottom: 8,
-                    color: "#F8FAFC",
-                    fontSize: "0.72rem",
-                    fontWeight: 700,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    mb: 1.25,
                   }}
                 >
-                  {selectedCover.label}
-                </Typography>
-                <Chip
-                  icon={<Check sx={{ fontSize: 12 }} />}
-                  label="Selected"
-                  size="small"
-                  sx={{
-                    position: "absolute",
-                    right: 8,
-                    top: 8,
-                    bgcolor: "#85A446",
-                    color: "#fff",
-                    fontWeight: 700,
-                    height: 20,
-                    fontSize: "0.62rem",
-                  }}
-                />
-              </Box>
-            )}
-
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
-                gap: 0.7,
-              }}
-            >
-              {coverImageList.map((image) => (
-                <Box
-                  key={image.id}
-                  onClick={() => handleCoverImageSelect(image.id)}
-                  sx={{
-                    position: "relative",
-                    borderRadius: 1.3,
-                    overflow: "hidden",
-                    aspectRatio: "1 / 1",
-                    cursor: "pointer",
-                    opacity: formData.coverImage === image.id ? 1 : 0.62,
-                    border:
-                      formData.coverImage === image.id
-                        ? "2px solid #85A446"
-                        : "1px solid rgba(255,255,255,0.08)",
-                    transition: "all 0.2s ease",
-                    "&:hover": {
-                      opacity: 0.95,
-                    },
-                  }}
-                >
-                  <Box
-                    component="img"
-                    src={image.url}
-                    alt={image.label}
-                    sx={{ width: "100%", height: "100%", objectFit: "cover" }}
-                  />
+                  <Typography
+                    sx={{
+                      color: "#CBD5E1",
+                      fontWeight: 800,
+                      fontSize: "0.82rem",
+                      textTransform: "uppercase",
+                      letterSpacing: 0.75,
+                    }}
+                  >
+                    Cover Image
+                  </Typography>
+                  <Button
+                    startIcon={<Upload sx={{ fontSize: 14 }} />}
+                    size="small"
+                    sx={{
+                      ml: "auto",
+                      color: "#A3E635",
+                      textTransform: "none",
+                      fontWeight: 700,
+                      fontSize: "0.68rem",
+                      minWidth: 0,
+                      px: 0.75,
+                      py: 0.2,
+                    }}
+                  >
+                    Upload
+                  </Button>
                 </Box>
-              ))}
-            </Box>
-          </Box>
+
+                {selectedCover && (
+                  <Box
+                    sx={{
+                      position: "relative",
+                      width: "100%",
+                      aspectRatio: "16 / 9",
+                      borderRadius: 1.5,
+                      overflow: "hidden",
+                      mb: 1.5,
+                    }}
+                  >
+                    <Box
+                      component="img"
+                      src={selectedCover.url}
+                      alt={selectedCover.label}
+                      sx={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        inset: 0,
+                        background:
+                          "linear-gradient(180deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.62) 100%)",
+                      }}
+                    />
+                    <Typography
+                      sx={{
+                        position: "absolute",
+                        left: 10,
+                        bottom: 8,
+                        color: "#F8FAFC",
+                        fontSize: "0.72rem",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {selectedCover.label}
+                    </Typography>
+                    <Chip
+                      icon={<Check sx={{ fontSize: 12 }} />}
+                      label="Selected"
+                      size="small"
+                      sx={{
+                        position: "absolute",
+                        right: 8,
+                        top: 8,
+                        bgcolor: "#85A446",
+                        color: "#fff",
+                        fontWeight: 700,
+                        height: 20,
+                        fontSize: "0.62rem",
+                      }}
+                    />
+                  </Box>
+                )}
+
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
+                    gap: 0.7,
+                  }}
+                >
+                  {coverImageList.map((image) => (
+                    <Box
+                      key={image.id}
+                      onClick={() => handleCoverImageSelect(image.id)}
+                      sx={{
+                        position: "relative",
+                        borderRadius: 1.3,
+                        overflow: "hidden",
+                        aspectRatio: "1 / 1",
+                        cursor: "pointer",
+                        opacity: formData.coverImage === image.id ? 1 : 0.62,
+                        border:
+                          formData.coverImage === image.id
+                            ? "2px solid #85A446"
+                            : "1px solid rgba(255,255,255,0.08)",
+                        transition: "all 0.2s ease",
+                        "&:hover": {
+                          opacity: 0.95,
+                        },
+                      }}
+                    >
+                      <Box
+                        component="img"
+                        src={image.url}
+                        alt={image.label}
+                        sx={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+            </>
+          )}
         </Box>
       </Box>
 

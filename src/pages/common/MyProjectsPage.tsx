@@ -110,15 +110,7 @@ const selectActiveProjects = (projects: Project[]) => {
   const explicitlyActive = projects.filter(
     (project) => project.status === "ACTIVE",
   );
-
-  if (explicitlyActive.length > 0) {
-    return [explicitlyActive[0]];
-  }
-
-  const inferredActive = projects.find(
-    (project) => project.status === "IN REVIEW",
-  );
-  return inferredActive ? [inferredActive] : [];
+  return explicitlyActive.length > 0 ? [explicitlyActive[0]] : [];
 };
 
 const initialProjects: Project[] = [
@@ -953,11 +945,6 @@ const MyProjectsPage = () => {
     [projectList],
   );
 
-  const inferredActiveProjectId =
-    activeProjects.length > 0 && activeProjects[0].status === "IN REVIEW"
-      ? activeProjects[0].id.toString()
-      : null;
-
   const activeOfferCards = useMemo(
     () =>
       activeProjects.slice(0, 1).map((project) => ({
@@ -983,13 +970,8 @@ const MyProjectsPage = () => {
   );
 
   const createdProjects = useMemo(
-    () =>
-      projectList.filter(
-        (project) =>
-          project.status === "IN REVIEW" &&
-          project.id.toString() !== inferredActiveProjectId,
-      ),
-    [projectList, inferredActiveProjectId],
+    () => projectList.filter((project) => project.status === "IN REVIEW"),
+    [projectList],
   );
 
   const pastProjects = useMemo(
@@ -1638,14 +1620,14 @@ const MyProjectsPage = () => {
                         variant="caption"
                         sx={{ color: "#808080", textTransform: "uppercase" }}
                       >
-                        Expected Harvest
+                        Expected ROI
                       </Typography>
                       <Typography
                         variant="body2"
                         sx={{ color: "#4caf50", fontWeight: 700 }}
                       >
-                        {project.expectedHarvest
-                          ? `${project.expectedHarvest.toLocaleString()} kg`
+                        {project.expectedROI > 0
+                          ? `${project.expectedROI}%`
                           : "Not specified"}
                       </Typography>
                     </Box>
