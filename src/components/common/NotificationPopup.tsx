@@ -16,8 +16,7 @@ import {
   Typography,
 } from "@mui/material";
 import { formatDistanceToNow } from "date-fns";
-import React, { useMemo, useState } from "react";
-import { notificationsData } from "../../data/json";
+import React, { useMemo } from "react";
 
 export interface NotificationMeta {
   requestId?: string;

@@ -143,7 +143,7 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
           <Stack direction="row" spacing={0.5} alignItems="center">
             <CalendarToday sx={{ fontSize: 14, color: 'var(--neutral-350)' }} />
             <Typography variant="caption" sx={{ color: 'var(--neutral-350)', fontSize: '0.75rem' }}>
-              Started {formatDate(request.createdAt)}
+              Started {request.createdAt ? formatDate(request.createdAt) : 'N/A'}
             </Typography>
           </Stack>
         </Stack>
@@ -247,7 +247,7 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
                 Payment Installments
               </Typography>
               <Typography variant="h5" fontWeight={700} sx={{ color: 'var(--text-primary)' }}>
-                {request.installmentSchedule.length}
+                {request.installmentSchedule?.length ?? 0}
               </Typography>
             </Box>
           </Box>
@@ -437,9 +437,9 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
                 </TableRow>
               </TableHead>
               <TableBody>
-                {request.costBreakdown.map((item) => (
+                {request.costBreakdown?.map((item, index) => (
                   <TableRow
-                    key={item.id}
+                    key={index}
                     sx={{
                       '&:hover': { bgcolor: 'var(--surface-tint)' },
                     }}
@@ -513,7 +513,7 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
               }}
             >
               <Typography variant="subtitle1" fontWeight={600} sx={{ color: 'var(--text-primary)', mb: 2 }}>
-                📅 Payment Schedule ({request.installmentSchedule.length} Installments)
+                📅 Payment Schedule ({request.installmentSchedule?.length ?? 0} Installments)
               </Typography>
 
               <TableContainer>
@@ -538,7 +538,7 @@ const InvestmentRequestDialog = ({ request, open, onClose, onInvest }: Investmen
                 </TableRow>
               </TableHead>
               <TableBody>
-                {request.installmentSchedule.map((installment) => (
+                {request.installmentSchedule?.map((installment) => (
                   <TableRow
                     key={installment.id}
                     sx={{

@@ -220,12 +220,19 @@ const InboxPage = () => {
       }
       setSearching(true);
       try {
-        const resp = await adminService.getAllUsers(1, 20, {
-          search: query.trim(),
-          sort: "-createdAt",
-        });
-        setSearchResults(resp.data.filter((u) => u._id !== currentUserId));
-        setSearchTotal(Math.max(0, resp.pagination.totalDocs));
+        const resp = await adminService.getAllUsers(1, 20);
+        const searchLower = query.trim().toLowerCase();
+        const filtered = resp.data
+          .filter((u) => u._id !== currentUserId)
+          .filter(
+            (u) =>
+              u.fullName?.toLowerCase().includes(searchLower) ||
+              u.email?.toLowerCase().includes(searchLower) ||
+              u.phoneNumber?.includes(query.trim())
+          )
+          .sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+        setSearchResults(filtered);
+        setSearchTotal(filtered.length);
       } catch (err) {
         console.error("Search failed:", err);
         setSearchResults([]);
