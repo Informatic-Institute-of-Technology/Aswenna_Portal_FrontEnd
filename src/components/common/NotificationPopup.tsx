@@ -72,23 +72,31 @@ const getNotificationIcon = (
     );
   }
 
-  if (type === "approval_status" || metaIcon === "check_circle" || newStatus === "accepted") {
+  if (
+    type === "approval_status" ||
+    metaIcon === "check_circle" ||
+    newStatus === "accepted"
+  ) {
     const isReject = metaIcon === "cancel" || newStatus === "rejected";
     const color = isReject ? "#F87171" : "#34D399";
-    const bg = isReject ? "rgba(248, 113, 113, 0.15)" : "rgba(52, 211, 153, 0.15)";
+    const bg = isReject
+      ? "rgba(248, 113, 113, 0.15)"
+      : "rgba(52, 211, 153, 0.15)";
     const IconComponent = isReject ? Cancel : CheckCircle;
     return (
-      <Box sx={{
-        color,
-        background: bg,
-        borderRadius: "50%",
-        width: 36,
-        height: 36,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexShrink: 0,
-      }}>
+      <Box
+        sx={{
+          color,
+          background: bg,
+          borderRadius: "50%",
+          width: 36,
+          height: 36,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}
+      >
         <IconComponent fontSize="small" />
       </Box>
     );
@@ -146,10 +154,7 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({
     };
   }, [notifications]);
 
-  const renderNotificationList = (
-    items: NotificationItem[],
-    label: string,
-  ) => {
+  const renderNotificationList = (items: NotificationItem[], label: string) => {
     if (items.length === 0) return null;
 
     return (
@@ -181,7 +186,9 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({
                 borderRadius: 2,
                 mx: 1,
                 transition: "all 0.2s",
-                background: n.read ? "transparent" : "rgba(255, 255, 255, 0.03)",
+                background: n.read
+                  ? "transparent"
+                  : "rgba(255, 255, 255, 0.03)",
                 "&:hover": {
                   background: "rgba(255, 255, 255, 0.06)",
                 },
@@ -317,7 +324,10 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({
             <NotificationsNone
               sx={{ fontSize: 48, color: "rgba(255,255,255,0.1)", mb: 2 }}
             />
-            <Typography variant="body1" sx={{ color: "#A1A1AA", fontWeight: 600 }}>
+            <Typography
+              variant="body1"
+              sx={{ color: "#A1A1AA", fontWeight: 600 }}
+            >
               No notifications yet
             </Typography>
             <Typography variant="caption" sx={{ color: "#71717A" }}>

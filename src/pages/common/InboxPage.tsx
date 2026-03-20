@@ -119,13 +119,20 @@ const UserAvatar = ({
   }
 
   const colors = [
-    "#2e7d52","#1565c0","#6a1b9a","#ad1457","#e65100",
-    "#2e7d32","#00695c","#37474f","#558b2f","#4527a0",
+    "#2e7d52",
+    "#1565c0",
+    "#6a1b9a",
+    "#ad1457",
+    "#e65100",
+    "#2e7d32",
+    "#00695c",
+    "#37474f",
+    "#558b2f",
+    "#4527a0",
   ];
   const colorIdx =
-    user.fullName
-      .split("")
-      .reduce((acc, c) => acc + c.charCodeAt(0), 0) % colors.length;
+    user.fullName.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0) %
+    colors.length;
   const bg = colors[colorIdx];
 
   return (
@@ -160,7 +167,9 @@ const InboxPage = () => {
 
   const [detailsOpen, setDetailsOpen] = useState(false);
 
-  const [convUserMap, setConvUserMap] = useState<Map<string, ApiUser>>(new Map());
+  const [convUserMap, setConvUserMap] = useState<Map<string, ApiUser>>(
+    new Map(),
+  );
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<ApiUser[]>([]);
@@ -228,7 +237,7 @@ const InboxPage = () => {
             (u) =>
               u.fullName?.toLowerCase().includes(searchLower) ||
               u.email?.toLowerCase().includes(searchLower) ||
-              u.phoneNumber?.includes(query.trim())
+              u.phoneNumber?.includes(query.trim()),
           )
           .sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
         setSearchResults(filtered);
@@ -334,7 +343,10 @@ const InboxPage = () => {
           <div className="chat-section-label">
             {searching ? (
               <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                <Loader2 size={10} style={{ animation: "spin 1s linear infinite" }} />
+                <Loader2
+                  size={10}
+                  style={{ animation: "spin 1s linear infinite" }}
+                />
                 Searching...
               </span>
             ) : (
@@ -360,7 +372,10 @@ const InboxPage = () => {
               </div>
               <div className="chat-conv-meta">
                 <div className="chat-conv-name">{u.fullName}</div>
-                <div className="chat-conv-sub" style={{ textTransform: "capitalize" }}>
+                <div
+                  className="chat-conv-sub"
+                  style={{ textTransform: "capitalize" }}
+                >
                   {getRoleName(u.role)}
                   {u.address ? ` • ${u.address}` : ""}
                 </div>
@@ -376,7 +391,9 @@ const InboxPage = () => {
         <div className="chat-list-empty">
           <MessageCircle size={28} style={{ opacity: 0.2 }} />
           <span>No conversations yet</span>
-          <span style={{ fontSize: 11, opacity: 0.6 }}>Search for a user to start chatting</span>
+          <span style={{ fontSize: 11, opacity: 0.6 }}>
+            Search for a user to start chatting
+          </span>
         </div>
       );
     }
@@ -400,7 +417,10 @@ const InboxPage = () => {
               </div>
               <div className="chat-conv-meta">
                 <div className="chat-conv-name">{other.fullName}</div>
-                <div className="chat-conv-sub" style={{ textTransform: "capitalize" }}>
+                <div
+                  className="chat-conv-sub"
+                  style={{ textTransform: "capitalize" }}
+                >
                   {getRoleName(other.role)}
                   {other.address ? ` • ${other.address}` : ""}
                 </div>
@@ -448,7 +468,10 @@ const InboxPage = () => {
                   onClick={() => setSearchQuery("")}
                 >
                   {searching ? (
-                    <Loader2 size={12} style={{ animation: "spin 1s linear infinite" }} />
+                    <Loader2
+                      size={12}
+                      style={{ animation: "spin 1s linear infinite" }}
+                    />
                   ) : (
                     <X size={12} />
                   )}
@@ -478,7 +501,10 @@ const InboxPage = () => {
                 <div className="chat-online-dot" />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div className="chat-thread-name">{activeUser.fullName}</div>
-                  <div className="chat-thread-sub" style={{ textTransform: "capitalize" }}>
+                  <div
+                    className="chat-thread-sub"
+                    style={{ textTransform: "capitalize" }}
+                  >
                     {getRoleName(activeUser.role)}
                     {activeUser.address ? ` • ${activeUser.address}` : ""}
                   </div>
@@ -506,19 +532,30 @@ const InboxPage = () => {
                   <div key={group.label}>
                     <div className="chat-day-divider">
                       <div className="chat-day-divider-line" />
-                      <span className="chat-day-divider-label">{group.label}</span>
+                      <span className="chat-day-divider-label">
+                        {group.label}
+                      </span>
                       <div className="chat-day-divider-line" />
                     </div>
                     {group.msgs.map((msg) => {
                       const isSent = msg.senderId === currentUserId;
                       return (
-                        <div key={msg.id} className={`chat-msg-row${isSent ? " sent" : ""}`}>
-                          {!isSent && <UserAvatar user={activeUser} size={26} />}
+                        <div
+                          key={msg.id}
+                          className={`chat-msg-row${isSent ? " sent" : ""}`}
+                        >
+                          {!isSent && (
+                            <UserAvatar user={activeUser} size={26} />
+                          )}
                           <div>
-                            <div className={`chat-bubble ${isSent ? "sent" : "received"}`}>
+                            <div
+                              className={`chat-bubble ${isSent ? "sent" : "received"}`}
+                            >
                               {msg.text}
                             </div>
-                            <div className={`chat-bubble-time${!isSent ? " from-left" : ""}`}>
+                            <div
+                              className={`chat-bubble-time${!isSent ? " from-left" : ""}`}
+                            >
                               {formatTime(msg.timestamp)}
                               {isSent && msg.read ? " • Read" : ""}
                             </div>
@@ -558,7 +595,13 @@ const InboxPage = () => {
           ) : (
             <div className="chat-empty" style={{ flex: 1 }}>
               <MessageCircle size={60} className="chat-empty-icon" />
-              <span style={{ fontSize: "var(--text-base)", fontWeight: "var(--font-semibold)", color: "var(--text-secondary)" }}>
+              <span
+                style={{
+                  fontSize: "var(--text-base)",
+                  fontWeight: "var(--font-semibold)",
+                  color: "var(--text-secondary)",
+                }}
+              >
                 Select a conversation
               </span>
               <span className="chat-empty-text">
@@ -601,30 +644,52 @@ const InboxPage = () => {
                   onClick={() => setDetailsOpen((v) => !v)}
                 >
                   <span>More Details</span>
-                  {detailsOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                  {detailsOpen ? (
+                    <ChevronUp size={13} />
+                  ) : (
+                    <ChevronDown size={13} />
+                  )}
                 </button>
 
                 {detailsOpen && (
                   <div className="chat-profile-body">
                     <div>
                       <div className="chat-profile-section-title">Contact</div>
-                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 8,
+                        }}
+                      >
                         {activeUser.email && (
                           <div className="chat-profile-info-row">
-                            <span className="chat-profile-info-label">Email</span>
-                            <span className="chat-profile-info-val">{activeUser.email}</span>
+                            <span className="chat-profile-info-label">
+                              Email
+                            </span>
+                            <span className="chat-profile-info-val">
+                              {activeUser.email}
+                            </span>
                           </div>
                         )}
                         {activeUser.phoneNumber && (
                           <div className="chat-profile-info-row">
-                            <span className="chat-profile-info-label">Phone</span>
-                            <span className="chat-profile-info-val">{activeUser.phoneNumber}</span>
+                            <span className="chat-profile-info-label">
+                              Phone
+                            </span>
+                            <span className="chat-profile-info-val">
+                              {activeUser.phoneNumber}
+                            </span>
                           </div>
                         )}
                         {activeUser.address && (
                           <div className="chat-profile-info-row">
-                            <span className="chat-profile-info-label">Location</span>
-                            <span className="chat-profile-info-val">{activeUser.address}</span>
+                            <span className="chat-profile-info-label">
+                              Location
+                            </span>
+                            <span className="chat-profile-info-val">
+                              {activeUser.address}
+                            </span>
                           </div>
                         )}
                       </div>
@@ -633,12 +698,26 @@ const InboxPage = () => {
                       <div className="chat-profile-section-title">Status</div>
                       <div className="chat-profile-info-row">
                         <span className="chat-profile-info-label">Account</span>
-                        <span className="chat-profile-info-val" style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                          <span style={{
-                            width: 7, height: 7, borderRadius: "50%",
-                            background: activeUser.emailVerified ? "var(--color-brand-primary)" : "var(--color-warning)",
-                            display: "inline-block", flexShrink: 0,
-                          }} />
+                        <span
+                          className="chat-profile-info-val"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 6,
+                          }}
+                        >
+                          <span
+                            style={{
+                              width: 7,
+                              height: 7,
+                              borderRadius: "50%",
+                              background: activeUser.emailVerified
+                                ? "var(--color-brand-primary)"
+                                : "var(--color-warning)",
+                              display: "inline-block",
+                              flexShrink: 0,
+                            }}
+                          />
                           {activeUser.emailVerified ? "Verified" : "Unverified"}
                         </span>
                       </div>
@@ -648,9 +727,14 @@ const InboxPage = () => {
               </div>
             </>
           ) : (
-            <div className="chat-empty" style={{ padding: "32px 14px", flex: 1 }}>
+            <div
+              className="chat-empty"
+              style={{ padding: "32px 14px", flex: 1 }}
+            >
               <User size={36} className="chat-empty-icon" />
-              <span className="chat-empty-text">Select a user to view their profile</span>
+              <span className="chat-empty-text">
+                Select a user to view their profile
+              </span>
             </div>
           )}
         </div>
