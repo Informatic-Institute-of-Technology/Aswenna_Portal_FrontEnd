@@ -38,6 +38,7 @@ import CreateAdPopup, {
   type LandAdFormValues,
 } from "../../components/landowner/CreateAdPopup";
 import { comprehensiveProjectsData } from "../../data/json";
+import { createLandownerAd } from "../../services/landownerAds.service";
 import Notification from "../../shared/components/Notification";
 import { useNotification } from "../../shared/hooks/useNotification";
 
@@ -172,6 +173,15 @@ const formatRentalAmount = (value: string) => {
 
 const formatAvailability = (ad: LandAdFormValues) =>
   `${formatDateLabel(ad.availableFrom)} - ${formatDateLabel(ad.availableTo)}`;
+
+const toUtcIsoFromDateInput = (value: string): string => {
+  if (!value) return "";
+
+  const [year, month, day] = value.split("-").map(Number);
+  if (!year || !month || !day) return value;
+
+  return new Date(Date.UTC(year, month - 1, day)).toISOString();
+};
 
 const toLandAdFormValues = (ad: LandAd): LandAdFormValues => ({
   title: ad.title,
@@ -390,22 +400,9 @@ const MyLandAdsPage = () => {
     () => landAds.filter((ad) => ad.status === "open"),
     [landAds],
   );
-
-  const hasActiveLandProject = useMemo(
-    () =>
-      landAds.some((ad) => ad.status === "open" || ad.status === "allocated") ||
-      activeProjects.length > 0,
-    [activeProjects.length, landAds],
-  );
+  const showPortfolioSections = true;
 
   const handleCreateAd = () => {
-    if (hasActiveLandProject) {
-      showWarning(
-        "Only one active land project is allowed. Complete or close the current active item first.",
-      );
-      return;
-    }
-
     setLandAdDialogMode("create");
     setEditingLandAdId(null);
     setLandAdDraft(buildPrefilledAdFromUser(user));
@@ -437,7 +434,7 @@ const MyLandAdsPage = () => {
     setLandAdDialogOpen(true);
   };
 
-  const handleSubmitLandAd = (values: LandAdFormValues) => {
+  const handleSubmitLandAd = async (values: LandAdFormValues) => {
     if (landAdDialogMode === "edit" && editingLandAdId !== null) {
       setLandAds((currentAds) =>
         currentAds.map((ad) =>
@@ -448,11 +445,32 @@ const MyLandAdsPage = () => {
       return;
     }
 
-    if (hasActiveLandProject) {
-      showWarning(
-        "Cannot publish a new ad while you already have an active land project.",
-      );
-      return;
+    if (!user?._id) {
+      showWarning("Unable to create ad. Missing user ID.");
+      throw new Error("Missing user ID");
+    }
+
+    const payload = {
+      landOwner: user._id,
+      title: values.title.trim(),
+      location: values.location.trim(),
+      landArea: values.landArea.trim(),
+      availableFrom: toUtcIsoFromDateInput(values.availableFrom),
+      availableTo: toUtcIsoFromDateInput(values.availableTo),
+      soilType: values.soilType.trim(),
+      rentalAmount: values.rentalAmount.trim(),
+      landHistory: values.landHistory.trim(),
+      ...(values.additionalInfo.trim()
+        ? { additionalInfo: values.additionalInfo.trim() }
+        : {}),
+    };
+
+    try {
+      await createLandownerAd(payload);
+    } catch (error) {
+      console.error("[MyOffers] Create landowner ad failed:", error);
+      showWarning("Failed to publish land advertisement. Please try again.");
+      throw error;
     }
 
     setLandAds((currentAds) => [
@@ -783,21 +801,10 @@ const MyLandAdsPage = () => {
             </Typography>
           </div>
           <div className="col-12 col-lg-4 d-flex justify-content-lg-end align-items-center gap-2 mt-3 mt-lg-0">
-            <Tooltip
-              title={
-                hasActiveLandProject
-                  ? "Only one active land project is allowed. Complete or close your current active item before creating a new one."
-                  : ""
-              }
-            >
-              <span>
-                <CreateOfferButton
-                  onClick={handleCreateAd}
-                  label="Create New Ad"
-                  // disabled={hasActiveLandProject}
-                />
-              </span>
-            </Tooltip>
+            <CreateOfferButton
+              onClick={handleCreateAd}
+              label="Create New Ad"
+            />
             <Tooltip title="Settings">
               <IconButton
                 sx={{
@@ -813,7 +820,9 @@ const MyLandAdsPage = () => {
         </div>
       </Box>
 
-      <section className="mb-5">
+      {showPortfolioSections && (
+        <>
+          <section className="mb-5">
         <SectionTitle
           title="My Land Ads"
           accent="linear-gradient(180deg, #f59e0b 0%, #fbbf24 100%)"
@@ -903,7 +912,9 @@ const MyLandAdsPage = () => {
             description="Completed collaborations involving your land will appear here."
           />
         )}
-      </section>
+          </section>
+        </>
+      )}
 
       <CreateAdPopup
         open={landAdDialogOpen}

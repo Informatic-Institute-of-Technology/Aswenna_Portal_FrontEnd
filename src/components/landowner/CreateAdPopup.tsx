@@ -16,7 +16,7 @@ import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 interface CreateAdPopupProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (values: LandAdFormValues) => void;
+  onSubmit: (values: LandAdFormValues) => void | Promise<void>;
   initialValues?: LandAdFormValues | null;
   mode?: "create" | "edit";
 }
@@ -246,10 +246,14 @@ const CreateAdPopup = ({
     return Object.keys(nextErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validateForm()) return;
-    onSubmit(formData);
-    onClose();
+    try {
+      await onSubmit(formData);
+      onClose();
+    } catch {
+      // Parent already handles the notification; keep dialog open for retry.
+    }
   };
 
   const landHistoryOptions = [
@@ -309,7 +313,7 @@ const CreateAdPopup = ({
       }}
     >
       <div
-        className="font-['Manrope'] text-slate-100 rounded-2xl flex flex-col overflow-hidden"
+        className="text-slate-100 rounded-2xl flex flex-col overflow-hidden"
         style={{ background: "#0a0a0a", width: 960, maxHeight: "92vh" }}
       >
         <div
