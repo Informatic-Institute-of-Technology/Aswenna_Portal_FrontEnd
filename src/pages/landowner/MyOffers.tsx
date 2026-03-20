@@ -27,7 +27,7 @@ import {
   Typography,
 } from "@mui/material";
 import type { ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { OfferCardProps } from "../../components/investor";
 import {
   CreateOfferButton,
@@ -38,14 +38,20 @@ import CreateAdPopup, {
   type LandAdFormValues,
 } from "../../components/landowner/CreateAdPopup";
 import { comprehensiveProjectsData } from "../../data/json";
-import { createLandownerAd } from "../../services/landownerAds.service";
+import {
+  createLandownerAd,
+  deleteLandownerAd,
+  getLandownerAds,
+  type LandownerAdApiItem,
+  updateLandownerAd,
+} from "../../services/landownerAds.service";
 import Notification from "../../shared/components/Notification";
 import { useNotification } from "../../shared/hooks/useNotification";
 
 type LandAdStatus = "open" | "allocated" | "expired";
 
 interface LandAd extends LandAdFormValues {
-  id: number;
+  id: string;
   status: LandAdStatus;
   projectName?: string;
   investorRequests: number;
@@ -54,64 +60,6 @@ interface LandAd extends LandAdFormValues {
 const DEFAULT_LAND_IMAGE =
   "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=900";
 
-const INITIAL_LAND_ADS: LandAd[] = [
-  {
-    id: 1,
-    title: "North Valley Seasonal Lease",
-    location: "North Valley Farm",
-    landArea: "25 acres",
-    availableFrom: "2026-03-01",
-    availableTo: "2026-12-15",
-    soilType: "loamy",
-    rentalAmount: "50000",
-    waterAccess: "irrigation",
-    landHistory: "organic-previous",
-    additionalInfo:
-      "Flat access roads, irrigation lines installed, and suitable for paddy or seasonal vegetables.",
-    image:
-      "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=900",
-    status: "open",
-    investorRequests: 4,
-  },
-  {
-    id: 2,
-    title: "Sunrise Fields Allocation",
-    location: "Sunrise Fields",
-    landArea: "15 acres",
-    availableFrom: "2026-04-01",
-    availableTo: "2026-11-30",
-    soilType: "clay",
-    rentalAmount: "35000",
-    waterAccess: "canal",
-    landHistory: "conventional-previous",
-    additionalInfo:
-      "Canal-fed plot with easy truck access and fenced perimeter.",
-    image:
-      "https://images.unsplash.com/photo-1500076656116-558758c991c1?w=900",
-    status: "allocated",
-    projectName: "Organic Wheat Cultivation",
-    investorRequests: 0,
-  },
-  {
-    id: 3,
-    title: "Green Meadows Renewal",
-    location: "Green Meadows",
-    landArea: "30 acres",
-    availableFrom: "2026-01-10",
-    availableTo: "2026-08-20",
-    soilType: "sandy",
-    rentalAmount: "45000",
-    waterAccess: "well-water",
-    landHistory: "crop-rotation",
-    additionalInfo:
-      "Previous rice cycle completed successfully. Land is ready for a new seasonal partnership.",
-    image:
-      "https://images.unsplash.com/photo-1464226180484-05a7a0c82715?w=900",
-    status: "expired",
-    projectName: "Rice Cultivation",
-    investorRequests: 0,
-  },
-];
 
 const EMPTY_LAND_AD: LandAdFormValues = {
   title: "",
@@ -174,6 +122,14 @@ const formatRentalAmount = (value: string) => {
 const formatAvailability = (ad: LandAdFormValues) =>
   `${formatDateLabel(ad.availableFrom)} - ${formatDateLabel(ad.availableTo)}`;
 
+const normalizeAdStatus = (status?: string): LandAdStatus => {
+  const normalized = status?.toLowerCase();
+  if (normalized === "active" || normalized === "open") return "open";
+  if (normalized === "allocated" || normalized === "joined") return "allocated";
+  if (normalized === "expired" || normalized === "completed") return "expired";
+  return "open";
+};
+
 const toUtcIsoFromDateInput = (value: string): string => {
   if (!value) return "";
 
@@ -201,6 +157,13 @@ const normalizeString = (value: unknown): string => {
   if (typeof value === "string") return value.trim();
   if (typeof value === "number") return String(value);
   return "";
+};
+
+const toNumberOrString = (value: string): string | number => {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  const numericValue = Number(trimmed);
+  return Number.isNaN(numericValue) ? trimmed : numericValue;
 };
 
 const buildPrefilledAdFromUser = (user: User | null): LandAdFormValues => {
@@ -345,19 +308,21 @@ const MyLandAdsPage = () => {
   const { user } = useAuth();
   const { notification, showSuccess, showWarning, hideNotification } =
     useNotification();
-  const [landAds, setLandAds] = useState<LandAd[]>(INITIAL_LAND_ADS);
+  const [landAds, setLandAds] = useState<LandAd[]>([]);
+  const [adsLoading, setAdsLoading] = useState(false);
+  const [hasExistingAdFromServer, setHasExistingAdFromServer] = useState(false);
   const [landAdDialogOpen, setLandAdDialogOpen] = useState(false);
   const [landAdDialogMode, setLandAdDialogMode] = useState<"create" | "edit">(
     "create",
   );
   const [landAdDraft, setLandAdDraft] = useState<LandAdFormValues>(EMPTY_LAND_AD);
-  const [editingLandAdId, setEditingLandAdId] = useState<number | null>(null);
+  const [editingLandAdId, setEditingLandAdId] = useState<string | null>(null);
   const [selectedLandAd, setSelectedLandAd] = useState<LandAd | null>(null);
   const [landAdDetailsOpen, setLandAdDetailsOpen] = useState(false);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<OfferCardProps | null>(null);
   const [deleteAdDialogOpen, setDeleteAdDialogOpen] = useState(false);
-  const [adToDeleteId, setAdToDeleteId] = useState<number | null>(null);
+  const [adToDeleteId, setAdToDeleteId] = useState<string | null>(null);
 
   const userDisplayName =
     user?.fullName || [user?.firstName, user?.lastName].filter(Boolean).join(" ") || "You";
@@ -396,20 +361,94 @@ const MyLandAdsPage = () => {
     [allProjects],
   );
 
-  const createdAds = useMemo(
-    () => landAds.filter((ad) => ad.status === "open"),
-    [landAds],
-  );
+  const createdAds = useMemo(() => landAds, [landAds]);
+  const hasExistingLandAd = hasExistingAdFromServer || createdAds.length > 0;
   const showPortfolioSections = true;
 
+  const fetchAds = async () => {
+    setAdsLoading(true);
+    try {
+      const response = await getLandownerAds();
+
+      const responseAny = response as unknown as {
+        data?: unknown;
+        items?: unknown;
+        docs?: unknown;
+        pagination?: { totalDocs?: number };
+      };
+
+      const nestedData = responseAny.data as
+        | {
+            data?: unknown;
+            items?: unknown;
+            docs?: unknown;
+            pagination?: { totalDocs?: number };
+          }
+        | undefined;
+
+      const rawAds = Array.isArray(responseAny.data)
+        ? responseAny.data
+        : Array.isArray(nestedData?.data)
+          ? nestedData.data
+          : Array.isArray(responseAny.items)
+            ? responseAny.items
+            : Array.isArray(nestedData?.items)
+              ? nestedData.items
+              : Array.isArray(responseAny.docs)
+                ? responseAny.docs
+                : Array.isArray(nestedData?.docs)
+                  ? nestedData.docs
+                  : [];
+
+      const totalDocs =
+        responseAny.pagination?.totalDocs ?? nestedData?.pagination?.totalDocs ?? 0;
+
+      const mapped = (rawAds as LandownerAdApiItem[]).map(
+        (item: LandownerAdApiItem): LandAd => ({
+          id: item._id,
+          title: item.title || "",
+          location: item.location || "",
+          landArea: normalizeString(item.landArea),
+          availableFrom: item.availableFrom || "",
+          availableTo: item.availableTo || "",
+          soilType: normalizeString(item.soilType),
+          rentalAmount: normalizeString(item.rentalAmount),
+          waterAccess: "",
+          landHistory: normalizeString(item.landHistory),
+          additionalInfo: normalizeString(item.additionalInfo),
+          image: item.image || "",
+          status: normalizeAdStatus(item.status),
+          investorRequests: 0,
+        }),
+      );
+      setLandAds(mapped);
+      setHasExistingAdFromServer(totalDocs > 0 || mapped.length > 0);
+    } catch (error) {
+      console.error("[MyOffers] Failed to fetch land ads:", error);
+      setHasExistingAdFromServer(false);
+    } finally {
+      setAdsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user?._id) void fetchAds();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?._id]);
+
   const handleCreateAd = () => {
+    if (hasExistingLandAd) {
+      showWarning("You can create only one land ad. Edit or delete the existing ad.");
+      return;
+    }
+
     setLandAdDialogMode("create");
     setEditingLandAdId(null);
     setLandAdDraft(buildPrefilledAdFromUser(user));
     setLandAdDialogOpen(true);
   };
 
-  const handleEditAd = (adId: number) => {
+  const handleEditAd = (adId: string) => {
     const ad = landAds.find((item) => item.id === adId);
     if (!ad) return;
 
@@ -419,7 +458,7 @@ const MyLandAdsPage = () => {
     setLandAdDialogOpen(true);
   };
 
-  const handleCreateNewSeason = (adId: number) => {
+  const handleCreateNewSeason = (adId: string) => {
     const ad = landAds.find((item) => item.id === adId);
     if (!ad) return;
 
@@ -436,11 +475,29 @@ const MyLandAdsPage = () => {
 
   const handleSubmitLandAd = async (values: LandAdFormValues) => {
     if (landAdDialogMode === "edit" && editingLandAdId !== null) {
-      setLandAds((currentAds) =>
-        currentAds.map((ad) =>
-          ad.id === editingLandAdId ? { ...ad, ...values } : ad,
-        ),
-      );
+      const updatePayload = {
+        title: values.title.trim(),
+        location: values.location.trim(),
+        landArea: toNumberOrString(values.landArea),
+        availableFrom: toUtcIsoFromDateInput(values.availableFrom),
+        availableTo: toUtcIsoFromDateInput(values.availableTo),
+        soilType: values.soilType.trim(),
+        rentalAmount: toNumberOrString(values.rentalAmount),
+        landHistory: values.landHistory.trim(),
+        ...(values.additionalInfo.trim()
+          ? { additionalInfo: values.additionalInfo.trim() }
+          : { additionalInfo: "" }),
+      };
+
+      try {
+        await updateLandownerAd(editingLandAdId, updatePayload);
+      } catch (error) {
+        console.error("[MyOffers] Update landowner ad failed:", error);
+        showWarning("Failed to update land advertisement. Please try again.");
+        throw error;
+      }
+
+      void fetchAds();
       showSuccess("Land advertisement updated successfully.");
       return;
     }
@@ -454,11 +511,11 @@ const MyLandAdsPage = () => {
       landOwner: user._id,
       title: values.title.trim(),
       location: values.location.trim(),
-      landArea: values.landArea.trim(),
+      landArea: toNumberOrString(values.landArea),
       availableFrom: toUtcIsoFromDateInput(values.availableFrom),
       availableTo: toUtcIsoFromDateInput(values.availableTo),
       soilType: values.soilType.trim(),
-      rentalAmount: values.rentalAmount.trim(),
+      rentalAmount: toNumberOrString(values.rentalAmount),
       landHistory: values.landHistory.trim(),
       ...(values.additionalInfo.trim()
         ? { additionalInfo: values.additionalInfo.trim() }
@@ -473,20 +530,11 @@ const MyLandAdsPage = () => {
       throw error;
     }
 
-    setLandAds((currentAds) => [
-      {
-        id: Date.now(),
-        ...values,
-        image: values.image || DEFAULT_LAND_IMAGE,
-        status: "open",
-        investorRequests: 0,
-      },
-      ...currentAds,
-    ]);
     showSuccess("Land advertisement published successfully.");
+    void fetchAds();
   };
 
-  const handleViewLandAd = (adId: number) => {
+  const handleViewLandAd = (adId: string) => {
     const ad = landAds.find((item) => item.id === adId);
     if (!ad) return;
 
@@ -494,15 +542,25 @@ const MyLandAdsPage = () => {
     setLandAdDetailsOpen(true);
   };
 
-  const handleDeleteAd = (adId: number) => {
+  const handleDeleteAd = (adId: string) => {
     setAdToDeleteId(adId);
     setDeleteAdDialogOpen(true);
   };
 
-  const handleConfirmDeleteAd = () => {
+  const handleConfirmDeleteAd = async () => {
     if (adToDeleteId === null) return;
-    setLandAds((prev) => prev.filter((ad) => ad.id !== adToDeleteId));
-    showSuccess("Land advertisement removed.");
+    try {
+      await deleteLandownerAd(adToDeleteId);
+      setLandAds((prev) => {
+        const updated = prev.filter((ad) => ad.id !== adToDeleteId);
+        setHasExistingAdFromServer(updated.length > 0);
+        return updated;
+      });
+      showSuccess("Land advertisement removed.");
+    } catch (error) {
+      console.error("[MyOffers] Delete land ad failed:", error);
+      showWarning("Failed to remove the advertisement. Please try again.");
+    }
     setDeleteAdDialogOpen(false);
     setAdToDeleteId(null);
   };
@@ -801,10 +859,21 @@ const MyLandAdsPage = () => {
             </Typography>
           </div>
           <div className="col-12 col-lg-4 d-flex justify-content-lg-end align-items-center gap-2 mt-3 mt-lg-0">
-            <CreateOfferButton
-              onClick={handleCreateAd}
-              label="Create New Ad"
-            />
+            <Tooltip
+              title={
+                hasExistingLandAd
+                  ? "Only one land ad is allowed. Edit or delete your current ad."
+                  : ""
+              }
+            >
+              <span>
+                <CreateOfferButton
+                  onClick={handleCreateAd}
+                  label="Create New Ad"
+                  disabled={hasExistingLandAd || adsLoading}
+                />
+              </span>
+            </Tooltip>
             <Tooltip title="Settings">
               <IconButton
                 sx={{
@@ -827,7 +896,11 @@ const MyLandAdsPage = () => {
           title="My Land Ads"
           accent="linear-gradient(180deg, #f59e0b 0%, #fbbf24 100%)"
         />
-        {createdAds.length > 0 ? (
+        {adsLoading ? (
+          <Box sx={{ textAlign: "center", py: 6 }}>
+            <Typography color="text.secondary">Loading your land ads…</Typography>
+          </Box>
+        ) : createdAds.length > 0 ? (
           <div className="row g-4">
             {createdAds.map((ad) => (
               <div key={ad.id} className="col-12 col-md-6 col-lg-4">
