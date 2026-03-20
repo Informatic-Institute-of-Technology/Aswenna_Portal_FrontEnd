@@ -1,13 +1,20 @@
 import { HttpClient } from "./httpClient";
 
-const farmerAdsHttpClient = new HttpClient("http://localhost:3000/api");
+const farmerAdsHttpClient = new HttpClient();
 
 export type FarmerOfferType = "harvest" | "commission";
+export type FarmerLandAvailability = "with_land" | "without_land";
 
 export interface FarmerAdCostBreakdownItem {
   category: string;
   description: string;
   estimatedCost: number;
+}
+
+export interface FarmerAdMilestoneBreakdownItem {
+  milestone: string;
+  description: string;
+  estimatedAmount: number;
 }
 
 export interface HarvestBasedDetailsPayload {
@@ -23,41 +30,56 @@ export interface CommissionBasedDetailsPayload {
 }
 
 export interface CreateFarmerAdPayload {
-  farmer: string;
+  farmer?: string;
+  farmerImage?: string;
   offerType: FarmerOfferType;
   projectName: string;
   description: string;
   cropType: string;
+  cropIcon?: string;
+  backgroundImage?: string;
   location: string;
+  landAvailability: FarmerLandAvailability;
   effectiveDateFrom: string;
   effectiveDateTo: string;
   farmingMethods: string;
-  agreementType: null;
   preferredRegions: string[];
   costBreakdown: FarmerAdCostBreakdownItem[];
+  milestoneBreakdown: FarmerAdMilestoneBreakdownItem[];
   totalInvestmentRequired: number;
   harvestBasedDetails?: HarvestBasedDetailsPayload;
   commissionBasedDetails?: CommissionBasedDetailsPayload;
 }
 
-const buildCreateAdsEndpoint = (userId: string) =>
-  `/v1/farmer/ads?userId=${encodeURIComponent(userId)}`;
+const buildCreateProjectEndpoint = () => `/v1/farmer-project`;
 
-const buildGetUserAdsEndpoint = (userId: string) =>
-  `/v1/farmer/ads/user?userId=${encodeURIComponent(userId)}`;
+const buildGetAllProjectsEndpoint = () => `/v1/farmer-project`;
+
+const buildUpdateProjectEndpoint = (projectId: string) =>
+  `/v1/farmer-project/${projectId}`;
+
+const buildDeleteProjectEndpoint = (projectId: string) =>
+  `/v1/farmer-project/${projectId}`;
 
 export const createFarmerAd = (
   userId: string,
   payload: CreateFarmerAdPayload,
-) => farmerAdsHttpClient.post<unknown>(buildCreateAdsEndpoint(userId), payload);
+) =>
+  farmerAdsHttpClient.post<unknown>(buildCreateProjectEndpoint(), {
+    ...payload,
+    farmer: userId,
+  });
 
 export const getFarmerAdsByUser = (userId: string) =>
-  farmerAdsHttpClient.get<unknown>(buildGetUserAdsEndpoint(userId));
+  farmerAdsHttpClient.get<unknown>(
+    `${buildGetAllProjectsEndpoint()}?farmerId=${encodeURIComponent(userId)}`,
+  );
 
 export const updateFarmerAd = (
   adId: string,
   payload: Partial<CreateFarmerAdPayload>,
-) => farmerAdsHttpClient.patch<unknown>(`/v1/farmer/ads/${adId}`, payload);
+) =>
+  farmerAdsHttpClient.patch<unknown>(buildUpdateProjectEndpoint(adId), payload);
 
 export const deleteFarmerAd = (adId: string) =>
-  farmerAdsHttpClient.delete<unknown>(`/v1/farmer/ads/${adId}`);
+  farmerAdsHttpClient.delete<unknown>(buildDeleteProjectEndpoint(adId));
