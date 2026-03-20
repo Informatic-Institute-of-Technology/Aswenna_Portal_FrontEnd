@@ -4,25 +4,33 @@ export {
   type UsersResponse,
 } from "./admin.service";
 export { authService } from "./auth.service";
+export { authClient, AuthClientError } from "./authClient";
+export { chatApi } from "./chatApi.service";
+export { chatSocket } from "./chatSocket.service";
 export {
   chatService,
   type ChatMessage,
   type Conversation,
 } from "./chat.service";
 export {
+  createFarmerAd,
+  deleteFarmerAd,
+  getFarmerAdsByUser,
+  updateFarmerAd,
+  type CreateFarmerAdPayload,
+  type FarmerAdCostBreakdownItem,
+  type FarmerOfferType,
+} from "./farmerAds.service";
+export {
+  getFarmerProjects,
+  type FarmerProjectApiItem,
+  type FarmerProjectPaginatedResponse,
+} from "./farmerProject.service";
+export {
   formPersistenceService,
   type FormData,
   type UserRole,
 } from "./formPersistence.service";
-export {
-  createFarmerAd,
-  deleteFarmerAd,
-  getFarmerAdsByUser,
-  type CreateFarmerAdPayload,
-  type FarmerAdCostBreakdownItem,
-  type FarmerOfferType,
-  updateFarmerAd,
-} from "./farmerAds.service";
 export { HttpClient, httpClient } from "./httpClient";
 export { LocationService } from "./location.service";
 export {

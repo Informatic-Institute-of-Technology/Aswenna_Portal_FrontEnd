@@ -1,6 +1,7 @@
 import { getAuthHeader, getCsrfToken } from "./tokenStore";
 
-const API_BASE_URL = "http://localhost:3000/api";
+const API_BASE_URL =
+  "api-aswenna-prod-fya7ezfgd8cuckeq.uaenorth-01.azurewebsites.net";
 
 export class HttpClient {
   private baseURL: string;
@@ -14,6 +15,7 @@ export class HttpClient {
       "Content-Type": "application/json",
       "X-Requested-With": "XMLHttpRequest",
       "Cache-Control": "no-store",
+      "ngrok-skip-browser-warning": "true",
     };
 
     const authHeader = getAuthHeader();
