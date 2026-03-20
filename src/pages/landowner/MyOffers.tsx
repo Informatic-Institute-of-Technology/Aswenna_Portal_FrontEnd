@@ -333,7 +333,8 @@ const StatusLabel = ({ status }: { status: LandAdStatus }) => {
 
 const MyLandAdsPage = () => {
   const { user } = useAuth();
-  const { notification, showSuccess, hideNotification } = useNotification();
+  const { notification, showSuccess, showWarning, hideNotification } =
+    useNotification();
   const [landAds, setLandAds] = useState<LandAd[]>(INITIAL_LAND_ADS);
   const [landAdDialogOpen, setLandAdDialogOpen] = useState(false);
   const [landAdDialogMode, setLandAdDialogMode] = useState<"create" | "edit">(
@@ -390,12 +391,21 @@ const MyLandAdsPage = () => {
     [landAds],
   );
 
-  const hasOpenAd = useMemo(
-    () => landAds.some((ad) => ad.status === "open"),
-    [landAds],
+  const hasActiveLandProject = useMemo(
+    () =>
+      landAds.some((ad) => ad.status === "open" || ad.status === "allocated") ||
+      activeProjects.length > 0,
+    [activeProjects.length, landAds],
   );
 
   const handleCreateAd = () => {
+    if (hasActiveLandProject) {
+      showWarning(
+        "Only one active land project is allowed. Complete or close the current active item first.",
+      );
+      return;
+    }
+
     setLandAdDialogMode("create");
     setEditingLandAdId(null);
     setLandAdDraft(buildPrefilledAdFromUser(user));
@@ -435,6 +445,13 @@ const MyLandAdsPage = () => {
         ),
       );
       showSuccess("Land advertisement updated successfully.");
+      return;
+    }
+
+    if (hasActiveLandProject) {
+      showWarning(
+        "Cannot publish a new ad while you already have an active land project.",
+      );
       return;
     }
 
@@ -759,7 +776,7 @@ const MyLandAdsPage = () => {
         <div className="row align-items-start">
           <div className="col-12 col-lg-8">
             <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-              My Land Ads
+              My Offers
             </Typography>
             <Typography variant="body1" color="text.secondary">
               Publish your land availability, track joined projects, and review investor interest from one place.
@@ -768,8 +785,8 @@ const MyLandAdsPage = () => {
           <div className="col-12 col-lg-4 d-flex justify-content-lg-end align-items-center gap-2 mt-3 mt-lg-0">
             <Tooltip
               title={
-                hasOpenAd
-                  ? "You already have an open land ad. Allocate or close it before creating a new one."
+                hasActiveLandProject
+                  ? "Only one active land project is allowed. Complete or close your current active item before creating a new one."
                   : ""
               }
             >
@@ -777,7 +794,7 @@ const MyLandAdsPage = () => {
                 <CreateOfferButton
                   onClick={handleCreateAd}
                   label="Create New Ad"
-                  disabled={hasOpenAd}
+                  disabled={hasActiveLandProject}
                 />
               </span>
             </Tooltip>

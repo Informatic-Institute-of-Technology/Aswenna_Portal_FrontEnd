@@ -1,4 +1,5 @@
 import { useAuth } from "@/Context/useAuth";
+import { adminService } from "@/services/admin.service";
 import {
   ArrowForward,
   Check,
@@ -157,7 +158,36 @@ const CreateAdPopup = ({
     uploadedObjectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
     uploadedObjectUrlsRef.current = [];
     setUploadedImages([]);
-  }, [initialValues, mode, open]);
+
+    // Pre-fill from user profile in create mode.
+    if (mode === "create" && user?._id) {
+      adminService
+        .getUserById(user._id)
+        .then((detail) => {
+          console.log("[CreateAdPopup] Prefill response user detail:", detail);
+          const land =
+            detail.landOwner?.landAddress ?? detail.landOwnerDetails?.landAddress;
+          const info = detail.personalInfo;
+          setFormData((prev) => ({
+            ...prev,
+            location:
+              prev.location ||
+              land?.city ||
+              land?.street ||
+              info?.city ||
+              info?.address ||
+              detail.address ||
+              "",
+            landArea: prev.landArea || land?.size || "",
+            soilType: prev.soilType || land?.soilType || "",
+            rentalAmount: prev.rentalAmount || land?.rentalExpectation || "",
+          }));
+        })
+        .catch((error) => {
+          console.error("[CreateAdPopup] Prefill request failed:", error);
+        });
+    }
+  }, [initialValues, mode, open, user?._id]);
 
   useEffect(
     () => () => {
@@ -222,17 +252,6 @@ const CreateAdPopup = ({
     onClose();
   };
 
-  const soilTypes = [
-    { value: "clay", label: "Clay" },
-    { value: "sandy", label: "Sandy" },
-    { value: "loamy", label: "Loamy" },
-    { value: "silty", label: "Silty" },
-    { value: "peaty", label: "Peaty" },
-    { value: "chalky", label: "Chalky" },
-    { value: "gravel", label: "Gravel" },
-    { value: "other", label: "Other" },
-  ];
-
   const landHistoryOptions = [
     { value: "organic-previous", label: "Previously Used for Organic Farming" },
     {
@@ -242,14 +261,6 @@ const CreateAdPopup = ({
     { value: "uncultivated", label: "Uncultivated Land" },
     { value: "crop-rotation", label: "Crop Rotation Practiced" },
     { value: "fallow", label: "Fallow Land" },
-  ];
-
-  const waterAccessOptions = [
-    { value: "irrigation", label: "Irrigation Access Available" },
-    { value: "rain-fed", label: "Rain-fed Only" },
-    { value: "well-water", label: "Tube Well / Well Water" },
-    { value: "canal", label: "Canal Water Access" },
-    { value: "mixed", label: "Multiple Water Sources" },
   ];
 
   const dialogTitle =
@@ -469,42 +480,20 @@ const CreateAdPopup = ({
                 <div className="grid grid-cols-2 gap-4">
                   <label className="block">
                     <span className={labelCls}>Soil Type</span>
-                    <select
+                    <input
                       className={errors.soilType ? inputErrCls : inputCls}
+                      type="text"
+                      placeholder="Prefilled from your profile"
                       value={formData.soilType}
                       onChange={(event) =>
                         handleInputChange("soilType", event.target.value)
                       }
-                    >
-                      <option value="">Select soil type</option>
-                      {soilTypes.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
+                    />
                     {errors.soilType && (
                       <span className="text-red-400 text-[10px] mt-0.5 block">
                         {errors.soilType}
                       </span>
                     )}
-                  </label>
-                  <label className="block">
-                    <span className={labelCls}>Water Access</span>
-                    <select
-                      className={inputCls}
-                      value={formData.waterAccess}
-                      onChange={(event) =>
-                        handleInputChange("waterAccess", event.target.value)
-                      }
-                    >
-                      <option value="">Select</option>
-                      {waterAccessOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
                   </label>
                 </div>
 
