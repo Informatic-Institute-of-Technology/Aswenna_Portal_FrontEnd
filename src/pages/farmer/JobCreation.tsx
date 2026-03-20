@@ -866,26 +866,13 @@ const CreateOfferDialog = ({
           ? formData.selectedRegions[0]
           : landLocation || "Not specified";
 
-    const resolvedProjectName =
-      offerType === "commission"
-        ? formData.projectName.trim() ||
-          `${formData.cropType.trim() || "Farming"} Commission Project`
-        : formData.projectName.trim();
+    const resolvedProjectName = formData.projectName.trim();
 
-    const resolvedProjectDescription =
-      offerType === "commission"
-        ? formData.description.trim() || "Commission-based farming project."
-        : formData.description.trim();
+    const resolvedProjectDescription = formData.description.trim();
 
-    const resolvedCropIcon =
-      offerType === "commission"
-        ? formData.cropIcon || CROP_EMOJIS[0]
-        : formData.cropIcon;
+    const resolvedCropIcon = formData.cropIcon;
 
-    const resolvedCoverImage =
-      offerType === "commission"
-        ? formData.coverImage || coverImageList[0]?.id || ""
-        : formData.coverImage;
+    const resolvedCoverImage = formData.coverImage;
 
     const payload: FarmerJobCreationPayload = {
       offerType,
