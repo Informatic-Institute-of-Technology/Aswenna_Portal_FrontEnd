@@ -1,11 +1,9 @@
 import { useAuth } from "@/Context/useAuth";
 import { adminService, type ApiUser } from "@/services/admin.service";
+import type { Conversation, Message } from "@/types/chat.types";
 import {
-  chatService,
-  type ChatMessage,
-  type Conversation,
-} from "@/services/chat.service";
-import {
+  Check,
+  CheckCheck,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -17,11 +15,14 @@ import {
   Search,
   Send,
   Smile,
+  Trash2,
   User,
   X,
 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "../../styles/InboxPage.css";
+import Notification from "@/shared/components/Notification";
+import { useChatStore, useNotification } from "@/shared/hooks";
 
 import { config } from "@/core/config";
 
@@ -55,8 +56,74 @@ const getInitials = (name: string) =>
     .map((w) => w[0]?.toUpperCase() || "")
     .join("");
 
+const getMemberUserId = (member: Conversation["members"][number]): string => {
+  if (typeof member.userId === "string") return member.userId;
+  if (member.userId && typeof member.userId === "object") {
+    return member.userId._id || "";
+  }
+  return member.user?._id || "";
+};
+
+const getMemberDisplay = (member: Conversation["members"][number]) => {
+  if (member.userId && typeof member.userId === "object") {
+    return {
+      id: member.userId._id || "",
+      fullName: member.userId.fullName || "User",
+      email: member.userId.email || "",
+      profilePicture: member.userId.personalInfo?.profilePicture,
+    };
+  }
+
+  if (member.user?._id) {
+    return {
+      id: member.user._id,
+      fullName: member.user.fullName || "User",
+      email: member.user.email || "",
+      profilePicture: undefined,
+    };
+  }
+
+  return null;
+};
+
+const getMessageSenderId = (message: Message): string => {
+  if (typeof message.senderId === "string") return message.senderId;
+  return message.senderId?._id || "";
+};
+
+const getReadByUserIds = (message: Message): string[] => {
+  if (!Array.isArray(message.readBy)) return [];
+
+  return message.readBy
+    .map((entry) => {
+      if (typeof entry === "string") return entry;
+      if (!entry || typeof entry !== "object") return "";
+
+      const userId = entry.userId;
+      if (typeof userId === "string") return userId;
+      return userId?._id || "";
+    })
+    .filter((id): id is string => !!id);
+};
+
+const getMessageSenderName = (message: Message): string => {
+  if (typeof message.senderId === "object" && message.senderId?.fullName) {
+    return message.senderId.fullName;
+  }
+  return "User";
+};
+
+const toValidDate = (value: string | undefined | null): Date | null => {
+  if (!value || typeof value !== "string") return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return date;
+};
+
 const formatTime = (iso: string) => {
-  const d = new Date(iso);
+  const d = toValidDate(iso);
+  if (!d) return "";
+
   const now = new Date();
   const isToday =
     d.getDate() === now.getDate() &&
@@ -71,13 +138,47 @@ const formatTime = (iso: string) => {
 };
 
 const formatDayLabel = (iso: string) => {
-  const d = new Date(iso);
+  const d = toValidDate(iso);
+  if (!d) return "RECENT";
+
   const now = new Date();
   const diffDays = Math.floor((now.getTime() - d.getTime()) / 86400000);
   if (diffDays === 0) return "TODAY";
   if (diffDays === 1) return "YESTERDAY";
   return d.toLocaleDateString([], {
     weekday: "long",
+    month: "short",
+    day: "numeric",
+  });
+};
+
+const formatConversationDateTime = (iso: string) => {
+  const d = toValidDate(iso);
+  if (!d) return "";
+
+  const now = new Date();
+
+  const isToday =
+    d.getDate() === now.getDate() &&
+    d.getMonth() === now.getMonth() &&
+    d.getFullYear() === now.getFullYear();
+
+  if (isToday) {
+    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  }
+
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+
+  const isYesterday =
+    d.getDate() === yesterday.getDate() &&
+    d.getMonth() === yesterday.getMonth() &&
+    d.getFullYear() === yesterday.getFullYear();
+
+  if (isYesterday) return "Yesterday";
+
+  return d.toLocaleDateString([], {
+    year: "numeric",
     month: "short",
     day: "numeric",
   });
@@ -159,7 +260,8 @@ const UserAvatar = ({
 };
 
 const InboxPage = () => {
-  const { user: authUser } = useAuth();
+  const { user: authUser, logout } = useAuth();
+  const { notification, showError, hideNotification } = useNotification();
   const currentUserId = authUser?._id || "";
 
   const [leftOpen, setLeftOpen] = useState(true);
@@ -176,48 +278,90 @@ const InboxPage = () => {
   const [searchTotal, setSearchTotal] = useState(0);
   const [searching, setSearching] = useState(false);
 
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-
-  const [activeConvId, setActiveConvId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [activeUser, setActiveUser] = useState<ApiUser | null>(null);
 
   const [inputText, setInputText] = useState("");
+  const [groupMemberUserId, setGroupMemberUserId] = useState("");
+  const [groupMemberRole, setGroupMemberRole] = useState<"member" | "admin">(
+    "member",
+  );
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const conversationsListRef = useRef<HTMLDivElement>(null);
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const {
+    conversations,
+    activeConversationId,
+    messagesByConversationId,
+    typingByConversationId,
+    connectionStatus,
+    loadingConversations,
+    hasMoreConversations,
+    setActiveConversation,
+    loadConversations,
+    loadMoreConversations,
+    openDirectConversation,
+    sendTextMessage,
+    setTyping,
+    markRead,
+    deleteConversation,
+    addGroupMember,
+    removeGroupMember,
+  } = useChatStore({
+    currentUserId,
+    onUnauthorized: logout,
+    onError: showError,
+  });
+
+  const messages = useMemo(
+    () =>
+      activeConversationId
+        ? messagesByConversationId[activeConversationId] || []
+        : [],
+    [activeConversationId, messagesByConversationId],
+  );
+
   useEffect(() => {
-    if (!currentUserId) return;
-    const convs = chatService.getConversations(currentUserId);
-    setConversations(convs);
+    if (!currentUserId || conversations.length === 0) return;
 
-    const participantIds = [
-      ...new Set(
-        convs.flatMap((c) =>
-          c.participantIds.filter((id) => id !== currentUserId),
-        ),
-      ),
-    ];
+    setConvUserMap((prev) => {
+      const next = new Map(prev);
 
-    if (participantIds.length === 0) return;
+      conversations.forEach((conversation) => {
+        conversation.members.forEach((member) => {
+          const memberId = getMemberUserId(member);
+          const memberDisplay = getMemberDisplay(member);
 
-    (async () => {
-      try {
-        const resp = await adminService.getAllUsers(1, 200);
-        const map = new Map<string, ApiUser>();
-        resp.data.forEach((u) => {
-          if (participantIds.includes(u._id)) {
-            map.set(u._id, u);
-          }
+          if (!memberId || memberId === currentUserId || !memberDisplay) return;
+          if (next.has(memberId)) return;
+
+          next.set(memberId, {
+            _id: memberId,
+            fullName: memberDisplay.fullName,
+            email: memberDisplay.email || "",
+            emailVerified: false,
+            phoneNumber: "",
+            phoneNumberVerified: false,
+            role: "user",
+            permissions: [],
+            createdBy: "",
+            updatedBy: "",
+            meta: [],
+            createdAt: "",
+            updatedAt: "",
+            __v: 0,
+            personalInfo: memberDisplay.profilePicture
+              ? { profilePicture: memberDisplay.profilePicture }
+              : undefined,
+          });
         });
-        setConvUserMap(map);
-      } catch (err) {
-        console.error("Failed to load conversation participants:", err);
-      }
-    })();
-  }, [currentUserId]);
+      });
+
+      return next;
+    });
+  }, [conversations, currentUserId]);
 
   const doSearch = useCallback(
     async (query: string) => {
@@ -229,19 +373,17 @@ const InboxPage = () => {
       }
       setSearching(true);
       try {
-        const resp = await adminService.getAllUsers(1, 20);
-        const searchLower = query.trim().toLowerCase();
-        const filtered = resp.data
-          .filter((u) => u._id !== currentUserId)
-          .filter(
-            (u) =>
-              u.fullName?.toLowerCase().includes(searchLower) ||
-              u.email?.toLowerCase().includes(searchLower) ||
-              u.phoneNumber?.includes(query.trim()),
-          )
-          .sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+        const resp = await adminService.getAllUsers(1, 20, query.trim());
+
+        const filtered = resp.data.filter((u) => u._id !== currentUserId);
+
         setSearchResults(filtered);
-        setSearchTotal(filtered.length);
+        setSearchTotal(
+          Math.max(
+            resp.pagination?.totalDocs || filtered.length,
+            filtered.length,
+          ),
+        );
       } catch (err) {
         console.error("Search failed:", err);
         setSearchResults([]);
@@ -270,59 +412,65 @@ const InboxPage = () => {
   }, [searchQuery, doSearch]);
 
   useEffect(() => {
-    if (!activeConvId) {
-      setMessages([]);
-      return;
-    }
-    setMessages(chatService.getMessages(activeConvId));
-    chatService.markAsRead(activeConvId, currentUserId);
-    setConversations(chatService.getConversations(currentUserId));
-  }, [activeConvId, currentUserId]);
-
-  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const openConversation = (otherUser: ApiUser) => {
+  useEffect(() => {
+    if (!activeConversationId || !currentUserId) return;
+
+    const unreadIncomingIds = messages
+      .filter(
+        (message) =>
+          getMessageSenderId(message) !== currentUserId &&
+          !getReadByUserIds(message).includes(currentUserId),
+      )
+      .map((message) => message._id);
+
+    if (unreadIncomingIds.length > 0) {
+      markRead(unreadIncomingIds);
+    }
+  }, [activeConversationId, currentUserId, markRead, messages]);
+
+  const openConversation = async (otherUser: ApiUser) => {
     if (!currentUserId) return;
-    const conv = chatService.getOrCreateConversation(
-      currentUserId,
-      otherUser._id,
-    );
-    setActiveConvId(conv.id);
+    await openDirectConversation(otherUser._id);
     setActiveUser(otherUser);
     setConvUserMap((prev) => {
       const next = new Map(prev);
       next.set(otherUser._id, otherUser);
       return next;
     });
-    setConversations(chatService.getConversations(currentUserId));
     setSearchQuery("");
     setTimeout(() => inputRef.current?.focus(), 150);
   };
 
-  const sendMessage = () => {
-    if (!inputText.trim() || !activeConvId || !currentUserId) return;
-    chatService.sendMessage(activeConvId, currentUserId, inputText);
-    setMessages(chatService.getMessages(activeConvId));
-    setConversations(chatService.getConversations(currentUserId));
+  const sendMessage = async () => {
+    if (!inputText.trim() || !activeConversationId || !currentUserId) return;
+    await sendTextMessage(inputText);
+    setTyping(false);
     setInputText("");
+    if (inputRef.current) {
+      inputRef.current.style.height = "auto";
+    }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
   };
 
-  const groupMessagesByDay = (msgs: ChatMessage[]) => {
-    const groups: { label: string; msgs: ChatMessage[] }[] = [];
+  const groupMessagesByDay = (msgs: Message[]) => {
+    const groups: { label: string; msgs: Message[] }[] = [];
     let lastDay = "";
     for (const m of msgs) {
-      const day = new Date(m.timestamp).toDateString();
+      const parsedDate = toValidDate(m.createdAt);
+      const day = parsedDate
+        ? parsedDate.toDateString()
+        : `fallback-${m._id || m.clientTempId || "msg"}`;
       if (day !== lastDay) {
-        groups.push({ label: formatDayLabel(m.timestamp), msgs: [] });
+        groups.push({ label: formatDayLabel(m.createdAt), msgs: [] });
         lastDay = day;
       }
       groups[groups.length - 1].msgs.push(m);
@@ -332,9 +480,90 @@ const InboxPage = () => {
 
   const messageGroups = groupMessagesByDay(messages);
   const isSearching = searchQuery.trim().length > 0;
+  const currentConversation = conversations.find(
+    (conversation) => conversation._id === activeConversationId,
+  );
 
-  const getOtherUserId = (c: Conversation) =>
-    c.participantIds.find((id) => id !== currentUserId) || "";
+  const activeTypingUserIds = activeConversationId
+    ? typingByConversationId[activeConversationId] || []
+    : [];
+
+  const activeTypingNames = activeTypingUserIds
+    .filter((userId) => userId !== currentUserId)
+    .map((userId) => convUserMap.get(userId)?.fullName || "Someone");
+
+  const getOtherUserId = (conversation: Conversation) => {
+    const otherMember = conversation.members.find(
+      (member) => getMemberUserId(member) !== currentUserId,
+    );
+    return otherMember ? getMemberUserId(otherMember) : "";
+  };
+
+  const getOtherMemberDisplay = (conversation: Conversation) => {
+    const otherMember = conversation.members.find(
+      (member) => getMemberUserId(member) !== currentUserId,
+    );
+    return otherMember ? getMemberDisplay(otherMember) : null;
+  };
+
+  const activeDirectOtherDisplay =
+    currentConversation?.type === "direct"
+      ? getOtherMemberDisplay(currentConversation)
+      : null;
+
+  const handleConversationsScroll = useCallback(() => {
+    if (isSearching) return;
+
+    const container = conversationsListRef.current;
+    if (!container || loadingConversations || !hasMoreConversations) return;
+
+    const remaining =
+      container.scrollHeight - container.scrollTop - container.clientHeight;
+
+    if (remaining < 120) {
+      loadMoreConversations();
+    }
+  }, [
+    hasMoreConversations,
+    isSearching,
+    loadMoreConversations,
+    loadingConversations,
+  ]);
+
+  const selectConversation = async (conversation: Conversation) => {
+    await setActiveConversation(conversation._id);
+
+    if (conversation.type === "group") {
+      setActiveUser(null);
+      return;
+    }
+
+    const otherUserId = getOtherUserId(conversation);
+    if (!otherUserId) {
+      setActiveUser(null);
+      return;
+    }
+
+    const existing = convUserMap.get(otherUserId);
+    if (existing) {
+      setActiveUser(existing);
+      return;
+    }
+
+    try {
+      const matched = await adminService.getUserById(otherUserId);
+      if (matched) {
+        setConvUserMap((prev) => {
+          const next = new Map(prev);
+          next.set(matched._id, matched);
+          return next;
+        });
+      }
+      setActiveUser(matched);
+    } catch (error) {
+      console.error("Failed to load conversation participant:", error);
+    }
+  };
 
   const renderLeftContent = () => {
     if (isSearching) {
@@ -400,42 +629,110 @@ const InboxPage = () => {
 
     return (
       <>
-        <div className="chat-section-label">Recent</div>
+        <div className="chat-section-label">
+          Recent{loadingConversations ? " • Loading..." : ""}
+        </div>
         {conversations.map((conv) => {
+          if (conv.type === "group") {
+            return (
+              <div
+                key={conv._id}
+                className={`chat-conv-item${activeConversationId === conv._id ? " active" : ""}`}
+                onClick={() => selectConversation(conv)}
+              >
+                <div className="chat-avatar">
+                  <div
+                    style={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: "50%",
+                      border: "2px solid var(--border-base)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: "var(--surface-200)",
+                    }}
+                  >
+                    <User size={16} />
+                  </div>
+                </div>
+                <div className="chat-conv-meta">
+                  <div className="chat-conv-name">
+                    {conv.name || "Group Conversation"}
+                  </div>
+                  <div className="chat-conv-sub">
+                    Group • {conv.members.length} members
+                  </div>
+                  {conv.lastMessageText && (
+                    <div className="chat-conv-last">{conv.lastMessageText}</div>
+                  )}
+                </div>
+                <div className="chat-conv-right">
+                  {conv.lastMessageAt && (
+                    <span className="chat-conv-time">
+                      {formatConversationDateTime(conv.lastMessageAt)}
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          }
+
           const otherId = getOtherUserId(conv);
           const other = convUserMap.get(otherId);
-          if (!other) return null;
+          const otherFromConversation = getOtherMemberDisplay(conv);
+          const displayName =
+            other?.fullName || otherFromConversation?.fullName || "User";
           return (
             <div
-              key={conv.id}
-              className={`chat-conv-item${activeConvId === conv.id ? " active" : ""}`}
-              onClick={() => openConversation(other)}
+              key={conv._id}
+              className={`chat-conv-item${activeConversationId === conv._id ? " active" : ""}`}
+              onClick={() => selectConversation(conv)}
             >
               <div className="chat-avatar">
-                <UserAvatar user={other} />
+                {other ? (
+                  <UserAvatar user={other} />
+                ) : (
+                  <div
+                    style={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: "50%",
+                      border: "2px solid var(--border-base)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: "var(--surface-200)",
+                      fontSize: 12,
+                      fontWeight: 700,
+                      flexShrink: 0,
+                    }}
+                  >
+                    {getInitials(displayName)}
+                  </div>
+                )}
                 <div className="chat-avatar-online" />
               </div>
               <div className="chat-conv-meta">
-                <div className="chat-conv-name">{other.fullName}</div>
-                <div
-                  className="chat-conv-sub"
-                  style={{ textTransform: "capitalize" }}
-                >
-                  {getRoleName(other.role)}
-                  {other.address ? ` • ${other.address}` : ""}
-                </div>
-                {conv.lastMessage && (
-                  <div className="chat-conv-last">{conv.lastMessage}</div>
+                <div className="chat-conv-name">{displayName}</div>
+                {other && (
+                  <div
+                    className="chat-conv-sub"
+                    style={{ textTransform: "capitalize" }}
+                  >
+                    {getRoleName(other.role)}
+                    {other.address ? ` • ${other.address}` : ""}
+                  </div>
+                )}
+                {conv.lastMessageText && (
+                  <div className="chat-conv-last">{conv.lastMessageText}</div>
                 )}
               </div>
               <div className="chat-conv-right">
-                {conv.lastMessageTime && (
+                {conv.lastMessageAt && (
                   <span className="chat-conv-time">
-                    {formatTime(conv.lastMessageTime)}
+                    {formatConversationDateTime(conv.lastMessageAt)}
                   </span>
-                )}
-                {conv.unreadCount > 0 && (
-                  <span className="chat-unread-badge">{conv.unreadCount}</span>
                 )}
               </div>
             </div>
@@ -452,8 +749,69 @@ const InboxPage = () => {
       <div className="chat-layout">
         <div className={`chat-sidebar ${leftOpen ? "open" : "closed"}`}>
           <div className="chat-sidebar-header">
-            <div className="chat-sidebar-title">Conversations</div>
+            <div
+              className="chat-sidebar-title"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              Conversations
+              <div
+                className="connection-status-badge"
+                title={`Status: ${connectionStatus}`}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  fontSize: "10px",
+                  fontWeight: "normal",
+                  textTransform: "uppercase",
+                  color:
+                    connectionStatus === "connected"
+                      ? "var(--color-brand-primary)"
+                      : connectionStatus === "connecting"
+                        ? "var(--color-warning, #f59e0b)"
+                        : "var(--color-danger)",
+                  backgroundColor: "var(--bg-elevated)",
+                  padding: "2px 8px",
+                  borderRadius: "12px",
+                  border: "1px solid var(--border-base)",
+                }}
+              >
+                <div
+                  style={{
+                    width: "6px",
+                    height: "6px",
+                    borderRadius: "50%",
+                    backgroundColor:
+                      connectionStatus === "connected"
+                        ? "var(--color-brand-primary)"
+                        : connectionStatus === "connecting"
+                          ? "var(--color-warning, #f59e0b)"
+                          : "var(--color-danger)",
+                    boxShadow:
+                      connectionStatus === "connected"
+                        ? "0 0 6px var(--color-brand-primary)"
+                        : "none",
+                    animation:
+                      connectionStatus === "connecting"
+                        ? "pulse 1.5s infinite"
+                        : "none",
+                  }}
+                />
+                {connectionStatus}
+              </div>
+            </div>
             <div className="chat-search-wrap">
+              <style>
+                {`@keyframes pulse {
+                  0% { opacity: 0.5; }
+                  50% { opacity: 1; }
+                  100% { opacity: 0.5; }
+                }`}
+              </style>
               <Search size={13} className="chat-search-icon" />
               <input
                 type="text"
@@ -480,7 +838,23 @@ const InboxPage = () => {
             </div>
           </div>
 
-          <div className="chat-conv-list">{renderLeftContent()}</div>
+          <div
+            ref={conversationsListRef}
+            className="chat-conv-list"
+            onScroll={handleConversationsScroll}
+          >
+            {renderLeftContent()}
+            {!isSearching &&
+              loadingConversations &&
+              conversations.length > 0 && (
+                <div
+                  className="chat-section-label"
+                  style={{ textAlign: "center" }}
+                >
+                  Loading...
+                </div>
+              )}
+          </div>
         </div>
 
         <div
@@ -494,19 +868,65 @@ const InboxPage = () => {
         </div>
 
         <div className="chat-thread">
-          {activeUser ? (
+          {activeConversationId ? (
             <>
               <div className="chat-thread-header">
-                <UserAvatar user={activeUser} size={34} />
-                <div className="chat-online-dot" />
+                {activeUser ? (
+                  <>
+                    <UserAvatar user={activeUser} size={34} />
+                    <div className="chat-online-dot" />
+                  </>
+                ) : (
+                  <div
+                    style={{
+                      width: 34,
+                      height: 34,
+                      borderRadius: "50%",
+                      border: "2px solid var(--border-base)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: "var(--surface-200)",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <User size={14} />
+                  </div>
+                )}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="chat-thread-name">{activeUser.fullName}</div>
+                  <div className="chat-thread-name">
+                    {activeUser?.fullName ||
+                      activeDirectOtherDisplay?.fullName ||
+                      currentConversation?.name ||
+                      "Group Conversation"}
+                  </div>
                   <div
                     className="chat-thread-sub"
                     style={{ textTransform: "capitalize" }}
                   >
-                    {getRoleName(activeUser.role)}
-                    {activeUser.address ? ` • ${activeUser.address}` : ""}
+                    {activeTypingNames.length > 0 ? (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 6,
+                          color: "var(--color-brand-primary)",
+                        }}
+                      >
+                        <div className="typing-dots">
+                          <span className="dot"></span>
+                          <span className="dot"></span>
+                          <span className="dot"></span>
+                        </div>
+                        {activeTypingNames.join(", ")} typing...
+                      </div>
+                    ) : (
+                      <>
+                        {activeUser
+                          ? `${getRoleName(activeUser.role)}${activeUser.address ? ` • ${activeUser.address}` : ""}`
+                          : `group • ${currentConversation?.members.length || 0} members`}
+                      </>
+                    )}
                   </div>
                 </div>
                 <button
@@ -523,13 +943,13 @@ const InboxPage = () => {
                   <div className="chat-empty">
                     <MessageCircle size={48} className="chat-empty-icon" />
                     <span className="chat-empty-text">
-                      Start the conversation with {activeUser.fullName}
+                      Start the conversation
                     </span>
                   </div>
                 )}
 
-                {messageGroups.map((group) => (
-                  <div key={group.label}>
+                {messageGroups.map((group, groupIndex) => (
+                  <div key={`${group.label}-${groupIndex}`}>
                     <div className="chat-day-divider">
                       <div className="chat-day-divider-line" />
                       <span className="chat-day-divider-label">
@@ -537,28 +957,100 @@ const InboxPage = () => {
                       </span>
                       <div className="chat-day-divider-line" />
                     </div>
-                    {group.msgs.map((msg) => {
-                      const isSent = msg.senderId === currentUserId;
+                    {group.msgs.map((msg, messageIndex) => {
+                      const isSent = getMessageSenderId(msg) === currentUserId;
+                      const readBy = getReadByUserIds(msg);
+                      const senderName = getMessageSenderName(msg);
+
+                      const prevMsg = group.msgs[messageIndex - 1];
+                      const nextMsg = group.msgs[messageIndex + 1];
+                      const prevIsSame =
+                        prevMsg &&
+                        getMessageSenderId(prevMsg) === getMessageSenderId(msg);
+                      const nextIsSame =
+                        nextMsg &&
+                        getMessageSenderId(nextMsg) === getMessageSenderId(msg);
+                      const isFirstInSequence = !prevIsSame;
+                      const isLastInSequence = !nextIsSame;
+
+                      const isRead =
+                        isSent &&
+                        readBy.some((readerId) => readerId !== currentUserId);
+
                       return (
                         <div
-                          key={msg.id}
-                          className={`chat-msg-row${isSent ? " sent" : ""}`}
+                          key={`${msg._id || msg.clientTempId || "msg"}-${msg.createdAt}-${messageIndex}`}
+                          className={`chat-msg-row${isSent ? " sent" : ""}${isLastInSequence ? " last-in-seq" : ""}${isFirstInSequence ? " first-in-seq" : ""}`}
                         >
                           {!isSent && (
-                            <UserAvatar user={activeUser} size={26} />
+                            <div
+                              className="chat-msg-avatar-wrapper"
+                              style={{ width: 26, flexShrink: 0 }}
+                            >
+                              {isLastInSequence &&
+                                (activeUser ? (
+                                  <UserAvatar
+                                    user={activeUser}
+                                    size={26}
+                                    showBorder={false}
+                                  />
+                                ) : (
+                                  <div
+                                    style={{
+                                      width: 26,
+                                      height: 26,
+                                      borderRadius: "50%",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                      background: "var(--surface-200)",
+                                      fontSize: 10,
+                                      fontWeight: 700,
+                                      flexShrink: 0,
+                                    }}
+                                    title={senderName}
+                                  >
+                                    {getInitials(senderName)}
+                                  </div>
+                                ))}
+                            </div>
                           )}
-                          <div>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: isSent ? "flex-end" : "flex-start",
+                              maxWidth: "75%",
+                            }}
+                          >
                             <div
-                              className={`chat-bubble ${isSent ? "sent" : "received"}`}
+                              className={`chat-bubble ${isSent ? "sent" : "received"} ${isFirstInSequence ? "first" : ""} ${isLastInSequence ? "last" : ""}`}
                             >
-                              {msg.text}
+                              {msg.content}
                             </div>
-                            <div
-                              className={`chat-bubble-time${!isSent ? " from-left" : ""}`}
-                            >
-                              {formatTime(msg.timestamp)}
-                              {isSent && msg.read ? " • Read" : ""}
-                            </div>
+                            {isLastInSequence && (
+                              <div
+                                className={`chat-bubble-time${!isSent ? " from-left" : ""}`}
+                              >
+                                {formatTime(msg.createdAt)}
+                                {isSent && (
+                                  <span
+                                    className="chat-read-receipt"
+                                    style={{ marginLeft: 4 }}
+                                  >
+                                    {isRead ? (
+                                      <CheckCheck
+                                        size={12}
+                                        className="text-brand-primary"
+                                        color="currentColor"
+                                      />
+                                    ) : (
+                                      <Check size={12} />
+                                    )}
+                                  </span>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                       );
@@ -572,13 +1064,23 @@ const InboxPage = () => {
                 <button className="chat-icon-btn" title="Attach">
                   <Paperclip size={15} />
                 </button>
-                <input
+                <textarea
                   ref={inputRef}
                   className="chat-text-input"
                   placeholder="Type a message..."
+                  rows={1}
                   value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setInputText(value);
+                    setTyping(value.trim().length > 0);
+                    // auto-resize
+                    e.target.style.height = "auto";
+                    e.target.style.height =
+                      Math.min(e.target.scrollHeight, 120) + "px";
+                  }}
                   onKeyDown={handleKeyDown}
+                  onBlur={() => setTyping(false)}
                 />
                 <button className="chat-icon-btn" title="Emoji">
                   <Smile size={15} />
@@ -622,18 +1124,41 @@ const InboxPage = () => {
         </div>
 
         <div className={`chat-profile ${rightOpen ? "open" : "closed"}`}>
-          {activeUser ? (
+          {activeConversationId ? (
             <>
               <div className="chat-profile-top">
-                <UserAvatar user={activeUser} size={74} showBorder={false} />
-                <div className="chat-profile-name">{activeUser.fullName}</div>
-                <div className="chat-profile-role">
-                  {getRoleName(activeUser.role)}
+                {activeUser ? (
+                  <UserAvatar user={activeUser} size={74} showBorder={false} />
+                ) : (
+                  <div
+                    style={{
+                      width: 74,
+                      height: 74,
+                      borderRadius: "50%",
+                      border: "3px solid var(--color-brand-primary)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: "var(--surface-200)",
+                    }}
+                  >
+                    <User size={28} />
+                  </div>
+                )}
+                <div className="chat-profile-name">
+                  {activeUser?.fullName ||
+                    currentConversation?.name ||
+                    "Group Conversation"}
                 </div>
-                {activeUser.address && (
+                <div className="chat-profile-role">
+                  {activeUser
+                    ? getRoleName(activeUser.role)
+                    : `Group • ${currentConversation?.members.length || 0} members`}
+                </div>
+                {activeUser?.address && (
                   <div className="chat-profile-location">
                     <MapPin size={10} />
-                    {activeUser.address}
+                    {activeUser?.address}
                   </div>
                 )}
               </div>
@@ -654,7 +1179,9 @@ const InboxPage = () => {
                 {detailsOpen && (
                   <div className="chat-profile-body">
                     <div>
-                      <div className="chat-profile-section-title">Contact</div>
+                      <div className="chat-profile-section-title">
+                        {activeUser ? "Contact" : "Group"}
+                      </div>
                       <div
                         style={{
                           display: "flex",
@@ -662,65 +1189,185 @@ const InboxPage = () => {
                           gap: 8,
                         }}
                       >
-                        {activeUser.email && (
+                        {activeUser?.email && (
                           <div className="chat-profile-info-row">
                             <span className="chat-profile-info-label">
                               Email
                             </span>
                             <span className="chat-profile-info-val">
-                              {activeUser.email}
+                              {activeUser?.email}
                             </span>
                           </div>
                         )}
-                        {activeUser.phoneNumber && (
+                        {activeUser?.phoneNumber && (
                           <div className="chat-profile-info-row">
                             <span className="chat-profile-info-label">
                               Phone
                             </span>
                             <span className="chat-profile-info-val">
-                              {activeUser.phoneNumber}
+                              {activeUser?.phoneNumber}
                             </span>
                           </div>
                         )}
-                        {activeUser.address && (
+                        {activeUser?.address && (
                           <div className="chat-profile-info-row">
                             <span className="chat-profile-info-label">
                               Location
                             </span>
                             <span className="chat-profile-info-val">
-                              {activeUser.address}
+                              {activeUser?.address}
                             </span>
                           </div>
+                        )}
+                        {!activeUser && currentConversation && (
+                          <>
+                            <div className="chat-profile-info-row">
+                              <span className="chat-profile-info-label">
+                                Conversation
+                              </span>
+                              <span className="chat-profile-info-val">
+                                {currentConversation._id}
+                              </span>
+                            </div>
+                            <div className="chat-profile-info-row">
+                              <span className="chat-profile-info-label">
+                                Members
+                              </span>
+                              <span className="chat-profile-info-val">
+                                {currentConversation.members.length}
+                              </span>
+                            </div>
+                          </>
                         )}
                       </div>
                     </div>
                     <div>
                       <div className="chat-profile-section-title">Status</div>
-                      <div className="chat-profile-info-row">
-                        <span className="chat-profile-info-label">Account</span>
-                        <span
-                          className="chat-profile-info-val"
+                      {activeUser ? (
+                        <div className="chat-profile-info-row">
+                          <span className="chat-profile-info-label">
+                            Account
+                          </span>
+                          <span
+                            className="chat-profile-info-val"
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 6,
+                            }}
+                          >
+                            <span
+                              style={{
+                                width: 7,
+                                height: 7,
+                                borderRadius: "50%",
+                                background: activeUser.emailVerified
+                                  ? "var(--color-brand-primary)"
+                                  : "var(--color-warning)",
+                                display: "inline-block",
+                                flexShrink: 0,
+                              }}
+                            />
+                            {activeUser.emailVerified
+                              ? "Verified"
+                              : "Unverified"}
+                          </span>
+                        </div>
+                      ) : (
+                        <div
                           style={{
                             display: "flex",
-                            alignItems: "center",
-                            gap: 6,
+                            flexDirection: "column",
+                            gap: 8,
                           }}
                         >
-                          <span
-                            style={{
-                              width: 7,
-                              height: 7,
-                              borderRadius: "50%",
-                              background: activeUser.emailVerified
-                                ? "var(--color-brand-primary)"
-                                : "var(--color-warning)",
-                              display: "inline-block",
-                              flexShrink: 0,
-                            }}
+                          <input
+                            className="chat-text-input"
+                            placeholder="Member user ID"
+                            value={groupMemberUserId}
+                            onChange={(e) =>
+                              setGroupMemberUserId(e.target.value)
+                            }
                           />
-                          {activeUser.emailVerified ? "Verified" : "Unverified"}
-                        </span>
-                      </div>
+                          <select
+                            className="chat-text-input"
+                            value={groupMemberRole}
+                            onChange={(e) =>
+                              setGroupMemberRole(
+                                (e.target.value as "member" | "admin") ||
+                                  "member",
+                              )
+                            }
+                          >
+                            <option value="member">member</option>
+                            <option value="admin">admin</option>
+                          </select>
+                          <button
+                            className="chat-send-btn"
+                            disabled={
+                              !groupMemberUserId.trim() ||
+                              currentConversation?.type !== "group"
+                            }
+                            onClick={async () => {
+                              if (
+                                !currentConversation ||
+                                currentConversation.type !== "group"
+                              )
+                                return;
+                              await addGroupMember(
+                                currentConversation._id,
+                                groupMemberUserId.trim(),
+                                groupMemberRole,
+                              );
+                              await loadConversations();
+                              setGroupMemberUserId("");
+                            }}
+                          >
+                            Add Member
+                          </button>
+                          <button
+                            className="chat-icon-btn"
+                            disabled={
+                              !groupMemberUserId.trim() ||
+                              currentConversation?.type !== "group"
+                            }
+                            onClick={async () => {
+                              if (
+                                !currentConversation ||
+                                currentConversation.type !== "group"
+                              )
+                                return;
+                              await removeGroupMember(
+                                currentConversation._id,
+                                groupMemberUserId.trim(),
+                              );
+                              await loadConversations();
+                              setGroupMemberUserId("");
+                            }}
+                          >
+                            Remove Member
+                          </button>
+                        </div>
+                      )}
+
+                      <button
+                        className="chat-danger-btn"
+                        disabled={!currentConversation}
+                        onClick={async () => {
+                          if (!currentConversation) return;
+
+                          const confirmed = window.confirm(
+                            "Delete this conversation permanently?",
+                          );
+                          if (!confirmed) return;
+
+                          await deleteConversation(currentConversation._id);
+                          setActiveUser(null);
+                        }}
+                      >
+                        <Trash2 size={14} />
+                        Delete Conversation
+                      </button>
                     </div>
                   </div>
                 )}
@@ -739,6 +1386,13 @@ const InboxPage = () => {
           )}
         </div>
       </div>
+
+      <Notification
+        open={notification.open}
+        message={notification.message}
+        severity={notification.severity}
+        onClose={hideNotification}
+      />
     </div>
   );
 };

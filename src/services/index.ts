@@ -4,6 +4,9 @@ export {
   type UsersResponse,
 } from "./admin.service";
 export { authService } from "./auth.service";
+export { authClient, AuthClientError } from "./authClient";
+export { chatApi } from "./chatApi.service";
+export { chatSocket } from "./chatSocket.service";
 export {
   chatService,
   type ChatMessage,
