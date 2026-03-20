@@ -1,0 +1,109 @@
+[
+  {
+    "id": "REQ-2024-001",
+    "farmerName": "Sunil Gamage",
+    "farmerAvatar": "https://lh3.googleusercontent.com/aida-public/AB6AXuBf0PA4Tq9RwgbYxyNsqPN4RVCcuuA7iiEBJNHCrKXM4PwWAvbzcRFU9f5ksNf9pEJvU8ib0rIYXWzciu1Ahl5vTdAVVRoA74TbhbOVzvgh4OeeQ7XnupEWE0UjJGvsfbaffZ__W3L6iobojD7U8oRhEzOIaqqtHhk9pWIp7fpuNG6W7XB_1r8ldmu--AyWq1izD3W8CpdK11KpEdIFaV4EsADrahBEvzDmYXEIIAlYVjJSFrA5CIeh2W0ZXvU97qeIiRv8DdtGzEQ",
+    "farmerInitials": "SG",
+    "location": "Rice Paddy Cultivation • Anuradhapura",
+    "isVerified": true,
+    "statusBadge": {
+      "label": "Review Needed",
+      "variant": "review"
+    },
+    "tags": [
+      {
+        "label": "Farmer Request",
+        "variant": "secondary"
+      },
+      {
+        "label": "20 Acres",
+        "variant": "secondary"
+      }
+    ],
+    "description": "Looking for investment to expand organic fertilizer usage for the upcoming Maha season. Estimated ROI is 15%.",
+    "timestamp": "Received: 2 hours ago",
+    "journeySteps": [
+      {
+        "title": "Request Received",
+        "description": "Farmer submitted investment request",
+        "timestamp": "Jan 30, 08:30 AM",
+        "status": "completed"
+      },
+      {
+        "title": "Document Verification",
+        "description": "Checking land ownership and certifications",
+        "timestamp": "Jan 30, 09:00 AM",
+        "status": "completed"
+      },
+      {
+        "title": "Investor Review",
+        "description": "Awaiting your decision",
+        "status": "active",
+        "icon": "rate_review"
+      },
+      {
+        "title": "Connection Acceptance",
+        "description": "Accept farmer connection",
+        "status": "pending"
+      },
+      {
+        "title": "Landowner Search",
+        "description": "Find and connect with landowner",
+        "status": "pending"
+      }
+    ],
+    "insight": "Experienced rice farmer with 12+ years. Organic certification. Previous investors report 98% success rate.",
+    "highlighted": true
+  },
+  {
+    "id": "REQ-2024-002",
+    "farmerName": "Tharindu K.",
+    "farmerAvatar": null,
+    "farmerInitials": "TK",
+    "location": "Coconut Estate • Kurunegala",
+    "isVerified": false,
+    "statusBadge": {
+      "label": "New",
+      "variant": "new"
+    },
+    "tags": [
+      {
+        "label": "5 Acres",
+        "variant": "secondary"
+      }
+    ],
+    "description": "Requesting funding for irrigation system upgrade. Detailed project plan attached.",
+    "timestamp": "Received: 5 hours ago",
+    "journeySteps": [
+      {
+        "title": "Request Received",
+        "description": "Farmer submitted investment request",
+        "timestamp": "Jan 30, 05:15 AM",
+        "status": "completed"
+      },
+      {
+        "title": "Initial Screening",
+        "description": "Automated checks in progress",
+        "status": "active",
+        "icon": "search"
+      },
+      {
+        "title": "Document Verification",
+        "description": "Pending land documents",
+        "status": "pending"
+      },
+      {
+        "title": "Investor Review",
+        "description": "Awaiting your decision",
+        "status": "pending"
+      },
+      {
+        "title": "Connection Acceptance",
+        "description": "Accept farmer connection",
+        "status": "pending"
+      }
+    ],
+    "insight": "New farmer profile. Irrigation upgrade project with clear ROI projections. Recommend thorough verification.",
+    "highlighted": false
+  }
+]

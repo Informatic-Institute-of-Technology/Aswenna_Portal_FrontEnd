@@ -1,16 +1,145 @@
-/**
- * User Service
- * Handles all user-related API calls
- */
+import type { User, UserRole } from "@/Context/createAuthContext";
+import { config } from "@/core/config";
+import { httpClient } from "./httpClient";
 
-import type { User } from '@/Context/createAuthContext';
-import { httpClient } from './httpClient';
+type RoleApiValue =
+  | string
+  | {
+      _id?: string;
+      name?: string;
+      description?: string;
+    }
+  | null
+  | undefined;
+
+const ROLE_ID_MAP: Record<string, UserRole> = {
+  "696e40fda4f896e9f40c8b93": "farmer",
+  "696e6163b558abe269548099": "investor",
+  "696e616db558abe26954809c": "landowner",
+  "696f008a3e12fb6fd9ed945b": "superadmin",
+};
+
+const normalizeCropFocus = (value: unknown): string[] => {
+  if (Array.isArray(value)) {
+    return value
+      .filter((item): item is string => typeof item === "string")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  if (typeof value === "string") {
+    return value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+};
+
+const deriveRole = (role: RoleApiValue): UserRole | undefined => {
+  const roleName =
+    typeof role === "string"
+      ? role
+      : typeof role === "object" && role
+        ? role.name
+        : undefined;
+  const roleId =
+    typeof role === "object" && role
+      ? role._id
+      : typeof role === "string"
+        ? role
+        : undefined;
+
+  const normalized = roleName?.toLowerCase();
+  if (
+    normalized === "farmer" ||
+    normalized === "investor" ||
+    normalized === "landowner" ||
+    normalized === "superadmin"
+  ) {
+    return normalized;
+  }
+
+  if (roleId && ROLE_ID_MAP[roleId]) {
+    return ROLE_ID_MAP[roleId];
+  }
+
+  return undefined;
+};
+
+type ProfilePictureApiValue =
+  | string
+  | {
+      url?: string;
+      filename?: string;
+      [key: string]: unknown;
+    }
+  | null
+  | undefined;
+
+type UploadedMediaApiValue =
+  | {
+      url?: string;
+      filename?: string;
+      [key: string]: unknown;
+    }
+  | null
+  | undefined;
+
+const resolveProfilePicture = (
+  value: ProfilePictureApiValue,
+): ProfilePictureApiValue => {
+  if (!value || typeof value === "string") return value;
+  if (value.url || !value.filename) return value;
+
+  return {
+    ...value,
+    url: `${config.storage.baseUrl}/${value.filename}`,
+  };
+};
+
+const resolveUploadedMedia = (
+  value: UploadedMediaApiValue,
+): UploadedMediaApiValue => {
+  if (!value) return value;
+  if (value.url || !value.filename) return value;
+
+  return {
+    ...value,
+    url: `${config.storage.baseUrl}/${value.filename}`,
+  };
+};
 
 export interface UpdateUserProfileDTO {
-  firstName: string;
-  lastName: string;
-  address: string;
-  phoneNumber: string;
+  firstName?: string;
+  lastName?: string;
+  fullName?: string;
+  address?: string;
+  phoneNumber?: string;
+  personalInfo?: {
+    nicNumber?: string;
+    gender?: string;
+    birthday?: string;
+    age?: number;
+    address?: string;
+    city?: string;
+    province?: string;
+    postalCode?: string;
+    district?: string;
+    profilePicture?: string | { url?: string; filename?: string } | null;
+    nicFrontImage?: { url?: string; filename?: string } | null;
+    nicBackImage?: { url?: string; filename?: string } | null;
+  };
+  investor?: {
+    organizationName?: string;
+    registrationNo?: string;
+    companyAddress?: string;
+    organizationPhoneNumber?: string;
+    dsDivision?: string;
+    gnDivision?: string;
+    cropFocus?: string[];
+  };
 }
 
 export interface UserApiResponse {
@@ -31,46 +160,88 @@ export interface UserApiResponse {
   createdAt: string | null;
   updatedAt: string | null;
   __v: number | null;
+  personalInfo?: {
+    nicNumber?: string;
+    gender?: string;
+    birthday?: string;
+    age?: number;
+    address?: string;
+    city?: string;
+    province?: string;
+    postalCode?: string;
+    district?: string;
+    profilePicture?: string | { url?: string; filename?: string } | null;
+    nicFrontImage?: { url?: string; filename?: string } | null;
+    nicBackImage?: { url?: string; filename?: string } | null;
+  } | null;
+  status?: string | null;
+  termsAccepted?: boolean | null;
+  role?: RoleApiValue;
+  investor?: {
+    organizationName?: string;
+    registrationNo?: string;
+    companyAddress?: string;
+    organizationPhoneNumber?: string;
+    dsDivision?: string;
+    gnDivision?: string;
+    cropFocus?: string | string[];
+  } | null;
 }
 
 class UserService {
-  /**
-   * Get user profile by ID
-   */
   async getUserProfile(userId: string): Promise<User> {
-    const response = await httpClient.get<UserApiResponse>(`/v1/user/${userId}`);
+    const response = await httpClient.get<UserApiResponse>(
+      `/v1/user/${userId}`,
+    );
     return this.mapUserResponse(response);
   }
-
-  /**
-   * Update user profile
-   */
-  async updateUserProfile(userId: string, data: UpdateUserProfileDTO): Promise<User> {
-    const response = await httpClient.patch<UserApiResponse>(`/v1/user/${userId}`, data);
+  async updateUserProfile(
+    userId: string,
+    data: UpdateUserProfileDTO,
+  ): Promise<User> {
+    const response = await httpClient.patch<UserApiResponse>(
+      `/v1/user/${userId}`,
+      data,
+    );
     return this.mapUserResponse(response);
   }
+  async checkEmailDuplicate(email: string): Promise<boolean> {
+    const response = await httpClient.get<{ exists: boolean }>(
+      `/v1/user/email/${encodeURIComponent(email)}/duplicate-check`,
+    );
+    return response.exists;
+  }
 
-  /**
-   * Get current user from token
-   */
   async getCurrentUser(): Promise<User | null> {
     try {
-      const storedUser = localStorage.getItem('user');
+      const storedUser = localStorage.getItem("user");
       if (storedUser) {
         const user = JSON.parse(storedUser);
         return user;
       }
       return null;
     } catch (error) {
-      console.error('Failed to get current user:', error);
+      console.error("Failed to get current user:", error);
       return null;
     }
   }
 
-  /**
-   * Map API response to User interface
-   */
   private mapUserResponse(response: UserApiResponse): User {
+    const mappedPersonalInfo = response.personalInfo
+      ? {
+          ...response.personalInfo,
+          profilePicture: resolveProfilePicture(
+            response.personalInfo.profilePicture,
+          ),
+          nicFrontImage: resolveUploadedMedia(
+            response.personalInfo.nicFrontImage,
+          ),
+          nicBackImage: resolveUploadedMedia(
+            response.personalInfo.nicBackImage,
+          ),
+        }
+      : null;
+
     return {
       _id: response._id || null,
       firstName: response.firstName || null,
@@ -82,13 +253,29 @@ class UserService {
       phoneNumber: response.phoneNumber || null,
       phoneNumberVerified: response.phoneNumberVerified ?? null,
       roles: Array.isArray(response.roles) ? response.roles : [],
-      permissions: Array.isArray(response.permissions) ? response.permissions : [],
+      permissions: Array.isArray(response.permissions)
+        ? response.permissions
+        : [],
       createdBy: response.createdBy || null,
       updatedBy: response.updatedBy || null,
       meta: Array.isArray(response.meta) ? response.meta : [],
       createdAt: response.createdAt || null,
       updatedAt: response.updatedAt || null,
       __v: response.__v ?? null,
+      role: deriveRole(response.role),
+      roleInfo:
+        typeof response.role === "object" && response.role
+          ? response.role
+          : null,
+      status: response.status ?? null,
+      termsAccepted: response.termsAccepted ?? null,
+      investor: response.investor
+        ? {
+            ...response.investor,
+            cropFocus: normalizeCropFocus(response.investor.cropFocus),
+          }
+        : null,
+      personalInfo: mappedPersonalInfo,
     };
   }
 }

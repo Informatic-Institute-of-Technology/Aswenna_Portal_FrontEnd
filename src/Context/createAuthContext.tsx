@@ -1,6 +1,31 @@
 import { createContext } from "react";
 
-export type UserRole = 'farmer' | 'investor' | 'landowner' | 'superadmin';
+export type UserRole = "farmer" | "investor" | "landowner" | "superadmin";
+
+export interface InvestorProfile {
+  organizationName?: string;
+  registrationNo?: string;
+  companyAddress?: string;
+  organizationPhoneNumber?: string;
+  dsDivision?: string;
+  gnDivision?: string;
+  cropFocus?: string[];
+}
+
+export interface RoleInfo {
+  _id?: string;
+  name?: string;
+  description?: string;
+}
+
+export interface UploadedMedia {
+  url?: string;
+  filename?: string;
+  fileSize?: string;
+  mimeType?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 export interface User {
   _id: string | null;
@@ -21,29 +46,34 @@ export interface User {
   updatedAt: string | null;
   __v: number | null;
   role?: UserRole;
-}
-
-export interface SignUpData {
-  email: string;
-  password: string;
-  name: string;
-  role: UserRole;
-  nationalId?: string;
-  address?: string;
-  contactNumber?: string;
-  alternateContact?: string;
-  dob?: string;
-  province?: string;
-  district?: string;
+  roleInfo?: RoleInfo | null;
+  status?: string | null;
+  termsAccepted?: boolean | null;
+  investor?: InvestorProfile | null;
+  personalInfo?: {
+    nicNumber?: string;
+    gender?: string;
+    birthday?: string;
+    age?: number;
+    address?: string;
+    city?: string;
+    province?: string;
+    postalCode?: string;
+    district?: string;
+    profilePicture?: string | UploadedMedia | null;
+    nicFrontImage?: UploadedMedia | null;
+    nicBackImage?: UploadedMedia | null;
+  } | null;
 }
 
 export interface AuthContextType {
   user: User | null;
+  sessionId: string | null;
   loading: boolean;
+  initializing: boolean;
   login: (email: string, password: string) => Promise<void>;
-  signup?: (data: SignUpData) => Promise<void>;
   logout: () => void;
-  updateUser: (user: User) => void;
+  updateUser: (user: User) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(

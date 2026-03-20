@@ -1,0 +1,1570 @@
+import {
+  AdministrativeFields,
+  FileUploader,
+  FormSection,
+  ImageGallery,
+  LocationMapPicker,
+  NicUploader,
+  ProfileStepper,
+} from "@/components";
+import {
+  LocationService,
+  registrationStore,
+  type LandownerRegistrationRequest,
+} from "@/services";
+import { getStoredCredentials, validateNIC } from "@/utils";
+import {
+  AccountBalance,
+  Add as AddIcon,
+  ArrowBack,
+  CameraAlt,
+  Cancel as CancelIcon,
+  CheckCircle as CheckCircleIcon,
+  Description,
+  Lightbulb,
+  LocationOn,
+  MyLocation,
+  Person,
+  PhotoLibrary,
+  Place,
+} from "@mui/icons-material";
+import {
+  Avatar,
+  Box,
+  Button,
+  CircularProgress,
+  Container,
+  FormControl,
+  Grid,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Tooltip,
+  Typography,
+  type SelectChangeEvent,
+} from "@mui/material";
+import { useJsApiLoader } from "@react-google-maps/api";
+import type { ChangeEvent } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Notification from "../../shared/components/Notification";
+import { useFormPersistence } from "../../shared/hooks/useFormPersistence";
+import { useNotification } from "../../shared/hooks/useNotification";
+
+const LandownerProfileSetup = () => {
+  const navigate = useNavigate();
+  const { notification, showSuccess, hideNotification } = useNotification();
+  const steps = ["Step 1", "Step 2", "Step 3"];
+
+  const { isLoaded } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: LocationService.getGoogleMapsApiKey(),
+  });
+
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const defaultCenter = LocationService.getDefaultMapCenter();
+
+  const [fullName, setFullName] = useState("");
+  const [profilePicture, setProfilePicture] = useState<string | null>(null);
+  const [profilePictureFile, setProfilePictureFile] = useState<File | null>(
+    null,
+  );
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [street, setStreet] = useState("");
+  const [city, setCity] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+
+  const [nicFrontFile, setNicFrontFile] = useState<File | null>(null);
+  const [nicBackFile, setNicBackFile] = useState<File | null>(null);
+  const [nicNumber, setNicNumber] = useState("");
+  const [nicError, setNicError] = useState("");
+  const [birthday, setBirthday] = useState("");
+  const [gender, setGender] = useState<"Male" | "Female" | "">("");
+  const [age, setAge] = useState<number | null>(null);
+
+  const [province, setProvince] = useState("");
+  const [district, setDistrict] = useState("");
+  const [dsDivision, setDsDivision] = useState("");
+  const [gnDivision, setGnDivision] = useState("");
+  const [dsDivisionsList, setDsDivisionsList] = useState<string[]>([]);
+  const [gnDivisionsList, setGnDivisionsList] = useState<
+    { name: string; number: string }[]
+  >([]);
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const pendingLocationUpdate = useRef<{
+    ds?: string;
+    gn?: string;
+    gnNumber?: string;
+  } | null>(null);
+  const pendingLandLocationUpdate = useRef<{
+    ds?: string;
+    gn?: string;
+    gnNumber?: string;
+  } | null>(null);
+
+  const sriLankaLocations = LocationService.getProvinceDistrictMap();
+
+  const [landStreet, setLandStreet] = useState("");
+  const [landCity, setLandCity] = useState("");
+  const [landProvince, setLandProvince] = useState("");
+  const [landDistrict, setLandDistrict] = useState("");
+  const [landPostalCode, setLandPostalCode] = useState("");
+  const [landDsDivision, setLandDsDivision] = useState("");
+  const [landGnDivision, setLandGnDivision] = useState("");
+  const [landDsDivisionsList, setLandDsDivisionsList] = useState<string[]>([]);
+  const [landGnDivisionsList, setLandGnDivisionsList] = useState<
+    { name: string; number: string }[]
+  >([]);
+  const [landSize, setLandSize] = useState("");
+  const [soilType, setSoilType] = useState("");
+  const [rentalExpectation, setRentalExpectation] = useState("");
+
+  const [certificateFiles, setCertificateFiles] = useState<File[]>([]);
+  const [galleryImages, setGalleryImages] = useState<
+    { file: File; preview: string }[]
+  >([]);
+  const [pinLocation, setPinLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(defaultCenter);
+
+  const soilTypes = [
+    "Sandy Loam",
+    "Clay",
+    "Loamy",
+    "Silt",
+    "Peaty",
+    "Chalky",
+    "Sandy",
+  ];
+
+  useEffect(() => {
+    const fetchDSDivisions = async () => {
+      if (district) {
+        try {
+          const divisions =
+            await LocationService.getDSDivisionsByDistrict(district);
+          setDsDivisionsList(divisions);
+
+          if (pendingLocationUpdate.current?.ds) {
+            const match = divisions.find(
+              (d) =>
+                d.toLowerCase() ===
+                pendingLocationUpdate.current?.ds?.toLowerCase(),
+            );
+            if (match) {
+              setDsDivision(match);
+            } else {
+              setDsDivision("");
+            }
+          } else {
+            setDsDivision("");
+          }
+        } catch (error) {
+          console.error("Failed to load DS Divisions", error);
+          setDsDivisionsList([]);
+          setDsDivision("");
+        }
+      } else {
+        setDsDivisionsList([]);
+        setDsDivision("");
+      }
+    };
+
+    fetchDSDivisions();
+  }, [district]);
+
+  useEffect(() => {
+    const fetchGNDivisions = async () => {
+      if (dsDivision) {
+        try {
+          const gns =
+            await LocationService.getGNDivisionsByDSDivision(dsDivision);
+          setGnDivisionsList(gns);
+          if (pendingLocationUpdate.current?.gn) {
+            const match = gns.find(
+              (g) => g.name === pendingLocationUpdate.current?.gn,
+            );
+            if (match) {
+              setGnDivision(match.name);
+            } else {
+              setGnDivision("");
+            }
+            pendingLocationUpdate.current = null;
+          } else {
+            setGnDivision("");
+          }
+        } catch (error) {
+          console.error("Failed to load GN Divisions", error);
+          setGnDivisionsList([]);
+          setGnDivision("");
+        }
+      } else {
+        setGnDivisionsList([]);
+        setGnDivision("");
+      }
+    };
+
+    fetchGNDivisions();
+  }, [dsDivision]);
+
+  useEffect(() => {
+    const fetchLandDSDivisions = async () => {
+      if (landDistrict) {
+        try {
+          const divisions =
+            await LocationService.getDSDivisionsByDistrict(landDistrict);
+          setLandDsDivisionsList(divisions);
+
+          if (pendingLandLocationUpdate.current?.ds) {
+            const pendingDs = pendingLandLocationUpdate.current.ds;
+            const match = divisions.find(
+              (d) => d.toLowerCase() === pendingDs.toLowerCase(),
+            );
+            if (match) {
+              setLandDsDivision(match);
+            } else {
+              console.warn(
+                "DS Division not found:",
+                pendingDs,
+                "in district:",
+                landDistrict,
+                "Available:",
+                divisions.slice(0, 5),
+              );
+              setLandDsDivision(pendingDs);
+            }
+          } else {
+            setLandDsDivision("");
+          }
+        } catch (error) {
+          console.error("Failed to load Land DS Divisions:", error);
+          setLandDsDivisionsList([]);
+          setLandDsDivision("");
+        }
+      } else {
+        setLandDsDivisionsList([]);
+        setLandDsDivision("");
+      }
+    };
+
+    fetchLandDSDivisions();
+  }, [landDistrict]);
+
+  useEffect(() => {
+    const fetchLandGNDivisions = async () => {
+      if (landDsDivision) {
+        try {
+          const gns =
+            await LocationService.getGNDivisionsByDSDivision(landDsDivision);
+          setLandGnDivisionsList(gns);
+
+          if (pendingLandLocationUpdate.current?.gn) {
+            const pendingGn = pendingLandLocationUpdate.current.gn;
+            const match = gns.find(
+              (g) => g.name.toLowerCase() === pendingGn.toLowerCase(),
+            );
+            if (match) {
+              setLandGnDivision(match.name);
+            } else {
+              console.warn(
+                "GN Division not found:",
+                pendingGn,
+                "in DS:",
+                landDsDivision,
+                "Available:",
+                gns.slice(0, 5).map((g) => g.name),
+              );
+
+              setLandGnDivision(pendingGn);
+            }
+            pendingLandLocationUpdate.current = null;
+          } else {
+            setLandGnDivision("");
+          }
+        } catch (error) {
+          console.error("Failed to load Land GN Divisions", error);
+          setLandGnDivisionsList([]);
+          setLandGnDivision("");
+        }
+      } else {
+        setLandGnDivisionsList([]);
+        setLandGnDivision("");
+      }
+    };
+
+    fetchLandGNDivisions();
+  }, [landDsDivision]);
+
+  useEffect(() => {
+    const fetchPostalCode = async () => {
+      if (city && district && !postalCode) {
+        try {
+          const code = await LocationService.getPostalCodeByAddress(
+            city,
+            district,
+          );
+          if (code) setPostalCode(code);
+        } catch (e) {
+          console.error("Failed to auto-fetch postal code", e);
+        }
+      }
+    };
+
+    const timeoutId = setTimeout(fetchPostalCode, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [city, district, postalCode]);
+
+  useEffect(() => {
+    const geocodeLandAddress = async () => {
+      if (!landStreet || !landCity) {
+        return;
+      }
+
+      try {
+        const coordinates = await LocationService.geocodeAddress(
+          landStreet,
+          landCity,
+          landDistrict,
+          landProvince,
+        );
+
+        if (coordinates) {
+          setPinLocation(coordinates);
+
+          if (map) {
+            map.panTo(coordinates);
+          }
+
+          try {
+            const locationDetails = await LocationService.getLocationDetails(
+              coordinates.lat,
+              coordinates.lng,
+            );
+
+            if (locationDetails) {
+              if (locationDetails.dsDivision) {
+                const divisions =
+                  await LocationService.getDSDivisionsByDistrict(landDistrict);
+                const matchingDs = divisions.find(
+                  (d) =>
+                    d.toLowerCase() ===
+                    locationDetails.dsDivision?.toLowerCase(),
+                );
+                if (matchingDs) {
+                  setLandDsDivision(matchingDs);
+
+                  if (locationDetails.gnDivision) {
+                    const gns =
+                      await LocationService.getGNDivisionsByDSDivision(
+                        matchingDs,
+                      );
+                    const matchingGn = gns.find(
+                      (g) => g.name === locationDetails.gnDivision,
+                    );
+                    if (matchingGn) {
+                      setLandGnDivision(matchingGn.name);
+                    }
+                  }
+                }
+              }
+            }
+          } catch (error) {
+            console.error(
+              "Error fetching location details for geocoded address:",
+              error,
+            );
+          }
+        } else {
+          console.log("Could not geocode the address");
+        }
+      } catch (error) {
+        console.error("Error geocoding land address:", error);
+      }
+    };
+
+    const timeoutId = setTimeout(geocodeLandAddress, 1500);
+    return () => clearTimeout(timeoutId);
+  }, [landStreet, landCity, landDistrict, landProvince, map]);
+
+  const handleBack = () => {
+    navigate("/role-selection");
+  };
+
+  const handleProfilePictureChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert("File size should not exceed 5MB");
+        return;
+      }
+      setProfilePictureFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfilePicture(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleProvinceChange = (event: SelectChangeEvent<string>) => {
+    setProvince(event.target.value);
+    setDistrict("");
+  };
+
+  const handleUseMyLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
+
+    setIsLoadingLocation(true);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          const details = await LocationService.getLocationDetails(
+            latitude,
+            longitude,
+          );
+
+          if (details.province) setProvince(details.province);
+          if (details.dsDivision || details.gnDivision) {
+            pendingLocationUpdate.current = {
+              ds: details.dsDivision,
+              gn: details.gnDivision,
+              gnNumber: details.gnNumber,
+            };
+          }
+
+          if (details.district) setDistrict(details.district);
+          if (details.city) setCity(details.city);
+          if (details.address) setStreet(details.address);
+          if (details.postalCode) setPostalCode(details.postalCode);
+        } catch (error) {
+          console.error("Error getting location details:", error);
+          alert("Failed to fetch location details.");
+        } finally {
+          setIsLoadingLocation(false);
+        }
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+        setIsLoadingLocation(false);
+        alert("Unable to retrieve your location.");
+      },
+    );
+  };
+
+  const handleNICChange = (value: string) => {
+    setNicNumber(value);
+    setNicError("");
+
+    if (value.trim() === "") {
+      setBirthday("");
+      setGender("");
+      setAge(null);
+      return;
+    }
+
+    if (value.length === 10 || value.length === 12) {
+      const result = validateNIC(value);
+
+      if (result.isValid) {
+        setBirthday(result.birthday || "");
+        setGender(result.gender || "");
+        setAge(result.age || null);
+        setNicError("");
+      } else {
+        setBirthday("");
+        setGender("");
+        setAge(null);
+        setNicError(result.error || "Invalid NIC");
+      }
+    }
+  };
+
+  const handleSoilTypeChange = (event: SelectChangeEvent<string>) => {
+    setSoilType(event.target.value);
+  };
+
+  const handleCertificateFilesSelected = (newFiles: File[]) => {
+    setCertificateFiles((prev) => [...prev, ...newFiles]);
+  };
+
+  const handleCertificateFileDelete = (index: number) => {
+    setCertificateFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleGalleryImageAdd = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      const newImages = Array.from(event.target.files).map((file) => ({
+        file,
+        preview: URL.createObjectURL(file),
+      }));
+      setGalleryImages((prev) => [...prev, ...newImages]);
+    }
+  };
+
+  const handleGalleryImageDelete = (index: number) => {
+    const imageToDelete = galleryImages[index];
+    if (imageToDelete) {
+      URL.revokeObjectURL(imageToDelete.preview);
+    }
+    setGalleryImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handlePinLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          setPinLocation({
+            lat: latitude,
+            lng: longitude,
+          });
+
+          if (map) {
+            map.panTo({ lat: latitude, lng: longitude });
+            map.setZoom(15);
+          }
+
+          try {
+            const address = await LocationService.reverseGeocode(
+              latitude,
+              longitude,
+            );
+            if (address) {
+              const parts = address.split(",").map((p) => p.trim());
+              if (parts.length >= 2) {
+                setLandStreet(`${parts[0]}, ${parts[1]}`);
+              } else if (parts.length > 0) {
+                setLandStreet(parts[0]);
+              }
+            }
+
+            const details = await LocationService.getLocationDetails(
+              latitude,
+              longitude,
+            );
+            if (details.city) setLandCity(details.city);
+            if (details.province) setLandProvince(details.province);
+            if (details.postalCode) setLandPostalCode(details.postalCode);
+
+            if (details.district) {
+              setLandDistrict(details.district);
+
+              try {
+                const dsDivisions =
+                  await LocationService.getDSDivisionsByDistrict(
+                    details.district,
+                  );
+                setLandDsDivisionsList(dsDivisions);
+
+                if (details.dsDivision && dsDivisions.length > 0) {
+                  const matchingDs = dsDivisions.find(
+                    (ds) =>
+                      ds.toLowerCase() === details.dsDivision?.toLowerCase(),
+                  );
+                  if (matchingDs) {
+                    setLandDsDivision(matchingDs);
+
+                    try {
+                      const gnDivisions =
+                        await LocationService.getGNDivisionsByDSDivision(
+                          matchingDs,
+                        );
+                      setLandGnDivisionsList(gnDivisions);
+
+                      if (details.gnDivision && gnDivisions.length > 0) {
+                        const matchingGn = gnDivisions.find(
+                          (gn) =>
+                            gn.name.toLowerCase() ===
+                            details.gnDivision?.toLowerCase(),
+                        );
+                        if (matchingGn) {
+                          setLandGnDivision(matchingGn.name);
+                        }
+                      }
+                    } catch (gnError) {
+                      console.error(
+                        "Failed to load Land GN Divisions",
+                        gnError,
+                      );
+                    }
+                  }
+                }
+              } catch (dsError) {
+                console.error("Failed to load Land DS Divisions", dsError);
+              }
+            }
+          } catch (error) {
+            console.error("Error getting location details:", error);
+          }
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          alert("Unable to get your location");
+        },
+      );
+    }
+  };
+
+  const handleMapClick = async (e: google.maps.MapMouseEvent) => {
+    if (e.latLng) {
+      const lat = e.latLng.lat();
+      const lng = e.latLng.lng();
+
+      setPinLocation({ lat, lng });
+
+      try {
+        const address = await LocationService.reverseGeocode(lat, lng);
+        if (address) {
+          const parts = address.split(",").map((p) => p.trim());
+          if (parts.length >= 2) {
+            setLandStreet(`${parts[0]}, ${parts[1]}`);
+          } else if (parts.length > 0) {
+            setLandStreet(parts[0]);
+          }
+        }
+
+        const details = await LocationService.getLocationDetails(lat, lng);
+
+        if (details.city) setLandCity(details.city);
+        if (details.province) setLandProvince(details.province);
+        if (details.postalCode) setLandPostalCode(details.postalCode);
+
+        if (details.district) {
+          if (details.dsDivision || details.gnDivision) {
+            pendingLandLocationUpdate.current = {
+              ds: details.dsDivision,
+              gn: details.gnDivision,
+              gnNumber: details.gnNumber,
+            };
+          }
+
+          setLandDistrict(details.district);
+        } else {
+          console.warn("No district in location details");
+        }
+      } catch (error) {
+        console.error("Error getting location details:", error);
+      }
+    }
+  };
+
+  const onMapLoad = (map: google.maps.Map) => {
+    setMap(map);
+  };
+
+  const handleMarkerDragEnd = async (e: google.maps.MapMouseEvent) => {
+    if (e.latLng) {
+      const lat = e.latLng.lat();
+      const lng = e.latLng.lng();
+
+      setPinLocation({ lat, lng });
+
+      try {
+        const address = await LocationService.reverseGeocode(lat, lng);
+        if (address) {
+          const parts = address.split(",").map((p) => p.trim());
+          if (parts.length >= 2) {
+            setLandStreet(`${parts[0]}, ${parts[1]}`);
+          } else if (parts.length > 0) {
+            setLandStreet(parts[0]);
+          }
+        }
+
+        const details = await LocationService.getLocationDetails(lat, lng);
+
+        if (details.city) setLandCity(details.city);
+        if (details.province) setLandProvince(details.province);
+        if (details.postalCode) setLandPostalCode(details.postalCode);
+
+        if (details.district) {
+          if (details.dsDivision || details.gnDivision) {
+            pendingLandLocationUpdate.current = {
+              ds: details.dsDivision,
+              gn: details.gnDivision,
+              gnNumber: details.gnNumber,
+            };
+          }
+          setLandDistrict(details.district);
+        } else {
+          console.warn("No district in location details (drag)");
+        }
+      } catch (error) {
+        console.error("Error getting location details (drag):", error);
+      }
+    }
+  };
+
+  const handleLandProvinceChange = (event: SelectChangeEvent<string>) => {
+    setLandProvince(event.target.value);
+    setLandDistrict("");
+    setLandDsDivision("");
+    setLandGnDivision("");
+  };
+
+  const handleLandDistrictChange = (event: SelectChangeEvent<string>) => {
+    setLandDistrict(event.target.value);
+    setLandDsDivision("");
+    setLandGnDivision("");
+  };
+
+  const handleCompleteRegistration = async () => {
+    const { email, password, emailVerified } = getStoredCredentials();
+    const formattedPhone = phoneNumber.startsWith("+")
+      ? phoneNumber
+      : phoneNumber.startsWith("0")
+        ? `+94${phoneNumber.substring(1)}`
+        : `+94${phoneNumber}`;
+
+    const payload: LandownerRegistrationRequest = {
+      fullName,
+      email,
+      emailVerified,
+      phoneNumber: formattedPhone,
+      phoneNumberVerified: false,
+      password,
+      role: "landowner",
+      personalInfo: {
+        nicNumber,
+        birthday,
+        gender: gender as "Male" | "Female",
+        age: age || 0,
+        address: street,
+        city,
+        postalCode,
+        district,
+        province,
+      },
+      landOwnerDetails: {
+        dsDivision,
+        gnDivision,
+        location: {
+          latitude: pinLocation?.lat ?? 0,
+          longitude: pinLocation?.lng ?? 0,
+        },
+        landAddress: {
+          street: landStreet,
+          city: landCity,
+          province: landProvince,
+          district: landDistrict,
+          postalCode: landPostalCode,
+          size: landSize,
+          soilType,
+          rentalExpectation,
+          dsDivision: landDsDivision,
+          gnDivision: landGnDivision,
+        },
+      },
+    };
+
+    localStorage.setItem("pendingRegistrationPayload", JSON.stringify(payload));
+    registrationStore.setFiles({
+      profilePicture: profilePictureFile,
+      nicFrontImage: nicFrontFile,
+      nicBackImage: nicBackFile,
+      bimsaviyaCertificate: certificateFiles[0] ?? null,
+      landImages: galleryImages.map((g) => g.file),
+    });
+    navigate("/terms-and-conditions");
+  };
+
+  const formData = {
+    profilePicture,
+    fullName,
+    phoneNumber,
+    nicNumber,
+    birthday,
+    gender,
+    age,
+    street,
+    city,
+    province,
+    district,
+    postalCode,
+    dsDivision,
+    gnDivision,
+    landStreet,
+    landCity,
+    landProvince,
+    landDistrict,
+    landPostalCode,
+    landDsDivision,
+    landGnDivision,
+    landSize,
+    soilType,
+    rentalExpectation,
+    pinLocation,
+  };
+
+  const { loadFormData } = useFormPersistence("landowner", formData);
+
+  useEffect(() => {
+    const loadSavedData = async () => {
+      const savedData = await loadFormData();
+      if (savedData) {
+        console.log("Loading saved landowner form data...");
+
+        if (savedData.fullName) setFullName(savedData.fullName as string);
+        if (savedData.phoneNumber)
+          setPhoneNumber(savedData.phoneNumber as string);
+        if (savedData.nicNumber) setNicNumber(savedData.nicNumber as string);
+        if (savedData.birthday) setBirthday(savedData.birthday as string);
+        if (savedData.gender) setGender(savedData.gender as "Male" | "Female");
+        if (savedData.age) setAge(savedData.age as number);
+        if (savedData.street) setStreet(savedData.street as string);
+        if (savedData.city) setCity(savedData.city as string);
+        if (savedData.province) setProvince(savedData.province as string);
+
+        if (savedData.dsDivision) {
+          pendingLocationUpdate.current = {
+            ds: savedData.dsDivision as string,
+            gn: (savedData.gnDivision as string) || undefined,
+          };
+        }
+        if (savedData.district) setDistrict(savedData.district as string);
+        if (savedData.postalCode) setPostalCode(savedData.postalCode as string);
+
+        if (savedData.landStreet) setLandStreet(savedData.landStreet as string);
+        if (savedData.landCity) setLandCity(savedData.landCity as string);
+        if (savedData.landProvince)
+          setLandProvince(savedData.landProvince as string);
+
+        if (savedData.landDsDivision) {
+          pendingLandLocationUpdate.current = {
+            ds: savedData.landDsDivision as string,
+            gn: (savedData.landGnDivision as string) || undefined,
+          };
+        }
+        if (savedData.landDistrict)
+          setLandDistrict(savedData.landDistrict as string);
+        if (savedData.landPostalCode)
+          setLandPostalCode(savedData.landPostalCode as string);
+        if (savedData.landSize) setLandSize(savedData.landSize as string);
+        if (savedData.soilType) setSoilType(savedData.soilType as string);
+        if (savedData.rentalExpectation)
+          setRentalExpectation(savedData.rentalExpectation as string);
+        if (savedData.pinLocation)
+          setPinLocation(savedData.pinLocation as { lat: number; lng: number });
+        if (savedData.profilePicture)
+          setProfilePicture(savedData.profilePicture as string);
+
+        showSuccess("Your previous form data has been restored!");
+      }
+    };
+
+    loadSavedData();
+
+  }, []);
+
+  return (
+    <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
+      <Container maxWidth="xl" sx={{ py: 2, px: 2 }}>
+        <Box sx={{ mb: 3 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              mb: 1,
+              cursor: "pointer",
+            }}
+            onClick={handleBack}
+          >
+            <ArrowBack
+              sx={{ color: "text.secondary", mr: 1, fontSize: "1rem" }}
+            />
+            <Typography variant="body2" color="text.secondary">
+              Back to Role Selection
+            </Typography>
+          </Box>
+
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              flexWrap: "wrap",
+              gap: 2,
+            }}
+          >
+            <Box>
+              <Typography
+                variant="h3"
+                component="h1"
+                sx={{ fontWeight: "bold", mb: 1 }}
+              >
+                Landowner{" "}
+                <span style={{ color: "var(--color-olive)" }}>Profile</span>
+              </Typography>
+            </Box>
+
+            <ProfileStepper activeStep={2} steps={steps} />
+          </Box>
+        </Box>
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12, lg: 4 }}>
+            <FormSection
+              icon={<Place sx={{ color: "primary.main", mr: 1.5 }} />}
+              title="Personal Information"
+            >
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12 }}>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "center", mb: 3 }}
+                  >
+                    <Box sx={{ position: "relative" }}>
+                      <Avatar
+                        src={profilePicture || undefined}
+                        sx={{
+                          width: 120,
+                          height: 120,
+                          border: "4px solid",
+                          borderColor: "primary.main",
+                          fontSize: "3rem",
+                        }}
+                      >
+                        {!profilePicture && (
+                          <Person sx={{ fontSize: "4rem" }} />
+                        )}
+                      </Avatar>
+                      <IconButton
+                        component="label"
+                        sx={{
+                          position: "absolute",
+                          bottom: 0,
+                          right: 0,
+                          backgroundColor: "primary.main",
+                          "&:hover": { backgroundColor: "primary.dark" },
+                          width: 40,
+                          height: 40,
+                        }}
+                      >
+                        <CameraAlt
+                          sx={{ color: "white", fontSize: "1.25rem" }}
+                        />
+                        <input
+                          type="file"
+                          hidden
+                          accept="image/*"
+                          onChange={handleProfilePictureChange}
+                        />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="Full Name"
+                    placeholder="Nimsara Jayathilaka"
+                    variant="outlined"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="Phone Number"
+                    placeholder="+94771234567"
+                    variant="outlined"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="National ID Number"
+                    placeholder="Enter the National ID Number"
+                    variant="outlined"
+                    value={nicNumber}
+                    onChange={(e) =>
+                      handleNICChange(e.target.value.toUpperCase())
+                    }
+                    error={!!nicError}
+                    InputLabelProps={{ shrink: true }}
+                    slotProps={{
+                      input: {
+                        endAdornment: nicNumber && (
+                          <InputAdornment position="end">
+                            {nicError ? (
+                              <Tooltip title={nicError} arrow placement="top">
+                                <CancelIcon
+                                  sx={{ color: "error.main", fontSize: 24 }}
+                                />
+                              </Tooltip>
+                            ) : birthday ? (
+                              <CheckCircleIcon
+                                sx={{ color: "success.main", fontSize: 24 }}
+                              />
+                            ) : null}
+                          </InputAdornment>
+                        ),
+                      },
+                    }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="Gender"
+                    placeholder="Gender"
+                    variant="outlined"
+                    value={gender}
+                    disabled
+                    InputLabelProps={{ shrink: true }}
+                    sx={{
+                      "& .MuiInputBase-input.Mui-disabled": {
+                        WebkitTextFillColor: gender
+                          ? "var(--text-primary)"
+                          : "var(--text-on-dark)",
+                        fontWeight: gender ? 600 : 400,
+                      },
+                    }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="Date of Birth"
+                    placeholder="Date of Birth"
+                    variant="outlined"
+                    value={
+                      birthday
+                        ? new Date(birthday).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })
+                        : ""
+                    }
+                    disabled
+                    InputLabelProps={{ shrink: true }}
+                    sx={{
+                      "& .MuiInputBase-input.Mui-disabled": {
+                        WebkitTextFillColor: birthday
+                          ? "var(--text-primary)"
+                          : "var(--text-on-dark)",
+                        fontWeight: birthday ? 600 : 400,
+                      },
+                    }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="Age"
+                    placeholder="Age"
+                    variant="outlined"
+                    value={age !== null ? `${age} years` : ""}
+                    disabled
+                    InputLabelProps={{ shrink: true }}
+                    sx={{
+                      "& .MuiInputBase-input.Mui-disabled": {
+                        WebkitTextFillColor:
+                          age !== null
+                            ? "var(--text-primary)"
+                            : "var(--text-on-dark)",
+                        fontWeight: age !== null ? 600 : 400,
+                      },
+                    }}
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12 }}>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      mt: 2,
+                      mb: 1,
+                      fontWeight: 600,
+                      color: "text.secondary",
+                    }}
+                  >
+                    Address
+                  </Typography>
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="Street Address (No / Lane)"
+                    placeholder="65, Galvihara Road"
+                    variant="outlined"
+                    value={street}
+                    onChange={(e) => setStreet(e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                    slotProps={{
+                      input: {
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={handleUseMyLocation}
+                              disabled={isLoadingLocation}
+                              title="Use My Location"
+                              color="primary"
+                            >
+                              {isLoadingLocation ? (
+                                <CircularProgress size={24} />
+                              ) : (
+                                <MyLocation />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      },
+                    }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="City / Town"
+                    placeholder="Colombo"
+                    variant="outlined"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <FormControl fullWidth>
+                    <InputLabel shrink>Province</InputLabel>
+                    <Select
+                      value={province}
+                      onChange={handleProvinceChange}
+                      displayEmpty
+                      label="Province"
+                      notched
+                    >
+                      <MenuItem value="" disabled>
+                        Select Province
+                      </MenuItem>
+                      {Object.keys(sriLankaLocations).map((prov) => (
+                        <MenuItem key={prov} value={prov}>
+                          {prov}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <FormControl fullWidth disabled={!province}>
+                    <InputLabel shrink>District</InputLabel>
+                    <Select
+                      value={district}
+                      onChange={(e) => setDistrict(e.target.value)}
+                      displayEmpty
+                      label="District"
+                      notched
+                    >
+                      <MenuItem value="" disabled>
+                        Select District
+                      </MenuItem>
+                      {province &&
+                        sriLankaLocations[province]?.map((dist) => (
+                          <MenuItem key={dist} value={dist}>
+                            {dist}
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="Postal Code"
+                    placeholder="00100"
+                    variant="outlined"
+                    value={postalCode}
+                    onChange={(e) => setPostalCode(e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Grid>
+              </Grid>
+            </FormSection>
+
+            <FormSection
+              icon={<AccountBalance sx={{ color: "primary.main", mr: 1.5 }} />}
+              title="Administrative Details"
+            >
+              <AdministrativeFields
+                district={district}
+                dsDivision={dsDivision}
+                gnDivision={gnDivision}
+                dsDivisionsList={dsDivisionsList}
+                gnDivisionsList={gnDivisionsList}
+                onDsDivisionChange={(e: SelectChangeEvent<string>) =>
+                  setDsDivision(e.target.value)
+                }
+                onGnDivisionChange={(e: SelectChangeEvent<string>) =>
+                  setGnDivision(e.target.value)
+                }
+              />
+            </FormSection>
+
+            <FormSection
+              icon={<Description sx={{ color: "primary.main", mr: 1.5 }} />}
+              title="Legal Documentation"
+            >
+              <Box sx={{ mb: 3 }}>
+                <NicUploader
+                  frontFile={nicFrontFile}
+                  backFile={nicBackFile}
+                  onFrontChange={setNicFrontFile}
+                  onBackChange={setNicBackFile}
+                />
+              </Box>
+              <FileUploader
+                label="Upload Bimsaviya Certificate"
+                helperText="PDF, JPG, or PNG (Max 10MB)"
+                files={certificateFiles}
+                onFilesSelected={handleCertificateFilesSelected}
+                onFileDelete={handleCertificateFileDelete}
+                accept=".pdf,.jpg,.jpeg,.png"
+              />
+            </FormSection>
+          </Grid>
+
+          <Grid size={{ xs: 12, lg: 4 }}>
+            <FormSection
+              icon={<MyLocation sx={{ color: "primary.main", mr: 1.5 }} />}
+              title="Pin Land Location"
+              action={
+                <Button
+                  size="small"
+                  onClick={handlePinLocation}
+                  sx={{ color: "primary.main", textTransform: "none" }}
+                >
+                  LIVE VIEW
+                </Button>
+              }
+            >
+              <LocationMapPicker
+                isLoaded={isLoaded}
+                center={defaultCenter}
+                pinLocation={pinLocation}
+                onMapClick={handleMapClick}
+                onMapLoad={onMapLoad}
+                onMarkerDragEnd={handleMarkerDragEnd}
+                height="300px"
+              />
+              <Grid container spacing={2} sx={{ mt: 1 }}>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="Latitude"
+                    variant="outlined"
+                    value={pinLocation ? pinLocation.lat.toFixed(6) : ""}
+                    disabled
+                    InputLabelProps={{ shrink: true }}
+                    placeholder="Click map to get coordinates"
+                    sx={{
+                      "& .MuiInputBase-input.Mui-disabled": {
+                        WebkitTextFillColor: pinLocation
+                          ? "var(--text-primary)"
+                          : "var(--text-on-dark)",
+                        fontWeight: pinLocation ? 600 : 400,
+                      },
+                    }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="Longitude"
+                    variant="outlined"
+                    value={pinLocation ? pinLocation.lng.toFixed(6) : ""}
+                    disabled
+                    InputLabelProps={{ shrink: true }}
+                    placeholder="Click map to get coordinates"
+                    sx={{
+                      "& .MuiInputBase-input.Mui-disabled": {
+                        WebkitTextFillColor: pinLocation
+                          ? "var(--text-primary)"
+                          : "var(--text-on-dark)",
+                        fontWeight: pinLocation ? 600 : 400,
+                      },
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            </FormSection>
+
+            <FormSection
+              icon={<LocationOn sx={{ color: "primary.main", mr: 1.5 }} />}
+              title="Land Address & Specifications"
+            >
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ mb: 1, color: "text.secondary" }}
+                  >
+                    Land Address
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="Street/Area"
+                    placeholder="Ramakrishna Road"
+                    variant="outlined"
+                    value={landStreet}
+                    onChange={(e) => setLandStreet(e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="City/Town"
+                    placeholder="Colombo 02"
+                    variant="outlined"
+                    value={landCity}
+                    onChange={(e) => setLandCity(e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <FormControl fullWidth>
+                    <InputLabel shrink>Province</InputLabel>
+                    <Select
+                      value={landProvince}
+                      onChange={handleLandProvinceChange}
+                      displayEmpty
+                      label="Province"
+                      notched
+                    >
+                      <MenuItem value="" disabled>
+                        Select Province
+                      </MenuItem>
+                      {Object.keys(sriLankaLocations).map((prov) => (
+                        <MenuItem key={prov} value={prov}>
+                          {prov}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <FormControl fullWidth disabled={!landProvince}>
+                    <InputLabel shrink>District</InputLabel>
+                    <Select
+                      value={landDistrict}
+                      onChange={handleLandDistrictChange}
+                      displayEmpty
+                      label="District"
+                      notched
+                    >
+                      <MenuItem value="" disabled>
+                        Select District
+                      </MenuItem>
+                      {landProvince &&
+                        sriLankaLocations[landProvince]?.map((dist) => (
+                          <MenuItem key={dist} value={dist}>
+                            {dist}
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="Postal Code"
+                    placeholder="60170"
+                    variant="outlined"
+                    value={landPostalCode}
+                    onChange={(e) => setLandPostalCode(e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="Land Size / Area (Acres)"
+                    placeholder="5.5"
+                    variant="outlined"
+                    type="number"
+                    value={landSize}
+                    onChange={(e) => setLandSize(e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <FormControl fullWidth>
+                    <InputLabel shrink>Soil Type</InputLabel>
+                    <Select
+                      value={soilType}
+                      onChange={handleSoilTypeChange}
+                      displayEmpty
+                      label="Soil Type"
+                      notched
+                    >
+                      <MenuItem value="" disabled>
+                        Select Soil Type
+                      </MenuItem>
+                      {soilTypes.map((type) => (
+                        <MenuItem key={type} value={type}>
+                          {type}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="Rental Expectation (Monthly)"
+                    placeholder="LKR 45,000"
+                    variant="outlined"
+                    value={rentalExpectation}
+                    onChange={(e) => setRentalExpectation(e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Grid>
+              </Grid>
+            </FormSection>
+
+            <FormSection
+              icon={<AccountBalance sx={{ color: "primary.main", mr: 1.5 }} />}
+              title="Land Administrative Details"
+            >
+              <AdministrativeFields
+                district={landDistrict}
+                dsDivision={landDsDivision}
+                gnDivision={landGnDivision}
+                dsDivisionsList={landDsDivisionsList}
+                gnDivisionsList={landGnDivisionsList}
+                onDsDivisionChange={(e: SelectChangeEvent<string>) =>
+                  setLandDsDivision(e.target.value)
+                }
+                onGnDivisionChange={(e: SelectChangeEvent<string>) =>
+                  setLandGnDivision(e.target.value)
+                }
+              />
+            </FormSection>
+          </Grid>
+
+          <Grid size={{ xs: 12, lg: 4 }}>
+            <FormSection
+              icon={<PhotoLibrary sx={{ color: "primary.main", mr: 1.5 }} />}
+              title="Land Gallery"
+              action={
+                <Button
+                  size="small"
+                  startIcon={<AddIcon />}
+                  onClick={() =>
+                    document.getElementById("gallery-input")?.click()
+                  }
+                  sx={{ color: "primary.main", textTransform: "none" }}
+                >
+                  Add more
+                </Button>
+              }
+            >
+              <ImageGallery
+                images={galleryImages}
+                onImageAdd={handleGalleryImageAdd}
+                onImageDelete={handleGalleryImageDelete}
+              />
+            </FormSection>
+
+            <FormSection
+              icon={<Lightbulb sx={{ color: "primary.main", mr: 1.5 }} />}
+              title="Expert Tip"
+              variant="bordered"
+            >
+              <Box sx={{ display: "flex", gap: 2 }}>
+                <Box
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    bgcolor: "primary.main",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  <Lightbulb sx={{ color: "white" }} />
+                </Box>
+                <Box>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight="bold"
+                    gutterBottom
+                  >
+                    Expert Tip
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Uploading clear, wide-angle photos of your land increases
+                    investor interest by up to 45%. Ensure boundaries are
+                    clearly visible.
+                  </Typography>
+                </Box>
+              </Box>
+            </FormSection>
+
+            <Button
+              fullWidth
+              variant="contained"
+              size="large"
+              onClick={handleCompleteRegistration}
+              sx={{
+                py: 1.5,
+                bgcolor: "primary.main",
+                fontWeight: "bold",
+                borderRadius: 2,
+                "&:hover": {
+                  bgcolor: "primary.dark",
+                },
+              }}
+            >
+              Complete Registration
+            </Button>
+          </Grid>
+        </Grid>
+
+        <Box
+          sx={{
+            textAlign: "center",
+            mt: 3,
+            pt: 3,
+            borderTop: "1px solid",
+            borderColor: "divider",
+          }}
+        >
+          <Typography variant="body2" color="text.secondary">
+            © 2024 Aswenna Platform. Sustainably Connecting Agriculture and
+            Opportunity.
+          </Typography>
+        </Box>
+      </Container>
+
+      <Notification
+        open={notification.open}
+        message={notification.message}
+        severity={notification.severity}
+        duration={5000}
+        onClose={hideNotification}
+      />
+    </Box>
+  );
+};
+
+export default LandownerProfileSetup;

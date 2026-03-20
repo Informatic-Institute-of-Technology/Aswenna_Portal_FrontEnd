@@ -1,27 +1,29 @@
-import { useAuth } from '@/Context/useAuth';
-import type { ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useAuth } from "@/Context/useAuth";
+import { Navigate, Outlet } from "react-router-dom";
 
-interface PublicRouteProps {
-  children: ReactNode;
-}
+const PublicRoute = () => {
+  const { user, sessionId, initializing } = useAuth();
 
-const PublicRoute = ({ children }: PublicRouteProps) => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
+  if (initializing) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
         <p>Loading...</p>
       </div>
     );
   }
 
-  if (user) {
-    return <Navigate to="/dashboard" replace />;
+  if (user && sessionId) {
+    return <Navigate to={`/${sessionId}/dashboard`} replace />;
   }
 
-  return <>{children}</>;
+  return <Outlet />;
 };
 
 export default PublicRoute;

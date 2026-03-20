@@ -14,17 +14,17 @@ const CreateOfferButton = ({ onClick, fullWidth = false }: CreateOfferButtonProp
             onClick={onClick}
             className="create-offer-btn"
             sx={{
-                background: 'linear-gradient(135deg, #6B8E23 0%, #8FA887 100%)',
+                background: 'linear-gradient(135deg, var(--color-olive) 0%, var(--color-olive-light) 100%)',
                 borderRadius: '12px',
                 padding: '0.875rem 1.75rem',
                 fontSize: '1rem',
                 fontWeight: 600,
                 textTransform: 'none',
-                boxShadow: '0 4px 15px rgba(107, 142, 35, 0.3)',
+                boxShadow: '0 4px 15px var(--color-olive-glow)',
                 width: fullWidth ? '100%' : 'auto',
                 '&:hover': {
-                    background: 'linear-gradient(135deg, #7C9F34 0%, #A4C29D 100%)',
-                    boxShadow: '0 6px 20px rgba(107, 142, 35, 0.4)',
+                    background: 'linear-gradient(135deg, var(--color-olive-hover) 0%, var(--color-olive-light) 100%)',
+                    boxShadow: '0 6px 20px var(--color-olive-glow)',
                     transform: 'translateY(-2px)',
                 },
             }}

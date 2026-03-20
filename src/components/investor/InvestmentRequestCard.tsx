@@ -1,285 +1,607 @@
-import type { InvestmentRequest } from '@/types/farmer.types';
-import {
-  CalendarToday,
-  Event,
-  LocationOn,
-  OpenInNew,
-  Person,
-  Schedule,
-  Star
-} from '@mui/icons-material';
+import { useEffect, useState } from "react";
+
+import { userService } from "@/services";
+import type { InvestmentRequest } from "@/types/farmer.types";
+import { CalendarToday, LocationOn, Visibility } from "@mui/icons-material";
 import {
   Avatar,
   Box,
-  Button,
   Card,
   CardContent,
+  CardMedia,
   Chip,
+  IconButton,
   Stack,
-  Typography
-} from '@mui/material';
+  Typography,
+} from "@mui/material";
 
 export interface InvestmentRequestCardProps {
   request: InvestmentRequest;
   onViewDetails?: (request: InvestmentRequest) => void;
 }
 
-const InvestmentRequestCard = ({ request, onViewDetails }: InvestmentRequestCardProps) => {
+const InvestmentRequestCard = ({
+  request,
+  onViewDetails,
+}: InvestmentRequestCardProps) => {
+  const [farmerProfileImage, setFarmerProfileImage] = useState<string | null>(
+    request.farmerImage || null,
+  );
+  const isCommission = request.offerType === "commission";
+
+  // Fetch farmer profile picture using farmer ID
+  useEffect(() => {
+    const fetchFarmerProfile = async () => {
+      try {
+        if (request.farmerId) {
+          const userProfile = await userService.getUserProfile(
+            request.farmerId,
+          );
+          if (
+            userProfile.personalInfo?.profilePicture &&
+            typeof userProfile.personalInfo.profilePicture === "string"
+          ) {
+            setFarmerProfileImage(userProfile.personalInfo.profilePicture);
+          } else if (
+            userProfile.personalInfo?.profilePicture &&
+            typeof userProfile.personalInfo.profilePicture === "object" &&
+            "url" in userProfile.personalInfo.profilePicture
+          ) {
+            setFarmerProfileImage(
+              userProfile.personalInfo.profilePicture.url || null,
+            );
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch farmer profile:", error);
+        // Fallback to farmerImage from request
+        setFarmerProfileImage(request.farmerImage || null);
+      }
+    };
+
+    fetchFarmerProfile();
+  }, [request.farmerId, request.farmerImage]);
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-LK", {
+      style: "currency",
+      currency: "LKR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
+    return new Date(dateStr).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
   };
 
-  const getDaysUntilDeadline = () => {
-    const deadline = new Date(request.fundingDeadline);
-    const today = new Date();
-    const diffTime = deadline.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
+  const getStatusColor = (): "success" | "warning" | "error" | "default" => {
+    switch (request.status?.toLowerCase()) {
+      case "open":
+        return "success";
+      case "draft":
+        return "warning";
+      case "completed":
+        return "default";
+      default:
+        return "default";
+    }
   };
 
-  // Get crop-specific background image
-  const getCropImage = (cropType: string) => {
-    const cropImages: Record<string, string> = {
-      'Tomatoes': 'https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=800',
-      'Rice': 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=800',
-      'Vegetables': 'https://images.unsplash.com/photo-1597362925123-77861d3fbac7?w=800',
-      'Tea': 'https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?w=800',
-      'Coconut': 'https://images.unsplash.com/photo-1598511726623-d2e9996892f0?w=800',
-      'Chili': 'https://images.unsplash.com/photo-1583454155184-870a1f63fd67?w=800',
-    };
-    return cropImages[cropType] || 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=800';
+  const handleViewDetails = () => {
+    if (onViewDetails) {
+      onViewDetails(request);
+    }
   };
-
-  const daysLeft = getDaysUntilDeadline();
-  const isUrgent = daysLeft <= 7;
 
   return (
-    <Card
-      sx={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        background: 'linear-gradient(145deg, #2a2a2a 0%, #1f1f1f 100%)',
-        border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: 2.5,
-        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-        overflow: 'hidden',
-        '&:hover': {
-          transform: 'translateY(-8px)',
-          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(107, 142, 35, 0.1)',
-        },
-      }}
-    >
-      {/* Header with Cover Image */}
-      <Box
+    <>
+      <Card
         sx={{
-          position: 'relative',
-          backgroundImage: `url('${getCropImage(request.cropType)}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          borderRadius: '12px 12px 0 0',
-          overflow: 'hidden',
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          background:
+            "linear-gradient(145deg, var(--bg-subtle) 0%, var(--bg-overlay) 100%)",
+          border: "1px solid var(--bg-active)",
+          borderRadius: 2.5,
+          transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+          overflow: "hidden",
+          "&:hover": {
+            transform: "translateY(-8px)",
+            boxShadow:
+              "0 20px 40px var(--overlay-md), 0 0 20px var(--color-olive-muted)",
+          },
         }}
       >
-        {/* Dark Overlay for readability */}
+        {/* Hero Section with Background Image */}
         <Box
           sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.7) 100%)',
-            zIndex: 1,
-          }}
-        />
-        
-        {/* Content */}
-        <Box
-          sx={{
-            position: 'relative',
-            zIndex: 2,
-            p: 2.5,
-            pb: 2,
+            position: "relative",
+            height: 160,
+            background:
+              "linear-gradient(135deg, var(--color-nature-deep) 0%, var(--color-nature-mid) 100%)",
+            overflow: "hidden",
           }}
         >
-          <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
-            <Chip
-              label={request.status.toUpperCase()}
-              size="small"
+          {request.coverImageUrl && (
+            <CardMedia
+              component="img"
+              image={request.coverImageUrl}
+              alt={request.cropType}
               sx={{
-                bgcolor: '#76c043',
-                color: '#fff',
-                fontWeight: 700,
-                fontSize: '0.7rem',
-                height: 24,
-                px: 0.5,
-                letterSpacing: '0.5px',
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                opacity: 0.6,
+                transition: "all 0.4s ease",
+                "&:hover": {
+                  transform: "scale(1.1)",
+                  opacity: 0.75,
+                },
               }}
             />
-            {isUrgent && (
+          )}
+          <Box
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background:
+                "linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.75) 100%)",
+            }}
+          />
+          <Box
+            sx={{
+              position: "relative",
+              zIndex: 2,
+              p: 2,
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1,
+                alignItems: "center",
+                flexWrap: "wrap",
+              }}
+            >
               <Chip
-                label={`${daysLeft} days left`}
+                label={request.status?.toUpperCase() || "UNKNOWN"}
+                color={getStatusColor()}
                 size="small"
                 sx={{
-                  bgcolor: 'rgba(255, 152, 0, 0.25)',
-                  color: '#ffa726',
-                  border: '1px solid rgba(255, 152, 0, 0.4)',
                   fontWeight: 600,
-                  fontSize: '0.7rem',
-                  height: 24,
-                  backdropFilter: 'blur(10px)',
+                  letterSpacing: 0.5,
+                  backdropFilter: "blur(10px)",
+                  textTransform: "uppercase",
                 }}
               />
-            )}
-          </Stack>
-          <Typography variant="h6" fontWeight={700} sx={{ color: '#fff', mb: 1, fontSize: '1.15rem', lineHeight: 1.3, textShadow: '0 2px 4px rgba(0, 0, 0, 0.4)' }}>
-            {request.projectTitle}
-          </Typography>
-          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.9)', display: 'flex', alignItems: 'center', gap: 0.5, fontSize: '0.75rem', textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)' }}>
-            <Box component="span" sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#76c043', display: 'inline-block', boxShadow: '0 0 8px rgba(118, 192, 67, 0.6)' }} />
-            Investment Opportunity • Direct Harvest
-          </Typography>
-        </Box>
-      </Box>
+              <Chip
+                label={isCommission ? "COMMISSION" : "HARVEST"}
+                size="small"
+                sx={{
+                  fontWeight: 600,
+                  letterSpacing: 0.5,
+                  backdropFilter: "blur(10px)",
+                  textTransform: "uppercase",
+                  bgcolor: isCommission
+                    ? "var(--color-amber-muted)"
+                    : "var(--color-success-bg)",
+                  color: isCommission
+                    ? "var(--color-amber)"
+                    : "var(--color-success)",
+                }}
+              />
+            </Box>
 
-      <CardContent sx={{ flexGrow: 1, p: 2.5, pt: 2.5 }}>
-        {/* Farmer Profile */}
-        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
-          <Avatar
-            src={request.farmerImage}
-            alt={request.farmerName}
-            sx={{ width: 52, height: 52, border: '3px solid rgba(118, 192, 67, 0.3)' }}
-          >
-            <Person />
-          </Avatar>
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="body1" fontWeight={700} sx={{ color: '#fff', fontSize: '1rem', mb: 0.5 }}>
-              {request.farmerName}
-            </Typography>
-            <Stack direction="row" spacing={2} alignItems="center">
-              <Stack direction="row" spacing={0.5} alignItems="center">
-                <Schedule sx={{ fontSize: 15, color: 'rgba(255,255,255,0.5)' }} />
-                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem' }}>
-                  {request.farmerExperience}+ years
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <Box
+                sx={{
+                  width: 48,
+                  height: 48,
+                  background: "var(--surface-light)",
+                  backdropFilter: "blur(10px)",
+                  borderRadius: 1.5,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "1.5rem",
+                }}
+              >
+                {request.cropIcon || "🌱"}
+              </Box>
+              <Box>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontWeight: 700,
+                    color: "var(--text-primary)",
+                    textShadow: "0 2px 4px var(--overlay-sm)",
+                    fontSize: "1.1rem",
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {request.projectTitle}
                 </Typography>
-              </Stack>
-              {request.farmerRating && (
-                <Stack direction="row" spacing={0.5} alignItems="center">
-                  <Star sx={{ fontSize: 15, color: '#ffa726' }} />
-                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.75rem', fontWeight: 600 }}>
-                    {request.farmerRating}
-                  </Typography>
-                </Stack>
-              )}
-            </Stack>
+                <Typography
+                  variant="caption"
+                  sx={{ color: "var(--text-on-dark)", fontSize: "0.8rem" }}
+                >
+                  Crop: <strong>{request.cropType}</strong>
+                </Typography>
+              </Box>
+            </Box>
           </Box>
-        </Stack>
+        </Box>
 
-        {/* Financial Metrics */}
-        <Box
+        {/* Card Content */}
+        <CardContent
           sx={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
             gap: 2,
-            mb: 3,
+            p: 2,
           }}
         >
-          <Box sx={{ p: 2, bgcolor: 'rgba(0,0,0,0.3)', borderRadius: 1.5, border: '1px solid rgba(255,255,255,0.06)' }}>
-            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', mb: 0.5, display: 'block', fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.5px' }}>
-              TOTAL INVESTMENT
-            </Typography>
-            <Typography variant="h6" fontWeight={700} sx={{ color: '#fff', fontSize: '1.4rem' }}>
-              LKR {(request.totalInvestmentRequired / 1000).toFixed(0)},000
-            </Typography>
-          </Box>
+          {/* Description */}
+          {request.description && (
+            <Box>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: "var(--text-tertiary)",
+                  textTransform: "uppercase",
+                  fontSize: "0.65rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.5px",
+                }}
+              >
+                About This Project
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "var(--text-on-dark)",
+                  display: "-webkit-box",
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  fontSize: "0.875rem",
+                  lineHeight: 1.5,
+                  mt: 0.5,
+                }}
+              >
+                {request.description}
+              </Typography>
+            </Box>
+          )}
 
-          <Box sx={{ p: 2, bgcolor: 'rgba(0,0,0,0.3)', borderRadius: 1.5, border: '1px solid rgba(255,255,255,0.06)' }}>
-            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', mb: 0.5, display: 'block', fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.5px' }}>
-              EXPECTED ROI
-            </Typography>
-            <Typography variant="h6" fontWeight={700} sx={{ color: '#fff', fontSize: '1.4rem' }}>
-              {request.expectedROI}%
-            </Typography>
-          </Box>
-        </Box>
+          {/* Location Info */}
+          <Stack spacing={1}>
+            <Stack direction="row" alignItems="flex-start" spacing={1}>
+              <LocationOn
+                sx={{
+                  fontSize: 16,
+                  color: "var(--text-on-dark)",
+                  mt: 0.3,
+                  flexShrink: 0,
+                }}
+              />
+              <Stack spacing={0.5} sx={{ flex: 1 }}>
+                <Box>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: "var(--text-tertiary)",
+                      textTransform: "uppercase",
+                      fontSize: "0.65rem",
+                      fontWeight: 700,
+                    }}
+                  >
+                    Primary Location
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "var(--text-primary)",
+                      fontSize: "0.875rem",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {request.location}
+                  </Typography>
+                </Box>
 
-        <Box sx={{ mb: 2.5 }}>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: 'rgba(255,255,255,0.7)', 
-              mb: 2,
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              fontSize: '0.875rem',
-              lineHeight: 1.6
-            }}
-          >
-            {request.description}
-          </Typography>
-          
-          <Stack spacing={1.2}>
-            <Stack direction="row" alignItems="center" spacing={1}>
-              <LocationOn sx={{ fontSize: 17, color: 'rgba(255,255,255,0.4)' }} />
-              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.8rem' }}>
-                {request.location}, {request.district}
-              </Typography>
-            </Stack>
-            <Stack direction="row" alignItems="center" spacing={1}>
-              <Event sx={{ fontSize: 17, color: 'rgba(255,255,255,0.4)' }} />
-              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.8rem' }}>
-                {request.expectedDuration} months | Yield: {request.expectedYield}
-              </Typography>
-            </Stack>
-            <Stack direction="row" alignItems="center" spacing={1}>
-              <CalendarToday sx={{ fontSize: 17, color: isUrgent ? '#ff9800' : 'rgba(255,255,255,0.4)' }} />
-              <Typography variant="caption" sx={{ color: isUrgent ? '#ff9800' : 'rgba(255,255,255,0.6)', fontWeight: isUrgent ? 600 : 400, fontSize: '0.8rem' }}>
-                Deadline: {formatDate(request.fundingDeadline)}
-              </Typography>
+                {request.preferredRegions &&
+                  request.preferredRegions.length > 0 && (
+                    <Box>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: "var(--text-tertiary)",
+                          textTransform: "uppercase",
+                          fontSize: "0.65rem",
+                          fontWeight: 700,
+                        }}
+                      >
+                        Preferred Regions
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: "var(--text-on-dark)",
+                          fontSize: "0.8rem",
+                        }}
+                      >
+                        {request.preferredRegions.join(", ")}
+                      </Typography>
+                    </Box>
+                  )}
+              </Stack>
             </Stack>
           </Stack>
-        </Box>
 
-        {/* View Details Button */}
-        <Box sx={{ mt: 'auto' }}>
-          <Button
-            fullWidth
-            variant="contained"
-            size="large"
-            endIcon={<OpenInNew sx={{ fontSize: 18 }} />}
-            onClick={() => onViewDetails?.(request)}
+          {/* Stats Row - Dynamic based on offer type */}
+          <Box
             sx={{
-              background: 'linear-gradient(135deg, #6B8E23 0%, #8FA887 100%)',
-              color: '#ffffff',
-              textTransform: 'none',
-              fontWeight: 700,
-              fontSize: '0.95rem',
-              py: 1.5,
-              borderRadius: 1.5,
-              boxShadow: '0 4px 16px rgba(107, 142, 35, 0.35)',
-              border: 'none',
-              '&:hover': {
-                background: 'linear-gradient(135deg, #7C9F34 0%, #A4C29D 100%)',
-                boxShadow: '0 6px 20px rgba(107, 142, 35, 0.45)',
-                transform: 'translateY(-2px)',
-              },
-              transition: 'all 0.3s ease',
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 1.5,
             }}
           >
-            View Details
-          </Button>
-        </Box>
-      </CardContent>
-    </Card>
+            <Box
+              sx={{
+                background: "var(--surface-tint)",
+                borderRadius: 1.5,
+                p: 1.5,
+                border: "1px solid var(--surface-muted)",
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{
+                  color: "var(--neutral-400)",
+                  textTransform: "uppercase",
+                  fontSize: "0.7rem",
+                  fontWeight: 600,
+                }}
+              >
+                {isCommission ? "Investment Amount" : "Total Investment"}
+              </Typography>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 700,
+                  color: "var(--color-olive)",
+                  fontSize: "1rem",
+                  mt: 0.5,
+                }}
+              >
+                {formatCurrency(
+                  isCommission
+                    ? request.investmentAmount || 0
+                    : request.totalInvestmentRequired || 0,
+                )}
+              </Typography>
+            </Box>
+
+            <Box
+              sx={{
+                background: "var(--surface-tint)",
+                borderRadius: 1.5,
+                p: 1.5,
+                border: "1px solid var(--surface-muted)",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                gap: 1,
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  width: "100%",
+                }}
+              >
+                <Avatar
+                  src={farmerProfileImage || undefined}
+                  alt={request.farmerName}
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    bgcolor: "var(--color-olive)",
+                    fontWeight: 700,
+                    fontSize: "0.875rem",
+                  }}
+                >
+                  {request.farmerName?.charAt(0)?.toUpperCase()}
+                </Avatar>
+                <Box sx={{ flex: 1 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: "var(--neutral-400)",
+                      textTransform: "uppercase",
+                      fontSize: "0.65rem",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Farmer
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontWeight: 600,
+                      color: "var(--text-primary)",
+                      fontSize: "0.875rem",
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {request.farmerName}
+                  </Typography>
+                </Box>
+              </Box>
+              <Box>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "var(--neutral-400)",
+                    textTransform: "uppercase",
+                    fontSize: "0.65rem",
+                    fontWeight: 600,
+                  }}
+                >
+                  Farmer ID
+                </Typography>
+                <Typography
+                  sx={{
+                    fontWeight: 600,
+                    color: "var(--color-olive)",
+                    fontSize: "0.8rem",
+                    fontFamily: "monospace",
+                  }}
+                >
+                  {request.farmerId}
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+
+          {/* Commission-specific details */}
+          {isCommission && (
+            <Box
+              sx={{
+                background: "var(--surface-tint)",
+                borderRadius: 1.5,
+                p: 1.5,
+                border: "1px solid var(--surface-muted)",
+              }}
+            >
+              <Stack spacing={1}>
+                <Box>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: "var(--text-tertiary)",
+                      fontSize: "0.7rem",
+                      fontWeight: 600,
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Number of Installments
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: "var(--text-primary)",
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {request.numberOfInstallments || "N/A"}
+                  </Typography>
+                </Box>
+                {request.expectedLandArea && (
+                  <Box>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: "var(--text-tertiary)",
+                        fontSize: "0.7rem",
+                        fontWeight: 600,
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      Expected Land Area
+                    </Typography>
+                    <Typography
+                      sx={{
+                        color: "var(--text-primary)",
+                        fontSize: "0.9rem",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {request.expectedLandArea} acres
+                    </Typography>
+                  </Box>
+                )}
+              </Stack>
+            </Box>
+          )}
+
+          {/* Deadline */}
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              mt: "auto",
+              pt: 2,
+              borderTop: "1px solid var(--surface-muted)",
+            }}
+          >
+            {request.fundingDeadline && (
+              <Stack direction="row" alignItems="center" spacing={0.5}>
+                <CalendarToday
+                  sx={{ fontSize: 16, color: "var(--text-on-dark)" }}
+                />
+                <Stack spacing={0}>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: "var(--text-tertiary)",
+                      fontSize: "0.65rem",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Deadline
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: "var(--text-secondary)",
+                      fontSize: "0.75rem",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {formatDate(request.fundingDeadline)}
+                  </Typography>
+                </Stack>
+              </Stack>
+            )}
+
+            <Box sx={{ ml: "auto" }}>
+              <IconButton
+                size="small"
+                onClick={handleViewDetails}
+                title="View Details"
+                sx={{
+                  color: "var(--color-olive)",
+                  "&:hover": { bgcolor: "var(--overlay-sm)" },
+                }}
+              >
+                <Visibility fontSize="small" />
+              </IconButton>
+            </Box>
+          </Box>
+        </CardContent>
+      </Card>
+    </>
   );
 };
 

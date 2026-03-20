@@ -13,7 +13,6 @@ interface ProfileAvatarProps {
 export const ProfileAvatar = ({
   fullName,
   avatarUrl,
-  onAvatarChange,
   size = 120,
   editable = true,
 }: ProfileAvatarProps) => {

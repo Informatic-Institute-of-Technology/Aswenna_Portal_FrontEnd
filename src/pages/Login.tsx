@@ -9,12 +9,25 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Notification from "../shared/components/Notification";
 import { useNotification } from "../shared/hooks/useNotification";
+import AccountProcessingDialog from "./components/AccountProcessingDialog";
+
+const INACTIVE_KEYWORDS = [
+  "inactive",
+  "pending",
+  "processing",
+  "not active",
+  "under review",
+];
+
+const isAccountInactiveError = (msg: string) =>
+  INACTIVE_KEYWORDS.some((kw) => msg.toLowerCase().includes(kw));
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [inactiveDialog, setInactiveDialog] = useState(false);
   const navigate = useNavigate();
   const { login, loading } = useAuth();
   const { notification, showError, hideNotification } = useNotification();
@@ -40,13 +53,31 @@ const Login = () => {
 
     try {
       await login(email, password);
-      navigate("/dashboard");
+      const sid = localStorage.getItem("session_id");
+      navigate(`/${sid}/dashboard`);
     } catch (err) {
-      const errorMsg = err instanceof Error && err.message 
-        ? err.message 
-        : "Invalid credentials. Please try again.";
-      setError(errorMsg);
-      showError(errorMsg);
+      let errorMsg = "An unexpected error occurred. Please try again.";
+      if (err instanceof Error && err.message) {
+        try {
+          const parsed = JSON.parse(err.message) as {
+            message?: string | string[];
+            statusCode?: number;
+          };
+          if (parsed.message) {
+            errorMsg = Array.isArray(parsed.message)
+              ? parsed.message.join(" ")
+              : parsed.message;
+          }
+        } catch {
+          errorMsg = err.message;
+        }
+      }
+      if (isAccountInactiveError(errorMsg)) {
+        setInactiveDialog(true);
+      } else {
+        setError(errorMsg);
+        showError(errorMsg);
+      }
     }
   };
 
@@ -130,20 +161,15 @@ const Login = () => {
               </button>
             </form>
 
-            <div className="signup-prompt">
-              <span>Don't have an account? </span>
-              <button
-                type="button"
-                onClick={() => navigate("/signup")}
-                className="signup-login-button"
-              >
-                Sign up
-              </button>
+            <div className="signup-link-container">
+              <span className="signup-text">Don't have an account? </span>
+              <Link to="/signup" className="signup-link">
+                Sign Up
+              </Link>
             </div>
           </div>
         </div>
 
-        {/* Right side - Illustration */}
         <div className="right-container">
           <img
             src={loginImage}
@@ -153,7 +179,11 @@ const Login = () => {
         </div>
       </div>
 
-      {/* Notification for errors - Auto-closes after 5 seconds */}
+      <AccountProcessingDialog
+        open={inactiveDialog}
+        onClose={() => setInactiveDialog(false)}
+      />
+
       <Notification
         open={notification.open}
         message={notification.message}

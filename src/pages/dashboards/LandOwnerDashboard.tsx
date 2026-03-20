@@ -1,26 +1,21 @@
+import { CardHeaderWithIcon, PlaceholderWidget, StatCard } from "@/components";
 import {
-    CardHeaderWithIcon,
-    PlaceholderWidget,
-    StatCard,
-} from '@/components';
-import DashboardLayout from '@/layouts/DashboardLayout';
-import {
-    AttachMoney,
-    BarChart as BarChartIcon,
-    Cloud,
-    Home,
-    LocationOn,
-} from '@mui/icons-material';
-import { Card, CardContent, Chip } from '@mui/material';
+  AttachMoney,
+  BarChart as BarChartIcon,
+  Cloud,
+  Home,
+  LocationOn,
+} from "@mui/icons-material";
+import { Card, CardContent, Chip } from "@mui/material";
 
 const LandOwnerDashboard = () => {
   return (
-    <DashboardLayout>
-      <div className="row g-3" style={{ marginBottom: '1.5rem' }}>
+    <>
+      <div className="row g-3" style={{ marginBottom: "1.5rem" }}>
         <div className="col-12 col-sm-6 col-md-4">
           <StatCard
             icon={Home}
-            iconBgColor="rgba(107, 142, 35, 0.2)"
+            iconBgColor="var(--color-olive-muted-strong)"
             iconColor="primary.main"
             label="Properties Listed"
             value={8}
@@ -29,8 +24,8 @@ const LandOwnerDashboard = () => {
         <div className="col-12 col-sm-6 col-md-4">
           <StatCard
             icon={LocationOn}
-            iconBgColor="rgba(59, 130, 246, 0.2)"
-            iconColor="#3b82f6"
+            iconBgColor="var(--color-info-blue-muted)"
+            iconColor="var(--color-info-blue)"
             label="Allocated to Deals"
             value={5}
           />
@@ -38,8 +33,8 @@ const LandOwnerDashboard = () => {
         <div className="col-12 col-sm-6 col-md-4">
           <StatCard
             icon={AttachMoney}
-            iconBgColor="rgba(251, 191, 36, 0.2)"
-            iconColor="#fbbf24"
+            iconBgColor="var(--color-amber-muted)"
+            iconColor="var(--color-amber)"
             label="Monthly Income"
             value="$8.5K"
           />
@@ -62,7 +57,10 @@ const LandOwnerDashboard = () => {
 
         <div className="col-12 col-lg-6">
           <Card>
-            <CardHeaderWithIcon icon={AttachMoney} title="Income / Rental Tracker" />
+            <CardHeaderWithIcon
+              icon={AttachMoney}
+              title="Income / Rental Tracker"
+            />
             <CardContent>
               <PlaceholderWidget
                 icon="💵"
@@ -103,7 +101,7 @@ const LandOwnerDashboard = () => {
           </Card>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

@@ -1,68 +1,125 @@
-import { useAuth } from '@/Context/useAuth';
+import { useAuth } from "@/Context/useAuth";
 import {
-    AccountCircle,
-    BarChart as BarChartIcon,
-    Handshake,
-    Home,
-    Landscape,
-    Mail,
-    People,
-    Settings,
-    TrendingUp,
-} from '@mui/icons-material';
+  AccountCircle,
+  Agriculture as AgriIcon,
+  BarChart as BarChartIcon,
+  Gavel,
+  Handshake,
+  Home,
+  Landscape,
+  Mail,
+  People,
+  ShoppingCart as ReqIcon,
+  Settings,
+  TrendingUp,
+} from "@mui/icons-material";
+import type {} from "@mui/material";
 import {
-    Avatar,
-    Box,
-    Button,
-    Divider,
-    List,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-    Typography,
-} from '@mui/material';
-import { useLocation, useNavigate } from 'react-router-dom';
+  Avatar,
+  Box,
+  Button,
+  Divider,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+} from "@mui/material";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const FarmerSidebar = () => {
-  const { user, logout } = useAuth();
+  const { user, sessionId, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
+  const basePath = `/${sessionId}`;
+
   const menuItems = [
-    { text: 'Insights', icon: <Home />, path: '/dashboard' },
-    { text: 'My Projects', icon: <BarChartIcon />, path: '/dashboard/my-projects' },
-    { text: 'Investors', icon: <People />, path: '/dashboard/investors' },
-    { text: 'Land Owners', icon: <Landscape />, path: '/dashboard/land-owners' },
-    { text: 'Match Making', icon: <Handshake />, path: '/dashboard/match-making' },
-    { text: 'Opportunities', icon: <TrendingUp />, path: '/dashboard/opportunities' },
+    { text: "Insights", icon: <Home />, path: `${basePath}/dashboard` },
+    {
+      text: "My Projects",
+      icon: <BarChartIcon />,
+      path: `${basePath}/dashboard/my-projects`,
+    },
+    {
+      text: "Investors",
+      icon: <People />,
+      path: `${basePath}/dashboard/investors`,
+    },
+    {
+      text: "Land Owners",
+      icon: <Landscape />,
+      path: `${basePath}/dashboard/land-owners`,
+    },
+    {
+      text: "Agreement",
+      icon: <Gavel />,
+      path: `${basePath}/dashboard/agreement`,
+    },
+    {
+      text: "Match Making",
+      icon: <Handshake />,
+      path: `${basePath}/dashboard/match-making`,
+    },
+    {
+      text: "Opportunities",
+      icon: <TrendingUp />,
+      path: `${basePath}/dashboard/opportunities`,
+    },
+  ];
+
+  const operationsItems = [
+    {
+      text: "Crop Jobs",
+      icon: <AgriIcon />,
+      path: `${basePath}/dashboard/crop-jobs`,
+    },
+    {
+      text: "Requests",
+      icon: <ReqIcon />,
+      path: `${basePath}/dashboard/requests`,
+    },
   ];
 
   const secondaryItems = [
-    { text: 'Inbox', icon: <Mail />, path: '/dashboard/inbox' },
-    { text: 'Account', icon: <AccountCircle />, path: '/dashboard/account' },
-    { text: 'Settings', icon: <Settings />, path: '/dashboard/settings' },
+    { text: "Inbox", icon: <Mail />, path: `${basePath}/dashboard/inbox` },
+    {
+      text: "Account",
+      icon: <AccountCircle />,
+      path: `${basePath}/dashboard/account`,
+    },
+    {
+      text: "Settings",
+      icon: <Settings />,
+      path: `${basePath}/dashboard/settings`,
+    },
   ];
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <Box sx={{ p: 3, textAlign: 'center' }}>
+    <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+      <Box sx={{ p: 3, textAlign: "center" }}>
         <Avatar
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJP8vN8tGwjdGdBoNRb3S7qP1VA0Q1F-SfWg&s"
-          alt={user?.fullName || 'null'}
-          sx={{ 
-            width: 120, 
-            height: 120, 
-            mx: 'auto', 
+          src={(() => {
+            const p = user?.personalInfo?.profilePicture;
+            if (!p) return undefined;
+            if (typeof p === "string") return p;
+            return p.url || undefined;
+          })()}
+          alt={user?.fullName || "null"}
+          sx={{
+            width: 120,
+            height: 120,
+            mx: "auto",
             mb: 2,
-            border: '4px solid',
-            borderColor: 'primary.main',
+            border: "4px solid",
+            borderColor: "primary.main",
           }}
         />
         <Typography variant="h6" sx={{ fontWeight: 600 }}>
-          {user?.fullName || 'null'}
+          {user?.fullName || "null"}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {user?.role || 'null'}
+          {user?.role || "null"}
         </Typography>
       </Box>
 
@@ -75,7 +132,12 @@ const FarmerSidebar = () => {
             selected={location.pathname === item.path}
             onClick={() => navigate(item.path)}
           >
-            <ListItemIcon sx={{ color: location.pathname === item.path ? 'primary.main' : 'inherit' }}>
+            <ListItemIcon
+              sx={{
+                color:
+                  location.pathname === item.path ? "primary.main" : "inherit",
+              }}
+            >
               {item.icon}
             </ListItemIcon>
             <ListItemText primary={item.text} />
@@ -85,6 +147,41 @@ const FarmerSidebar = () => {
 
       <Divider />
 
+      <Box sx={{ px: 2, pt: 1.5, pb: 0.5 }}>
+        <Typography
+          variant="caption"
+          sx={{
+            color: "primary.main",
+            fontWeight: 700,
+            textTransform: "uppercase",
+            letterSpacing: 1,
+            fontSize: 10,
+          }}
+        >
+          Operations
+        </Typography>
+      </Box>
+      <List sx={{ py: 0 }}>
+        {operationsItems.map((item) => (
+          <ListItemButton
+            key={item.path}
+            selected={location.pathname === item.path}
+            onClick={() => navigate(item.path)}
+          >
+            <ListItemIcon
+              sx={{
+                color:
+                  location.pathname === item.path ? "primary.main" : "inherit",
+              }}
+            >
+              {item.icon}
+            </ListItemIcon>
+            <ListItemText primary={item.text} />
+          </ListItemButton>
+        ))}
+      </List>
+
+      <Divider />
 
       <List sx={{ py: 2 }}>
         {secondaryItems.map((item) => (
@@ -93,7 +190,12 @@ const FarmerSidebar = () => {
             selected={location.pathname === item.path}
             onClick={() => navigate(item.path)}
           >
-            <ListItemIcon sx={{ color: location.pathname === item.path ? 'primary.main' : 'inherit' }}>
+            <ListItemIcon
+              sx={{
+                color:
+                  location.pathname === item.path ? "primary.main" : "inherit",
+              }}
+            >
               {item.icon}
             </ListItemIcon>
             <ListItemText primary={item.text} />
@@ -102,12 +204,7 @@ const FarmerSidebar = () => {
       </List>
 
       <Box sx={{ p: 2 }}>
-        <Button
-          variant="contained"
-          fullWidth
-          onClick={logout}
-          sx={{ py: 1.5 }}
-        >
+        <Button variant="contained" fullWidth onClick={logout} sx={{ py: 1.5 }}>
           Logout
         </Button>
       </Box>

@@ -1,25 +1,26 @@
-import { SriLankaMap } from '@/components';
-import DashboardLayout from '@/layouts/DashboardLayout';
-import { adminService, type ApiUser } from '@/services/admin.service';
+import { SriLankaMap } from "@/components";
+import {
+  adminService,
+  type ApiRoleObject,
+  type ApiUser,
+} from "@/services/admin.service";
 import {
   AccessTime,
   Agriculture,
   Assessment,
   AssignmentOutlined,
   BarChartOutlined,
+  Block,
   Business,
   CheckCircle,
-  GroupOutlined,
   Landscape,
   MapOutlined,
   People,
   PersonAdd,
   RefreshOutlined,
-  TrendingDown,
-  TrendingUp,
   Verified,
-  Warning
-} from '@mui/icons-material';
+  Warning,
+} from "@mui/icons-material";
 import {
   Alert,
   Avatar,
@@ -40,9 +41,9 @@ import {
   TableHead,
   TableRow,
   Tabs,
-  Typography
-} from '@mui/material';
-import { useEffect, useState } from 'react';
+  Typography,
+} from "@mui/material";
+import { useEffect, useState } from "react";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -67,8 +68,10 @@ function TabPanel(props: TabPanelProps) {
 
 const SuperAdminDashboard = () => {
   const [tabValue, setTabValue] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [users, setUsers] = useState<ApiUser[]>([]);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [userStats, setUserStats] = useState({
     totalUsers: 0,
     farmers: 0,
@@ -76,6 +79,10 @@ const SuperAdminDashboard = () => {
     landowners: 0,
     verified: 0,
     unverified: 0,
+    activeUsers: 0,
+    pendingStatus: 0,
+    inactiveUsers: 0,
+    suspendedUsers: 0,
   });
   const [provinceDistribution, setProvinceDistribution] = useState<{
     [province: string]: {
@@ -87,29 +94,98 @@ const SuperAdminDashboard = () => {
   }>({});
   const [error, setError] = useState<string | null>(null);
 
+  const ROLE_MAP: Record<string, string> = {
+    "696e40fda4f896e9f40c8b93": "farmer",
+    "696e6163b558abe269548099": "investor",
+    "696e616db558abe26954809c": "landowner",
+    "696f008a3e12fb6fd9ed945b": "superadmin",
+  };
+
+  const getRoleKey = (role: string | ApiRoleObject): string => {
+    if (typeof role === "object" && role !== null)
+      return ROLE_MAP[role._id] ?? "unknown";
+    return ROLE_MAP[role] ?? "unknown";
+  };
+
   const fetchData = async () => {
     try {
       setError(null);
-      const [usersResponse, stats, provinceData] = await Promise.all([
-        adminService.getAllUsers(),
-        adminService.getUserStats(),
-        adminService.getProvinceDistribution(),
-      ]);
 
-      setUsers(usersResponse.data);
+      // Single paginated fetch — all subsequent stats derived from this
+      const allUsers = await adminService.getAllUsersPaginated();
+
+      // ── Compute stats inline ──
+      const stats = {
+        totalUsers: allUsers.filter((u) => getRoleKey(u.role) !== "superadmin")
+          .length,
+        farmers: allUsers.filter((u) => getRoleKey(u.role) === "farmer").length,
+        investors: allUsers.filter((u) => getRoleKey(u.role) === "investor")
+          .length,
+        landowners: allUsers.filter((u) => getRoleKey(u.role) === "landowner")
+          .length,
+        verified: allUsers.filter((u) => u.emailVerified).length,
+        unverified: allUsers.filter((u) => !u.emailVerified).length,
+        activeUsers: allUsers.filter(
+          (u) => (u.status || u.statues || "").toUpperCase() === "ACTIVE",
+        ).length,
+        pendingStatus: allUsers.filter(
+          (u) => (u.status || u.statues || "").toUpperCase() === "PENDING",
+        ).length,
+        inactiveUsers: allUsers.filter(
+          (u) => (u.status || u.statues || "").toUpperCase() === "INACTIVE",
+        ).length,
+        suspendedUsers: allUsers.filter(
+          (u) => (u.status || u.statues || "").toUpperCase() === "SUSPENDED",
+        ).length,
+      };
+
+      // ── Compute province distribution inline ──
+      const ROLE_PROVINCE_MAP: Record<
+        string,
+        "farmers" | "investors" | "landowners"
+      > = {
+        "696e40fda4f896e9f40c8b93": "farmers",
+        "696e6163b558abe269548099": "investors",
+        "696e616db558abe26954809c": "landowners",
+      };
+      const provinceData: typeof provinceDistribution = {};
+      allUsers.forEach((user) => {
+        const addr = user.address ?? "";
+        const parts = addr.split(",").map((p) => p.trim());
+        const province = parts[1] || "Unknown";
+        const roleId =
+          typeof user.role === "object" ? user.role._id : user.role;
+        const roleKey = ROLE_PROVINCE_MAP[roleId];
+        if (!provinceData[province]) {
+          provinceData[province] = {
+            farmers: 0,
+            investors: 0,
+            landowners: 0,
+            total: 0,
+          };
+        }
+        if (roleKey) provinceData[province][roleKey]++;
+        provinceData[province].total++;
+      });
+
+      setUsers(allUsers);
       setUserStats(stats);
       setProvinceDistribution(provinceData);
+      setLastUpdated(new Date());
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to load dashboard data';
+      const message =
+        err instanceof Error ? err.message : "Failed to load dashboard data";
       setError(message);
-      console.error('Dashboard error:', err);
+      console.error("Dashboard error:", err);
     } finally {
+      setLoading(false);
       setRefreshing(false);
     }
   };
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleRefresh = () => {
@@ -121,43 +197,46 @@ const SuperAdminDashboard = () => {
     setTabValue(newValue);
   };
 
-  const calculateGrowth = () => {
-    return {
-      users: 12.5,
-      farmers: 15.3,
-      investors: 8.7,
-      landowners: 10.2,
-    };
-  };
-
-  const growth = calculateGrowth();
-
   const getTopDistricts = () => {
-    const districtCounts = users.reduce((acc: { [key: string]: number }, user) => {
-      if (!user.address || typeof user.address !== 'string' || user.address.trim() === '') {
+    const districtCounts = users.reduce(
+      (acc: { [key: string]: number }, user) => {
+        if (
+          !user.address ||
+          typeof user.address !== "string" ||
+          user.address.trim() === ""
+        ) {
+          return acc;
+        }
+
+        const words = user.address
+          .trim()
+          .split(/[,\s]+/)
+          .filter((w) => w.length > 0);
+
+        if (words.length === 0) return acc;
+
+        let rawDistrict = words[words.length - 1].replace(/[^\w\s]/gi, "");
+
+        const isNumber = /^\d+$/.test(rawDistrict);
+        const isNo = rawDistrict.toLowerCase() === "no";
+
+        if ((isNumber || isNo) && words.length > 1) {
+          rawDistrict = words[words.length - 2].replace(/[^\w\s]/gi, "");
+        }
+
+        const district = rawDistrict.trim();
+
+        if (
+          district &&
+          !/^\d+$/.test(district) &&
+          district.toLowerCase() !== "no"
+        ) {
+          acc[district] = (acc[district] || 0) + 1;
+        }
         return acc;
-      }
-
-      const words = user.address.trim().split(/[,\s]+/).filter(w => w.length > 0);
-
-      if (words.length === 0) return acc;
-
-      let rawDistrict = words[words.length - 1].replace(/[^\w\s]/gi, '');
-
-      const isNumber = /^\d+$/.test(rawDistrict);
-      const isNo = rawDistrict.toLowerCase() === 'no';
-
-      if ((isNumber || isNo) && words.length > 1) {
-        rawDistrict = words[words.length - 2].replace(/[^\w\s]/gi, '');
-      }
-
-      const district = rawDistrict.trim();
-
-      if (district && !/^\d+$/.test(district) && district.toLowerCase() !== 'no') {
-        acc[district] = (acc[district] || 0) + 1;
-      }
-      return acc;
-    }, {});
+      },
+      {},
+    );
 
     return Object.entries(districtCounts)
       .map(([name, count]) => ({ name, count }))
@@ -168,116 +247,43 @@ const SuperAdminDashboard = () => {
   const topDistricts = getTopDistricts();
   const maxDistrictCount = topDistricts[0]?.count || 1;
 
-  const ModernStatCard = ({
-    title,
-    value,
-    subtitle,
-    icon,
-    color,
-    growth,
-    trend = 'up',
-  }: {
-    title: string;
-    value: string | number;
-    subtitle?: string;
-    icon: React.ReactNode;
-    color: string;
-    growth?: number;
-    trend?: 'up' | 'down';
-  }) => (
-    <Card
-      sx={{
-        position: 'relative',
-        overflow: 'hidden',
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        '&:hover': {
-          transform: 'translateY(-4px)',
-          boxShadow: `0 12px 24px ${color}20`,
-        },
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 4,
-          background: color,
-        },
-      }}
-    >
-      <CardContent>
-        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="body2" color="text.secondary" gutterBottom>
-              {title}
-            </Typography>
-            <Typography variant="h3" sx={{ fontWeight: 700, color, mt: 1, mb: 0.5 }}>
-              {value}
-            </Typography>
-            {subtitle && (
-              <Typography variant="caption" color="text.secondary">
-                {subtitle}
-              </Typography>
-            )}
-            {growth !== undefined && (
-              <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
-                {trend === 'up' ? (
-                  <TrendingUp sx={{ fontSize: 16, color: 'success.main', mr: 0.5 }} />
-                ) : (
-                  <TrendingDown sx={{ fontSize: 16, color: 'error.main', mr: 0.5 }} />
-                )}
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: trend === 'up' ? 'success.main' : 'error.main',
-                    fontWeight: 600,
-                  }}
-                >
-                  {growth}% vs last month
-                </Typography>
-              </Box>
-            )}
-          </Box>
-          <Box
-            sx={{
-              width: 64,
-              height: 64,
-              borderRadius: 2,
-              background: `linear-gradient(135deg, ${color}20 0%, ${color}40 100%)`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: color,
-            }}
-          >
-            {icon}
-          </Box>
-        </Box>
-      </CardContent>
-    </Card>
-  );
-
   return (
-    <DashboardLayout>
+    <>
       <Box>
-        <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box
+          sx={{
+            mb: 4,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Box>
             <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
               Super Admin Dashboard
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Platform-wide insights and analytics • Last updated: {new Date().toLocaleTimeString()}
+              Platform-wide insights and analytics • Last updated:{" "}
+              {lastUpdated ? lastUpdated.toLocaleTimeString() : "Loading..."}
             </Typography>
           </Box>
           <Button
             variant="outlined"
-            startIcon={refreshing ? <CircularProgress size={16} /> : <RefreshOutlined />}
+            startIcon={
+              refreshing ? <CircularProgress size={16} /> : <RefreshOutlined />
+            }
             onClick={handleRefresh}
             disabled={refreshing}
           >
-            {refreshing ? 'Refreshing...' : 'Refresh Data'}
+            {refreshing ? "Refreshing..." : "Refresh Data"}
           </Button>
         </Box>
+
+        {loading && (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
+            <CircularProgress />
+          </Box>
+        )}
 
         {error && (
           <Alert severity="error" sx={{ mb: 3 }}>
@@ -285,497 +291,738 @@ const SuperAdminDashboard = () => {
           </Alert>
         )}
 
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <ModernStatCard
-              title="Total Users"
-              value={userStats.totalUsers}
-              subtitle="Active platform users"
-              icon={<GroupOutlined sx={{ fontSize: 32 }} />}
-              color="#2196F3"
-              growth={growth.users}
-              trend="up"
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <ModernStatCard
-              title="Farmers"
-              value={userStats.farmers}
-              subtitle="Cultivators registered"
-              icon={<Agriculture sx={{ fontSize: 32 }} />}
-              color="#4CAF50"
-              growth={growth.farmers}
-              trend="up"
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <ModernStatCard
-              title="Investors"
-              value={userStats.investors}
-              subtitle="Active investors"
-              icon={<Business sx={{ fontSize: 32 }} />}
-              color="#FF9800"
-              growth={growth.investors}
-              trend="up"
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <ModernStatCard
-              title="Landowners"
-              value={userStats.landowners}
-              subtitle="Property owners"
-              icon={<Landscape sx={{ fontSize: 32 }} />}
-              color="#9C27B0"
-              growth={growth.landowners}
-              trend="up"
-            />
-          </Grid>
-        </Grid>
-
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Card
-              sx={{
-                background: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
-                color: 'white',
-              }}
-            >
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Box>
-                    <Typography variant="h6" sx={{ mb: 1, opacity: 0.9 }}>
-                      Verified Users
-                    </Typography>
-                    <Typography variant="h3" sx={{ fontWeight: 700 }}>
-                      {userStats.verified}
-                    </Typography>
-                    <Typography variant="body2" sx={{ mt: 1, opacity: 0.8 }}>
-                      {((userStats.verified / userStats.totalUsers) * 100).toFixed(1)}% of total users
-                    </Typography>
-                  </Box>
-                  <CheckCircle sx={{ fontSize: 64, opacity: 0.3 }} />
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Card
-              sx={{
-                background: 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)',
-                color: 'white',
-              }}
-            >
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Box>
-                    <Typography variant="h6" sx={{ mb: 1, opacity: 0.9 }}>
-                      Pending Verification
-                    </Typography>
-                    <Typography variant="h3" sx={{ fontWeight: 700 }}>
-                      {userStats.unverified}
-                    </Typography>
-                    <Typography variant="body2" sx={{ mt: 1, opacity: 0.8 }}>
-                      {((userStats.unverified / userStats.totalUsers) * 100).toFixed(1)}% need attention
-                    </Typography>
-                  </Box>
-                  <AccessTime sx={{ fontSize: 64, opacity: 0.3 }} />
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-
-        <Card sx={{ mb: 4 }}>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs
-              value={tabValue}
-              onChange={handleTabChange}
-              aria-label="dashboard tabs"
-              variant="scrollable"
-              scrollButtons="auto"
-            >
-              <Tab icon={<MapOutlined />} iconPosition="start" label="Geographic Distribution" />
-              <Tab icon={<BarChartOutlined />} iconPosition="start" label="User Analytics" />
-              <Tab icon={<AssignmentOutlined />} iconPosition="start" label="Recent Activity" />
-            </Tabs>
-          </Box>
-
-          <TabPanel value={tabValue} index={0}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                User Distribution Across Sri Lanka
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                Interactive map showing user concentration by province
-              </Typography>
-
-              <Grid container spacing={3}>
-                <Grid size={{ xs: 12, lg: 6 }}>
-                  <Box sx={{ position: 'relative' }}>
-                    <SriLankaMap provinceDistribution={provinceDistribution} />
-
-                    <Paper
-                      sx={{
-                        position: 'absolute',
-                        top: 10,
-                        right: 10,
-                        p: 1.5,
-                        bgcolor: 'rgba(0, 0, 0, 0.3)',
-                        borderRadius: 1,
-                        boxShadow: 3,
-                        maxWidth: 180,
-                        zIndex: 1000
-                      }}
-                    >
-                      <Typography variant="caption" sx={{ fontWeight: 600, display: 'block', mb: 0.5, color: 'white' }}>
-                        Map Legend
-                      </Typography>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                          <Agriculture sx={{ color: '#4CAF50', fontSize: 16 }} />
-                          <Typography variant="caption" sx={{ color: 'white' }}>Farmers</Typography>
+        {!loading && (
+          <>
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+              {[
+                {
+                  label: "Active",
+                  value: userStats.activeUsers,
+                  bg: "linear-gradient(135deg, #16a34a 0%, #22c55e 100%)",
+                  icon: <CheckCircle sx={{ fontSize: 64, opacity: 0.3 }} />,
+                  note: "Active accounts",
+                },
+                {
+                  label: "Pending",
+                  value: userStats.pendingStatus,
+                  bg: "linear-gradient(135deg, #ea580c 0%, #f97316 100%)",
+                  icon: <AccessTime sx={{ fontSize: 64, opacity: 0.3 }} />,
+                  note: "Awaiting approval",
+                },
+                {
+                  label: "Inactive",
+                  value: userStats.inactiveUsers,
+                  bg: "linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%)",
+                  icon: <People sx={{ fontSize: 64, opacity: 0.3 }} />,
+                  note: "Deactivated accounts",
+                },
+                {
+                  label: "Suspended",
+                  value: userStats.suspendedUsers,
+                  bg: "linear-gradient(135deg, #dc2626 0%, #f87171 100%)",
+                  icon: <Block sx={{ fontSize: 64, opacity: 0.3 }} />,
+                  note: "Suspended accounts",
+                },
+              ].map((s) => (
+                <Grid key={s.label} size={{ xs: 12, sm: 6, md: 3 }}>
+                  <Card sx={{ background: s.bg, color: "white" }}>
+                    <CardContent>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Box>
+                          <Typography
+                            variant="h6"
+                            sx={{ mb: 1, opacity: 0.9, fontWeight: 600 }}
+                          >
+                            {s.label}
+                          </Typography>
+                          <Typography variant="h3" sx={{ fontWeight: 700 }}>
+                            {s.value}
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{ mt: 1, opacity: 0.8 }}
+                          >
+                            {userStats.totalUsers > 0
+                              ? (
+                                  (s.value / userStats.totalUsers) *
+                                  100
+                                ).toFixed(1)
+                              : "0.0"}
+                            % · {s.note}
+                          </Typography>
                         </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                          <Business sx={{ color: '#FF9800', fontSize: 16 }} />
-                          <Typography variant="caption" sx={{ color: 'white' }}>Investors</Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                          <Landscape sx={{ color: '#9C27B0', fontSize: 16 }} />
-                          <Typography variant="caption" sx={{ color: 'white' }}>Landowners</Typography>
-                        </Box>
+                        {s.icon}
                       </Box>
-                    </Paper>
-                  </Box>
+                    </CardContent>
+                  </Card>
                 </Grid>
+              ))}
+            </Grid>
 
-                <Grid size={{ xs: 12, lg: 6 }}>
-                  <Paper sx={{ p: 3, height: '100%', minHeight: 500 }}>
-                    <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
-                      Top 5 User Districts
-                    </Typography>
+            <Card sx={{ mb: 4 }}>
+              <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+                <Tabs
+                  value={tabValue}
+                  onChange={handleTabChange}
+                  aria-label="dashboard tabs"
+                  variant="scrollable"
+                  scrollButtons="auto"
+                >
+                  <Tab
+                    icon={<MapOutlined />}
+                    iconPosition="start"
+                    label="Geographic Distribution"
+                  />
+                  <Tab
+                    icon={<BarChartOutlined />}
+                    iconPosition="start"
+                    label="User Analytics"
+                  />
+                  <Tab
+                    icon={<AssignmentOutlined />}
+                    iconPosition="start"
+                    label="Recent Activity"
+                  />
+                </Tabs>
+              </Box>
 
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-                      {topDistricts.map((district, index) => (
-                        <Box key={district.name}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                              <Box
-                                sx={{
-                                  width: 32,
-                                  height: 32,
-                                  borderRadius: '50%',
-                                  bgcolor: index === 0 ? '#FFD700' : index === 1 ? '#1a6ac5' : index === 2 ? '#CD7F32' : 'primary.main',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  color: 'white',
-                                  fontWeight: 700,
-                                  fontSize: '0.875rem',
-                                }}
-                              >
-                                {index + 1}
-                              </Box>
-                              <Box>
-                                <Typography variant="body1" sx={{ fontWeight: 600, textTransform: 'capitalize' }}>
-                                  {district.name}
-                                </Typography>
-                                <Typography variant="caption" color="text.secondary">
-                                  {district.count.toLocaleString()} {district.count === 1 ? 'User' : 'Users'}
-                                </Typography>
-                              </Box>
-                            </Box>
-                            <Chip
-                              label={district.count}
-                              size="small"
-                              color="primary"
-                              sx={{ fontWeight: 600, minWidth: 50 }}
-                            />
-                          </Box>
+              <TabPanel value={tabValue} index={0}>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    User Distribution Across Sri Lanka
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 3 }}
+                  >
+                    Interactive map showing user concentration by province
+                  </Typography>
 
+                  <Grid container spacing={3}>
+                    <Grid size={{ xs: 12, lg: 6 }}>
+                      <Box sx={{ position: "relative" }}>
+                        <SriLankaMap
+                          provinceDistribution={provinceDistribution}
+                        />
 
+                        <Paper
+                          sx={{
+                            position: "absolute",
+                            top: 10,
+                            right: 10,
+                            p: 1.5,
+                            bgcolor: "var(--overlay-sm)",
+                            borderRadius: 1,
+                            boxShadow: 3,
+                            maxWidth: 180,
+                            zIndex: 1000,
+                          }}
+                        >
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              fontWeight: 600,
+                              display: "block",
+                              mb: 0.5,
+                              color: "white",
+                            }}
+                          >
+                            Map Legend
+                          </Typography>
                           <Box
                             sx={{
-                              height: 8,
-                              borderRadius: 4,
-                              bgcolor: 'grey.200',
-                              overflow: 'hidden',
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: 0.5,
                             }}
                           >
                             <Box
                               sx={{
-                                height: '100%',
-                                width: `${(district.count / maxDistrictCount) * 100}%`,
-                                bgcolor: index === 0 ? '#FFD700' : index === 1 ? '#37c44a' : index === 2 ? '#CD7F32' : 'primary.main',
-                                transition: 'width 0.3s ease',
-                                borderRadius: 4,
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 0.5,
                               }}
-                            />
+                            >
+                              <Agriculture
+                                sx={{
+                                  color: "var(--color-success)",
+                                  fontSize: 16,
+                                }}
+                              />
+                              <Typography
+                                variant="caption"
+                                sx={{ color: "white" }}
+                              >
+                                Farmers
+                              </Typography>
+                            </Box>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 0.5,
+                              }}
+                            >
+                              <Business
+                                sx={{
+                                  color: "var(--color-orange)",
+                                  fontSize: 16,
+                                }}
+                              />
+                              <Typography
+                                variant="caption"
+                                sx={{ color: "white" }}
+                              >
+                                Investors
+                              </Typography>
+                            </Box>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 0.5,
+                              }}
+                            >
+                              <Landscape
+                                sx={{
+                                  color: "var(--color-purple)",
+                                  fontSize: 16,
+                                }}
+                              />
+                              <Typography
+                                variant="caption"
+                                sx={{ color: "white" }}
+                              >
+                                Landowners
+                              </Typography>
+                            </Box>
                           </Box>
-                        </Box>
-                      ))}
-                    </Box>
-                  </Paper>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </TabPanel>
-
-          <TabPanel value={tabValue} index={1}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                User Role Distribution
-              </Typography>
-
-              <Grid container spacing={3} sx={{ mt: 2 }}>
-                <Grid size={{ xs: 12, md: 4 }}>
-                  <Paper sx={{ p: 3, textAlign: 'center' }}>
-                    <Agriculture sx={{ fontSize: 48, color: '#4CAF50', mb: 2 }} />
-                    <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                      {userStats.farmers}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                      Farmers
-                    </Typography>
-                    <LinearProgress
-                      variant="determinate"
-                      value={(userStats.farmers / userStats.totalUsers) * 100}
-                      sx={{ mt: 2, height: 8, borderRadius: 4 }}
-                    />
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                      {((userStats.farmers / userStats.totalUsers) * 100).toFixed(1)}% of total
-                    </Typography>
-                  </Paper>
-                </Grid>
-                <Grid size={{ xs: 12, md: 4 }}>
-                  <Paper sx={{ p: 3, textAlign: 'center' }}>
-                    <Business sx={{ fontSize: 48, color: '#FF9800', mb: 2 }} />
-                    <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                      {userStats.investors}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                      Investors
-                    </Typography>
-                    <LinearProgress
-                      variant="determinate"
-                      value={(userStats.investors / userStats.totalUsers) * 100}
-                      sx={{ mt: 2, height: 8, borderRadius: 4 }}
-                      color="warning"
-                    />
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                      {((userStats.investors / userStats.totalUsers) * 100).toFixed(1)}% of total
-                    </Typography>
-                  </Paper>
-                </Grid>
-                <Grid size={{ xs: 12, md: 4 }}>
-                  <Paper sx={{ p: 3, textAlign: 'center' }}>
-                    <Landscape sx={{ fontSize: 48, color: '#9C27B0', mb: 2 }} />
-                    <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                      {userStats.landowners}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                      Landowners
-                    </Typography>
-                    <LinearProgress
-                      variant="determinate"
-                      value={(userStats.landowners / userStats.totalUsers) * 100}
-                      sx={{ mt: 2, height: 8, borderRadius: 4 }}
-                      color="secondary"
-                    />
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                      {((userStats.landowners / userStats.totalUsers) * 100).toFixed(1)}% of total
-                    </Typography>
-                  </Paper>
-                </Grid>
-              </Grid>
-
-              <Box sx={{ mt: 4 }}>
-                <Typography variant="h6" gutterBottom>
-                  Verification Status
-                </Typography>
-                <Paper sx={{ p: 3, mt: 2 }}>
-                  <Grid container spacing={3}>
-                    <Grid size={{ xs: 12, md: 6 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                        <CheckCircle sx={{ color: 'success.main', mr: 2 }} />
-                        <Box sx={{ flex: 1 }}>
-                          <Typography variant="body2">Verified</Typography>
-                          <LinearProgress
-                            variant="determinate"
-                            value={(userStats.verified / userStats.totalUsers) * 100}
-                            sx={{ mt: 1, height: 10, borderRadius: 5 }}
-                            color="success"
-                          />
-                        </Box>
-                        <Typography variant="h6" sx={{ ml: 2, fontWeight: 600 }}>
-                          {userStats.verified}
-                        </Typography>
+                        </Paper>
                       </Box>
                     </Grid>
-                    <Grid size={{ xs: 12, md: 6 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                        <Warning sx={{ color: 'warning.main', mr: 2 }} />
-                        <Box sx={{ flex: 1 }}>
-                          <Typography variant="body2">Unverified</Typography>
-                          <LinearProgress
-                            variant="determinate"
-                            value={(userStats.unverified / userStats.totalUsers) * 100}
-                            sx={{ mt: 1, height: 10, borderRadius: 5 }}
-                            color="warning"
-                          />
-                        </Box>
-                        <Typography variant="h6" sx={{ ml: 2, fontWeight: 600 }}>
-                          {userStats.unverified}
+
+                    <Grid size={{ xs: 12, lg: 6 }}>
+                      <Paper sx={{ p: 3, height: "100%", minHeight: 500 }}>
+                        <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
+                          Top 5 User Districts
                         </Typography>
-                      </Box>
-                    </Grid>
-                  </Grid>
-                </Paper>
-              </Box>
-            </CardContent>
-          </TabPanel>
 
-          <TabPanel value={tabValue} index={2}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Recent User Registrations
-              </Typography>
-              <TableContainer component={Paper} sx={{ mt: 2 }}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>User</TableCell>
-                      <TableCell>Email</TableCell>
-                      <TableCell>Role</TableCell>
-                      <TableCell>Location</TableCell>
-                      <TableCell>Status</TableCell>
-                      <TableCell>Joined</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {users.slice(0, 10).map((user) => {
-                      const roleMap: { [key: string]: { name: string; color: string; icon?: React.ReactElement } } = {
-                        '696e40fda4f896e9f40c8b93': { name: 'Farmer', color: '#4CAF50', icon: <Agriculture sx={{ fontSize: 16 }} /> },
-                        '696e6163b558abe269548099': { name: 'Investor', color: '#FF9800', icon: <Business sx={{ fontSize: 16 }} /> },
-                        '696e616db558abe26954809c': { name: 'Landowner', color: '#9C27B0', icon: <Landscape sx={{ fontSize: 16 }} /> },
-                        '696f008a3e12fb6fd9ed945b': { name: 'Super Admin', color: '#F44336', icon: <Verified sx={{ fontSize: 16 }} /> },
-                      };
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 2.5,
+                          }}
+                        >
+                          {topDistricts.map((district, index) => (
+                            <Box key={district.name}>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "space-between",
+                                  mb: 1,
+                                }}
+                              >
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 2,
+                                  }}
+                                >
+                                  <Box
+                                    sx={{
+                                      width: 32,
+                                      height: 32,
+                                      borderRadius: "50%",
+                                      bgcolor:
+                                        index === 0
+                                          ? "var(--color-amber)"
+                                          : index === 1
+                                            ? "var(--color-info-blue)"
+                                            : index === 2
+                                              ? "var(--color-amber)"
+                                              : "primary.main",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                      color: "white",
+                                      fontWeight: 700,
+                                      fontSize: "0.875rem",
+                                    }}
+                                  >
+                                    {index + 1}
+                                  </Box>
+                                  <Box>
+                                    <Typography
+                                      variant="body1"
+                                      sx={{
+                                        fontWeight: 600,
+                                        textTransform: "capitalize",
+                                      }}
+                                    >
+                                      {district.name}
+                                    </Typography>
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                    >
+                                      {district.count.toLocaleString()}{" "}
+                                      {district.count === 1 ? "User" : "Users"}
+                                    </Typography>
+                                  </Box>
+                                </Box>
+                                <Chip
+                                  label={district.count}
+                                  size="small"
+                                  color="primary"
+                                  sx={{ fontWeight: 600, minWidth: 50 }}
+                                />
+                              </Box>
 
-                      const roleInfo = roleMap[user.role] || { name: 'Unknown', color: '#757575', icon: <People sx={{ fontSize: 16 }} /> };
-
-                      return (
-                        <TableRow key={user._id} hover>
-                          <TableCell>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                              <Avatar sx={{ width: 40, height: 40, bgcolor: roleInfo.color }}>
-                                {user.firstName[0]}
-                              </Avatar>
-                              <Box>
-                                <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                  {user.fullName}
-                                </Typography>
-                                <Typography variant="caption" color="text.secondary">
-                                  {user.phoneNumber}
-                                </Typography>
+                              <Box
+                                sx={{
+                                  height: 8,
+                                  borderRadius: 4,
+                                  bgcolor: "grey.200",
+                                  overflow: "hidden",
+                                }}
+                              >
+                                <Box
+                                  sx={{
+                                    height: "100%",
+                                    width: `${(district.count / maxDistrictCount) * 100}%`,
+                                    bgcolor:
+                                      index === 0
+                                        ? "var(--color-amber)"
+                                        : index === 1
+                                          ? "var(--color-success)"
+                                          : index === 2
+                                            ? "var(--color-amber)"
+                                            : "primary.main",
+                                    transition: "width 0.3s ease",
+                                    borderRadius: 4,
+                                  }}
+                                />
                               </Box>
                             </Box>
-                          </TableCell>
-                          <TableCell>{user.email}</TableCell>
-                          <TableCell>
-                            <Chip
-                              icon={roleInfo.icon}
-                              label={roleInfo.name}
-                              size="small"
-                              sx={{
-                                bgcolor: `${roleInfo.color}20`,
-                                color: roleInfo.color,
-                                fontWeight: 600,
-                              }}
+                          ))}
+                        </Box>
+                      </Paper>
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </TabPanel>
+
+              <TabPanel value={tabValue} index={1}>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    User Role Distribution
+                  </Typography>
+
+                  <Grid container spacing={3} sx={{ mt: 2 }}>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                      <Paper sx={{ p: 3, textAlign: "center" }}>
+                        <Agriculture
+                          sx={{
+                            fontSize: 48,
+                            color: "var(--color-success)",
+                            mb: 2,
+                          }}
+                        />
+                        <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                          {userStats.farmers}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ mt: 1 }}
+                        >
+                          Farmers
+                        </Typography>
+                        <LinearProgress
+                          variant="determinate"
+                          value={
+                            (userStats.farmers / userStats.totalUsers) * 100
+                          }
+                          sx={{ mt: 2, height: 8, borderRadius: 4 }}
+                        />
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ mt: 1, display: "block" }}
+                        >
+                          {(
+                            (userStats.farmers / userStats.totalUsers) *
+                            100
+                          ).toFixed(1)}
+                          % of total
+                        </Typography>
+                      </Paper>
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                      <Paper sx={{ p: 3, textAlign: "center" }}>
+                        <Business
+                          sx={{
+                            fontSize: 48,
+                            color: "var(--color-orange)",
+                            mb: 2,
+                          }}
+                        />
+                        <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                          {userStats.investors}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ mt: 1 }}
+                        >
+                          Investors
+                        </Typography>
+                        <LinearProgress
+                          variant="determinate"
+                          value={
+                            (userStats.investors / userStats.totalUsers) * 100
+                          }
+                          sx={{ mt: 2, height: 8, borderRadius: 4 }}
+                          color="warning"
+                        />
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ mt: 1, display: "block" }}
+                        >
+                          {(
+                            (userStats.investors / userStats.totalUsers) *
+                            100
+                          ).toFixed(1)}
+                          % of total
+                        </Typography>
+                      </Paper>
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                      <Paper sx={{ p: 3, textAlign: "center" }}>
+                        <Landscape
+                          sx={{
+                            fontSize: 48,
+                            color: "var(--color-purple)",
+                            mb: 2,
+                          }}
+                        />
+                        <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                          {userStats.landowners}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ mt: 1 }}
+                        >
+                          Landowners
+                        </Typography>
+                        <LinearProgress
+                          variant="determinate"
+                          value={
+                            (userStats.landowners / userStats.totalUsers) * 100
+                          }
+                          sx={{ mt: 2, height: 8, borderRadius: 4 }}
+                          color="secondary"
+                        />
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ mt: 1, display: "block" }}
+                        >
+                          {(
+                            (userStats.landowners / userStats.totalUsers) *
+                            100
+                          ).toFixed(1)}
+                          % of total
+                        </Typography>
+                      </Paper>
+                    </Grid>
+                  </Grid>
+
+                  <Box sx={{ mt: 4 }}>
+                    <Typography variant="h6" gutterBottom>
+                      Verification Status
+                    </Typography>
+                    <Paper sx={{ p: 3, mt: 2 }}>
+                      <Grid container spacing={3}>
+                        <Grid size={{ xs: 12, md: 6 }}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              mb: 2,
+                            }}
+                          >
+                            <CheckCircle
+                              sx={{ color: "success.main", mr: 2 }}
                             />
-                          </TableCell>
-                          <TableCell>{user.address}</TableCell>
-                          <TableCell>
-                            {user.emailVerified ? (
-                              <Chip
-                                icon={<CheckCircle sx={{ fontSize: 16 }} />}
-                                label="Verified"
-                                size="small"
+                            <Box sx={{ flex: 1 }}>
+                              <Typography variant="body2">Verified</Typography>
+                              <LinearProgress
+                                variant="determinate"
+                                value={
+                                  (userStats.verified / userStats.totalUsers) *
+                                  100
+                                }
+                                sx={{ mt: 1, height: 10, borderRadius: 5 }}
                                 color="success"
                               />
-                            ) : (
-                              <Chip
-                                icon={<Warning sx={{ fontSize: 16 }} />}
-                                label="Pending"
-                                size="small"
+                            </Box>
+                            <Typography
+                              variant="h6"
+                              sx={{ ml: 2, fontWeight: 600 }}
+                            >
+                              {userStats.verified}
+                            </Typography>
+                          </Box>
+                        </Grid>
+                        <Grid size={{ xs: 12, md: 6 }}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              mb: 2,
+                            }}
+                          >
+                            <Warning sx={{ color: "warning.main", mr: 2 }} />
+                            <Box sx={{ flex: 1 }}>
+                              <Typography variant="body2">
+                                Unverified
+                              </Typography>
+                              <LinearProgress
+                                variant="determinate"
+                                value={
+                                  (userStats.unverified /
+                                    userStats.totalUsers) *
+                                  100
+                                }
+                                sx={{ mt: 1, height: 10, borderRadius: 5 }}
                                 color="warning"
                               />
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant="caption">
-                              {new Date(user.createdAt).toLocaleDateString()}
+                            </Box>
+                            <Typography
+                              variant="h6"
+                              sx={{ ml: 2, fontWeight: 600 }}
+                            >
+                              {userStats.unverified}
                             </Typography>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </CardContent>
-          </TabPanel>
-        </Card>
+                          </Box>
+                        </Grid>
+                      </Grid>
+                    </Paper>
+                  </Box>
+                </CardContent>
+              </TabPanel>
 
-        <Card>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Quick Actions
-            </Typography>
-            <Grid container spacing={2} sx={{ mt: 1 }}>
-              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  startIcon={<PersonAdd />}
-                  sx={{ py: 1.5 }}
-                >
-                  Add New User
-                </Button>
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  startIcon={<Assessment />}
-                  sx={{ py: 1.5 }}
-                >
-                  Generate Report
-                </Button>
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  startIcon={<Verified />}
-                  sx={{ py: 1.5 }}
-                >
-                  Verify Users
-                </Button>
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  startIcon={<BarChartOutlined />}
-                  sx={{ py: 1.5 }}
-                >
-                  View Analytics
-                </Button>
-              </Grid>
-            </Grid>
-          </CardContent>
-        </Card>
+              <TabPanel value={tabValue} index={2}>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    Recent User Registrations
+                  </Typography>
+                  <TableContainer component={Paper} sx={{ mt: 2 }}>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>User</TableCell>
+                          <TableCell>Email</TableCell>
+                          <TableCell>Role</TableCell>
+                          <TableCell>Location</TableCell>
+                          <TableCell>Status</TableCell>
+                          <TableCell>Joined</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {users.slice(0, 10).map((user) => {
+                          const roleMap: {
+                            [key: string]: {
+                              name: string;
+                              color: string;
+                              icon?: React.ReactElement;
+                            };
+                          } = {
+                            "696e40fda4f896e9f40c8b93": {
+                              name: "Farmer",
+                              color: "var(--color-success)",
+                              icon: <Agriculture sx={{ fontSize: 16 }} />,
+                            },
+                            "696e6163b558abe269548099": {
+                              name: "Investor",
+                              color: "var(--color-orange)",
+                              icon: <Business sx={{ fontSize: 16 }} />,
+                            },
+                            "696e616db558abe26954809c": {
+                              name: "Landowner",
+                              color: "var(--color-purple)",
+                              icon: <Landscape sx={{ fontSize: 16 }} />,
+                            },
+                            "696f008a3e12fb6fd9ed945b": {
+                              name: "Super Admin",
+                              color: "var(--color-overdue)",
+                              icon: <Verified sx={{ fontSize: 16 }} />,
+                            },
+                          };
+
+                          const roleInfo = roleMap[
+                            typeof user.role === "object"
+                              ? user.role._id
+                              : user.role
+                          ] || {
+                            name: "Unknown",
+                            color: "var(--neutral-500)",
+                            icon: <People sx={{ fontSize: 16 }} />,
+                          };
+
+                          return (
+                            <TableRow key={user._id} hover>
+                              <TableCell>
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1.5,
+                                  }}
+                                >
+                                  <Avatar
+                                    sx={{
+                                      width: 40,
+                                      height: 40,
+                                      bgcolor: roleInfo.color,
+                                    }}
+                                  >
+                                    {
+                                      (user.firstName ??
+                                        user.fullName ??
+                                        "?"[0])[0]
+                                    }
+                                  </Avatar>
+                                  <Box>
+                                    <Typography
+                                      variant="body2"
+                                      sx={{ fontWeight: 600 }}
+                                    >
+                                      {user.fullName}
+                                    </Typography>
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                    >
+                                      {user.phoneNumber}
+                                    </Typography>
+                                  </Box>
+                                </Box>
+                              </TableCell>
+                              <TableCell>{user.email}</TableCell>
+                              <TableCell>
+                                <Chip
+                                  icon={roleInfo.icon}
+                                  label={roleInfo.name}
+                                  size="small"
+                                  sx={{
+                                    bgcolor: `${roleInfo.color}20`,
+                                    color: roleInfo.color,
+                                    fontWeight: 600,
+                                  }}
+                                />
+                              </TableCell>
+                              <TableCell>{user.address}</TableCell>
+                              <TableCell>
+                                {user.emailVerified ? (
+                                  <Chip
+                                    icon={<CheckCircle sx={{ fontSize: 16 }} />}
+                                    label="Verified"
+                                    size="small"
+                                    color="success"
+                                  />
+                                ) : (
+                                  <Chip
+                                    icon={<Warning sx={{ fontSize: 16 }} />}
+                                    label="Pending"
+                                    size="small"
+                                    color="warning"
+                                  />
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <Typography variant="caption">
+                                  {new Date(
+                                    user.createdAt,
+                                  ).toLocaleDateString()}
+                                </Typography>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </CardContent>
+              </TabPanel>
+            </Card>
+
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Quick Actions
+                </Typography>
+                <Grid container spacing={2} sx={{ mt: 1 }}>
+                  <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      startIcon={<PersonAdd />}
+                      sx={{ py: 1.5 }}
+                    >
+                      Add New User
+                    </Button>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      startIcon={<Assessment />}
+                      sx={{ py: 1.5 }}
+                    >
+                      Generate Report
+                    </Button>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      startIcon={<Verified />}
+                      sx={{ py: 1.5 }}
+                    >
+                      Verify Users
+                    </Button>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      startIcon={<BarChartOutlined />}
+                      sx={{ py: 1.5 }}
+                    >
+                      View Analytics
+                    </Button>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </>
+        )}
       </Box>
-    </DashboardLayout>
+    </>
   );
 };
 

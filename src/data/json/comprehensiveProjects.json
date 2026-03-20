@@ -1,13 +1,13 @@
-[
+﻿[
   {
     "id": "1",
     "projectId": "PRJ-156",
-    "investorId": "696e6196b558abe2695480a6",
+    "investorId": "69aa938c6610063a02adee58",
     "projectName": "Premium Rice Cultivation",
     "cropType": "Rice (Nadu)",
     "cropIcon": "🌾",
     "farmerName": "Kamal Perera",
-    "farmerId": "FAR-234",
+    "farmerId": "69aa70e96610063a02adedae",
     "farmerImage": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
     "location": "Anuradhapura",
     "district": "Anuradhapura",
@@ -22,7 +22,7 @@
     "investorName": "Smart Agri Investments",
     "investorAmount": 250000,
     "landownerName": "Perera Estates",
-    "landownerId": "LND-019",
+    "landownerId": "69aa70e96610063a02adedae",
     "riskLevel": "LOW",
     "riskStatus": "No Issues",
     "milestones": [
@@ -195,7 +195,7 @@
         "milestoneId": "M6",
         "amount": 22000,
         "dueDate": "2026-01-15",
-        "status": "pending",
+        "status": "overdue",
         "description": "Milestone 6: Pre-Harvest Preparation Payment"
       },
       {
@@ -213,6 +213,58 @@
         "dueDate": "2026-04-30",
         "status": "pending",
         "description": "Milestone 8: Post-Harvest & Distribution Payment"
+      }
+    ],
+    "landRentals": [
+      {
+        "id": "P1R1",
+        "landArea": "12.5 acres",
+        "month": "November 2025",
+        "dueDate": "2025-11-30",
+        "paidDate": "2025-11-28",
+        "amount": 31250,
+        "status": "paid"
+      },
+      {
+        "id": "P1R2",
+        "landArea": "12.5 acres",
+        "month": "December 2025",
+        "dueDate": "2025-12-31",
+        "paidDate": "2025-12-30",
+        "amount": 31250,
+        "status": "paid"
+      },
+      {
+        "id": "P1R3",
+        "landArea": "12.5 acres",
+        "month": "January 2026",
+        "dueDate": "2026-01-31",
+        "amount": 31250,
+        "status": "overdue"
+      },
+      {
+        "id": "P1R4",
+        "landArea": "12.5 acres",
+        "month": "February 2026",
+        "dueDate": "2026-02-28",
+        "amount": 31250,
+        "status": "overdue"
+      },
+      {
+        "id": "P1R5",
+        "landArea": "12.5 acres",
+        "month": "March 2026",
+        "dueDate": "2026-03-31",
+        "amount": 31250,
+        "status": "pending"
+      },
+      {
+        "id": "P1R6",
+        "landArea": "12.5 acres",
+        "month": "April 2026",
+        "dueDate": "2026-04-30",
+        "amount": 31250,
+        "status": "pending"
       }
     ],
     "financialBreakdown": [
@@ -247,7 +299,7 @@
     ],
     "partyMembers": [
       {
-        "id": "FAR-234",
+        "id": "69aa70e96610063a02adedae",
         "name": "Kamal Perera",
         "role": "farmer",
         "email": "kamal.perera@agrimail.lk",
@@ -260,7 +312,7 @@
         "rating": 4.8
       },
       {
-        "id": "LND-019",
+        "id": "69aa70e96610063a02adedae",
         "name": "Perera Estates",
         "role": "landowner",
         "email": "contact@pereraestates.lk",
@@ -277,12 +329,12 @@
   {
     "id": "2",
     "projectId": "PRJ-178",
-    "investorId": "696e6196b558abe2695480a6",
+    "investorId": "69aa938c6610063a02adee58",
     "projectName": "Organic Vegetable Farm",
     "cropType": "Mixed Vegetables",
     "cropIcon": "🥬",
     "farmerName": "Sunil Fernando",
-    "farmerId": "FAR-189",
+    "farmerId": "69aa70e96610063a02adedae",
     "farmerImage": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
     "location": "Nuwara Eliya",
     "district": "Nuwara Eliya",
@@ -299,7 +351,7 @@
     "investorName": "Green Valley Investors",
     "investorAmount": 180000,
     "landownerName": "Highland Farms",
-    "landownerId": "LND-045",
+    "landownerId": "69aa70e96610063a02adedae",
     "riskLevel": "MEDIUM",
     "riskStatus": "Weather concerns",
     "milestones": [
@@ -414,7 +466,7 @@
         "milestoneId": "VM3",
         "amount": 35000,
         "dueDate": "2026-01-31",
-        "status": "pending",
+        "status": "overdue",
         "description": "Growth Phase Monitoring Payment"
       },
       {
@@ -422,7 +474,7 @@
         "milestoneId": "VM4",
         "amount": 38000,
         "dueDate": "2026-02-15",
-        "status": "pending",
+        "status": "overdue",
         "description": "First Harvest Cycle Payment"
       },
       {
@@ -440,6 +492,41 @@
         "dueDate": "2026-03-15",
         "status": "pending",
         "description": "Final Harvest & Distribution Payment"
+      }
+    ],
+    "landRentals": [
+      {
+        "id": "P2R1",
+        "landArea": "8 acres",
+        "month": "December 2025",
+        "dueDate": "2025-12-31",
+        "paidDate": "2025-12-29",
+        "amount": 18000,
+        "status": "paid"
+      },
+      {
+        "id": "P2R2",
+        "landArea": "8 acres",
+        "month": "January 2026",
+        "dueDate": "2026-01-31",
+        "amount": 18000,
+        "status": "overdue"
+      },
+      {
+        "id": "P2R3",
+        "landArea": "8 acres",
+        "month": "February 2026",
+        "dueDate": "2026-02-28",
+        "amount": 18000,
+        "status": "overdue"
+      },
+      {
+        "id": "P2R4",
+        "landArea": "8 acres",
+        "month": "March 2026",
+        "dueDate": "2026-03-15",
+        "amount": 18000,
+        "status": "pending"
       }
     ],
     "financialBreakdown": [
@@ -486,7 +573,7 @@
     ],
     "partyMembers": [
       {
-        "id": "FAR-189",
+        "id": "69aa70e96610063a02adedae",
         "name": "Sunil Fernando",
         "role": "farmer",
         "email": "sunil.fernando@organicfarms.lk",
@@ -499,7 +586,7 @@
         "rating": 4.9
       },
       {
-        "id": "LND-045",
+        "id": "69aa70e96610063a02adedae",
         "name": "Highland Farms",
         "role": "landowner",
         "email": "contact@highlandfarms.lk",
@@ -516,12 +603,12 @@
   {
     "id": "3",
     "projectId": "PRJ-089",
-    "investorId": "696e6196b558abe2695480a6",
+    "investorId": "69aa938c6610063a02adee58",
     "projectName": "Coconut Plantation",
     "cropType": "King Coconut",
     "cropIcon": "🥥",
     "farmerName": "Mahinda Silva",
-    "farmerId": "FAR-178",
+    "farmerId": "69aa70e96610063a02adedae",
     "farmerImage": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
     "location": "Kurunegala",
     "district": "Kurunegala",
@@ -538,7 +625,7 @@
     "investorName": "Smart Agri Investments",
     "investorAmount": 320000,
     "landownerName": "Silva Estates",
-    "landownerId": "LND-054",
+    "landownerId": "69aa70e96610063a02adedae",
     "riskLevel": "LOW",
     "riskStatus": "Successfully Completed",
     "milestones": [
@@ -689,6 +776,62 @@
         "description": "Milestone 6: Final Assessment & Handover Payment"
       }
     ],
+    "landRentals": [
+      {
+        "id": "P3R1",
+        "landArea": "15 acres",
+        "month": "June 2025",
+        "dueDate": "2025-06-30",
+        "paidDate": "2025-06-28",
+        "amount": 28500,
+        "status": "paid"
+      },
+      {
+        "id": "P3R2",
+        "landArea": "15 acres",
+        "month": "July 2025",
+        "dueDate": "2025-07-31",
+        "paidDate": "2025-07-30",
+        "amount": 28500,
+        "status": "paid"
+      },
+      {
+        "id": "P3R3",
+        "landArea": "15 acres",
+        "month": "August 2025",
+        "dueDate": "2025-08-31",
+        "paidDate": "2025-08-29",
+        "amount": 28500,
+        "status": "paid"
+      },
+      {
+        "id": "P3R4",
+        "landArea": "15 acres",
+        "month": "September 2025",
+        "dueDate": "2025-09-30",
+        "paidDate": "2025-09-28",
+        "amount": 28500,
+        "status": "paid"
+      },
+      {
+        "id": "P3R5",
+        "landArea": "15 acres",
+        "month": "October 2025",
+        "dueDate": "2025-10-31",
+        "paidDate": "2025-10-30",
+        "amount": 28500,
+        "status": "paid"
+      },
+      {
+        "id": "P3R6",
+        "landArea": "15 acres",
+        "month": "November 2025",
+        "dueDate": "2025-11-30",
+        "paidDate": "2025-11-29",
+        "amount": 28500,
+        "status": "paid"
+      }
+    ],
     "financialBreakdown": [
       {
         "category": "Land Preparation & Survey",
@@ -726,14 +869,14 @@
         "type": "expense"
       },
       {
-        "category": "💰 Commission Income (12% Rate)",
+        "category": "Commission Income (12% Rate)",
         "amount": 38400,
         "type": "commission"
       }
     ],
     "partyMembers": [
       {
-        "id": "FAR-178",
+        "id": "69aa70e96610063a02adedae",
         "name": "Mahinda Silva",
         "role": "farmer",
         "email": "mahinda.silva@coconutfarms.lk",
@@ -746,7 +889,7 @@
         "rating": 4.8
       },
       {
-        "id": "LND-054",
+        "id": "69aa70e96610063a02adedae",
         "name": "Silva Estates",
         "role": "landowner",
         "email": "contact@silvaestates.lk",
@@ -763,12 +906,12 @@
   {
     "id": "4",
     "projectId": "PRJ-123",
-    "investorId": "696e6196b558abe2695480a6",
+    "investorId": "69aa938c6610063a02adee58",
     "projectName": "Spice Garden",
     "cropType": "Cinnamon & Pepper",
     "cropIcon": "🌿",
     "farmerName": "Saman Kumara",
-    "farmerId": "FAR-211",
+    "farmerId": "69aa70e96610063a02adedae",
     "farmerImage": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150",
     "location": "Matale",
     "district": "Matale",
@@ -783,7 +926,7 @@
     "investorName": "Spice Trade International",
     "investorAmount": 420000,
     "landownerName": "Kumara Holdings",
-    "landownerId": "LND-067",
+    "landownerId": "69aa70e96610063a02adedae",
     "riskLevel": "LOW",
     "riskStatus": "Successfully Completed",
     "milestones": [
@@ -934,6 +1077,71 @@
         "description": "Milestone 6: Certification & Harvest Prep Payment"
       }
     ],
+    "landRentals": [
+      {
+        "id": "P4R1",
+        "landArea": "10 acres",
+        "month": "April 2025",
+        "dueDate": "2025-04-30",
+        "paidDate": "2025-04-29",
+        "amount": 22000,
+        "status": "paid"
+      },
+      {
+        "id": "P4R2",
+        "landArea": "10 acres",
+        "month": "May 2025",
+        "dueDate": "2025-05-31",
+        "paidDate": "2025-05-30",
+        "amount": 22000,
+        "status": "paid"
+      },
+      {
+        "id": "P4R3",
+        "landArea": "10 acres",
+        "month": "June 2025",
+        "dueDate": "2025-06-30",
+        "paidDate": "2025-06-29",
+        "amount": 22000,
+        "status": "paid"
+      },
+      {
+        "id": "P4R4",
+        "landArea": "10 acres",
+        "month": "July 2025",
+        "dueDate": "2025-07-31",
+        "paidDate": "2025-07-30",
+        "amount": 22000,
+        "status": "paid"
+      },
+      {
+        "id": "P4R5",
+        "landArea": "10 acres",
+        "month": "August 2025",
+        "dueDate": "2025-08-31",
+        "paidDate": "2025-08-30",
+        "amount": 22000,
+        "status": "paid"
+      },
+      {
+        "id": "P4R6",
+        "landArea": "10 acres",
+        "month": "September 2025",
+        "dueDate": "2025-09-30",
+        "paidDate": "2025-09-29",
+        "amount": 22000,
+        "status": "paid"
+      },
+      {
+        "id": "P4R7",
+        "landArea": "10 acres",
+        "month": "October 2025",
+        "dueDate": "2025-10-31",
+        "paidDate": "2025-10-30",
+        "amount": 22000,
+        "status": "paid"
+      }
+    ],
     "financialBreakdown": [
       {
         "category": "Land Preparation & Clearing",
@@ -966,7 +1174,7 @@
     ],
     "partyMembers": [
       {
-        "id": "FAR-211",
+        "id": "69aa70e96610063a02adedae",
         "name": "Saman Kumara",
         "role": "farmer",
         "email": "saman.kumara@spicefarms.lk",
@@ -979,7 +1187,7 @@
         "rating": 4.9
       },
       {
-        "id": "LND-067",
+        "id": "69aa70e96610063a02adedae",
         "name": "Kumara Holdings",
         "role": "landowner",
         "email": "contact@kumaraholdings.lk",

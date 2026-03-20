@@ -1,26 +1,21 @@
-import {
-  CardHeaderWithIcon,
-  PlaceholderWidget,
-  StatCard,
-} from '@/components';
-import DashboardLayout from '@/layouts/DashboardLayout';
+import { CardHeaderWithIcon, PlaceholderWidget, StatCard } from "@/components";
 import {
   AttachMoney,
   BarChart as BarChartIcon,
   Description,
   People,
   TrendingUp,
-} from '@mui/icons-material';
-import { Card, CardContent, Chip } from '@mui/material';
+} from "@mui/icons-material";
+import { Card, CardContent, Chip } from "@mui/material";
 
 const InvestorDashboard = () => {
   return (
-    <DashboardLayout>
-      <div className="row g-3" style={{ marginBottom: '1.5rem' }}>
+    <>
+      <div className="row g-3" style={{ marginBottom: "1.5rem" }}>
         <div className="col-12 col-sm-6 col-md-4">
           <StatCard
             icon={AttachMoney}
-            iconBgColor="rgba(107, 142, 35, 0.2)"
+            iconBgColor="var(--color-olive-muted-strong)"
             iconColor="primary.main"
             label="Active Investments"
             value="$125K"
@@ -29,8 +24,8 @@ const InvestorDashboard = () => {
         <div className="col-12 col-sm-6 col-md-4">
           <StatCard
             icon={People}
-            iconBgColor="rgba(59, 130, 246, 0.2)"
-            iconColor="#3b82f6"
+            iconBgColor="var(--color-info-blue-muted)"
+            iconColor="var(--color-info-blue)"
             label="Pending Applications"
             value={18}
           />
@@ -38,8 +33,8 @@ const InvestorDashboard = () => {
         <div className="col-12 col-sm-6 col-md-4">
           <StatCard
             icon={TrendingUp}
-            iconBgColor="rgba(251, 191, 36, 0.2)"
-            iconColor="#fbbf24"
+            iconBgColor="var(--color-amber-muted)"
+            iconColor="var(--color-amber)"
             label="Expected ROI"
             value="24%"
           />
@@ -51,14 +46,14 @@ const InvestorDashboard = () => {
           <Card>
             <CardHeaderWithIcon
               icon={BarChartIcon}
-              title="Profitability Charts"
+              title="Profitability Overview"
               action={<Chip label="Live" size="small" color="primary" />}
             />
             <CardContent>
               <PlaceholderWidget
                 icon="📊"
-                title="Historical Price Charts & Predictions"
-                description="Upcoming season price forecasts and profitability analysis"
+                title="Historical Price Insights & Predictions"
+                description="Upcoming season price forecasts and profitability summary"
               />
             </CardContent>
           </Card>
@@ -66,7 +61,10 @@ const InvestorDashboard = () => {
 
         <div className="col-12 col-lg-6">
           <Card>
-            <CardHeaderWithIcon icon={AttachMoney} title="Investment Portfolio" />
+            <CardHeaderWithIcon
+              icon={AttachMoney}
+              title="Investment Portfolio"
+            />
             <CardContent>
               <PlaceholderWidget
                 icon="💰"
@@ -79,7 +77,10 @@ const InvestorDashboard = () => {
 
         <div className="col-12 col-lg-6">
           <Card>
-            <CardHeaderWithIcon icon={TrendingUp} title="ROI & Market Analysis" />
+            <CardHeaderWithIcon
+              icon={TrendingUp}
+              title="ROI & Market Analysis"
+            />
             <CardContent>
               <PlaceholderWidget
                 icon="📈"
@@ -107,7 +108,7 @@ const InvestorDashboard = () => {
           </Card>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

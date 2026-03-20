@@ -1,4 +1,7 @@
-const API_BASE_URL = 'http://localhost:3000/api';
+import { getAuthHeader, getCsrfToken } from "./tokenStore";
+
+const API_BASE_URL =
+  "api-aswenna-prod-fya7ezfgd8cuckeq.uaenorth-01.azurewebsites.net";
 
 export class HttpClient {
   private baseURL: string;
@@ -7,10 +10,25 @@ export class HttpClient {
     this.baseURL = baseURL;
   }
 
-  private getAuthHeaders(): HeadersInit {
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
+  private getAuthHeaders(includeCsrf = false): HeadersInit {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      "X-Requested-With": "XMLHttpRequest",
+      "Cache-Control": "no-store",
+      "ngrok-skip-browser-warning": "true",
     };
+
+    const authHeader = getAuthHeader();
+    if (authHeader) {
+      headers["Authorization"] = authHeader;
+    }
+
+    if (includeCsrf) {
+      const csrf = getCsrfToken();
+      if (csrf) {
+        headers["X-CSRF-Token"] = csrf;
+      }
+    }
 
     return headers;
   }
@@ -19,7 +37,12 @@ export class HttpClient {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || `HTTP ${response.status}: ${response.statusText}`);
+      if (data.message && (Array.isArray(data.message) || data.error)) {
+        throw new Error(JSON.stringify(data));
+      }
+      throw new Error(
+        data.message || `HTTP ${response.status}: ${response.statusText}`,
+      );
     }
 
     return data;
@@ -27,8 +50,9 @@ export class HttpClient {
 
   async get<T>(endpoint: string): Promise<T> {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
-      method: 'GET',
+      method: "GET",
       headers: this.getAuthHeaders(),
+      credentials: "same-origin",
     });
 
     return this.handleResponse<T>(response);
@@ -36,9 +60,10 @@ export class HttpClient {
 
   async post<T>(endpoint: string, data?: unknown): Promise<T> {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
-      method: 'POST',
-      headers: this.getAuthHeaders(),
+      method: "POST",
+      headers: this.getAuthHeaders(true),
       body: JSON.stringify(data),
+      credentials: "same-origin",
     });
 
     return this.handleResponse<T>(response);
@@ -46,9 +71,10 @@ export class HttpClient {
 
   async put<T>(endpoint: string, data?: unknown): Promise<T> {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
-      method: 'PUT',
-      headers: this.getAuthHeaders(),
+      method: "PUT",
+      headers: this.getAuthHeaders(true),
       body: JSON.stringify(data),
+      credentials: "same-origin",
     });
 
     return this.handleResponse<T>(response);
@@ -56,9 +82,10 @@ export class HttpClient {
 
   async patch<T>(endpoint: string, data?: unknown): Promise<T> {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
-      method: 'PATCH',
-      headers: this.getAuthHeaders(),
+      method: "PATCH",
+      headers: this.getAuthHeaders(true),
       body: JSON.stringify(data),
+      credentials: "same-origin",
     });
 
     return this.handleResponse<T>(response);
@@ -66,8 +93,35 @@ export class HttpClient {
 
   async delete<T>(endpoint: string): Promise<T> {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
-      method: 'DELETE',
-      headers: this.getAuthHeaders(),
+      method: "DELETE",
+      headers: this.getAuthHeaders(true),
+      credentials: "same-origin",
+    });
+
+    return this.handleResponse<T>(response);
+  }
+
+  async postMultipart<T>(endpoint: string, formData: FormData): Promise<T> {
+    const headers: Record<string, string> = {
+      "X-Requested-With": "XMLHttpRequest",
+      "Cache-Control": "no-store",
+    };
+
+    const authHeader = getAuthHeader();
+    if (authHeader) {
+      headers["Authorization"] = authHeader;
+    }
+
+    const csrf = getCsrfToken();
+    if (csrf) {
+      headers["X-CSRF-Token"] = csrf;
+    }
+
+    const response = await fetch(`${this.baseURL}${endpoint}`, {
+      method: "POST",
+      headers,
+      body: formData,
+      credentials: "same-origin",
     });
 
     return this.handleResponse<T>(response);

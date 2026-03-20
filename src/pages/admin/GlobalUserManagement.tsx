@@ -1,899 +1,391 @@
-import { CardHeaderWithIcon } from '@/components';
-import DashboardLayout from '@/layouts/DashboardLayout';
-import { adminService, type ApiUser } from '@/services/admin.service';
-import type { GlobalUser } from '@/types/admin.types';
+import { PersonAdd, Refresh } from "@mui/icons-material";
 import {
-  Cancel,
-  CheckCircle,
-  Close,
-  Edit,
-  Error,
-  Pending,
-  Person,
-  Save,
-  Search,
-  Visibility,
-  Warning
-} from '@mui/icons-material';
-import {
-  Avatar,
+  Alert,
   Box,
-  Card,
-  CardContent,
+  Button,
   Chip,
-  Dialog,
-  DialogContent,
-  Grid,
   IconButton,
-  InputAdornment,
-  Paper,
+  Snackbar,
   Tab,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
   Tabs,
-  TextField,
   Tooltip,
-  Typography
-} from '@mui/material';
-import { useEffect, useState } from 'react';
+  Typography,
+} from "@mui/material";
+import React from "react";
+import ConfirmActionDialog from "./components/ConfirmActionDialog";
+import TableSectionHeader from "./components/TableSectionHeader";
+import UserDetailDialog from "./components/UserDetailDialog";
+import UserStatCards from "./components/UserStatCards";
+import UserTableSection from "./components/UserTableSection";
+import { useTableFilter } from "./hooks/useTableFilter";
+import { useUserManagement } from "./hooks/useUserManagement";
+import { normalizeStatus } from "./utils/userManagement.utils";
 
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('en-LK', {
-    style: 'currency',
-    currency: 'LKR',
-    minimumFractionDigits: 0,
-  }).format(amount);
-};
+const STATUS_TAB_DEFS = [
+  {
+    label: "All",
+    countKey: "all" as const,
+    activeColor: "rgba(255,255,255,0.9)",
+    chipBg: "var(--surface-light)",
+    chipColor: "inherit" as const,
+    indicatorColor: "rgba(255,255,255,0.65)",
+  },
+  {
+    label: "Active",
+    countKey: "active" as const,
+    activeColor: "var(--color-brand-primary)",
+    chipBg: "var(--color-brand-muted)",
+    chipColor: "var(--color-brand-primary)",
+    indicatorColor: "var(--color-brand-primary)",
+  },
+  {
+    label: "Inactive",
+    countKey: "inactive" as const,
+    activeColor: "var(--color-error)",
+    chipBg: "var(--color-overdue-muted)",
+    chipColor: "var(--color-error)",
+    indicatorColor: "var(--color-error)",
+  },
+  {
+    label: "Suspended",
+    countKey: "suspended" as const,
+    activeColor: "var(--color-error)",
+    chipBg: "var(--color-error-bg)",
+    chipColor: "var(--color-error)",
+    indicatorColor: "var(--color-error)",
+  },
+] as const;
 
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-};
-
-const formatDateTime = (dateString: string) => {
-  return new Date(dateString).toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-};
-
-const getTrustScoreColor = (score: number) => {
-  if (score >= 90) return 'success';
-  if (score >= 75) return 'info';
-  if (score >= 60) return 'warning';
-  return 'error';
-};
-
-const getVerificationIcon = (status: string) => {
-  switch (status) {
-    case 'verified':
-      return <CheckCircle fontSize="small" color="success" />;
-    case 'pending':
-      return <Pending fontSize="small" color="warning" />;
-    case 'rejected':
-      return <Error fontSize="small" color="error" />;
-    default:
-      return <Pending fontSize="small" color="disabled" />;
-  }
-};
-
-const roleIdToRole = (roleId: string): GlobalUser['role'] => {
-  const roleMapping: { [key: string]: GlobalUser['role'] } = {
-    '696e40fda4f896e9f40c8b93': 'farmer',
-    '696e6163b558abe269548099': 'investor',
-    '696e616db558abe26954809c': 'landowner',
-    '696f008a3e12fb6fd9ed945b': 'superadmin',
-  };
-
-  return roleMapping[roleId] || 'farmer';
-};
-
-const mapApiUserToGlobalUser = (user: ApiUser): GlobalUser => {
-  const fullName = user.fullName || `${user.firstName} ${user.lastName}`.trim();
-  const isVerified = Boolean(user.emailVerified);
-  const phoneVerified = Boolean(user.phoneNumberVerified);
-  const trustScore = isVerified ? 85 : 65;
-
-  return {
-    id: user._id,
-    fullName: fullName || 'Unknown User',
-    email: user.email,
-    phoneNumber: user.phoneNumber,
-    role: roleIdToRole(user.role),
-    registrationDate: user.createdAt,
-    lastLogin: user.updatedAt || user.createdAt,
-    isVerified,
-    isActive: true,
-    address: user.address,
-    totalProjects: 0,
-    activeProjects: 0,
-    completedProjects: 0,
-    totalTransactions: 0,
-    verificationStatus: {
-      identity: 'pending',
-      email: isVerified ? 'verified' : 'pending',
-      phone: phoneVerified ? 'verified' : 'pending',
-    },
-    documents: [],
-    overduePayments: 0,
-    disputesInvolved: 0,
-    trustScore,
-  };
-};
+const ROWS_PER_PAGE = 10;
 
 const GlobalUserManagement = () => {
-  const [users, setUsers] = useState<GlobalUser[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [roleFilter, setRoleFilter] = useState<string>('all');
-  const [selectedUser, setSelectedUser] = useState<GlobalUser | null>(null);
-  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage] = useState(10);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editFormData, setEditFormData] = useState({
-    firstName: '',
-    lastName: '',
-    phoneNumber: '',
-    address: '',
-  });
-  const [saving, setSaving] = useState(false);
+  const {
+    users,
+    loading,
+    error,
+    filteredUsers,
+    statusCounts,
+    roleStats,
+    activeRate,
+    searchQuery,
+    setSearchQuery,
+    statusTab,
+    setStatusTab,
+    selectedUser,
+    userDetail,
+    detailLoading,
+    detailTab,
+    setDetailTab,
+    detailDialogOpen,
+    handleViewDetails,
+    handleCloseDialog,
+    confirmDialog,
+    setConfirmDialog,
+    actionLoading,
+    actionError,
+    deleteSuccess,
+    setDeleteSuccess,
+    requestAction,
+    handleConfirmAction,
+    refreshUsers,
+  } = useUserManagement();
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setError(null);
-        const apiUsers = await adminService.getAllUsersPaginated();
-        setUsers(apiUsers.map(mapApiUserToGlobalUser));
-      } catch {
-        setError('Failed to load users');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const pendingFilter = useTableFilter();
+  const mainFilter = useTableFilter();
 
-    fetchUsers();
-  }, []);
+  const [pendingPage, setPendingPage] = React.useState(0);
+  const [mainPage, setMainPage] = React.useState(0);
 
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.id.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-
-    return matchesSearch && matchesRole;
-  });
-
-  const handleViewDetails = (user: GlobalUser) => {
-    setSelectedUser(user);
-    setDetailDialogOpen(true);
-  };
-
-  const handleCloseDialog = () => {
-    setDetailDialogOpen(false);
-    setSelectedUser(null);
-    setIsEditMode(false);
-  };
-
-  const handleEditClick = () => {
-    if (selectedUser) {
-      const nameParts = selectedUser.fullName.split(' ');
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || '';
-
-      setEditFormData({
-        firstName,
-        lastName,
-        phoneNumber: selectedUser.phoneNumber || '',
-        address: selectedUser.address || '',
-      });
-      setIsEditMode(true);
-    }
-  };
-
-  const handleCancelEdit = () => {
-    setIsEditMode(false);
-  };
-
-  const handleSaveEdit = async () => {
-    if (!selectedUser) return;
-
-    try {
-      setSaving(true);
-      await adminService.updateUser(selectedUser.id, editFormData);
-
-      const apiUsers = await adminService.getAllUsersPaginated();
-      setUsers(apiUsers.map(mapApiUserToGlobalUser));
-
-      const updatedUser = apiUsers.find(u => u._id === selectedUser.id);
-      if (updatedUser) {
-        setSelectedUser(mapApiUserToGlobalUser(updatedUser));
-      }
-
-      setIsEditMode(false);
-    } catch (error) {
-      console.error('Failed to update user:', error);
-      alert('Failed to update user. Please try again.');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const getRoleStats = () => {
-    return {
-      all: users.length,
-      farmer: users.filter((u) => u.role === 'farmer').length,
-      investor: users.filter((u) => u.role === 'investor').length,
-      landowner: users.filter((u) => u.role === 'landowner').length,
-    };
-  };
-
-  const roleStats = getRoleStats();
-
-  const paginatedUsers = filteredUsers.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
+  React.useEffect(
+    () => setPendingPage(0),
+    [pendingFilter.columnFilters, pendingFilter.sortConfig],
+  );
+  React.useEffect(
+    () => setMainPage(0),
+    [mainFilter.columnFilters, mainFilter.sortConfig, statusTab, searchQuery],
   );
 
-  const handleChangePage = (_event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
+  const [pendingSearch, setPendingSearch] = React.useState("");
+
+  const allPendingBase = users
+    .filter((u) => normalizeStatus(u.apiStatus) === "Pending")
+    .filter((u) =>
+      pendingSearch
+        ? `${u.fullName} ${u.email}`
+            .toLowerCase()
+            .includes(pendingSearch.toLowerCase())
+        : true,
+    );
+  const displayedPending = pendingFilter.apply(allPendingBase);
+  const paginatedPending = displayedPending.slice(
+    pendingPage * ROWS_PER_PAGE,
+    (pendingPage + 1) * ROWS_PER_PAGE,
+  );
+
+  const displayedMain = mainFilter.apply(filteredUsers);
+  const paginatedMain = displayedMain.slice(
+    mainPage * ROWS_PER_PAGE,
+    (mainPage + 1) * ROWS_PER_PAGE,
+  );
+
+  const currentTabDef = STATUS_TAB_DEFS[statusTab];
+
+  const mainEmptyMessage =
+    statusTab === 1
+      ? "No active users found"
+      : statusTab === 2
+        ? "No inactive users found"
+        : statusTab === 3
+          ? "No suspended users found"
+          : "No users found matching your criteria";
 
   return (
-    <DashboardLayout>
-      <Card sx={{ mb: 3 }}>
-        <CardHeaderWithIcon icon={Person} title="Global User Management" />
-        <CardContent>
-          <Box sx={{ mb: 3 }}>
-            <Grid container spacing={2} alignItems="center">
-              <Grid size={{ xs: 12, md: 6 }}>
-                <TextField
-                  fullWidth
-                  placeholder="Search by name, email, or user ID..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Search />
-                      </InputAdornment>
-                    ),
+    <>
+      <Box>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            mb: 3,
+          }}
+        >
+          <Box>
+            <Typography variant="h5" sx={{ fontWeight: 700 }}>
+              User Management
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              {users.length} registered users across all roles
+            </Typography>
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <Tooltip title="Refresh all data">
+              <IconButton
+                onClick={refreshUsers}
+                disabled={loading}
+                size="small"
+                sx={{
+                  color: "var(--color-olive)",
+                  border: "1px solid var(--color-olive-muted-strong)",
+                  borderRadius: 2,
+                  p: 1,
+                  "&:hover": { bgcolor: "var(--color-olive-muted)" },
+                }}
+              >
+                <Refresh
+                  sx={{
+                    fontSize: 18,
+                    animation: loading ? "spin 0.8s linear infinite" : "none",
+                    "@keyframes spin": {
+                      from: { transform: "rotate(0deg)" },
+                      to: { transform: "rotate(360deg)" },
+                    },
                   }}
                 />
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Tabs
-                  value={roleFilter}
-                  onChange={(_, newValue) => setRoleFilter(newValue)}
-                  variant="scrollable"
-                  scrollButtons="auto"
-                >
-                  <Tab label={`All (${roleStats.all})`} value="all" />
-                  <Tab label={`Farmers (${roleStats.farmer})`} value="farmer" />
-                  <Tab label={`Investors (${roleStats.investor})`} value="investor" />
-                  <Tab label={`Land Owners (${roleStats.landowner})`} value="landowner" />
-                </Tabs>
-              </Grid>
-            </Grid>
-          </Box>
-
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>User</TableCell>
-                  <TableCell>Role</TableCell>
-                  <TableCell>Verification</TableCell>
-                  <TableCell align="center">Trust Score</TableCell>
-                  <TableCell align="center">Projects</TableCell>
-                  <TableCell align="center">Transactions</TableCell>
-                  <TableCell align="right">Total Value</TableCell>
-                  <TableCell>Last Login</TableCell>
-                  <TableCell align="center">Alerts</TableCell>
-                  <TableCell align="center">Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {paginatedUsers.map((user) => (
-                  <TableRow key={user.id} hover>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <Avatar src={user.avatar} alt={user.fullName} />
-                        <Box>
-                          <Typography variant="body2" fontWeight={600}>
-                            {user.fullName}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {user.email}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Chip label={user.role} size="small" color="primary" />
-                    </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-                        <Tooltip title={`Identity: ${user.verificationStatus.identity}`}>
-                          {getVerificationIcon(user.verificationStatus.identity)}
-                        </Tooltip>
-                        <Tooltip title={`Email: ${user.verificationStatus.email}`}>
-                          {getVerificationIcon(user.verificationStatus.email)}
-                        </Tooltip>
-                        <Tooltip title={`Phone: ${user.verificationStatus.phone}`}>
-                          {getVerificationIcon(user.verificationStatus.phone)}
-                        </Tooltip>
-                        {user.verificationStatus.bankAccount && (
-                          <Tooltip title={`Bank: ${user.verificationStatus.bankAccount}`}>
-                            {getVerificationIcon(user.verificationStatus.bankAccount)}
-                          </Tooltip>
-                        )}
-                      </Box>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Chip
-                        label={user.trustScore}
-                        size="small"
-                        color={getTrustScoreColor(user.trustScore) as "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning"}
-                      />
-                    </TableCell>
-                    <TableCell align="center">
-                      <Typography variant="body2">
-                        {user.activeProjects}/{user.totalProjects}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        active/total
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Typography variant="body2" fontWeight={600}>
-                        {user.totalTransactions}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="right">
-                      <Typography variant="body2" fontWeight={600}>
-                        {user.totalInvested
-                          ? formatCurrency(user.totalInvested)
-                          : user.totalEarnings
-                            ? formatCurrency(user.totalEarnings)
-                            : '-'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="caption" color="text.secondary">
-                        {formatDateTime(user.lastLogin)}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                        {user.overduePayments > 0 && (
-                          <Tooltip title={`${user.overduePayments} overdue payment(s)`}>
-                            <Chip
-                              label={user.overduePayments}
-                              size="small"
-                              color="error"
-                              icon={<Warning />}
-                            />
-                          </Tooltip>
-                        )}
-                        {user.disputesInvolved > 0 && (
-                          <Tooltip title={`${user.disputesInvolved} dispute(s)`}>
-                            <Chip
-                              label={user.disputesInvolved}
-                              size="small"
-                              color="warning"
-                              icon={<Error />}
-                            />
-                          </Tooltip>
-                        )}
-                        {user.overduePayments === 0 && user.disputesInvolved === 0 && (
-                          <Typography variant="caption" color="text.secondary">
-                            None
-                          </Typography>
-                        )}
-                      </Box>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Tooltip title="View Details">
-                        <IconButton
-                          size="small"
-                          color="primary"
-                          onClick={() => handleViewDetails(user)}
-                        >
-                          <Visibility />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-
-          <TablePagination
-            component="div"
-            count={filteredUsers.length}
-            page={page}
-            onPageChange={handleChangePage}
-            rowsPerPage={rowsPerPage}
-            rowsPerPageOptions={[10]}
-            sx={{ borderTop: 1, borderColor: 'divider' }}
-          />
-
-          {loading && (
-            <Box sx={{ textAlign: 'center', py: 3 }}>
-              <Typography variant="body2" color="text.secondary">
-                Loading users...
-              </Typography>
-            </Box>
-          )}
-
-          {error && (
-            <Box sx={{ textAlign: 'center', py: 3 }}>
-              <Typography variant="body2" color="error">
-                {error}
-              </Typography>
-            </Box>
-          )}
-
-          {filteredUsers.length === 0 && !loading && !error && (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
-              <Typography variant="body2" color="text.secondary">
-                No users found matching your criteria
-              </Typography>
-            </Box>
-          )}
-        </CardContent>
-      </Card>
-
-      <Dialog
-        open={detailDialogOpen}
-        onClose={handleCloseDialog}
-        maxWidth="md"
-        fullWidth
-        PaperProps={{
-          sx: {
-            borderRadius: 3,
-            background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.1)',
-          }
-        }}
-      >
-        {selectedUser && (
-          <>
-            <Box
+              </IconButton>
+            </Tooltip>
+            <Button
+              variant="contained"
+              startIcon={<PersonAdd />}
               sx={{
-                background: 'rgba(255, 255, 255, 0.05)',
-                backdropFilter: 'blur(20px)',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-                p: 3,
-                position: 'relative',
+                background:
+                  "linear-gradient(135deg, var(--color-olive-dark) 0%, var(--color-olive) 100%)",
+                borderRadius: 2,
+                px: 2.5,
+                py: 1,
+                fontWeight: 600,
+                textTransform: "none",
+                boxShadow: "0 4px 14px var(--color-olive-glow)",
+                "&:hover": {
+                  background:
+                    "linear-gradient(135deg, var(--color-olive-dark) 0%, var(--color-olive-hover) 100%)",
+                },
               }}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, position: 'relative', zIndex: 1 }}>
-                <Avatar
-                  src={selectedUser.avatar}
-                  sx={{
-                    width: 70,
-                    height: 70,
-                    border: '2px solid rgba(255,255,255,0.2)',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                  }}
-                />
-                <Box sx={{ flex: 1 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: 'white', mb: 0.5 }}>
-                    {selectedUser.fullName}
-                  </Typography>
-                  <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
-                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.875rem' }}>
-                      {selectedUser.id}
-                    </Typography>
-                    <Chip
-                      label={selectedUser.role}
-                      size="small"
-                      sx={{
-                        bgcolor: 'rgba(255,255,255,0.15)',
-                        color: 'white',
-                        fontWeight: 600,
-                        backdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                      }}
-                    />
-                  </Box>
-                </Box>
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                  {isEditMode ? (
-                    <>
-                      <IconButton
-                        onClick={handleSaveEdit}
-                        disabled={saving}
+              Add User
+            </Button>
+          </Box>
+        </Box>
+
+        <UserStatCards roleStats={roleStats} activeRate={activeRate} />
+
+        {allPendingBase.length > 0 && (
+          <Box sx={{ mt: 1 }}>
+            <TableSectionHeader
+              title="Pending Approvals"
+              subtitle="Users awaiting admin review and activation"
+              accentGradient="linear-gradient(180deg, var(--color-amber), var(--color-amber-muted))"
+              accentColor="var(--color-amber)"
+              borderColor="var(--color-pending-border)"
+              searchValue={pendingSearch}
+              searchPlaceholder="Search pending users…"
+              onSearchChange={setPendingSearch}
+              filterPaneOpen={pendingFilter.filterPaneOpen}
+              filterCount={pendingFilter.activeFilterCount}
+              onFilterToggle={() => pendingFilter.setFilterPaneOpen((v) => !v)}
+            />
+            <UserTableSection
+              filter={pendingFilter}
+              displayedUsers={displayedPending}
+              paginatedUsers={paginatedPending}
+              page={pendingPage}
+              onPageChange={setPendingPage}
+              onViewDetails={handleViewDetails}
+              onRequestAction={requestAction}
+              accentColor="var(--color-amber)"
+              headerColor="rgba(245,158,11,0.6)"
+              borderColor="var(--color-pending-border)"
+              headerBg="var(--color-pending-muted)"
+              emptyMessage="No pending users match the current filters"
+              sx={{ mb: 4 }}
+            />
+          </Box>
+        )}
+
+        <Box sx={{ mt: 3 }}>
+          <TableSectionHeader
+            title="User Directory"
+            subtitle="Manage and monitor all registered platform users"
+            accentGradient="linear-gradient(180deg, var(--color-olive), var(--color-olive-dark))"
+            accentColor="var(--color-olive)"
+            borderColor="var(--color-olive-muted-strong)"
+            searchValue={searchQuery}
+            searchPlaceholder="Search users by name or email…"
+            onSearchChange={setSearchQuery}
+            filterPaneOpen={mainFilter.filterPaneOpen}
+            filterCount={mainFilter.activeFilterCount}
+            onFilterToggle={() => mainFilter.setFilterPaneOpen((v) => !v)}
+          />
+          <UserTableSection
+            filter={mainFilter}
+            displayedUsers={displayedMain}
+            paginatedUsers={paginatedMain}
+            page={mainPage}
+            onPageChange={setMainPage}
+            onViewDetails={handleViewDetails}
+            onRequestAction={requestAction}
+            accentColor="var(--color-olive)"
+            headerColor="rgba(255,255,255,0.45)"
+            borderColor="var(--surface-light)"
+            headerBg="transparent"
+            emptyMessage={mainEmptyMessage}
+            loading={loading}
+            error={error}
+          >
+            <Box
+              sx={{
+                px: 3,
+                pt: 2,
+                pb: 0,
+                borderBottom: "1px solid var(--color-olive-muted)",
+              }}
+            >
+              <Tabs
+                value={statusTab}
+                onChange={(_e, v: number) => setStatusTab(v)}
+                sx={{
+                  minHeight: 44,
+                  "& .MuiTab-root": {
+                    textTransform: "none",
+                    fontWeight: 600,
+                    fontSize: "0.85rem",
+                    minWidth: 0,
+                    px: 0,
+                    mr: 4,
+                    pb: 1.5,
+                    color: "rgba(255,255,255,0.45)",
+                  },
+                  "& .Mui-selected": { fontWeight: 700 },
+                  "& .MuiTabs-indicator": {
+                    height: 3,
+                    borderRadius: "3px 3px 0 0",
+                    bgcolor: currentTabDef.indicatorColor,
+                  },
+                }}
+              >
+                {STATUS_TAB_DEFS.map((tab, idx) => (
+                  <Tab
+                    key={tab.label}
+                    label={
+                      <Box
                         sx={{
-                          color: '#4CAF50',
-                          bgcolor: 'rgba(76, 175, 80, 0.1)',
-                          '&:hover': {
-                            bgcolor: 'rgba(76, 175, 80, 0.2)',
-                          },
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 0.75,
                         }}
                       >
-                        <Save />
-                      </IconButton>
-                      <IconButton
-                        onClick={handleCancelEdit}
-                        disabled={saving}
-                        sx={{
-                          color: 'rgba(255,255,255,0.7)',
-                          bgcolor: 'rgba(255,255,255,0.1)',
-                          '&:hover': {
-                            bgcolor: 'rgba(255,255,255,0.2)',
-                          },
-                        }}
-                      >
-                        <Cancel />
-                      </IconButton>
-                    </>
-                  ) : (
-                    <IconButton
-                      onClick={handleEditClick}
-                      sx={{
-                        color: 'rgba(255,255,255,0.9)',
-                        bgcolor: 'rgba(255,255,255,0.1)',
-                        '&:hover': {
-                          bgcolor: 'rgba(255,255,255,0.2)',
-                        },
-                      }}
-                    >
-                      <Edit />
-                    </IconButton>
-                  )}
-                  <IconButton
-                    onClick={handleCloseDialog}
+                        {tab.label}
+                        <Chip
+                          label={statusCounts[tab.countKey]}
+                          size="small"
+                          sx={{
+                            height: 18,
+                            fontSize: "0.68rem",
+                            fontWeight: 700,
+                            bgcolor: tab.chipBg,
+                            color: tab.chipColor,
+                          }}
+                        />
+                      </Box>
+                    }
                     sx={{
-                      color: 'rgba(255,255,255,0.9)',
-                      bgcolor: 'rgba(255,255,255,0.1)',
-                      '&:hover': {
-                        bgcolor: 'rgba(255,255,255,0.2)',
+                      "&.Mui-selected": {
+                        color: STATUS_TAB_DEFS[idx].activeColor,
                       },
                     }}
-                  >
-                    <Close />
-                  </IconButton>
-                </Box>
-              </Box>
+                  />
+                ))}
+              </Tabs>
             </Box>
+          </UserTableSection>
+        </Box>
+      </Box>
 
+      <ConfirmActionDialog
+        open={confirmDialog.open}
+        action={confirmDialog.action}
+        user={confirmDialog.user}
+        loading={actionLoading}
+        errorMessage={actionError}
+        onConfirm={handleConfirmAction}
+        onCancel={() =>
+          setConfirmDialog({ open: false, action: null, user: null })
+        }
+      />
 
+      <UserDetailDialog
+        open={detailDialogOpen}
+        selectedUser={selectedUser}
+        userDetail={userDetail}
+        detailLoading={detailLoading}
+        detailTab={detailTab}
+        onTabChange={setDetailTab}
+        onClose={handleCloseDialog}
+      />
 
-            <DialogContent sx={{ p: 0, bgcolor: 'transparent' }}>
-              <Box sx={{
-                display: 'flex',
-                justifyContent: 'space-around',
-                p: 3,
-                borderBottom: '1px solid rgba(255,255,255,0.1)',
-                bgcolor: 'rgba(255,255,255,0.02)',
-              }}>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h5" sx={{ fontWeight: 700, color: 'white' }}>
-                    {selectedUser.totalProjects}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)' }}>
-                    Projects
-                  </Typography>
-                </Box>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h5" sx={{ fontWeight: 700, color: '#4CAF50' }}>
-                    {selectedUser.activeProjects}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)' }}>
-                    Active
-                  </Typography>
-                </Box>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h5" sx={{ fontWeight: 700, color: 'white' }}>
-                    {selectedUser.completedProjects}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)' }}>
-                    Completed
-                  </Typography>
-                </Box>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Chip
-                    label={selectedUser.trustScore}
-                    size="small"
-                    color={getTrustScoreColor(selectedUser.trustScore) as "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning"}
-                    sx={{ fontWeight: 700, fontSize: '1rem', height: 32, minWidth: 50 }}
-                  />
-                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', display: 'block', mt: 0.5 }}>
-                    Trust Score
-                  </Typography>
-                </Box>
-              </Box>
-
-              <Box sx={{ p: 3 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'white', mb: 2, letterSpacing: 0.5 }}>
-                  ABOUT
-                </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  {isEditMode && (
-                    <>
-                      <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-                        <Box sx={{ minWidth: 100 }}>
-                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
-                            First Name
-                          </Typography>
-                        </Box>
-                        <TextField
-                          fullWidth
-                          size="small"
-                          value={editFormData.firstName}
-                          onChange={(e) => setEditFormData({ ...editFormData, firstName: e.target.value })}
-                          sx={{
-                            '& .MuiOutlinedInput-root': {
-                              color: 'white',
-                              '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
-                              '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
-                              '&.Mui-focused fieldset': { borderColor: '#4CAF50' },
-                            },
-                          }}
-                        />
-                      </Box>
-                      <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-                        <Box sx={{ minWidth: 100 }}>
-                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
-                            Last Name
-                          </Typography>
-                        </Box>
-                        <TextField
-                          fullWidth
-                          size="small"
-                          value={editFormData.lastName}
-                          onChange={(e) => setEditFormData({ ...editFormData, lastName: e.target.value })}
-                          sx={{
-                            '& .MuiOutlinedInput-root': {
-                              color: 'white',
-                              '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
-                              '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
-                              '&.Mui-focused fieldset': { borderColor: '#4CAF50' },
-                            },
-                          }}
-                        />
-                      </Box>
-                    </>
-                  )}
-                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-                    <Box sx={{ minWidth: 100 }}>
-                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
-                        Email
-                      </Typography>
-                    </Box>
-                    <Typography variant="body2" sx={{ color: 'white', fontWeight: 500 }}>
-                      {selectedUser.email}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-                    <Box sx={{ minWidth: 100 }}>
-                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
-                        Phone
-                      </Typography>
-                    </Box>
-                    {isEditMode ? (
-                      <TextField
-                        fullWidth
-                        size="small"
-                        value={editFormData.phoneNumber}
-                        onChange={(e) => setEditFormData({ ...editFormData, phoneNumber: e.target.value })}
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            color: 'white',
-                            '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
-                            '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
-                            '&.Mui-focused fieldset': { borderColor: '#4CAF50' },
-                          },
-                        }}
-                      />
-                    ) : (
-                      <Typography variant="body2" sx={{ color: 'white', fontWeight: 500 }}>
-                        {selectedUser.phoneNumber}
-                      </Typography>
-                    )}
-                  </Box>
-                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-                    <Box sx={{ minWidth: 100 }}>
-                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
-                        Address
-                      </Typography>
-                    </Box>
-                    {isEditMode ? (
-                      <TextField
-                        fullWidth
-                        size="small"
-                        multiline
-                        rows={2}
-                        value={editFormData.address}
-                        onChange={(e) => setEditFormData({ ...editFormData, address: e.target.value })}
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            color: 'white',
-                            '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
-                            '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
-                            '&.Mui-focused fieldset': { borderColor: '#4CAF50' },
-                          },
-                        }}
-                      />
-                    ) : (
-                      <Typography variant="body2" sx={{ color: 'white', fontWeight: 500 }}>
-                        {selectedUser.address}
-                      </Typography>
-                    )}
-                  </Box>
-                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-                    <Box sx={{ minWidth: 100 }}>
-                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
-                        Joined
-                      </Typography>
-                    </Box>
-                    <Typography variant="body2" sx={{ color: 'white', fontWeight: 500 }}>
-                      {formatDate(selectedUser.registrationDate)}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-                    <Box sx={{ minWidth: 100 }}>
-                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
-                        Last Active
-                      </Typography>
-                    </Box>
-                    <Typography variant="body2" sx={{ color: 'white', fontWeight: 500 }}>
-                      {formatDateTime(selectedUser.lastLogin)}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-                    <Box sx={{ minWidth: 100 }}>
-                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
-                        Status
-                      </Typography>
-                    </Box>
-                    <Chip
-                      label={selectedUser.isActive ? 'Active' : 'Inactive'}
-                      size="small"
-                      color={selectedUser.isActive ? 'success' : 'error'}
-                      sx={{ fontWeight: 600, height: 24 }}
-                    />
-                  </Box>
-                </Box>
-              </Box>
-
-              {/* Verification Section */}
-              <Box sx={{ px: 3, pb: 3, borderTop: '1px solid rgba(255,255,255,0.1)', pt: 3 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'white', mb: 2, letterSpacing: 0.5 }}>
-                  VERIFICATION
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                  <Chip
-                    label={`Identity: ${selectedUser.verificationStatus.identity}`}
-                    size="small"
-                    icon={getVerificationIcon(selectedUser.verificationStatus.identity)!}
-                    sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: 'white' }}
-                  />
-                  <Chip
-                    label={`Email: ${selectedUser.verificationStatus.email}`}
-                    size="small"
-                    icon={getVerificationIcon(selectedUser.verificationStatus.email)!}
-                    color={selectedUser.verificationStatus.email === 'verified' ? 'success' : 'warning'}
-                  />
-                  <Chip
-                    label={`Phone: ${selectedUser.verificationStatus.phone}`}
-                    size="small"
-                    icon={getVerificationIcon(selectedUser.verificationStatus.phone)!}
-                    color={selectedUser.verificationStatus.phone === 'verified' ? 'success' : 'warning'}
-                  />
-                  {selectedUser.verificationStatus.bankAccount && (
-                    <Chip
-                      label={`Bank: ${selectedUser.verificationStatus.bankAccount}`}
-                      size="small"
-                      icon={getVerificationIcon(selectedUser.verificationStatus.bankAccount)!}
-                      sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: 'white' }}
-                    />
-                  )}
-                </Box>
-              </Box>
-
-              {/* Financial Section */}
-              {(selectedUser.totalInvested || selectedUser.totalEarnings || selectedUser.overduePayments > 0) && (
-                <Box sx={{ px: 3, pb: 3, borderTop: '1px solid rgba(255,255,255,0.1)', pt: 3 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'white', mb: 2, letterSpacing: 0.5 }}>
-                    FINANCIALS
-                  </Typography>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    {selectedUser.totalInvested && (
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                          Total Invested
-                        </Typography>
-                        <Typography variant="h6" sx={{ color: '#4CAF50', fontWeight: 700 }}>
-                          {formatCurrency(selectedUser.totalInvested)}
-                        </Typography>
-                      </Box>
-                    )}
-                    {selectedUser.totalEarnings && (
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                          Total Earnings
-                        </Typography>
-                        <Typography variant="h6" sx={{ color: '#4CAF50', fontWeight: 700 }}>
-                          {formatCurrency(selectedUser.totalEarnings)}
-                        </Typography>
-                      </Box>
-                    )}
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                        Overdue Payments
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: selectedUser.overduePayments > 0 ? '#f44336' : 'white', fontWeight: 600 }}>
-                        {selectedUser.overduePayments}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                        Transactions
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: 'white', fontWeight: 600 }}>
-                        {selectedUser.totalTransactions}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Box>
-              )}
-
-              {/* Risk Indicators Section */}
-              {(selectedUser.overduePayments > 0 || selectedUser.disputesInvolved > 0) && (
-                <Box sx={{
-                  px: 3,
-                  pb: 3,
-                  borderTop: '1px solid rgba(244, 67, 54, 0.3)',
-                  pt: 3,
-                  bgcolor: 'rgba(244, 67, 54, 0.05)',
-                }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#f44336', mb: 2, letterSpacing: 0.5 }}>
-                    ⚠️ ALERTS
-                  </Typography>
-                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                    {selectedUser.overduePayments > 0 && (
-                      <Chip
-                        label={`${selectedUser.overduePayments} Overdue Payment(s)`}
-                        size="small"
-                        color="error"
-                        icon={<Warning />}
-                      />
-                    )}
-                    {selectedUser.disputesInvolved > 0 && (
-                      <Chip
-                        label={`${selectedUser.disputesInvolved} Dispute(s)`}
-                        size="small"
-                        color="warning"
-                        icon={<Error />}
-                      />
-                    )}
-                  </Box>
-                </Box>
-              )}
-            </DialogContent>
-          </>
-        )}
-      </Dialog>
-    </DashboardLayout>
+      <Snackbar
+        open={deleteSuccess}
+        autoHideDuration={4000}
+        onClose={() => setDeleteSuccess(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        sx={{ mt: 8 }}
+      >
+        <Alert
+          onClose={() => setDeleteSuccess(false)}
+          severity="error"
+          variant="filled"
+          elevation={6}
+          sx={{
+            width: "100%",
+            minWidth: "300px",
+            fontSize: "0.95rem",
+            "& .MuiAlert-message": { padding: "8px 0" },
+          }}
+        >
+          User Deleted Successfully
+        </Alert>
+      </Snackbar>
+    </>
   );
 };
 
