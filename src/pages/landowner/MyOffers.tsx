@@ -42,6 +42,7 @@ import {
   createLandownerAd,
   deleteLandownerAd,
   getLandownerAds,
+  uploadLandAdImages,
   type LandownerAdApiItem,
   updateLandownerAd,
 } from "../../services/landownerAds.service";
@@ -473,7 +474,10 @@ const MyLandAdsPage = () => {
     setLandAdDialogOpen(true);
   };
 
-  const handleSubmitLandAd = async (values: LandAdFormValues) => {
+  const handleSubmitLandAd = async (
+    values: LandAdFormValues,
+    newImageFiles?: File[],
+  ) => {
     if (landAdDialogMode === "edit" && editingLandAdId !== null) {
       const updatePayload = {
         title: values.title.trim(),
@@ -522,12 +526,33 @@ const MyLandAdsPage = () => {
         : {}),
     };
 
+    let createdAdId: string | undefined;
     try {
-      await createLandownerAd(payload);
+      const response = await createLandownerAd(payload);
+      createdAdId = (response as { _id?: string } | undefined)?._id;
     } catch (error) {
       console.error("[MyOffers] Create landowner ad failed:", error);
       showWarning("Failed to publish land advertisement. Please try again.");
       throw error;
+    }
+
+    // Upload new images if any
+    if (newImageFiles && newImageFiles.length > 0 && createdAdId) {
+      try {
+        await uploadLandAdImages(createdAdId, newImageFiles);
+        console.log(
+          `[MyOffers] Successfully uploaded ${newImageFiles.length} image(s) to ad ${createdAdId}`,
+        );
+      } catch (error) {
+        console.error(
+          "[MyOffers] Failed to upload images for ad:",
+          createdAdId,
+          error,
+        );
+        showWarning(
+          "Land advertisement created but some images failed to upload.",
+        );
+      }
     }
 
     showSuccess("Land advertisement published successfully.");

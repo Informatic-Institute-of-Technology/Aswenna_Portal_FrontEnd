@@ -16,7 +16,10 @@ import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 interface CreateAdPopupProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (values: LandAdFormValues) => void | Promise<void>;
+  onSubmit: (
+    values: LandAdFormValues,
+    newImageFiles?: File[],
+  ) => void | Promise<void>;
   initialValues?: LandAdFormValues | null;
   mode?: "create" | "edit";
 }
@@ -86,12 +89,15 @@ const CreateAdPopup = ({
 }: CreateAdPopupProps) => {
   const { user } = useAuth();
   const [formData, setFormData] = useState<LandAdFormValues>(EMPTY_FORM_VALUES);
-  const [errors, setErrors] = useState<Partial<Record<keyof LandAdFormValues, string>>>({});
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof LandAdFormValues, string>>
+  >({});
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [fetchedLandImages, setFetchedLandImages] = useState<string[]>([]);
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const uploadedObjectUrlsRef = useRef<string[]>([]);
+  const uploadedFilesRef = useRef<Map<string, File>>(new Map());
 
   const profilePicture = useMemo(() => {
     const media = user?.personalInfo?.profilePicture;
@@ -133,6 +139,7 @@ const CreateAdPopup = ({
 
     uploadedObjectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
     uploadedObjectUrlsRef.current = [];
+    uploadedFilesRef.current.clear();
     setUploadedImages([]);
 
     // Pre-fill from user profile in create mode.
@@ -142,16 +149,17 @@ const CreateAdPopup = ({
         .then((detail) => {
           console.log("[CreateAdPopup] Prefill response user detail:", detail);
           const land =
-            detail.landOwner?.landAddress ?? detail.landOwnerDetails?.landAddress;
+            detail.landOwner?.landAddress ??
+            detail.landOwnerDetails?.landAddress;
           const info = detail.personalInfo;
-          
+
           // Extract land images from the API response (landImages from landAddress)
           const landImages = land?.landImages ?? [];
           const landImageUrls = landImages
             .map((img) => mediaToUrl(img))
             .filter((url: string) => url);
           setFetchedLandImages(landImageUrls);
-          
+
           setFormData((prev) => ({
             ...prev,
             location:
@@ -178,6 +186,7 @@ const CreateAdPopup = ({
     () => () => {
       uploadedObjectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
       uploadedObjectUrlsRef.current = [];
+      uploadedFilesRef.current.clear();
     },
     [],
   );
@@ -211,6 +220,7 @@ const CreateAdPopup = ({
       }
       const objectUrl = URL.createObjectURL(file);
       uploadedObjectUrlsRef.current.push(objectUrl);
+      uploadedFilesRef.current.set(objectUrl, file);
       newUrls.push(objectUrl);
     }
     setUploadedImages((prev) => [...newUrls, ...prev]);
@@ -224,12 +234,16 @@ const CreateAdPopup = ({
   const validateForm = () => {
     const nextErrors: Partial<Record<keyof LandAdFormValues, string>> = {};
     if (!formData.title.trim()) nextErrors.title = "Land ad title is required.";
-    if (!formData.location.trim()) nextErrors.location = "Location is required.";
-    if (!formData.landArea.trim()) nextErrors.landArea = "Land area is required.";
+    if (!formData.location.trim())
+      nextErrors.location = "Location is required.";
+    if (!formData.landArea.trim())
+      nextErrors.landArea = "Land area is required.";
     if (!formData.soilType.trim()) nextErrors.soilType = "Select a soil type.";
-    if (!formData.rentalAmount.trim()) nextErrors.rentalAmount = "Rental amount is required.";
+    if (!formData.rentalAmount.trim())
+      nextErrors.rentalAmount = "Rental amount is required.";
     if (formData.landImages.length === 0) {
-      nextErrors.landImages = "Select or upload at least one land image before publishing.";
+      nextErrors.landImages =
+        "Select or upload at least one land image before publishing.";
     }
 
     setErrors(nextErrors);
@@ -239,7 +253,18 @@ const CreateAdPopup = ({
   const handleSubmit = async () => {
     if (!validateForm()) return;
     try {
-      await onSubmit(formData);
+      // Extract newly uploaded image files (those not in fetchedLandImages)
+      const newImageFiles: File[] = [];
+      formData.landImages.forEach((imageUrl) => {
+        if (!fetchedLandImages.includes(imageUrl)) {
+          const file = uploadedFilesRef.current.get(imageUrl);
+          if (file) {
+            newImageFiles.push(file);
+          }
+        }
+      });
+
+      await onSubmit(formData, newImageFiles);
       onClose();
     } catch {
       // Parent already handles the notification; keep dialog open for retry.
@@ -268,7 +293,10 @@ const CreateAdPopup = ({
     const city = valueAsString(user?.personalInfo?.city);
     const district = valueAsString(user?.personalInfo?.district);
     const province = valueAsString(user?.personalInfo?.province);
-    return [city, district, province].filter(Boolean).join(", ") || "Location details";
+    return (
+      [city, district, province].filter(Boolean).join(", ") ||
+      "Location details"
+    );
   };
 
   const inputCls =
@@ -370,7 +398,9 @@ const CreateAdPopup = ({
                     type="text"
                     placeholder="e.g. Green Valley Seasonal Lease"
                     value={formData.title}
-                    onChange={(event) => handleInputChange("title", event.target.value)}
+                    onChange={(event) =>
+                      handleInputChange("title", event.target.value)
+                    }
                   />
                   {errors.title && (
                     <span className="text-red-400 text-[10px] mt-0.5 block">
@@ -450,7 +480,9 @@ const CreateAdPopup = ({
                   <label className="block">
                     <span className={labelCls}>Available From</span>
                     <input
-                      className={inputCls + " [color-scheme:dark] cursor-pointer"}
+                      className={
+                        inputCls + " [color-scheme:dark] cursor-pointer"
+                      }
                       type="date"
                       value={formData.availableFrom}
                       onChange={(event) =>
@@ -461,7 +493,9 @@ const CreateAdPopup = ({
                   <label className="block">
                     <span className={labelCls}>Available To</span>
                     <input
-                      className={inputCls + " [color-scheme:dark] cursor-pointer"}
+                      className={
+                        inputCls + " [color-scheme:dark] cursor-pointer"
+                      }
                       type="date"
                       value={formData.availableTo}
                       onChange={(event) =>
@@ -496,7 +530,10 @@ const CreateAdPopup = ({
                       className={inputCls}
                       value={formData.waterAvailability}
                       onChange={(event) =>
-                        handleInputChange("waterAvailability", event.target.value)
+                        handleInputChange(
+                          "waterAvailability",
+                          event.target.value,
+                        )
                       }
                     >
                       <option value="">Select water source</option>
@@ -582,10 +619,12 @@ const CreateAdPopup = ({
                     </span>
                   </div>
                   <p className="text-slate-500 text-[11px] mt-0.5 flex items-center gap-1 truncate">
-                    <EmailOutlined style={{ fontSize: 11 }} /> {user?.email || "-"}
+                    <EmailOutlined style={{ fontSize: 11 }} />{" "}
+                    {user?.email || "-"}
                   </p>
                   <p className="text-slate-500 text-[11px] mt-0.5 flex items-center gap-1">
-                    <PhoneOutlined style={{ fontSize: 11 }} /> {user?.phoneNumber || "-"}
+                    <PhoneOutlined style={{ fontSize: 11 }} />{" "}
+                    {user?.phoneNumber || "-"}
                   </p>
                   <p className="text-slate-500 text-[11px] mt-0.5 truncate">
                     {buildLocationSummary()}
@@ -621,7 +660,10 @@ const CreateAdPopup = ({
               {selectedCovers.length > 0 ? (
                 <div className="grid grid-cols-3 gap-2 mb-2.5">
                   {selectedCovers.map((imageUrl, idx) => (
-                    <div key={`${imageUrl}-${idx}`} className="relative rounded-lg overflow-hidden aspect-square">
+                    <div
+                      key={`${imageUrl}-${idx}`}
+                      className="relative rounded-lg overflow-hidden aspect-square"
+                    >
                       <img
                         src={imageUrl}
                         alt={`Selected land image ${idx + 1}`}
@@ -633,12 +675,17 @@ const CreateAdPopup = ({
                         onClick={() => {
                           setFormData((prev) => ({
                             ...prev,
-                            landImages: prev.landImages.filter((_, i) => i !== idx),
+                            landImages: prev.landImages.filter(
+                              (_, i) => i !== idx,
+                            ),
                           }));
                         }}
                         className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center"
                       >
-                        <Close className="text-white" style={{ fontSize: 18 }} />
+                        <Close
+                          className="text-white"
+                          style={{ fontSize: 18 }}
+                        />
                       </button>
                       <div className="absolute top-1 right-1 bg-[#85a446] text-white px-1.5 py-0.5 rounded-full text-[8px] font-bold flex items-center gap-0.5">
                         <Check style={{ fontSize: 9 }} />
@@ -690,7 +737,9 @@ const CreateAdPopup = ({
                         onClick={() => {
                           setFormData((prev) => {
                             const newImages = isSelected
-                              ? prev.landImages.filter((img) => img !== imageUrl)
+                              ? prev.landImages.filter(
+                                  (img) => img !== imageUrl,
+                                )
                               : [...prev.landImages, imageUrl];
                             return { ...prev, landImages: newImages };
                           });
@@ -704,7 +753,10 @@ const CreateAdPopup = ({
                         />
                         {isSelected && (
                           <div className="absolute inset-0 bg-[#85a446]/20 flex items-center justify-center">
-                            <Check className="text-[#85a446]" style={{ fontSize: 18 }} />
+                            <Check
+                              className="text-[#85a446]"
+                              style={{ fontSize: 18 }}
+                            />
                           </div>
                         )}
                       </button>

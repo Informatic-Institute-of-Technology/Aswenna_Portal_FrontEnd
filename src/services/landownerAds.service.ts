@@ -62,3 +62,14 @@ export const updateLandownerAd = (
   adId: string,
   payload: UpdateLandownerAdPayload,
 ) => httpClient.patch<unknown>(`/v1/land-owner/ads/${adId}`, payload);
+
+export const uploadLandAdImages = (adId: string, imageFiles: File[]) => {
+  const formData = new FormData();
+  imageFiles.forEach((file) => {
+    formData.append("images", file);
+  });
+  return httpClient.postMultipart<unknown>(
+    `/v1/land-owner/ads/${adId}/images`,
+    formData,
+  );
+};
