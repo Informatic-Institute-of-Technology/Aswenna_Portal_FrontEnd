@@ -176,18 +176,26 @@ const CreateAdPopup = ({
               dsDivision?: string;
               gnDivision?: string;
             } = {};
-            
-            if (typeof land.street === "string") addressData.street = land.street;
+
+            if (typeof land.street === "string")
+              addressData.street = land.street;
             if (typeof land.city === "string") addressData.city = land.city;
-            if (typeof land.province === "string") addressData.province = land.province;
-            if (typeof land.district === "string") addressData.district = land.district;
-            if (typeof land.postalCode === "string") addressData.postalCode = land.postalCode;
+            if (typeof land.province === "string")
+              addressData.province = land.province;
+            if (typeof land.district === "string")
+              addressData.district = land.district;
+            if (typeof land.postalCode === "string")
+              addressData.postalCode = land.postalCode;
             if (typeof land.size === "string") addressData.size = land.size;
-            if (typeof land.soilType === "string") addressData.soilType = land.soilType;
-            if (typeof land.rentalExpectation === "string") addressData.rentalExpectation = land.rentalExpectation;
-            if (typeof land.dsDivision === "string") addressData.dsDivision = land.dsDivision;
-            if (typeof land.gnDivision === "string") addressData.gnDivision = land.gnDivision;
-            
+            if (typeof land.soilType === "string")
+              addressData.soilType = land.soilType;
+            if (typeof land.rentalExpectation === "string")
+              addressData.rentalExpectation = land.rentalExpectation;
+            if (typeof land.dsDivision === "string")
+              addressData.dsDivision = land.dsDivision;
+            if (typeof land.gnDivision === "string")
+              addressData.gnDivision = land.gnDivision;
+
             setLandAddress(addressData);
           }
 

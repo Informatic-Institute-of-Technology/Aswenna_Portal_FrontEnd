@@ -37,6 +37,7 @@ import {
 import CreateAdPopup, {
   type LandAdFormValues,
 } from "../../components/landowner/CreateAdPopup";
+import LandImageCarousel from "../../components/landowner/LandImageCarousel";
 import { comprehensiveProjectsData } from "../../data/json";
 import {
   createLandownerAd,
@@ -45,6 +46,8 @@ import {
   updateLandownerAd,
   uploadLandAdImages,
   type LandownerAdApiItem,
+  type LandImage,
+  type LandownerInfo,
 } from "../../services/landownerAds.service";
 import Notification from "../../shared/components/Notification";
 import { useNotification } from "../../shared/hooks/useNotification";
@@ -58,6 +61,9 @@ interface LandAd extends LandAdFormValues {
   investorRequests: number;
   waterAccess?: string;
   image?: string;
+  images?: LandImage[];
+  landowner?: LandownerInfo | string;
+  landownerName?: string;
 }
 
 const DEFAULT_LAND_IMAGE =
@@ -164,20 +170,12 @@ const normalizeString = (value: unknown): string => {
 const normalizeLocationField = (value: unknown): string => {
   if (typeof value === "string") return value.trim();
   if (typeof value === "object" && value) {
-    // Handle object with coordinates like { latitude, longitude }
-    // or { street, city, district, province }
     const obj = value as Record<string, unknown>;
-    
-    // Try extracting address parts if they exist
-    const addressParts = [
-      obj.street,
-      obj.city,
-      obj.district,
-      obj.province,
-    ]
+
+    const addressParts = [obj.street, obj.city, obj.district, obj.province]
       .filter((part) => typeof part === "string" && part)
       .map((part) => (part as string).trim());
-    
+
     if (addressParts.length > 0) {
       return addressParts.join(", ");
     }
@@ -430,23 +428,44 @@ const MyLandAdsPage = () => {
         0;
 
       const mapped = (rawAds as LandownerAdApiItem[]).map(
-        (item: LandownerAdApiItem): LandAd => ({
-          id: item._id,
-          title: item.title || "",
-          location: normalizeLocationField(item.location),
-          landArea: normalizeString(item.landArea),
-          availableFrom: item.availableFrom || "",
-          availableTo: item.availableTo || "",
-          soilType: normalizeString(item.soilType),
-          rentalAmount: normalizeString(item.rentalAmount),
-          waterAvailability: "",
-          landHistory: normalizeString(item.landHistory),
-          additionalInfo: normalizeString(item.additionalInfo),
-          landImages: item.image ? [item.image] : [],
-          image: item.image || "",
-          status: normalizeAdStatus(item.status),
-          investorRequests: 0,
-        }),
+        (item: LandownerAdApiItem): LandAd => {
+          // Extract landowner name
+          let landownerName = "";
+          if (typeof item.landowner === "object" && item.landowner) {
+            landownerName = item.landowner.fullName || "";
+          } else if (typeof item.landowner === "string") {
+            landownerName = item.landowner;
+          }
+
+          // Extract image URLs from images array
+          const imageUrls = (item.images || [])
+            .filter((img): img is LandImage => img && !!img.url)
+            .map((img) => img);
+
+          // Use images array if available, otherwise fall back to single image
+          const primaryImage = imageUrls.length > 0 ? imageUrls[0].url : item.image;
+
+          return {
+            id: item._id,
+            title: item.title || "",
+            location: normalizeLocationField(item.location),
+            landArea: normalizeString(item.landArea),
+            availableFrom: item.availableFrom || "",
+            availableTo: item.availableTo || "",
+            soilType: normalizeString(item.soilType),
+            rentalAmount: normalizeString(item.rentalAmount),
+            waterAvailability: item.waterAvailability || "",
+            landHistory: normalizeString(item.landHistory),
+            additionalInfo: normalizeString(item.additionalInfo),
+            landImages: imageUrls.map((img) => img.url || "").filter(Boolean),
+            image: primaryImage || "",
+            images: imageUrls,
+            landowner: item.landowner,
+            landownerName,
+            status: normalizeAdStatus(item.status),
+            investorRequests: 0,
+          };
+        },
       );
       setLandAds(mapped);
       setHasExistingAdFromServer(totalDocs > 0 || mapped.length > 0);
@@ -460,7 +479,6 @@ const MyLandAdsPage = () => {
 
   useEffect(() => {
     if (user?._id) void fetchAds();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?._id]);
 
   const handleCreateAd = () => {
@@ -654,45 +672,19 @@ const MyLandAdsPage = () => {
           },
         }}
       >
-        {/* Image header — matches OfferCard height and overlay structure */}
-        <Box sx={{ position: "relative", height: 160, overflow: "hidden" }}>
-          <Box
-            sx={{
-              position: "absolute",
-              inset: 0,
-              background:
-                "linear-gradient(135deg, var(--color-nature-deep) 0%, var(--color-nature-mid) 100%)",
-            }}
-          />
-          <CardMedia
-            component="img"
-            image={ad.image || DEFAULT_LAND_IMAGE}
-            alt={ad.title}
-            sx={{
-              position: "absolute",
-              inset: 0,
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              opacity: 0.6,
-              transition: "opacity 0.3s ease, transform 0.3s ease",
-              "&:hover": { opacity: 0.75, transform: "scale(1.05)" },
-            }}
-          />
-          <Box
-            sx={{
-              position: "absolute",
-              inset: 0,
-              background:
-                "linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.75) 100%)",
-            }}
+        {/* Image carousel header */}
+        <Box sx={{ position: "relative" }}>
+          <LandImageCarousel
+            images={ad.images || (ad.image ? [{ url: ad.image }] : [])}
+            title={ad.title}
+            defaultImage={DEFAULT_LAND_IMAGE}
           />
           {/* Status chip — top left */}
-          <Box sx={{ position: "absolute", top: 12, left: 12 }}>
+          <Box sx={{ position: "absolute", top: 12, left: 12, zIndex: 10 }}>
             <StatusLabel status={ad.status} />
           </Box>
           {/* Title + area chip — bottom left */}
-          <Box sx={{ position: "absolute", bottom: 12, left: 12, right: 12 }}>
+          <Box sx={{ position: "absolute", bottom: 12, left: 12, right: 12, zIndex: 10 }}>
             <Typography
               variant="subtitle1"
               sx={{
@@ -705,16 +697,30 @@ const MyLandAdsPage = () => {
             >
               {ad.title}
             </Typography>
-            <Chip
-              label={ad.landArea}
-              size="small"
-              sx={{
-                bgcolor: "rgba(255,255,255,0.18)",
-                color: "#fff",
-                fontWeight: 600,
-                fontSize: "0.7rem",
-              }}
-            />
+            <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap" }}>
+              <Chip
+                label={ad.landArea}
+                size="small"
+                sx={{
+                  bgcolor: "rgba(255,255,255,0.18)",
+                  color: "#fff",
+                  fontWeight: 600,
+                  fontSize: "0.7rem",
+                }}
+              />
+              {ad.landownerName && (
+                <Chip
+                  label={ad.landownerName}
+                  size="small"
+                  sx={{
+                    bgcolor: "rgba(133, 164, 70, 0.3)",
+                    color: "#fff",
+                    fontWeight: 600,
+                    fontSize: "0.7rem",
+                  }}
+                />
+              )}
+            </Stack>
           </Box>
         </Box>
 
@@ -1213,7 +1219,8 @@ const MyLandAdsPage = () => {
                     variant="body1"
                     sx={{ fontWeight: 600, textTransform: "capitalize" }}
                   >
-                    {selectedLandAd.waterAvailability.replace(/-/g, " ") || "Not specified"}
+                    {selectedLandAd.waterAvailability.replace(/-/g, " ") ||
+                      "Not specified"}
                   </Typography>
                 </Box>
                 <Box>
