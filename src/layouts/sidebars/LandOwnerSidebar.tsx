@@ -1,10 +1,6 @@
 import { useAuth } from "@/Context/useAuth";
 import {
   AccountCircle,
-  Domain as AssetIcon,
-  AttachMoney,
-  BarChart as BarChartIcon,
-  Cloud,
   Description,
   Home,
   Landscape,
@@ -44,28 +40,10 @@ const LandOwnerSidebar = () => {
       path: `${basePath}/dashboard/received-requests`,
     },
     {
-      text: "Income Tracker",
-      icon: <AttachMoney />,
-      path: `${basePath}/dashboard/income-tracker`,
-    },
-    {
-      text: "Insights & Analysis",
-      icon: <BarChartIcon />,
-      path: `${basePath}/dashboard/land-analysis`,
-    },
-    {
-      text: "Land, Soil & Weather",
-      icon: <Cloud />,
-      path: `${basePath}/dashboard/soil-weather`,
-    },
-  ];
-
-  const assetItems = [
-    {
-      text: "Land Asset Register",
-      icon: <AssetIcon />,
-      path: `${basePath}/dashboard/land-assets`,
-    },
+      text: "Smart Matchmaking",
+      icon: <Description />,
+      path: `${basePath}/dashboard/smart-matchmaking`,
+    }
   ];
 
   const secondaryItems = [
@@ -148,25 +126,6 @@ const LandOwnerSidebar = () => {
           Asset Management
         </Typography>
       </Box>
-      <List sx={{ py: 0 }}>
-        {assetItems.map((item) => (
-          <ListItemButton
-            key={item.path}
-            selected={location.pathname === item.path}
-            onClick={() => navigate(item.path)}
-          >
-            <ListItemIcon
-              sx={{
-                color:
-                  location.pathname === item.path ? "primary.main" : "inherit",
-              }}
-            >
-              {item.icon}
-            </ListItemIcon>
-            <ListItemText primary={item.text} />
-          </ListItemButton>
-        ))}
-      </List>
 
       <Divider />
 

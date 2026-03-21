@@ -1166,6 +1166,7 @@ const MyLandAdsPage = () => {
         open={detailsDialogOpen}
         onClose={() => setDetailsDialogOpen(false)}
         project={selectedProject}
+        viewMode="landowner"
       />
 
       <Notification
