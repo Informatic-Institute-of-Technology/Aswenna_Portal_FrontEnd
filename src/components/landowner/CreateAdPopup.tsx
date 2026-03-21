@@ -426,7 +426,7 @@ const CreateAdPopup = ({
                 </label>
 
                 <div className="block">
-                  <span className={labelCls}>Land Location (From Profile)</span>
+                  <span className={labelCls}>Land Location</span>
                   <div className="mt-1.5 bg-[#141414] rounded-lg px-3.5 py-3 text-slate-300 text-sm space-y-2">
                     {landAddress.street && (
                       <div>
@@ -482,7 +482,7 @@ const CreateAdPopup = ({
                 </div>
 
                 <div className="block">
-                  <span className={labelCls}>Land Details (From Profile)</span>
+                  <span className={labelCls}>Land Details</span>
                   <div className="mt-1.5 bg-[#141414] rounded-lg px-3.5 py-3 text-slate-300 text-sm space-y-2">
                     <div className="grid grid-cols-2 gap-4">
                       {landAddress.size && (
