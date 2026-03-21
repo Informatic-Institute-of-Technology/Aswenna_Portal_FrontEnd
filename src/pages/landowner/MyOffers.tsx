@@ -37,7 +37,6 @@ import {
 import CreateAdPopup, {
   type LandAdFormValues,
 } from "../../components/landowner/CreateAdPopup";
-import LandImageCarousel from "../../components/landowner/LandImageCarousel";
 import { comprehensiveProjectsData } from "../../data/json";
 import {
   createLandownerAd,
@@ -672,12 +671,28 @@ const MyLandAdsPage = () => {
           },
         }}
       >
-        {/* Image carousel header */}
-        <Box sx={{ position: "relative" }}>
-          <LandImageCarousel
-            images={ad.images || (ad.image ? [{ url: ad.image }] : [])}
-            title={ad.title}
-            defaultImage={DEFAULT_LAND_IMAGE}
+        {/* Image header */}
+        <Box sx={{ position: "relative", height: 160, overflow: "hidden" }}>
+          <CardMedia
+            component="img"
+            image={ad.image || DEFAULT_LAND_IMAGE}
+            alt={ad.title}
+            sx={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              opacity: 0.7,
+              transition: "opacity 0.3s ease, transform 0.3s ease",
+              "&:hover": { opacity: 0.85, transform: "scale(1.05)" },
+            }}
+          />
+          <Box
+            sx={{
+              position: "absolute",
+              inset: 0,
+              background:
+                "linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.75) 100%)",
+            }}
           />
           {/* Status chip — top left */}
           <Box sx={{ position: "absolute", top: 12, left: 12, zIndex: 10 }}>
