@@ -1,0 +1,21 @@
+**
+ * InvestorDashboard.tsx
+ *
+ * Top-level orchestrator for the Investor Dashboard page.
+ * All chart/table logic lives in @/components/investor/dashboard/*.
+ */
+import { StatCard } from "@/components";
+import {
+  FinancialPerformance,
+  OperationalMetrics,
+  PortfolioComposition,
+  SmartInsights,
+} from "../../components/investor/dashboard";
+import {
+  AttachMoney,
+  Description,
+  People,
+  TrendingUp,
+} from "@mui/icons-material";
+import { Box, Typography } from "@mui/material";
+import dashboardData from "../../../sample-data/investor-dashboard.json";
