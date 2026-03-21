@@ -2,9 +2,10 @@ import { CardHeaderWithIcon, PlaceholderWidget, StatCard } from "@/components";
 import {
   AttachMoney,
   BarChart as BarChartIcon,
+  CheckCircle,
   Cloud,
   Home,
-  LocationOn,
+  PlusOne,
 } from "@mui/icons-material";
 import { Card, CardContent, Chip } from "@mui/material";
 
@@ -14,19 +15,19 @@ const LandOwnerDashboard = () => {
       <div className="row g-3" style={{ marginBottom: "1.5rem" }}>
         <div className="col-12 col-sm-6 col-md-4">
           <StatCard
-            icon={Home}
+            icon={CheckCircle}
             iconBgColor="var(--color-olive-muted-strong)"
             iconColor="primary.main"
-            label="Properties Listed"
-            value={8}
+            label="Completed Projects"
+            value={10}
           />
         </div>
         <div className="col-12 col-sm-6 col-md-4">
           <StatCard
-            icon={LocationOn}
+            icon={PlusOne}
             iconBgColor="var(--color-info-blue-muted)"
             iconColor="var(--color-info-blue)"
-            label="Allocated to Deals"
+            label="New requests"
             value={5}
           />
         </div>

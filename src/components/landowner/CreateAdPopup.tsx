@@ -1,92 +1,260 @@
+import { useAuth } from "@/Context/useAuth";
+import { adminService } from "@/services/admin.service";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
-  Button,
-  Box,
-  IconButton,
-  MenuItem,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import { useState } from "react";
+  ArrowForward,
+  Check,
+  Close,
+  EmailOutlined,
+  KeyboardArrowDown,
+  PersonOutline,
+  PhoneOutlined,
+  Upload,
+} from "@mui/icons-material";
+import { Dialog } from "@mui/material";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 
 interface CreateAdPopupProps {
   open: boolean;
   onClose: () => void;
+  onSubmit: (values: LandAdFormValues) => void | Promise<void>;
+  initialValues?: LandAdFormValues | null;
+  mode?: "create" | "edit";
 }
 
-const fieldStyle = {
-  "& .MuiInputBase-root": {
-    color: "var(--text-secondary)",
-  },
-  "& .MuiInput-underline:before": {
-    borderBottom: "1px solid var(--neutral-700)",
-  },
-  "& .MuiInput-underline:hover:before": {
-    borderBottom: "1px solid var(--neutral-500)",
-  },
-  "& .MuiInput-underline:after": {
-    borderBottom: "2px solid var(--color-olive)",
-  },
-  "& .MuiSelect-icon": {
-    color: "var(--text-secondary)",
-  },
+export interface LandAdFormValues {
+  title: string;
+  location: string;
+  landArea: string;
+  availableFrom: string;
+  availableTo: string;
+  soilType: string;
+  rentalAmount: string;
+  waterAccess: string;
+  landHistory: string;
+  additionalInfo: string;
+  image: string;
+}
+
+const EMPTY_FORM_VALUES: LandAdFormValues = {
+  title: "",
+  location: "",
+  landArea: "",
+  availableFrom: "",
+  availableTo: "",
+  soilType: "",
+  rentalAmount: "",
+  waterAccess: "",
+  landHistory: "",
+  additionalInfo: "",
+  image: "",
 };
 
-const Label = ({ text }: { text: string }) => (
-  <Box sx={{ color: "var(--text-primary)", fontSize: "14px", fontWeight: 500, mb: "6px" }}>
-    {text}
-  </Box>
-);
+const valueAsString = (value: unknown): string => {
+  if (typeof value === "string") return value;
+  if (typeof value === "number") return String(value);
+  return "";
+};
 
-const CreateAdPopup = ({ open, onClose }: CreateAdPopupProps) => {
-  const [formData, setFormData] = useState({
-    location: "",
-    fromDate: "",
-    toDate: "",
-    soilType: "",
-    additionalInfo: "",
-    landArea: "",
-    rentalAmount: "",
-    landHistory: "",
-    photo: null as File | null,
+const mediaToUrl = (value: unknown): string => {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  if (typeof value === "object" && value) {
+    const maybeUrl = (value as { url?: unknown }).url;
+    const maybeFileName = (value as { filename?: unknown }).filename;
+    if (typeof maybeUrl === "string") return maybeUrl;
+    if (typeof maybeFileName === "string") return maybeFileName;
+  }
+  return "";
+};
+
+const uniqueNonEmpty = (values: string[]) => {
+  const seen = new Set<string>();
+  return values.filter((value) => {
+    const trimmed = value.trim();
+    if (!trimmed || seen.has(trimmed)) return false;
+    seen.add(trimmed);
+    return true;
   });
+};
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+const CreateAdPopup = ({
+  open,
+  onClose,
+  onSubmit,
+  initialValues,
+  mode = "create",
+}: CreateAdPopupProps) => {
+  const { user } = useAuth();
+  const [formData, setFormData] = useState<LandAdFormValues>(EMPTY_FORM_VALUES);
+  const [errors, setErrors] = useState<Partial<Record<keyof LandAdFormValues, string>>>({});
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [isLocationOpen, setIsLocationOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const uploadedObjectUrlsRef = useRef<string[]>([]);
+
+  const profilePicture = useMemo(() => {
+    const media = user?.personalInfo?.profilePicture;
+    return mediaToUrl(media);
+  }, [user?.personalInfo?.profilePicture]);
+
+  const fullName = useMemo(
+    () =>
+      user?.fullName ||
+      [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
+      "Landowner",
+    [user?.firstName, user?.fullName, user?.lastName],
+  );
+
+  const signedUpImageOptions = useMemo(() => {
+    const userData = user as
+      | {
+          personalInfo?: {
+            profilePicture?: unknown;
+            nicFrontImage?: unknown;
+            nicBackImage?: unknown;
+          } | null;
+          landOwnerDetails?: {
+            landImages?: unknown[];
+            images?: unknown[];
+          } | null;
+        }
+      | null;
+
+    const personal = userData?.personalInfo;
+    const landOwnerDetails = userData?.landOwnerDetails;
+
+    const directImages = [
+      mediaToUrl(personal?.profilePicture),
+      mediaToUrl(personal?.nicFrontImage),
+      mediaToUrl(personal?.nicBackImage),
+      ...(landOwnerDetails?.landImages ?? []).map(mediaToUrl),
+      ...(landOwnerDetails?.images ?? []).map(mediaToUrl),
+    ];
+
+    return uniqueNonEmpty(directImages);
+  }, [user]);
+
+  const allImageOptions = useMemo(
+    () => uniqueNonEmpty([...uploadedImages, ...signedUpImageOptions]),
+    [signedUpImageOptions, uploadedImages],
+  );
+
+  useEffect(() => {
+    if (!open) return;
+
+    const base = initialValues ?? EMPTY_FORM_VALUES;
+    setFormData(
+      mode === "create"
+        ? {
+            ...base,
+            image: "",
+            additionalInfo: base.additionalInfo || "",
+          }
+        : base,
+    );
+    setErrors({});
+    setIsLocationOpen(false);
+
+    uploadedObjectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+    uploadedObjectUrlsRef.current = [];
+    setUploadedImages([]);
+
+    // Pre-fill from user profile in create mode.
+    if (mode === "create" && user?._id) {
+      adminService
+        .getUserById(user._id)
+        .then((detail) => {
+          console.log("[CreateAdPopup] Prefill response user detail:", detail);
+          const land =
+            detail.landOwner?.landAddress ?? detail.landOwnerDetails?.landAddress;
+          const info = detail.personalInfo;
+          setFormData((prev) => ({
+            ...prev,
+            location:
+              prev.location ||
+              land?.city ||
+              land?.street ||
+              info?.city ||
+              info?.address ||
+              detail.address ||
+              "",
+            landArea: prev.landArea || land?.size || "",
+            soilType: prev.soilType || land?.soilType || "",
+            rentalAmount: prev.rentalAmount || land?.rentalExpectation || "",
+          }));
+        })
+        .catch((error) => {
+          console.error("[CreateAdPopup] Prefill request failed:", error);
+        });
+    }
+  }, [initialValues, mode, open, user?._id]);
+
+  useEffect(
+    () => () => {
+      uploadedObjectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+      uploadedObjectUrlsRef.current = [];
+    },
+    [],
+  );
+
+  const handleInputChange = (name: keyof LandAdFormValues, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFormData((prev) => ({
+    if (errors[name]) {
+      setErrors((prev) => ({
         ...prev,
-        photo: file,
+        [name]: undefined,
       }));
     }
   };
 
-  const handleSubmit = () => {
-    // Handle form submission logic here
-    console.log("Form submitted:", formData);
-    onClose();
+  const handleCoverUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setErrors((prev) => ({
+        ...prev,
+        image: "Please upload a valid image file.",
+      }));
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(file);
+    uploadedObjectUrlsRef.current.push(objectUrl);
+    setUploadedImages((prev) => [objectUrl, ...prev]);
+    handleInputChange("image", objectUrl);
+
+    // Allow selecting the same file again in a later upload.
+    event.target.value = "";
   };
 
-  const soilTypes = [
-    { value: "clay", label: "Clay" },
-    { value: "sandy", label: "Sandy" },
-    { value: "loamy", label: "Loamy" },
-    { value: "silty", label: "Silty" },
-    { value: "peaty", label: "Peaty" },
-    { value: "chalky", label: "Chalky" },
-    { value: "gravel", label: "Gravel" },
-    { value: "other", label: "Other" },
-  ];
+  const validateForm = () => {
+    const nextErrors: Partial<Record<keyof LandAdFormValues, string>> = {};
+    if (!formData.title.trim()) nextErrors.title = "Land ad title is required.";
+    if (!formData.location.trim()) nextErrors.location = "Location is required.";
+    if (!formData.landArea.trim()) nextErrors.landArea = "Land area is required.";
+    if (!formData.soilType.trim()) nextErrors.soilType = "Select a soil type.";
+    if (!formData.rentalAmount.trim()) nextErrors.rentalAmount = "Rental amount is required.";
+    if (!formData.image.trim()) {
+      nextErrors.image = "Select or upload a cover image before publishing.";
+    }
+
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+    try {
+      await onSubmit(formData);
+      onClose();
+    } catch {
+      // Parent already handles the notification; keep dialog open for retry.
+    }
+  };
 
   const landHistoryOptions = [
     { value: "organic-previous", label: "Previously Used for Organic Farming" },
@@ -99,226 +267,432 @@ const CreateAdPopup = ({ open, onClose }: CreateAdPopupProps) => {
     { value: "fallow", label: "Fallow Land" },
   ];
 
+  const dialogTitle =
+    mode === "edit" ? "Edit Land Advertisement" : "Create Land Advertisement";
+  const primaryActionLabel =
+    mode === "edit" ? "Save Changes" : "Publish Land Ad";
+
+  const selectedCover = formData.image;
+
+  const buildLocationSummary = () => {
+    const city = valueAsString(user?.personalInfo?.city);
+    const district = valueAsString(user?.personalInfo?.district);
+    const province = valueAsString(user?.personalInfo?.province);
+    return [city, district, province].filter(Boolean).join(", ") || "Location details";
+  };
+
+  const inputCls =
+    "mt-1.5 block w-full bg-[#141414] text-slate-100 placeholder-slate-600 border-0 rounded-lg px-3.5 h-10 text-sm outline-none transition-all focus:ring-2 focus:ring-[#85a446]/20";
+  const inputErrCls =
+    "mt-1.5 block w-full bg-[#141414] text-slate-100 placeholder-slate-600 border-0 rounded-lg px-3.5 h-10 text-sm outline-none transition-all ring-2 ring-red-500/60";
+  const textareaCls =
+    "mt-1.5 block w-full bg-[#141414] text-slate-100 placeholder-slate-600 border-0 rounded-lg px-3.5 py-2.5 text-sm outline-none transition-all focus:ring-2 focus:ring-[#85a446]/20 resize-none";
+  const labelCls =
+    "text-slate-400 text-[11px] font-semibold uppercase tracking-widest";
+
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="md"
-      fullWidth
+      maxWidth={false}
       PaperProps={{
         sx: {
+          bgcolor: "transparent",
+          boxShadow: "none",
+          overflow: "visible",
           borderRadius: "16px",
-          background: "linear-gradient(180deg, var(--bg-overlay), var(--bg-elevated))",
-          color: "var(--text-primary)",
-          padding: "12px",
+        },
+      }}
+      slotProps={{
+        backdrop: {
+          sx: {
+            backdropFilter: "blur(8px)",
+            backgroundColor: "rgba(0, 0, 0, 0.68)",
+          },
         },
       }}
     >
-      <DialogTitle
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          fontSize: "20px",
-          fontWeight: 600,
-        }}
+      <div
+        className="text-slate-100 rounded-2xl flex flex-col overflow-hidden"
+        style={{ background: "#0a0a0a", width: 960, maxHeight: "92vh" }}
       >
-        Create an Ad
-        <IconButton onClick={onClose} sx={{ color: "var(--text-primary)" }}>
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
-
-      <DialogContent>
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-            columnGap: "48px",
-            rowGap: "32px",
-          }}
+        <div
+          className="shrink-0 flex items-center gap-3 px-5 py-4"
+          style={{ background: "#0a0a0a" }}
         >
-          <Box>
-            <Label text="Location" />
-            <TextField
-              name="location"
-              variant="standard"
-              fullWidth
-              sx={fieldStyle}
-              value={formData.location}
-              onChange={handleInputChange}
-              placeholder="Add location"
-            />
-          </Box>
+          <button
+            onClick={onClose}
+            className="flex size-9 items-center justify-center rounded-full bg-white/[0.06] hover:bg-white/[0.10] transition-colors shrink-0"
+          >
+            <Close style={{ fontSize: 18 }} className="text-slate-300" />
+          </button>
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] text-[#85a446] font-bold uppercase tracking-widest mb-0.5">
+              Landowner Ad
+            </p>
+            <h2 className="text-white text-base font-bold leading-none">
+              {dialogTitle}
+            </h2>
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0">
+            {[
+              "Ad Details",
+              mode === "edit" ? "Review & Update" : "Review & Publish",
+            ].map((label, i) => (
+              <div
+                key={label}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all ${
+                  i === 0
+                    ? "bg-[#85a446] text-white shadow-lg shadow-[#85a446]/25"
+                    : "bg-white/[0.05] text-slate-500"
+                }`}
+              >
+                <span
+                  className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold ${
+                    i === 0
+                      ? "bg-white/25 text-white"
+                      : "bg-white/10 text-slate-500"
+                  }`}
+                >
+                  {i + 1}
+                </span>
+                {label}
+              </div>
+            ))}
+          </div>
+        </div>
 
-          <Box>
-            <Label text="Land Area" />
-            <TextField
-              name="landArea"
-              variant="standard"
-              fullWidth
-              sx={fieldStyle}
-              value={formData.landArea}
-              onChange={handleInputChange}
-              placeholder="Land Area"
-            />
-          </Box>
+        <div className="flex flex-1 overflow-hidden">
+          <div className="flex-1 overflow-y-auto px-6 py-7 space-y-8">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-1.5 h-5 rounded-full bg-[#85a446]" />
+                <span className="text-sm text-slate-200 font-bold uppercase tracking-wider">
+                  Ad Info
+                </span>
+              </div>
 
-          <Box>
-            <Label text="Available Period" />
-            <TextField
-              name="availablePeriod"
-              variant="standard"
-              fullWidth
-              sx={fieldStyle}
-              value={formData.fromDate}
-              onChange={handleInputChange}
-              placeholder="Available Period"
-            />
-          </Box>
+              <div className="space-y-5">
+                <label className="block">
+                  <span className={labelCls}>Land Ad Title</span>
+                  <input
+                    className={errors.title ? inputErrCls : inputCls}
+                    type="text"
+                    placeholder="e.g. Green Valley Seasonal Lease"
+                    value={formData.title}
+                    onChange={(event) => handleInputChange("title", event.target.value)}
+                  />
+                  {errors.title && (
+                    <span className="text-red-400 text-[10px] mt-0.5 block">
+                      {errors.title}
+                    </span>
+                  )}
+                </label>
 
-          <Box>
-            <Label text="Rental Amount" />
-            <TextField
-              name="rentalAmount"
-              variant="standard"
-              fullWidth
-              sx={fieldStyle}
-              value={formData.rentalAmount}
-              onChange={handleInputChange}
-              placeholder="Enter Amount"
-            />
-          </Box>
+                <label className="block">
+                  <span className={labelCls}>Location</span>
+                  <input
+                    className={errors.location ? inputErrCls : inputCls}
+                    type="text"
+                    placeholder="City / district"
+                    value={formData.location}
+                    onChange={(event) =>
+                      handleInputChange("location", event.target.value)
+                    }
+                  />
+                  {errors.location && (
+                    <span className="text-red-400 text-[10px] mt-0.5 block">
+                      {errors.location}
+                    </span>
+                  )}
+                </label>
 
-          <Box>
-            <Label text="Soil Type" />
-            <TextField
-              fullWidth
-              select
-              placeholder="select soil type"
-              name="soilType"
-              value={formData.soilType}
-              onChange={handleInputChange}
-              size="small"
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "8px",
-                  backgroundColor: "var(--text-primary)",
-                },
+                <div className="grid grid-cols-2 gap-4">
+                  <label className="block">
+                    <span className={labelCls}>Land Area</span>
+                    <input
+                      className={errors.landArea ? inputErrCls : inputCls}
+                      type="text"
+                      placeholder="e.g. 25 acres"
+                      value={formData.landArea}
+                      onChange={(event) =>
+                        handleInputChange("landArea", event.target.value)
+                      }
+                    />
+                    {errors.landArea && (
+                      <span className="text-red-400 text-[10px] mt-0.5 block">
+                        {errors.landArea}
+                      </span>
+                    )}
+                  </label>
+
+                  <label className="block">
+                    <span className={labelCls}>Rental Amount (LKR)</span>
+                    <input
+                      className={errors.rentalAmount ? inputErrCls : inputCls}
+                      type="text"
+                      placeholder="e.g. 50000"
+                      value={formData.rentalAmount}
+                      onChange={(event) =>
+                        handleInputChange("rentalAmount", event.target.value)
+                      }
+                    />
+                    {errors.rentalAmount && (
+                      <span className="text-red-400 text-[10px] mt-0.5 block">
+                        {errors.rentalAmount}
+                      </span>
+                    )}
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-1.5 h-5 rounded-full bg-[#85a446]" />
+                <span className="text-sm text-slate-200 font-bold uppercase tracking-wider">
+                  Availability & Land Details
+                </span>
+              </div>
+
+              <div className="space-y-5">
+                <div className="grid grid-cols-2 gap-4">
+                  <label className="block">
+                    <span className={labelCls}>Available From</span>
+                    <input
+                      className={inputCls + " [color-scheme:dark] cursor-pointer"}
+                      type="date"
+                      value={formData.availableFrom}
+                      onChange={(event) =>
+                        handleInputChange("availableFrom", event.target.value)
+                      }
+                    />
+                  </label>
+                  <label className="block">
+                    <span className={labelCls}>Available To</span>
+                    <input
+                      className={inputCls + " [color-scheme:dark] cursor-pointer"}
+                      type="date"
+                      value={formData.availableTo}
+                      onChange={(event) =>
+                        handleInputChange("availableTo", event.target.value)
+                      }
+                    />
+                  </label>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <label className="block">
+                    <span className={labelCls}>Soil Type</span>
+                    <input
+                      className={errors.soilType ? inputErrCls : inputCls}
+                      type="text"
+                      placeholder="Prefilled from your profile"
+                      value={formData.soilType}
+                      onChange={(event) =>
+                        handleInputChange("soilType", event.target.value)
+                      }
+                    />
+                    {errors.soilType && (
+                      <span className="text-red-400 text-[10px] mt-0.5 block">
+                        {errors.soilType}
+                      </span>
+                    )}
+                  </label>
+                </div>
+
+                <label className="block">
+                  <span className={labelCls}>Land History</span>
+                  <select
+                    className={inputCls}
+                    value={formData.landHistory}
+                    onChange={(event) =>
+                      handleInputChange("landHistory", event.target.value)
+                    }
+                  >
+                    <option value="">Select</option>
+                    {landHistoryOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="block">
+                  <span className={labelCls}>Additional Information</span>
+                  <textarea
+                    className={textareaCls}
+                    rows={3}
+                    placeholder="Add any details investors should know"
+                    value={formData.additionalInfo}
+                    onChange={(event) =>
+                      handleInputChange("additionalInfo", event.target.value)
+                    }
+                  />
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div className="w-[340px] shrink-0 overflow-y-auto px-5 py-7 space-y-6 border-l border-white/[0.14]">
+            <div
+              className="rounded-xl overflow-hidden"
+              style={{
+                background: "linear-gradient(135deg,#0f1a0a 0%,#0d1108 100%)",
               }}
             >
-              {soilTypes.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Box>
+              <div className="px-4 pt-3 pb-1">
+                <p className="text-[10px] text-[#85a446]/70 font-bold uppercase tracking-widest mb-2">
+                  Publishing as
+                </p>
+              </div>
+              <div className="flex items-center gap-3 px-4 pb-4">
+                {profilePicture ? (
+                  <img
+                    src={profilePicture}
+                    alt="Profile"
+                    className="w-10 h-10 rounded-full object-cover shrink-0"
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-[#85a446]/10 flex items-center justify-center shrink-0">
+                    <PersonOutline
+                      className="text-[#85a446]"
+                      style={{ fontSize: 20 }}
+                    />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-white text-sm font-bold truncate">
+                      {fullName}
+                    </span>
+                    <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#85a446]/20 text-[#85a446]">
+                      Landowner
+                    </span>
+                  </div>
+                  <p className="text-slate-500 text-[11px] mt-0.5 flex items-center gap-1 truncate">
+                    <EmailOutlined style={{ fontSize: 11 }} /> {user?.email || "-"}
+                  </p>
+                  <p className="text-slate-500 text-[11px] mt-0.5 flex items-center gap-1">
+                    <PhoneOutlined style={{ fontSize: 11 }} /> {user?.phoneNumber || "-"}
+                  </p>
+                  <p className="text-slate-500 text-[11px] mt-0.5 truncate">
+                    {buildLocationSummary()}
+                  </p>
+                </div>
+              </div>
+            </div>
 
-          <Box>
-            <Label text="Land History" />
-            <TextField
-              fullWidth
-              select
-              placeholder="Select"
-              name="landHistory"
-              value={formData.landHistory}
-              onChange={handleInputChange}
-              size="small"
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "8px",
-                  backgroundColor: "var(--text-primary)",
-                },
-              }}
-            >
-              {landHistoryOptions.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Box>
+            <div>
+              <div className="flex items-center gap-2 mb-2.5">
+                <div className="w-1 h-4 rounded-full bg-[#85a446]" />
+                <span className="text-xs text-slate-300 font-bold uppercase tracking-widest">
+                  Cover Image
+                </span>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="ml-auto text-[#85a446] text-[10px] font-bold flex items-center gap-1 hover:opacity-80 transition-opacity"
+                >
+                  <Upload style={{ fontSize: 13 }} /> Upload
+                </button>
+              </div>
 
-          <Box>
-            <Label text="Additional Information" />
-            <TextField
-              name="additionalInfo"
-              variant="standard"
-              fullWidth
-              sx={fieldStyle}
-              value={formData.additionalInfo}
-              onChange={handleInputChange}
-              placeholder="Additional info"
-              multiline
-              rows={2}
-            />
-          </Box>
-
-          <Box>
-            <Label text="Upload a Photo" />
-            <Box
-              sx={{
-                border: "1px dashed var(--text-secondary)",
-                borderRadius: "8px",
-                padding: "16px",
-                textAlign: "center",
-                cursor: "pointer",
-                backgroundColor: "var(--bg-subtle)",
-                minHeight: "56px",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                "&:hover": {
-                  borderColor: "var(--color-olive)",
-                  backgroundColor: "rgba(113, 188, 93, 0.04)",
-                },
-              }}
-              onClick={() => document.getElementById("photo-upload")?.click()}
-            >
               <input
-                id="photo-upload"
+                ref={fileInputRef}
                 type="file"
                 accept="image/*"
-                onChange={handleFileChange}
-                style={{ display: "none" }}
+                onChange={handleCoverUpload}
+                className="hidden"
               />
-              <div style={{ color: "var(--neutral-500)", fontSize: "14px" }}>
-                {formData.photo ? formData.photo.name : "No file chosen"}
-              </div>
-              <div
-                style={{
-                  color: "var(--neutral-350)",
-                  fontSize: "12px",
-                  marginTop: "4px",
-                }}
-              >
-                Click to upload or drag and drop
-              </div>
-            </Box>
-          </Box>
-        </Box>
 
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 5 }}>
-          <Button
-            variant="contained"
-            onClick={handleSubmit}
-            sx={{
-              backgroundColor: "var(--color-olive)",
-              px: 8,
-              py: 1.2,
-              borderRadius: "10px",
-              fontWeight: 600,
-              "&:hover": {
-                backgroundColor: "var(--color-olive-dark)",
-              },
-            }}
+              {selectedCover ? (
+                <div className="relative w-full aspect-video rounded-xl overflow-hidden mb-2.5">
+                  <img
+                    src={selectedCover}
+                    alt="Selected cover"
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute top-2 right-2 bg-[#85a446] text-white px-1.5 py-0.5 rounded-full text-[9px] font-bold flex items-center gap-0.5">
+                    <Check style={{ fontSize: 10 }} /> Selected
+                  </div>
+                </div>
+              ) : (
+                <div className="w-full aspect-video rounded-xl mb-2.5 border border-dashed border-white/20 bg-[#111111] flex items-center justify-center text-slate-500 text-xs px-4 text-center">
+                  Choose one of your signup images or upload a new cover image.
+                </div>
+              )}
+
+              {errors.image && (
+                <span className="text-red-400 text-[10px] mb-2 block">
+                  {errors.image}
+                </span>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setIsLocationOpen((value) => !value)}
+                className="w-full flex items-center justify-between bg-[#141414] rounded-xl px-4 h-11 text-xs text-slate-400 hover:text-slate-200 transition-colors mb-2"
+              >
+                <span>
+                  {allImageOptions.length === 0
+                    ? "No signup images found"
+                    : `${allImageOptions.length} image${allImageOptions.length > 1 ? "s" : ""} available`}
+                </span>
+                <KeyboardArrowDown
+                  style={{ fontSize: 18 }}
+                  className={`transition-transform ${isLocationOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+
+              {isLocationOpen && allImageOptions.length > 0 && (
+                <div className="grid grid-cols-4 gap-1.5">
+                  {allImageOptions.map((imageUrl, index) => (
+                    <button
+                      type="button"
+                      key={`${imageUrl}-${index}`}
+                      className={`relative rounded-lg overflow-hidden aspect-square transition-all ${
+                        formData.image === imageUrl
+                          ? "ring-2 ring-[#85a446] ring-offset-1 ring-offset-[#0a0a0a]"
+                          : "opacity-70 hover:opacity-95"
+                      }`}
+                      onClick={() => handleInputChange("image", imageUrl)}
+                    >
+                      <img
+                        src={imageUrl}
+                        alt={`Uploaded option ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div
+          className="shrink-0 flex items-center justify-between gap-3 px-5 py-3.5"
+          style={{ background: "#0a0a0a" }}
+        >
+          <button
+            onClick={onClose}
+            className="text-slate-500 text-sm font-semibold px-4 py-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] hover:text-slate-300 transition-all"
           >
-            Save
-          </Button>
-        </Box>
-      </DialogContent>
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="flex items-center gap-2 bg-[#85a446] hover:bg-[#93b34e] active:scale-[0.98] text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all shadow-lg shadow-[#85a446]/20"
+          >
+            {primaryActionLabel} <ArrowForward style={{ fontSize: 18 }} />
+          </button>
+        </div>
+      </div>
     </Dialog>
   );
 };

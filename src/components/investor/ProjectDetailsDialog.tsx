@@ -1,7 +1,6 @@
 import { useAuth } from "@/Context/useAuth";
 import {
   AccessTime,
-  Agriculture,
   AttachMoney,
   BusinessCenter,
   CalendarToday,
@@ -43,12 +42,14 @@ interface ProjectDetailsDialogProps {
   open: boolean;
   onClose: () => void;
   project: OfferCardProps | null;
+  viewMode?: "investor" | "landowner";
 }
 
 const ProjectDetailsDialog = ({
   open,
   onClose,
   project,
+  viewMode = "investor",
 }: ProjectDetailsDialogProps) => {
   const [activeTab, setActiveTab] = useState(0);
   const [mapDialogOpen, setMapDialogOpen] = useState(false);
@@ -144,6 +145,51 @@ const ProjectDetailsDialog = ({
     );
     return Math.round(totalProgress / project.milestones.length);
   }, [project]);
+
+  const landownerInstallments = useMemo(() => {
+    if (!project) return [];
+
+    if (project.landRentals && project.landRentals.length > 0) {
+      return project.landRentals.map((rental) => ({
+        id: rental.id,
+        title: `${rental.month} — Land Rent`,
+        dueDate: rental.dueDate,
+        paidDate: rental.paidDate,
+        amount: rental.amount,
+        status: rental.status,
+        landArea: rental.landArea,
+      }));
+    }
+
+    return (project.payments || []).map((payment) => ({
+      id: payment.id,
+      title: payment.description || "Monthly Rental",
+      dueDate: payment.dueDate,
+      paidDate: payment.paidDate,
+      amount: payment.amount,
+      status: payment.status,
+      landArea: "",
+    }));
+  }, [project]);
+
+  const landownerRentalSummary = useMemo(() => {
+    const total = landownerInstallments.reduce((sum, item) => sum + item.amount, 0);
+    const paid = landownerInstallments
+      .filter((item) => item.status === "paid")
+      .reduce((sum, item) => sum + item.amount, 0);
+    const overdue = landownerInstallments
+      .filter((item) => item.status === "overdue")
+      .reduce((sum, item) => sum + item.amount, 0);
+    const pending = Math.max(total - paid - overdue, 0);
+
+    return {
+      total,
+      paid,
+      pending,
+      overdue,
+      completion: total > 0 ? Math.round((paid / total) * 100) : 0,
+    };
+  }, [landownerInstallments]);
 
   const notifications = useMemo(() => {
     if (!project) return [];
@@ -398,6 +444,8 @@ const ProjectDetailsDialog = ({
     return diff;
   };
 
+  const isLandownerView = viewMode === "landowner";
+
   return (
     <>
       <Dialog
@@ -484,15 +532,21 @@ const ProjectDetailsDialog = ({
                 "&.Mui-selected": { color: "white" },
               }}
             />
+            {!isLandownerView && (
+              <Tab
+                label="Milestones & Progress"
+                sx={{
+                  color: "var(--text-on-dark)",
+                  "&.Mui-selected": { color: "white" },
+                }}
+              />
+            )}
             <Tab
-              label="Milestones & Progress"
-              sx={{
-                color: "var(--text-on-dark)",
-                "&.Mui-selected": { color: "white" },
-              }}
-            />
-            <Tab
-              label="Payments & Finance"
+              label={
+                isLandownerView
+                  ? "Rental Installments"
+                  : "Payments & Finance"
+              }
               sx={{
                 color: "var(--text-on-dark)",
                 "&.Mui-selected": { color: "white" },
@@ -593,7 +647,8 @@ const ProjectDetailsDialog = ({
                     fontWeight={600}
                     sx={{ display: "flex", alignItems: "center", gap: 1 }}
                   >
-                    <AttachMoney /> Financial Summary
+                    <AttachMoney />
+                    {isLandownerView ? "Rental Payment Summary" : "Financial Summary"}
                   </Typography>
                   <Box
                     sx={{
@@ -603,286 +658,137 @@ const ProjectDetailsDialog = ({
                       gap: 2,
                     }}
                   >
-                    <Box>
-                      <Typography variant="caption" color="var(--text-on-dark)">
-                        TOTAL INVESTMENT
-                      </Typography>
-                      <Typography variant="h5" color="white" fontWeight={700}>
-                        {formatCurrency(calculatedFinancials.budget)}
-                      </Typography>
-                    </Box>
-                    {calculatedFinancials.disbursed > 0 && (
-                      <Box>
-                        <Typography
-                          variant="caption"
-                          color="var(--text-on-dark)"
-                        >
-                          DISBURSED AMOUNT
-                        </Typography>
-                        <Typography
-                          variant="h6"
-                          color="var(--color-lime)"
-                          fontWeight={600}
-                        >
-                          {formatCurrency(calculatedFinancials.disbursed)}
-                        </Typography>
-                        <LinearProgress
-                          variant="determinate"
-                          value={
-                            (calculatedFinancials.disbursed /
-                              calculatedFinancials.budget) *
-                            100
-                          }
-                          sx={{
-                            mt: 1,
-                            height: 6,
-                            borderRadius: 3,
-                            backgroundColor: "var(--surface-light)",
-                            "& .MuiLinearProgress-bar": {
-                              borderRadius: 3,
-                              backgroundColor: "var(--color-lime)",
-                            },
-                          }}
-                        />
-                      </Box>
-                    )}
-                    {calculatedFinancials.remaining > 0 && (
-                      <Box>
-                        <Typography
-                          variant="caption"
-                          color="var(--text-on-dark)"
-                        >
-                          REMAINING BALANCE
-                        </Typography>
-                        <Typography
-                          variant="h6"
-                          color="var(--color-amber)"
-                          fontWeight={600}
-                        >
-                          {formatCurrency(calculatedFinancials.remaining)}
-                        </Typography>
-                      </Box>
-                    )}
-                    <Divider
-                      sx={{ borderColor: "var(--surface-light)", my: 1 }}
-                    />
-                    <Box>
-                      <Typography variant="caption" color="var(--text-on-dark)">
-                        EXPECTED ROI
-                      </Typography>
-                      <Typography
-                        variant="h5"
-                        color="var(--color-lime)"
-                        fontWeight={700}
-                      >
-                        {project.expectedROI}%
-                      </Typography>
-                    </Box>
-                    {project.investmentType && (
+                    {isLandownerView ? (
                       <>
-                        <Divider
-                          sx={{ borderColor: "var(--surface-light)", my: 1 }}
-                        />
+                        <Box>
+                          <Typography variant="caption" color="var(--text-on-dark)">
+                            TOTAL RENTAL VALUE
+                          </Typography>
+                          <Typography variant="h5" color="white" fontWeight={700}>
+                            {formatCurrency(landownerRentalSummary.total)}
+                          </Typography>
+                        </Box>
                         <Box>
                           <Typography
                             variant="caption"
                             color="var(--text-on-dark)"
-                            sx={{ mb: 1, display: "block" }}
                           >
-                            INVESTMENT DETAILS
+                            COMPLETED PAYMENTS
                           </Typography>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 2,
-                              flexWrap: "wrap",
-                            }}
+                          <Typography
+                            variant="h6"
+                            color="var(--color-lime)"
+                            fontWeight={600}
                           >
-                            <Chip
-                              icon={
-                                project.investmentType === "harvest" ? (
-                                  <Agriculture sx={{ fontSize: 18 }} />
-                                ) : (
-                                  <BusinessCenter sx={{ fontSize: 18 }} />
-                                )
-                              }
-                              label={
-                                project.investmentType === "harvest"
-                                  ? "Harvest-Based"
-                                  : "Commission-Based"
-                              }
-                              size="small"
-                              sx={{
-                                bgcolor:
-                                  project.investmentType === "harvest"
-                                    ? "var(--color-success-bg)"
-                                    : "var(--color-info-blue-muted)",
-                                color:
-                                  project.investmentType === "harvest"
-                                    ? "var(--color-lime)"
-                                    : "var(--color-info-blue)",
-                                fontWeight: 700,
-                                border: `1px solid ${project.investmentType === "harvest" ? "var(--color-lime)" : "var(--color-info-blue)"}`,
-                                fontSize: "0.8rem",
-                              }}
-                            />
-
-                            {project.investmentType === "commission" &&
-                              project.commissionRate && (
-                                <>
-                                  <Box
-                                    sx={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                      gap: 0.5,
-                                    }}
-                                  >
-                                    <Typography
-                                      variant="caption"
-                                      color="var(--text-on-dark)"
-                                    >
-                                      Rate:
-                                    </Typography>
-                                    <Typography
-                                      variant="body2"
-                                      color="var(--color-info-blue)"
-                                      fontWeight={700}
-                                    >
-                                      {project.commissionRate}%
-                                    </Typography>
-                                  </Box>
-
-                                  {project.earnedCommission !== undefined &&
-                                    project.earnedCommission > 0 && (
-                                      <>
-                                        <Box
-                                          sx={{
-                                            display: "flex",
-                                            alignItems: "center",
-                                            gap: 0.5,
-                                          }}
-                                        >
-                                          <Typography
-                                            variant="caption"
-                                            color="var(--text-on-dark)"
-                                          >
-                                            •
-                                          </Typography>
-                                          <Box
-                                            sx={{
-                                              bgcolor:
-                                                "var(--color-info-blue-muted)",
-                                              px: 1.5,
-                                              py: 0.5,
-                                              borderRadius: 1,
-                                              border:
-                                                "1px solid var(--color-info-blue-border)",
-                                              display: "flex",
-                                              alignItems: "center",
-                                              gap: 0.5,
-                                            }}
-                                          >
-                                            <Typography
-                                              variant="body2"
-                                              color="var(--color-info-blue)"
-                                              fontWeight={600}
-                                            >
-                                              Earned:
-                                            </Typography>
-                                            <Typography
-                                              variant="h6"
-                                              color="var(--color-info-blue)"
-                                              fontWeight={700}
-                                              sx={{ fontSize: "1.1rem" }}
-                                            >
-                                              {formatCurrency(
-                                                project.earnedCommission,
-                                              )}
-                                            </Typography>
-                                            {project.endDate && (
-                                              <Typography
-                                                variant="caption"
-                                                color="var(--text-on-dark)"
-                                                sx={{
-                                                  fontStyle: "italic",
-                                                  ml: 0.5,
-                                                }}
-                                              >
-                                                (
-                                                {project.status === "active"
-                                                  ? `by ${new Date(project.endDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
-                                                  : "final"}
-                                                )
-                                              </Typography>
-                                            )}
-                                          </Box>
-                                        </Box>
-
-                                        {project.investorAmount && (
-                                          <Box
-                                            sx={{
-                                              display: "flex",
-                                              alignItems: "center",
-                                              gap: 0.5,
-                                            }}
-                                          >
-                                            <Typography
-                                              variant="caption"
-                                              color="var(--text-on-dark)"
-                                            >
-                                              •
-                                            </Typography>
-                                            <Box
-                                              sx={{
-                                                bgcolor:
-                                                  "var(--color-success-bg)",
-                                                px: 1.5,
-                                                py: 0.5,
-                                                borderRadius: 1,
-                                                border:
-                                                  "1px solid var(--color-success-border)",
-                                                display: "flex",
-                                                alignItems: "center",
-                                                gap: 0.5,
-                                              }}
-                                            >
-                                              <Typography
-                                                variant="body2"
-                                                color="var(--color-lime)"
-                                                fontWeight={600}
-                                              >
-                                                Net Income:
-                                              </Typography>
-                                              <Typography
-                                                variant="h6"
-                                                color="var(--color-lime)"
-                                                fontWeight={700}
-                                                sx={{ fontSize: "1.1rem" }}
-                                              >
-                                                {formatCurrency(
-                                                  project.earnedCommission +
-                                                    project.investorAmount,
-                                                )}
-                                              </Typography>
-                                              <Typography
-                                                variant="caption"
-                                                color="var(--text-on-dark)"
-                                                sx={{
-                                                  fontStyle: "italic",
-                                                  ml: 0.5,
-                                                }}
-                                              >
-                                                (after investment)
-                                              </Typography>
-                                            </Box>
-                                          </Box>
-                                        )}
-                                      </>
-                                    )}
-                                </>
-                              )}
+                            {formatCurrency(landownerRentalSummary.paid)}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography
+                            variant="caption"
+                            color="var(--text-on-dark)"
+                          >
+                            YET TO BE PAID
+                          </Typography>
+                          <Typography
+                            variant="h6"
+                            color="var(--color-amber)"
+                            fontWeight={600}
+                          >
+                            {formatCurrency(
+                              landownerRentalSummary.pending +
+                                landownerRentalSummary.overdue,
+                            )}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography
+                            variant="caption"
+                            color="var(--text-on-dark)"
+                          >
+                            PAYMENT COMPLETION
+                          </Typography>
+                          <LinearProgress
+                            variant="determinate"
+                            value={landownerRentalSummary.completion}
+                            sx={{
+                              mt: 1,
+                              height: 8,
+                              borderRadius: 4,
+                              backgroundColor: "var(--surface-light)",
+                              "& .MuiLinearProgress-bar": {
+                                borderRadius: 4,
+                                backgroundColor: "var(--color-lime)",
+                              },
+                            }}
+                          />
+                          <Typography
+                            variant="caption"
+                            color="white"
+                            sx={{ mt: 0.5, display: "block" }}
+                          >
+                            {landownerRentalSummary.completion}% complete
+                          </Typography>
+                        </Box>
+                      </>
+                    ) : (
+                      <>
+                        <Box>
+                          <Typography variant="caption" color="var(--text-on-dark)">
+                            TOTAL INVESTMENT
+                          </Typography>
+                          <Typography variant="h5" color="white" fontWeight={700}>
+                            {formatCurrency(calculatedFinancials.budget)}
+                          </Typography>
+                        </Box>
+                        {calculatedFinancials.disbursed > 0 && (
+                          <Box>
+                            <Typography
+                              variant="caption"
+                              color="var(--text-on-dark)"
+                            >
+                              DISBURSED AMOUNT
+                            </Typography>
+                            <Typography
+                              variant="h6"
+                              color="var(--color-lime)"
+                              fontWeight={600}
+                            >
+                              {formatCurrency(calculatedFinancials.disbursed)}
+                            </Typography>
                           </Box>
+                        )}
+                        {calculatedFinancials.remaining > 0 && (
+                          <Box>
+                            <Typography
+                              variant="caption"
+                              color="var(--text-on-dark)"
+                            >
+                              REMAINING BALANCE
+                            </Typography>
+                            <Typography
+                              variant="h6"
+                              color="var(--color-amber)"
+                              fontWeight={600}
+                            >
+                              {formatCurrency(calculatedFinancials.remaining)}
+                            </Typography>
+                          </Box>
+                        )}
+                        <Divider
+                          sx={{ borderColor: "var(--surface-light)", my: 1 }}
+                        />
+                        <Box>
+                          <Typography variant="caption" color="var(--text-on-dark)">
+                            EXPECTED ROI
+                          </Typography>
+                          <Typography
+                            variant="h5"
+                            color="var(--color-lime)"
+                            fontWeight={700}
+                          >
+                            {project.expectedROI}%
+                          </Typography>
                         </Box>
                       </>
                     )}
@@ -1692,7 +1598,7 @@ const ProjectDetailsDialog = ({
           )}
 
           {/* Milestones Tab */}
-          {activeTab === 1 && (
+          {activeTab === 1 && !isLandownerView && (
             <Box>
               <Typography
                 variant="h5"
@@ -1870,7 +1776,7 @@ const ProjectDetailsDialog = ({
           )}
 
           {/* Payments Tab */}
-          {activeTab === 2 && (
+          {activeTab === (isLandownerView ? 1 : 2) && (
             <Box>
               <Typography
                 variant="h5"
@@ -1879,11 +1785,13 @@ const ProjectDetailsDialog = ({
                 fontWeight={600}
                 sx={{ mb: 3 }}
               >
-                Payment Schedule & Financial Breakdown
+                {isLandownerView
+                  ? "Monthly Rental Installments"
+                  : "Payment Schedule & Financial Breakdown"}
               </Typography>
 
               {/* Financial Breakdown - Auto-Calculated */}
-              {calculatedBudgetBreakdown.length > 0 && (
+              {!isLandownerView && calculatedBudgetBreakdown.length > 0 && (
                 <Box
                   sx={{
                     mb: 4,
@@ -2042,7 +1950,7 @@ const ProjectDetailsDialog = ({
               )}
 
               {/* Payment Schedule */}
-              {project.payments && project.payments.length > 0 ? (
+              {!isLandownerView && project.payments && project.payments.length > 0 ? (
                 <Box>
                   <Typography
                     variant="h6"
@@ -2276,15 +2184,61 @@ const ProjectDetailsDialog = ({
                       </Box>
                     )}
                 </Box>
-              ) : (
+              ) : !isLandownerView ? (
                 <Typography variant="body1" color="var(--text-on-dark)">
                   No payment data available
                 </Typography>
-              )}
+              ) : null}
 
               {/* Land Rental Section */}
-              {project.landRentals && project.landRentals.length > 0 && (
+              {isLandownerView && (
                 <Box sx={{ mt: 4 }}>
+                  <Box
+                    sx={{
+                      mb: 2,
+                      p: 2,
+                      bgcolor: "var(--surface-tint)",
+                      borderRadius: 2,
+                      border: "1px solid var(--surface-light)",
+                      display: "grid",
+                      gridTemplateColumns: { xs: "1fr 1fr", md: "repeat(4, 1fr)" },
+                      gap: 1.5,
+                    }}
+                  >
+                    <Box>
+                      <Typography variant="caption" color="var(--text-on-dark)">
+                        TOTAL RENTAL
+                      </Typography>
+                      <Typography variant="subtitle1" color="white" fontWeight={700}>
+                        {formatCurrency(landownerRentalSummary.total)}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="caption" color="var(--text-on-dark)">
+                        COMPLETED
+                      </Typography>
+                      <Typography variant="subtitle1" color="var(--color-lime)" fontWeight={700}>
+                        {formatCurrency(landownerRentalSummary.paid)}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="caption" color="var(--text-on-dark)">
+                        PENDING
+                      </Typography>
+                      <Typography variant="subtitle1" color="var(--color-amber)" fontWeight={700}>
+                        {formatCurrency(landownerRentalSummary.pending)}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="caption" color="var(--text-on-dark)">
+                        OVERDUE
+                      </Typography>
+                      <Typography variant="subtitle1" color="var(--color-overdue)" fontWeight={700}>
+                        {formatCurrency(landownerRentalSummary.overdue)}
+                      </Typography>
+                    </Box>
+                  </Box>
+
                   <Typography
                     variant="h6"
                     color="white"
@@ -2300,10 +2254,11 @@ const ProjectDetailsDialog = ({
                     <Landscape sx={{ color: "var(--color-orange)" }} />{" "}
                     Landowner Rental Payments
                   </Typography>
-                  <Box
-                    sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-                  >
-                    {project.landRentals.map((rental) => (
+                  {landownerInstallments.length > 0 ? (
+                    <Box
+                      sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+                    >
+                      {landownerInstallments.map((rental) => (
                       <Box
                         key={rental.id}
                         sx={{
@@ -2341,7 +2296,7 @@ const ProjectDetailsDialog = ({
                                 color="white"
                                 fontWeight={600}
                               >
-                                {rental.month} — Land Rent
+                                {rental.title}
                               </Typography>
                               <Chip
                                 label={rental.status.toUpperCase()}
@@ -2379,7 +2334,7 @@ const ProjectDetailsDialog = ({
                                     color: "var(--color-orange)",
                                   }}
                                 />
-                                {rental.landArea}
+                                {rental.landArea || "Monthly rental"}
                               </Typography>
                               <Typography
                                 variant="body2"
@@ -2392,7 +2347,7 @@ const ProjectDetailsDialog = ({
                                     verticalAlign: "middle",
                                   }}
                                 />
-                                Due: {rental.dueDate}
+                                Due: {formatDate(rental.dueDate)}
                               </Typography>
                               {rental.paidDate && (
                                 <Typography
@@ -2406,7 +2361,7 @@ const ProjectDetailsDialog = ({
                                       verticalAlign: "middle",
                                     }}
                                   />
-                                  Paid: {rental.paidDate}
+                                  Paid: {formatDate(rental.paidDate)}
                                 </Typography>
                               )}
                               {rental.status === "overdue" && (
@@ -2432,18 +2387,23 @@ const ProjectDetailsDialog = ({
                             color="white"
                             fontWeight={700}
                           >
-                            LKR {rental.amount.toLocaleString()}
+                            {formatCurrency(rental.amount)}
                           </Typography>
                         </Box>
                       </Box>
-                    ))}
-                  </Box>
+                      ))}
+                    </Box>
+                  ) : (
+                    <Typography variant="body1" color="var(--text-on-dark)">
+                      No monthly rental installments found for this project.
+                    </Typography>
+                  )}
                 </Box>
               )}
             </Box>
           )}
 
-          {activeTab === 3 && (
+          {activeTab === (isLandownerView ? 2 : 3) && (
             <Box>
               <Box
                 sx={{
