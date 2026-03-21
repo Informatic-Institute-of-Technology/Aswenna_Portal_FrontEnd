@@ -46,38 +46,10 @@ const LandOwnerSidebar = () => {
       path: `${basePath}/dashboard/received-requests`,
     },
     {
-      text: "Tenant Search",
-      icon: <Search />,
-      path: `${basePath}/dashboard/tenant-search`,
-    },
-    {
-      text: "Land Analysis",
-      icon: <BarChartIcon />,
-      path: `${basePath}/dashboard/land-analysis`,
-    },
-    {
-      text: "Income Tracker",
-      icon: <AttachMoney />,
-      path: `${basePath}/dashboard/income-tracker`,
-    },
-    {
-      text: "Soil & Weather",
-      icon: <Cloud />,
-      path: `${basePath}/dashboard/soil-weather`,
-    },
-    {
-      text: "Tenant Management",
-      icon: <People />,
-      path: `${basePath}/dashboard/tenant-management`,
-    },
-  ];
-
-  const assetItems = [
-    {
-      text: "Land Asset Register",
-      icon: <AssetIcon />,
-      path: `${basePath}/dashboard/land-assets`,
-    },
+      text: "Smart Matchmaking",
+      icon: <Description />,
+      path: `${basePath}/dashboard/smart-matchmaking`,
+    }
   ];
 
   const secondaryItems = [
@@ -160,25 +132,6 @@ const LandOwnerSidebar = () => {
           Asset Management
         </Typography>
       </Box>
-      <List sx={{ py: 0 }}>
-        {assetItems.map((item) => (
-          <ListItemButton
-            key={item.path}
-            selected={location.pathname === item.path}
-            onClick={() => navigate(item.path)}
-          >
-            <ListItemIcon
-              sx={{
-                color:
-                  location.pathname === item.path ? "primary.main" : "inherit",
-              }}
-            >
-              {item.icon}
-            </ListItemIcon>
-            <ListItemText primary={item.text} />
-          </ListItemButton>
-        ))}
-      </List>
 
       <Divider />
 

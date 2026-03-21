@@ -154,8 +154,6 @@ function AppRoutes() {
             />
             <Route path="tenant-search" element={<TenantSearchPage />} />
             <Route path="land-analysis" element={<LandAnalysisPage />} />
-            <Route path="income-tracker" element={<Dashboard />} />
-            <Route path="soil-weather" element={<Dashboard />} />
             <Route path="tenant-management" element={<TenantSearchPage />} />
 
             <Route path="admin/users" element={<GlobalUserManagement />} />
