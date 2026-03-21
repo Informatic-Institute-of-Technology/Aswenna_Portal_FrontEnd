@@ -56,6 +56,8 @@ interface LandAd extends LandAdFormValues {
   status: LandAdStatus;
   projectName?: string;
   investorRequests: number;
+  waterAccess?: string;
+  image?: string;
 }
 
 const DEFAULT_LAND_IMAGE =
@@ -69,10 +71,10 @@ const EMPTY_LAND_AD: LandAdFormValues = {
   availableTo: "",
   soilType: "",
   rentalAmount: "",
-  waterAccess: "",
+  waterAvailability: "",
   landHistory: "",
   additionalInfo: "",
-  image: "",
+  landImages: [],
 };
 
 const STATUS_CONFIG: Record<
@@ -147,15 +149,39 @@ const toLandAdFormValues = (ad: LandAd): LandAdFormValues => ({
   availableTo: ad.availableTo,
   soilType: ad.soilType,
   rentalAmount: ad.rentalAmount,
-  waterAccess: ad.waterAccess,
+  waterAvailability: ad.waterAvailability,
   landHistory: ad.landHistory,
   additionalInfo: ad.additionalInfo,
-  image: ad.image,
+  landImages: ad.landImages,
 });
 
 const normalizeString = (value: unknown): string => {
   if (typeof value === "string") return value.trim();
   if (typeof value === "number") return String(value);
+  return "";
+};
+
+const normalizeLocationField = (value: unknown): string => {
+  if (typeof value === "string") return value.trim();
+  if (typeof value === "object" && value) {
+    // Handle object with coordinates like { latitude, longitude }
+    // or { street, city, district, province }
+    const obj = value as Record<string, unknown>;
+    
+    // Try extracting address parts if they exist
+    const addressParts = [
+      obj.street,
+      obj.city,
+      obj.district,
+      obj.province,
+    ]
+      .filter((part) => typeof part === "string" && part)
+      .map((part) => (part as string).trim());
+    
+    if (addressParts.length > 0) {
+      return addressParts.join(", ");
+    }
+  }
   return "";
 };
 
@@ -224,11 +250,10 @@ const buildPrefilledAdFromUser = (user: User | null): LandAdFormValues => {
     availableTo: "",
     soilType: normalizeString(landAddress?.soilType),
     rentalAmount: normalizeString(landAddress?.rentalExpectation),
-    waterAccess: "",
+    waterAvailability: "",
     landHistory: "",
     additionalInfo: "",
-    // Intentionally left blank: user must choose/upload a cover image when creating.
-    image: "",
+    landImages: [],
   };
 };
 
@@ -408,15 +433,16 @@ const MyLandAdsPage = () => {
         (item: LandownerAdApiItem): LandAd => ({
           id: item._id,
           title: item.title || "",
-          location: item.location || "",
+          location: normalizeLocationField(item.location),
           landArea: normalizeString(item.landArea),
           availableFrom: item.availableFrom || "",
           availableTo: item.availableTo || "",
           soilType: normalizeString(item.soilType),
           rentalAmount: normalizeString(item.rentalAmount),
-          waterAccess: "",
+          waterAvailability: "",
           landHistory: normalizeString(item.landHistory),
           additionalInfo: normalizeString(item.additionalInfo),
+          landImages: item.image ? [item.image] : [],
           image: item.image || "",
           status: normalizeAdStatus(item.status),
           investorRequests: 0,
@@ -515,6 +541,8 @@ const MyLandAdsPage = () => {
     const payload = {
       landOwner: user._id,
       title: values.title.trim(),
+      location: values.location.trim(),
+      landArea: values.landArea.trim(),
       availableFrom: toUtcIsoFromDateInput(values.availableFrom),
       availableTo: toUtcIsoFromDateInput(values.availableTo),
       soilType: values.soilType.trim(),
@@ -1179,13 +1207,13 @@ const MyLandAdsPage = () => {
                 </Box>
                 <Box>
                   <Typography variant="caption" color="text.secondary">
-                    Water Access
+                    Water Availability
                   </Typography>
                   <Typography
                     variant="body1"
                     sx={{ fontWeight: 600, textTransform: "capitalize" }}
                   >
-                    {selectedLandAd.waterAccess.replace(/-/g, " ")}
+                    {selectedLandAd.waterAvailability.replace(/-/g, " ") || "Not specified"}
                   </Typography>
                 </Box>
                 <Box>

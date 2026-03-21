@@ -154,7 +154,6 @@ const CreateAdPopup = ({
     uploadedFilesRef.current.clear();
     setUploadedImages([]);
 
-    // Pre-fill from user profile in create mode.
     if (mode === "create" && user?._id) {
       adminService
         .getUserById(user._id)
