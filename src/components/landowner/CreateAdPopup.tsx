@@ -29,10 +29,10 @@ export interface LandAdFormValues {
   availableTo: string;
   soilType: string;
   rentalAmount: string;
-  waterAccess: string;
+  waterAvailability: string;
   landHistory: string;
   additionalInfo: string;
-  image: string;
+  landImages: string[];
 }
 
 const EMPTY_FORM_VALUES: LandAdFormValues = {
@@ -43,10 +43,10 @@ const EMPTY_FORM_VALUES: LandAdFormValues = {
   availableTo: "",
   soilType: "",
   rentalAmount: "",
-  waterAccess: "",
+  waterAvailability: "",
   landHistory: "",
   additionalInfo: "",
-  image: "",
+  landImages: [],
 };
 
 const valueAsString = (value: unknown): string => {
@@ -147,7 +147,7 @@ const CreateAdPopup = ({
       mode === "create"
         ? {
             ...base,
-            image: "",
+            landImages: [],
             additionalInfo: base.additionalInfo || "",
           }
         : base,
@@ -211,23 +211,28 @@ const CreateAdPopup = ({
   };
 
   const handleCoverUpload = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+    const files = event.target.files;
+    if (!files) return;
 
-    if (!file.type.startsWith("image/")) {
-      setErrors((prev) => ({
-        ...prev,
-        image: "Please upload a valid image file.",
-      }));
-      return;
+    const newUrls: string[] = [];
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (!file.type.startsWith("image/")) {
+        setErrors((prev) => ({
+          ...prev,
+          landImages: "Please upload valid image files only.",
+        }));
+        continue;
+      }
+      const objectUrl = URL.createObjectURL(file);
+      uploadedObjectUrlsRef.current.push(objectUrl);
+      newUrls.push(objectUrl);
     }
-
-    const objectUrl = URL.createObjectURL(file);
-    uploadedObjectUrlsRef.current.push(objectUrl);
-    setUploadedImages((prev) => [objectUrl, ...prev]);
-    handleInputChange("image", objectUrl);
-
-    // Allow selecting the same file again in a later upload.
+    setUploadedImages((prev) => [...newUrls, ...prev]);
+    setFormData((prev) => ({
+      ...prev,
+      landImages: [...newUrls, ...prev.landImages],
+    }));
     event.target.value = "";
   };
 
@@ -238,8 +243,8 @@ const CreateAdPopup = ({
     if (!formData.landArea.trim()) nextErrors.landArea = "Land area is required.";
     if (!formData.soilType.trim()) nextErrors.soilType = "Select a soil type.";
     if (!formData.rentalAmount.trim()) nextErrors.rentalAmount = "Rental amount is required.";
-    if (!formData.image.trim()) {
-      nextErrors.image = "Select or upload a cover image before publishing.";
+    if (formData.landImages.length === 0) {
+      nextErrors.landImages = "Select or upload at least one land image before publishing.";
     }
 
     setErrors(nextErrors);
@@ -272,7 +277,7 @@ const CreateAdPopup = ({
   const primaryActionLabel =
     mode === "edit" ? "Save Changes" : "Publish Land Ad";
 
-  const selectedCover = formData.image;
+  const selectedCovers = formData.landImages;
 
   const buildLocationSummary = () => {
     const city = valueAsString(user?.personalInfo?.city);
@@ -499,6 +504,26 @@ const CreateAdPopup = ({
                       </span>
                     )}
                   </label>
+
+                  <label className="block">
+                    <span className={labelCls}>Water Availability</span>
+                    <select
+                      className={inputCls}
+                      value={formData.waterAvailability}
+                      onChange={(event) =>
+                        handleInputChange("waterAvailability", event.target.value)
+                      }
+                    >
+                      <option value="">Select water source</option>
+                      <option value="borewell">Borewell</option>
+                      <option value="well">Well</option>
+                      <option value="river">River</option>
+                      <option value="canal">Canal</option>
+                      <option value="rain-harvested">Rain-Harvested</option>
+                      <option value="municipality">Municipality Supply</option>
+                      <option value="limited">Limited/None</option>
+                    </select>
+                  </label>
                 </div>
 
                 <label className="block">
@@ -588,7 +613,7 @@ const CreateAdPopup = ({
               <div className="flex items-center gap-2 mb-2.5">
                 <div className="w-1 h-4 rounded-full bg-[#85a446]" />
                 <span className="text-xs text-slate-300 font-bold uppercase tracking-widest">
-                  Cover Image
+                  Land Images
                 </span>
                 <button
                   type="button"
@@ -603,32 +628,48 @@ const CreateAdPopup = ({
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
+                multiple
                 onChange={handleCoverUpload}
                 className="hidden"
               />
 
-              {selectedCover ? (
-                <div className="relative w-full aspect-video rounded-xl overflow-hidden mb-2.5">
-                  <img
-                    src={selectedCover}
-                    alt="Selected cover"
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute top-2 right-2 bg-[#85a446] text-white px-1.5 py-0.5 rounded-full text-[9px] font-bold flex items-center gap-0.5">
-                    <Check style={{ fontSize: 10 }} /> Selected
-                  </div>
+              {selectedCovers.length > 0 ? (
+                <div className="grid grid-cols-3 gap-2 mb-2.5">
+                  {selectedCovers.map((imageUrl, idx) => (
+                    <div key={`${imageUrl}-${idx}`} className="relative rounded-lg overflow-hidden aspect-square">
+                      <img
+                        src={imageUrl}
+                        alt={`Selected land image ${idx + 1}`}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            landImages: prev.landImages.filter((_, i) => i !== idx),
+                          }));
+                        }}
+                        className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center"
+                      >
+                        <Close className="text-white" style={{ fontSize: 18 }} />
+                      </button>
+                      <div className="absolute top-1 right-1 bg-[#85a446] text-white px-1.5 py-0.5 rounded-full text-[8px] font-bold flex items-center gap-0.5">
+                        <Check style={{ fontSize: 9 }} />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : (
                 <div className="w-full aspect-video rounded-xl mb-2.5 border border-dashed border-white/20 bg-[#111111] flex items-center justify-center text-slate-500 text-xs px-4 text-center">
-                  Choose one of your signup images or upload a new cover image.
+                  Choose signup images or upload land images.
                 </div>
               )}
 
-              {errors.image && (
+              {errors.landImages && (
                 <span className="text-red-400 text-[10px] mb-2 block">
-                  {errors.image}
+                  {errors.landImages}
                 </span>
               )}
 
@@ -650,25 +691,40 @@ const CreateAdPopup = ({
 
               {isLocationOpen && allImageOptions.length > 0 && (
                 <div className="grid grid-cols-4 gap-1.5">
-                  {allImageOptions.map((imageUrl, index) => (
-                    <button
-                      type="button"
-                      key={`${imageUrl}-${index}`}
-                      className={`relative rounded-lg overflow-hidden aspect-square transition-all ${
-                        formData.image === imageUrl
-                          ? "ring-2 ring-[#85a446] ring-offset-1 ring-offset-[#0a0a0a]"
-                          : "opacity-70 hover:opacity-95"
-                      }`}
-                      onClick={() => handleInputChange("image", imageUrl)}
-                    >
-                      <img
-                        src={imageUrl}
-                        alt={`Uploaded option ${index + 1}`}
-                        className="w-full h-full object-cover"
-                        referrerPolicy="no-referrer"
-                      />
-                    </button>
-                  ))}
+                  {allImageOptions.map((imageUrl, index) => {
+                    const isSelected = selectedCovers.includes(imageUrl);
+                    return (
+                      <button
+                        type="button"
+                        key={`${imageUrl}-${index}`}
+                        className={`relative rounded-lg overflow-hidden aspect-square transition-all ${
+                          isSelected
+                            ? "ring-2 ring-[#85a446] ring-offset-1 ring-offset-[#0a0a0a]"
+                            : "opacity-70 hover:opacity-95"
+                        }`}
+                        onClick={() => {
+                          setFormData((prev) => {
+                            const newImages = isSelected
+                              ? prev.landImages.filter((img) => img !== imageUrl)
+                              : [...prev.landImages, imageUrl];
+                            return { ...prev, landImages: newImages };
+                          });
+                        }}
+                      >
+                        <img
+                          src={imageUrl}
+                          alt={`Uploaded option ${index + 1}`}
+                          className="w-full h-full object-cover"
+                          referrerPolicy="no-referrer"
+                        />
+                        {isSelected && (
+                          <div className="absolute inset-0 bg-[#85a446]/20 flex items-center justify-center">
+                            <Check className="text-[#85a446]" style={{ fontSize: 18 }} />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
