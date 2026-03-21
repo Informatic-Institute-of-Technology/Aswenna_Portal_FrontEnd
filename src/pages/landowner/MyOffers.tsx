@@ -487,6 +487,7 @@ const MyLandAdsPage = () => {
         availableTo: toUtcIsoFromDateInput(values.availableTo),
         soilType: values.soilType.trim(),
         rentalAmount: toNumberOrString(values.rentalAmount),
+        waterAvailability: values.waterAvailability.trim(),
         landHistory: values.landHistory.trim(),
         ...(values.additionalInfo.trim()
           ? { additionalInfo: values.additionalInfo.trim() }
@@ -518,6 +519,7 @@ const MyLandAdsPage = () => {
       availableTo: toUtcIsoFromDateInput(values.availableTo),
       soilType: values.soilType.trim(),
       rentalAmount: toNumberOrString(values.rentalAmount),
+      waterAvailability: values.waterAvailability.trim(),
       landHistory: values.landHistory.trim(),
       ...(values.additionalInfo.trim()
         ? { additionalInfo: values.additionalInfo.trim() }

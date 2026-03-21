@@ -8,6 +8,7 @@ export interface CreateLandownerAdPayload {
   availableFrom: string;
   availableTo: string;
   soilType: string;
+  waterAvailability?: string;
   rentalAmount: string | number;
   landHistory?: string;
   additionalInfo?: string;
@@ -20,6 +21,7 @@ export interface UpdateLandownerAdPayload {
   availableFrom?: string;
   availableTo?: string;
   soilType?: string;
+  waterAvailability?: string;
   rentalAmount?: string | number;
   landHistory?: string;
   additionalInfo?: string;
