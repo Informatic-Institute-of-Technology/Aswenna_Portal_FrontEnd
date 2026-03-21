@@ -121,7 +121,6 @@ export function normalizeDirectHarvestOffer(
   };
 }
 
-
 export function normalizeSponsorshipOffer(
   offer: SponsorshipOfferAPI,
 ): UnifiedProject {
@@ -199,7 +198,6 @@ export function filterProjectsByStatus(
   return projects.filter((p) => p.status === status);
 }
 
-
 export function filterProjectsByStakeholder(
   projects: UnifiedProject[],
   stakeholder: ProjectStakeholder,
@@ -213,7 +211,6 @@ export function filterProjectsByCategory(
 ): UnifiedProject[] {
   return projects.filter((p) => p.category === category);
 }
-
 
 export function groupProjectsByCategory(
   projects: UnifiedProject[],
@@ -287,7 +284,6 @@ export function sortProjects(
 
   return sorted;
 }
-
 
 export function searchProjects(
   projects: UnifiedProject[],

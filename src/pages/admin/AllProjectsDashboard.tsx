@@ -374,7 +374,8 @@ export const AllProjectsDashboard: React.FC = () => {
                       borderBottom: "1px solid rgba(63, 63, 70, 0.5)",
                     },
                   }}
-                ><TableCell sx={{ py: 1.75, pl: 2 }}>
+                >
+                  <TableCell sx={{ py: 1.75, pl: 2 }}>
                     <Box>
                       <Typography
                         variant="body2"
@@ -400,7 +401,8 @@ export const AllProjectsDashboard: React.FC = () => {
                         {project.category.replace("-", " ").toUpperCase()}
                       </Typography>
                     </Box>
-                  </TableCell><TableCell sx={{ textAlign: "right", py: 1.75, pr: 2 }}>
+                  </TableCell>
+                  <TableCell sx={{ textAlign: "right", py: 1.75, pr: 2 }}>
                     <Typography
                       variant="body2"
                       sx={{ fontWeight: 700, color: "#22C55E" }}
@@ -419,7 +421,8 @@ export const AllProjectsDashboard: React.FC = () => {
                     >
                       {project.financialMetric?.label}
                     </Typography>
-                  </TableCell><TableCell sx={{ py: 1.75 }}>
+                  </TableCell>
+                  <TableCell sx={{ py: 1.75 }}>
                     <Box
                       sx={{
                         display: "flex",
@@ -458,7 +461,8 @@ export const AllProjectsDashboard: React.FC = () => {
                         </Typography>
                       </Box>
                     </Box>
-                  </TableCell><TableCell sx={{ textAlign: "center", py: 1.75, px: 1.5 }}>
+                  </TableCell>
+                  <TableCell sx={{ textAlign: "center", py: 1.75, px: 1.5 }}>
                     <Box
                       sx={{
                         display: "flex",
@@ -514,7 +518,8 @@ export const AllProjectsDashboard: React.FC = () => {
                         )}
                       </Box>
                     </Box>
-                  </TableCell><TableCell sx={{ textAlign: "center", py: 1.75 }}>
+                  </TableCell>
+                  <TableCell sx={{ textAlign: "center", py: 1.75 }}>
                     <Box
                       sx={{
                         display: "inline-block",
@@ -532,7 +537,8 @@ export const AllProjectsDashboard: React.FC = () => {
                     >
                       {statusStyling.label}
                     </Box>
-                  </TableCell><TableCell sx={{ textAlign: "center", py: 1.75, pr: 2 }}>
+                  </TableCell>
+                  <TableCell sx={{ textAlign: "center", py: 1.75, pr: 2 }}>
                     <Tooltip title="View Full Details">
                       <Button
                         size="small"
@@ -580,7 +586,8 @@ export const AllProjectsDashboard: React.FC = () => {
   }
 
   return (
-    <Container maxWidth="xl" sx={{ py: 3 }}><Grid container spacing={2} sx={{ mb: 3 }}>
+    <Container maxWidth="xl" sx={{ py: 3 }}>
+      <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card sx={{ height: "100%" }}>
             <CardContent>
@@ -679,13 +686,15 @@ export const AllProjectsDashboard: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-      </Grid><Card>
+      </Grid>
+      <Card>
         <CardHeaderWithIcon
           icon={Assessment}
           title="All Projects - Real-time Monitoring"
         />
 
-        <CardContent><Box sx={{ mb: 3 }}>
+        <CardContent>
+          <Box sx={{ mb: 3 }}>
             <Grid container spacing={2} alignItems="center">
               <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
@@ -728,8 +737,10 @@ export const AllProjectsDashboard: React.FC = () => {
                 </Tabs>
               </Grid>
             </Grid>
-          </Box>{tabValue === 0 && (
-            <><Box sx={{ mb: 2, display: "flex", gap: 1, flexWrap: "wrap" }}>
+          </Box>
+          {tabValue === 0 && (
+            <>
+              <Box sx={{ mb: 2, display: "flex", gap: 1, flexWrap: "wrap" }}>
                 <Button
                   size="small"
                   variant={
@@ -767,7 +778,8 @@ export const AllProjectsDashboard: React.FC = () => {
             </>
           )}
           {tabValue === 1 && (
-            <><Box sx={{ mb: 2, display: "flex", gap: 1, flexWrap: "wrap" }}>
+            <>
+              <Box sx={{ mb: 2, display: "flex", gap: 1, flexWrap: "wrap" }}>
                 <Button
                   size="small"
                   variant={
@@ -810,7 +822,8 @@ export const AllProjectsDashboard: React.FC = () => {
           )}
           {tabValue === 2 && renderProjectsTable(landownerProjects)}
         </CardContent>
-      </Card><Drawer
+      </Card>
+      <Drawer
         anchor="right"
         open={!!selectedProject}
         onClose={() => setSelectedProject(null)}
@@ -830,7 +843,8 @@ export const AllProjectsDashboard: React.FC = () => {
               height: "100%",
               position: "relative",
             }}
-          ><Button
+          >
+            <Button
               size="small"
               onClick={() => setSelectedProject(null)}
               sx={{
@@ -846,7 +860,8 @@ export const AllProjectsDashboard: React.FC = () => {
               }}
             >
               <Close />
-            </Button><Box
+            </Button>
+            <Box
               sx={{
                 position: "relative",
                 width: "100%",
@@ -875,14 +890,16 @@ export const AllProjectsDashboard: React.FC = () => {
                     "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 50%, rgba(18,18,18,1) 100%)",
                 },
               }}
-            ><Box
+            >
+              <Box
                 sx={{
                   position: "relative",
                   zIndex: 1,
                   p: 3,
                   width: "100%",
                 }}
-              ><Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 2 }}>
+              >
+                <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 2 }}>
                   <Chip
                     label={selectedProject.category
                       .replace("-", " ")
@@ -918,7 +935,8 @@ export const AllProjectsDashboard: React.FC = () => {
                       fontWeight: 600,
                     }}
                   />
-                </Box><Box
+                </Box>
+                <Box
                   sx={{
                     display: "flex",
                     gap: 1.5,
@@ -962,7 +980,8 @@ export const AllProjectsDashboard: React.FC = () => {
                       {selectedProject.location}
                     </Typography>
                   </Box>
-                </Box><Box
+                </Box>
+                <Box
                   sx={{
                     display: "flex",
                     alignItems: "center",
@@ -1028,8 +1047,10 @@ export const AllProjectsDashboard: React.FC = () => {
                   </Box>
                 </Box>
               </Box>
-            </Box><Box sx={{ p: 3, overflowY: "auto", flex: 1 }}>
-              <Stack spacing={3}>{selectedProject.cropType && (
+            </Box>
+            <Box sx={{ p: 3, overflowY: "auto", flex: 1 }}>
+              <Stack spacing={3}>
+                {selectedProject.cropType && (
                   <Box
                     sx={{
                       background:
@@ -1060,7 +1081,8 @@ export const AllProjectsDashboard: React.FC = () => {
                       {selectedProject.cropType}
                     </Typography>
                   </Box>
-                )}{selectedProject.description && (
+                )}
+                {selectedProject.description && (
                   <Box>
                     <Typography
                       variant="subtitle2"
@@ -1085,7 +1107,8 @@ export const AllProjectsDashboard: React.FC = () => {
                       {selectedProject.description}
                     </Typography>
                   </Box>
-                )}<Box
+                )}
+                <Box
                   sx={{
                     background:
                       "linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.05) 100%)",
@@ -1124,13 +1147,15 @@ export const AllProjectsDashboard: React.FC = () => {
                           selectedProject.financialMetric?.value || 0,
                         )}
                   </Typography>
-                </Box><Box
+                </Box>
+                <Box
                   sx={{
                     display: "grid",
                     gridTemplateColumns: "1fr 1fr",
                     gap: 2,
                   }}
-                >{selectedProject.landArea ? (
+                >
+                  {selectedProject.landArea ? (
                     <Box
                       sx={{
                         backgroundColor: "#222",
@@ -1155,7 +1180,8 @@ export const AllProjectsDashboard: React.FC = () => {
                         </span>
                       </Typography>
                     </Box>
-                  ) : null}{selectedProject.expectedYield ? (
+                  ) : null}
+                  {selectedProject.expectedYield ? (
                     <Box
                       sx={{
                         backgroundColor: "#222",
@@ -1180,7 +1206,8 @@ export const AllProjectsDashboard: React.FC = () => {
                         </span>
                       </Typography>
                     </Box>
-                  ) : null}{selectedProject.totalInvestment ? (
+                  ) : null}
+                  {selectedProject.totalInvestment ? (
                     <Box
                       sx={{
                         backgroundColor: "#222",
@@ -1202,7 +1229,8 @@ export const AllProjectsDashboard: React.FC = () => {
                         {formatCurrency(selectedProject.totalInvestment)}
                       </Typography>
                     </Box>
-                  ) : null}{selectedProject.duration ? (
+                  ) : null}
+                  {selectedProject.duration ? (
                     <Box
                       sx={{
                         backgroundColor: "#222",
@@ -1228,7 +1256,9 @@ export const AllProjectsDashboard: React.FC = () => {
                       </Typography>
                     </Box>
                   ) : null}
-                </Box><Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>{selectedProject.startDate || selectedProject.endDate ? (
+                </Box>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  {selectedProject.startDate || selectedProject.endDate ? (
                     <Box
                       sx={{
                         backgroundColor: "#222",
@@ -1300,7 +1330,8 @@ export const AllProjectsDashboard: React.FC = () => {
                       gridTemplateColumns: "1fr 1fr",
                       gap: 2,
                     }}
-                  >{selectedProject.expectedROI ? (
+                  >
+                    {selectedProject.expectedROI ? (
                       <Box
                         sx={{
                           background:
@@ -1328,7 +1359,8 @@ export const AllProjectsDashboard: React.FC = () => {
                           {selectedProject.expectedROI}%
                         </Typography>
                       </Box>
-                    ) : null}{selectedProject.applicationCount ? (
+                    ) : null}
+                    {selectedProject.applicationCount ? (
                       <Box
                         sx={{
                           background:
@@ -1358,7 +1390,8 @@ export const AllProjectsDashboard: React.FC = () => {
                       </Box>
                     ) : null}
                   </Box>
-                </Box>{selectedProject.preferredRegions &&
+                </Box>
+                {selectedProject.preferredRegions &&
                   selectedProject.preferredRegions.length > 0 && (
                     <Box sx={{ mt: 1 }}>
                       <Typography
@@ -1389,7 +1422,8 @@ export const AllProjectsDashboard: React.FC = () => {
                         ))}
                       </Box>
                     </Box>
-                  )}<Box
+                  )}
+                <Box
                   sx={{ pt: 3, borderTop: "1px solid rgba(255,255,255,0.1)" }}
                 >
                   <Typography
