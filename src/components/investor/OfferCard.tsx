@@ -1,5 +1,6 @@
 import {
   Agriculture,
+  BusinessCenter,
   Landscape,
   LocationOn,
   Visibility,
@@ -94,6 +95,10 @@ export interface OfferCardProps {
   investorId?: string;
   landownerName?: string;
   landownerId?: string;
+  secondaryPartyName?: string;
+  secondaryPartyRoleLabel?: string;
+  secondaryPartyRoleType?: "farmer" | "investor" | "landowner";
+  secondaryPartyLocation?: string;
   totalMilestones?: number;
   completedMilestones?: number;
   pendingMilestones?: number;
@@ -135,6 +140,10 @@ const OfferCard = ({
   endDate,
   backgroundImage,
   landownerName,
+  secondaryPartyName,
+  secondaryPartyRoleLabel,
+  secondaryPartyRoleType,
+  secondaryPartyLocation,
   investmentType,
   earnedCommission,
   investorAmount,
@@ -260,6 +269,42 @@ const OfferCard = ({
         return "default";
     }
   };
+
+  const secondaryName = secondaryPartyName ?? landownerName;
+  const secondaryRoleType = secondaryPartyRoleType ?? "landowner";
+  const secondaryRoleLabel =
+    secondaryPartyRoleLabel ??
+    (secondaryRoleType === "investor"
+      ? "Investor"
+      : secondaryRoleType === "farmer"
+        ? "Farmer"
+        : "Landowner");
+  const secondaryLocation = secondaryPartyLocation ?? location;
+
+  const secondaryRoleConfig =
+    secondaryRoleType === "investor"
+      ? {
+          borderColor: "var(--color-info-blue)",
+          backgroundColor: "var(--color-info-blue-muted)",
+          textColor: "var(--color-info-blue)",
+          icon: <BusinessCenter sx={{ fontSize: 10, color: "white" }} />,
+          avatar: <BusinessCenter sx={{ fontSize: 20, color: "var(--color-info-blue)" }} />,
+        }
+      : secondaryRoleType === "farmer"
+        ? {
+            borderColor: "var(--color-lime)",
+            backgroundColor: "var(--color-lime-muted)",
+            textColor: "var(--color-lime)",
+            icon: <Agriculture sx={{ fontSize: 10, color: "white" }} />,
+            avatar: <Agriculture sx={{ fontSize: 20, color: "var(--color-lime)" }} />,
+          }
+        : {
+            borderColor: "var(--color-orange)",
+            backgroundColor: "var(--color-orange-muted)",
+            textColor: "var(--color-orange)",
+            icon: <Landscape sx={{ fontSize: 10, color: "white" }} />,
+            avatar: <Landscape sx={{ fontSize: 20, color: "var(--color-orange)" }} />,
+          };
 
   return (
     <Card
@@ -562,7 +607,7 @@ const OfferCard = ({
               display: "flex",
               alignItems: "center",
               gap: 1.5,
-              mb: landownerName ? 1.5 : 0,
+              mb: secondaryName ? 1.5 : 0,
             }}
           >
             <Box sx={{ position: "relative" }}>
@@ -626,7 +671,7 @@ const OfferCard = ({
                 </Typography>
               </Box>
             </Box>
-            {!landownerName && (
+            {!secondaryName && (
               <Tooltip title="View Details">
                 <IconButton
                   size="small"
@@ -644,7 +689,7 @@ const OfferCard = ({
             )}
           </Box>
 
-          {landownerName && (
+          {secondaryName && (
             <Box
               sx={{
                 display: "flex",
@@ -658,13 +703,11 @@ const OfferCard = ({
                     width: 40,
                     height: 40,
                     border: "2px solid",
-                    borderColor: "var(--color-orange)",
-                    bgcolor: "var(--color-orange-muted)",
+                    borderColor: secondaryRoleConfig.borderColor,
+                    bgcolor: secondaryRoleConfig.backgroundColor,
                   }}
                 >
-                  <Landscape
-                    sx={{ fontSize: 20, color: "var(--color-orange)" }}
-                  />
+                  {secondaryRoleConfig.avatar}
                 </Avatar>
                 <Box
                   sx={{
@@ -673,7 +716,7 @@ const OfferCard = ({
                     right: -2,
                     width: 18,
                     height: 18,
-                    bgcolor: "var(--color-orange)",
+                    bgcolor: secondaryRoleConfig.borderColor,
                     borderRadius: "50%",
                     display: "flex",
                     alignItems: "center",
@@ -681,7 +724,7 @@ const OfferCard = ({
                     border: "2px solid var(--bg-overlay)",
                   }}
                 >
-                  <Landscape sx={{ fontSize: 10, color: "white" }} />
+                  {secondaryRoleConfig.icon}
                 </Box>
               </Box>
               <Box sx={{ flex: 1 }}>
@@ -689,14 +732,17 @@ const OfferCard = ({
                   variant="body2"
                   sx={{ fontWeight: 600, fontSize: "0.85rem" }}
                 >
-                  {landownerName}
+                  {secondaryName}
                 </Typography>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                   <Typography
                     variant="caption"
-                    sx={{ color: "var(--color-orange)", fontSize: "0.7rem" }}
+                    sx={{
+                      color: secondaryRoleConfig.textColor,
+                      fontSize: "0.7rem",
+                    }}
                   >
-                    Landowner
+                    {secondaryRoleLabel}
                   </Typography>
                   <Typography
                     variant="caption"
@@ -712,7 +758,7 @@ const OfferCard = ({
                     color="text.secondary"
                     sx={{ fontSize: "0.7rem" }}
                   >
-                    {location}
+                    {secondaryLocation}
                   </Typography>
                 </Box>
               </Box>

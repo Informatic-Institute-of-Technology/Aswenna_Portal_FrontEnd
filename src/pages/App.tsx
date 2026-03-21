@@ -45,9 +45,9 @@ const PayInstallmentPage = lazy(
   () => import("./investor/payment/PayInstallmentPage"),
 );
 
-const MyLandAdsPage = lazy(() => import("./landowner/MyLandAdsPage"));
+const MyLandAdsPage = lazy(() => import("./landowner/MyOffers"));
 const ReceivedRequestsPage = lazy(
-  () => import("./landowner/ReceivedRequestsPage"),
+  () => import("./landowner/Opportunities"),
 );
 const TenantSearchPage = lazy(() => import("./landowner/TenantSearchPage"));
 const LandAnalysisPage = lazy(() => import("./landowner/LandAnalysisPage"));

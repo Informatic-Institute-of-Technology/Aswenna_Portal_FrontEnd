@@ -9,8 +9,6 @@ import {
   Home,
   Landscape,
   Mail,
-  People,
-  Search,
   Settings,
 } from "@mui/icons-material";
 import {
@@ -36,12 +34,12 @@ const LandOwnerSidebar = () => {
   const menuItems = [
     { text: "Dashboard", icon: <Home />, path: `${basePath}/dashboard` },
     {
-      text: "My Land Ads",
+      text: "My Offers",
       icon: <Landscape />,
       path: `${basePath}/dashboard/my-land-ads`,
     },
     {
-      text: "Received Requests",
+      text: "Opportunities",
       icon: <Description />,
       path: `${basePath}/dashboard/received-requests`,
     },

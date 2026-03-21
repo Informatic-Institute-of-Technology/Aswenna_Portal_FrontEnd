@@ -1,8 +1,10 @@
 import ChatIcon from "@mui/icons-material/Chat";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
+import InboxIcon from "@mui/icons-material/Inbox";
 import StarIcon from "@mui/icons-material/Star";
 import VerifiedIcon from "@mui/icons-material/Verified";
+import type { AlertColor } from "@mui/material";
 import {
   Avatar,
   Box,
@@ -17,6 +19,9 @@ import {
   Typography,
 } from "@mui/material";
 import { useMemo, useState } from "react";
+import { SectionHeader, TabNavigation, type TabItem } from "../../components/common";
+import { RequestCard } from "../../components/investor/requests";
+import Notification from "../../shared/components/Notification";
 
 type RequestStatus = "pending" | "approved" | "declined";
 
@@ -141,16 +146,33 @@ const formatTimestamp = (dateString: string) => {
 };
 
 const ReceivedRequestsPage = () => {
+  const [activeTab, setActiveTab] = useState<"incoming">("incoming");
   const [requests, setRequests] = useState<LandRequest[]>(requestData.requests);
-  const [selectedRequest, setSelectedRequest] = useState<LandRequest | null>(
-    null,
-  );
+  const [selectedRequest, setSelectedRequest] = useState<LandRequest | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
+  const [notification, setNotification] = useState<{
+    open: boolean;
+    message: string;
+    severity: AlertColor;
+  }>({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   const pendingRequests = useMemo(
     () => requests.filter((request) => request.status === "pending"),
     [requests],
   );
+
+  const tabs: TabItem[] = [
+    {
+      value: "incoming",
+      label: "Incoming Investor Requests",
+      icon: <InboxIcon sx={{ fontSize: 20 }} />,
+      count: pendingRequests.length,
+    },
+  ];
 
   const handleOpenDetails = (request: LandRequest) => {
     setSelectedRequest(request);
@@ -159,129 +181,159 @@ const ReceivedRequestsPage = () => {
 
   const handleCloseDetails = () => {
     setDetailOpen(false);
+    setSelectedRequest(null);
   };
 
-  const handleStatusChange = (requestId: string, newStatus: RequestStatus) => {
-    setRequests((prevRequests) =>
-      prevRequests.map((request) =>
+  const handleStatusChange = (
+    requestId: string,
+    newStatus: RequestStatus,
+    showToast = true,
+  ) => {
+    setRequests((prevRequests) => {
+      const matchedRequest = prevRequests.find(
+        (request) => request.request_id === requestId,
+      );
+
+      if (showToast && matchedRequest) {
+        const actionLabel = newStatus === "approved" ? "approved" : "declined";
+        setNotification({
+          open: true,
+          message: `Request from ${matchedRequest.investor_info.name} was ${actionLabel}.`,
+          severity: newStatus === "approved" ? "success" : "info",
+        });
+      }
+
+      return prevRequests.map((request) =>
         request.request_id === requestId
           ? { ...request, status: newStatus }
           : request,
-      ),
-    );
+      );
+    });
+
     if (selectedRequest?.request_id === requestId) {
       setSelectedRequest({ ...selectedRequest, status: newStatus });
+      if (newStatus !== "pending") {
+        setDetailOpen(false);
+      }
     }
+  };
+
+  const handleCloseNotification = () => {
+    setNotification((prev) => ({ ...prev, open: false }));
   };
 
   const selectedCurrency = selectedRequest?.financials.currency ?? "LKR";
 
   return (
     <>
-      <Box className="container-fluid" sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-          Received Requests
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Review and manage proposals from investors interested in your land.
-          You can compare offers, view investor profiles, and message them
-          directly to finalize details.
-        </Typography>
-      </Box>
-
-      <Stack spacing={2.5}>
-        {pendingRequests.map((request) => {
-          const { financials: _financials, investor_info } = request;
-
-          return (
-            <Box
-              key={request.request_id}
-              sx={{
-                border: "1px solid",
-                borderColor: "divider",
-                borderRadius: 2,
-                p: 2,
-                background: "var(--surface-tint)",
-              }}
-            >
-              <Stack
-                direction={{ xs: "column", md: "row" }}
-                justifyContent="space-between"
-                spacing={2}
-              >
-                <Box>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                    New proposal for {request.land_name}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mt: 0.5 }}
-                  >
-                    Received from {investor_info.name} •{" "}
-                    {formatTimestamp(request.timestamp)}
-                  </Typography>
-                </Box>
-
-                <Stack direction="row" spacing={1.2} alignItems="center">
-                  <Button
-                    variant="outlined"
-                    onClick={() => handleOpenDetails(request)}
-                  >
-                    View Details
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="success"
-                    onClick={() =>
-                      handleStatusChange(request.request_id, "approved")
-                    }
-                  >
-                    Approve
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="error"
-                    onClick={() =>
-                      handleStatusChange(request.request_id, "declined")
-                    }
-                  >
-                    Decline
-                  </Button>
-                </Stack>
-              </Stack>
-            </Box>
-          );
-        })}
-      </Stack>
-
-      {pendingRequests.length === 0 && (
-        <Box
-          sx={{
-            mt: 2,
-            textAlign: "center",
-            p: 6,
-            borderRadius: 2,
-            border: "2px dashed",
-            borderColor: "divider",
-            background: "var(--surface-tint)",
-          }}
-        >
-          <Typography variant="h6" sx={{ mb: 1 }}>
-            No Pending Proposals
+      <Box sx={{ p: 3 }}>
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+            Opportunities
           </Typography>
-          <Typography variant="body2" color="text.secondary">
-            New investor requests will appear here.
+          <Typography variant="body1" color="text.secondary">
+            Review incoming investor proposals for your land opportunities.
           </Typography>
         </Box>
-      )}
 
-      <Dialog
-        open={detailOpen}
-        onClose={handleCloseDetails}
-        fullWidth
-        maxWidth="md"
-      >
+        <TabNavigation
+          activeTab={activeTab}
+          tabs={tabs}
+          onChange={(value) => setActiveTab(value as "incoming")}
+          variant="dark"
+        />
+
+        {activeTab === "incoming" && (
+          <Box>
+            <SectionHeader
+              title="Incoming Investor Requests"
+              description="Only active investor requests are shown here. Open any request to review full proposal details and respond."
+              accentColor="var(--color-brand-accent)"
+              showLeftBorder={true}
+            />
+
+            {pendingRequests.length > 0 ? (
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))",
+                  gap: 3,
+                }}
+              >
+                {pendingRequests.map((request) => {
+                  const investor = request.investor_info;
+                  return (
+                    <RequestCard
+                      key={request.request_id}
+                      type="agreement"
+                      name={investor.name}
+                      avatarInitials={investor.name
+                        .split(" ")
+                        .map((part) => part[0])
+                        .join("")
+                        .slice(0, 2)
+                        .toUpperCase()}
+                      location={request.land_name}
+                      statusBadge={{
+                        label: "Pending Review",
+                        variant: "pending",
+                      }}
+                      tags={[
+                        {
+                          label: request.proposal_details.project_type,
+                          variant: "primary",
+                        },
+                        {
+                          label: request.proposal_details.duration,
+                          variant: "secondary",
+                        },
+                        {
+                          label: `${formatMoney(
+                            request.financials.landowner_asking_price,
+                            request.financials.currency,
+                          )} asking`,
+                          variant: "secondary",
+                        },
+                      ]}
+                      description={request.proposal_details.description}
+                      timestamp={formatTimestamp(request.timestamp)}
+                      primaryAction={{
+                        label: "View Details",
+                        onClick: () => handleOpenDetails(request),
+                      }}
+                      secondaryAction={{
+                        label: "Approve",
+                        onClick: () =>
+                          handleStatusChange(request.request_id, "approved"),
+                      }}
+                      isVerified={investor.is_verified}
+                    />
+                  );
+                })}
+              </Box>
+            ) : (
+              <Box
+                sx={{
+                  textAlign: "center",
+                  py: 8,
+                  bgcolor: "var(--surface-tint)",
+                  borderRadius: 2,
+                  color: "text.secondary",
+                }}
+              >
+                <Typography variant="h6" gutterBottom>
+                  No incoming investor requests
+                </Typography>
+                <Typography variant="body2">
+                  New investor requests will appear here when they arrive.
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        )}
+      </Box>
+
+      <Dialog open={detailOpen} onClose={handleCloseDetails} fullWidth maxWidth="md">
         <DialogTitle
           sx={{
             display: "flex",
@@ -297,6 +349,7 @@ const ReceivedRequestsPage = () => {
             startIcon={<CloseIcon />}
           ></Button>
         </DialogTitle>
+
         {selectedRequest && (
           <>
             <DialogContent dividers>
@@ -315,7 +368,8 @@ const ReceivedRequestsPage = () => {
                         .split(" ")
                         .map((part) => part[0])
                         .join("")
-                        .slice(0, 2)}
+                        .slice(0, 2)
+                        .toUpperCase()}
                     </Avatar>
                     <Box>
                       <Stack direction="row" spacing={1} alignItems="center">
@@ -342,8 +396,7 @@ const ReceivedRequestsPage = () => {
                       >
                         <StarIcon color="warning" fontSize="small" />
                         <Typography variant="body2">
-                          {selectedRequest.investor_info.rating.toFixed(1)} /
-                          5.0
+                          {selectedRequest.investor_info.rating.toFixed(1)} / 5.0
                         </Typography>
                       </Stack>
                     </Box>
@@ -418,6 +471,14 @@ const ReceivedRequestsPage = () => {
           </>
         )}
       </Dialog>
+
+      <Notification
+        open={notification.open}
+        message={notification.message}
+        severity={notification.severity}
+        duration={4000}
+        onClose={handleCloseNotification}
+      />
     </>
   );
 };
