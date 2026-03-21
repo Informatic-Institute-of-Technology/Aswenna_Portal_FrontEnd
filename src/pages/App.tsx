@@ -57,6 +57,7 @@ const GlobalPaymentLedger = lazy(() => import("./admin/GlobalPaymentLedger"));
 const ActiveProjectsMonitoring = lazy(
   () => import("./admin/ActiveProjectsMonitoring"),
 );
+const AllProjectsDashboard = lazy(() => import("./admin/AllProjectsDashboard"));
 const SystemActivityLog = lazy(() => import("./admin/SystemActivityLog"));
 
 const PageLoader = () => (
@@ -163,6 +164,10 @@ function AppRoutes() {
             <Route
               path="admin/projects"
               element={<ActiveProjectsMonitoring />}
+            />
+            <Route
+              path="admin/all-projects"
+              element={<AllProjectsDashboard />}
             />
             <Route path="admin/activity-log" element={<SystemActivityLog />} />
             <Route path="admin/disputes" element={<SettingsPage />} />
