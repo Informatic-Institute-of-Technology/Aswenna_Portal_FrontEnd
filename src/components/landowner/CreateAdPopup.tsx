@@ -94,6 +94,18 @@ const CreateAdPopup = ({
   >({});
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [fetchedLandImages, setFetchedLandImages] = useState<string[]>([]);
+  const [landAddress, setLandAddress] = useState<{
+    street?: string;
+    city?: string;
+    province?: string;
+    district?: string;
+    postalCode?: string;
+    size?: string;
+    soilType?: string;
+    rentalExpectation?: string;
+    dsDivision?: string;
+    gnDivision?: string;
+  }>({});
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const uploadedObjectUrlsRef = useRef<string[]>([]);
@@ -151,7 +163,22 @@ const CreateAdPopup = ({
           const land =
             detail.landOwner?.landAddress ??
             detail.landOwnerDetails?.landAddress;
-          const info = detail.personalInfo;
+
+          // Store landAddress details for display
+          if (land) {
+            setLandAddress({
+              street: land.street,
+              city: land.city,
+              province: land.province,
+              district: land.district,
+              postalCode: land.postalCode,
+              size: land.size,
+              soilType: land.soilType,
+              rentalExpectation: land.rentalExpectation,
+              dsDivision: land.dsDivision,
+              gnDivision: land.gnDivision,
+            });
+          }
 
           // Extract land images from the API response (landImages from landAddress)
           const landImages = land?.landImages ?? [];
@@ -162,14 +189,7 @@ const CreateAdPopup = ({
 
           setFormData((prev) => ({
             ...prev,
-            location:
-              prev.location ||
-              land?.city ||
-              land?.street ||
-              info?.city ||
-              info?.address ||
-              detail.address ||
-              "",
+            location: prev.location || land?.city || "",
             landArea: prev.landArea || land?.size || "",
             soilType: prev.soilType || land?.soilType || "",
             rentalAmount: prev.rentalAmount || land?.rentalExpectation || "",
@@ -234,10 +254,6 @@ const CreateAdPopup = ({
   const validateForm = () => {
     const nextErrors: Partial<Record<keyof LandAdFormValues, string>> = {};
     if (!formData.title.trim()) nextErrors.title = "Land ad title is required.";
-    if (!formData.location.trim())
-      nextErrors.location = "Location is required.";
-    if (!formData.landArea.trim())
-      nextErrors.landArea = "Land area is required.";
     if (!formData.soilType.trim()) nextErrors.soilType = "Select a soil type.";
     if (!formData.rentalAmount.trim())
       nextErrors.rentalAmount = "Rental amount is required.";
@@ -409,61 +425,127 @@ const CreateAdPopup = ({
                   )}
                 </label>
 
+                <div className="block">
+                  <span className={labelCls}>Land Location (From Profile)</span>
+                  <div className="mt-1.5 bg-[#141414] rounded-lg px-3.5 py-3 text-slate-300 text-sm space-y-2">
+                    {landAddress.street && (
+                      <div>
+                        <span className="text-[10px] text-slate-500 uppercase">
+                          Street
+                        </span>
+                        <p className="text-slate-200">{landAddress.street}</p>
+                      </div>
+                    )}
+                    <div className="grid grid-cols-2 gap-4">
+                      {landAddress.city && (
+                        <div>
+                          <span className="text-[10px] text-slate-500 uppercase">
+                            City
+                          </span>
+                          <p className="text-slate-200">{landAddress.city}</p>
+                        </div>
+                      )}
+                      {landAddress.district && (
+                        <div>
+                          <span className="text-[10px] text-slate-500 uppercase">
+                            District
+                          </span>
+                          <p className="text-slate-200">
+                            {landAddress.district}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      {landAddress.province && (
+                        <div>
+                          <span className="text-[10px] text-slate-500 uppercase">
+                            Province
+                          </span>
+                          <p className="text-slate-200">
+                            {landAddress.province}
+                          </p>
+                        </div>
+                      )}
+                      {landAddress.postalCode && (
+                        <div>
+                          <span className="text-[10px] text-slate-500 uppercase">
+                            Postal Code
+                          </span>
+                          <p className="text-slate-200">
+                            {landAddress.postalCode}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="block">
+                  <span className={labelCls}>Land Details (From Profile)</span>
+                  <div className="mt-1.5 bg-[#141414] rounded-lg px-3.5 py-3 text-slate-300 text-sm space-y-2">
+                    <div className="grid grid-cols-2 gap-4">
+                      {landAddress.size && (
+                        <div>
+                          <span className="text-[10px] text-slate-500 uppercase">
+                            Land Size
+                          </span>
+                          <p className="text-slate-200">{landAddress.size}</p>
+                        </div>
+                      )}
+                      {landAddress.soilType && (
+                        <div>
+                          <span className="text-[10px] text-slate-500 uppercase">
+                            Soil Type
+                          </span>
+                          <p className="text-slate-200">
+                            {landAddress.soilType}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      {landAddress.dsDivision && (
+                        <div>
+                          <span className="text-[10px] text-slate-500 uppercase">
+                            DS Division
+                          </span>
+                          <p className="text-slate-200">
+                            {landAddress.dsDivision}
+                          </p>
+                        </div>
+                      )}
+                      {landAddress.gnDivision && (
+                        <div>
+                          <span className="text-[10px] text-slate-500 uppercase">
+                            GN Division
+                          </span>
+                          <p className="text-slate-200">
+                            {landAddress.gnDivision}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
                 <label className="block">
-                  <span className={labelCls}>Location</span>
+                  <span className={labelCls}>Rental Amount (LKR)</span>
                   <input
-                    className={errors.location ? inputErrCls : inputCls}
+                    className={errors.rentalAmount ? inputErrCls : inputCls}
                     type="text"
-                    placeholder="City / district"
-                    value={formData.location}
+                    placeholder="e.g. 50000"
+                    value={formData.rentalAmount}
                     onChange={(event) =>
-                      handleInputChange("location", event.target.value)
+                      handleInputChange("rentalAmount", event.target.value)
                     }
                   />
-                  {errors.location && (
+                  {errors.rentalAmount && (
                     <span className="text-red-400 text-[10px] mt-0.5 block">
-                      {errors.location}
+                      {errors.rentalAmount}
                     </span>
                   )}
                 </label>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <label className="block">
-                    <span className={labelCls}>Land Area</span>
-                    <input
-                      className={errors.landArea ? inputErrCls : inputCls}
-                      type="text"
-                      placeholder="e.g. 25 acres"
-                      value={formData.landArea}
-                      onChange={(event) =>
-                        handleInputChange("landArea", event.target.value)
-                      }
-                    />
-                    {errors.landArea && (
-                      <span className="text-red-400 text-[10px] mt-0.5 block">
-                        {errors.landArea}
-                      </span>
-                    )}
-                  </label>
-
-                  <label className="block">
-                    <span className={labelCls}>Rental Amount (LKR)</span>
-                    <input
-                      className={errors.rentalAmount ? inputErrCls : inputCls}
-                      type="text"
-                      placeholder="e.g. 50000"
-                      value={formData.rentalAmount}
-                      onChange={(event) =>
-                        handleInputChange("rentalAmount", event.target.value)
-                      }
-                    />
-                    {errors.rentalAmount && (
-                      <span className="text-red-400 text-[10px] mt-0.5 block">
-                        {errors.rentalAmount}
-                      </span>
-                    )}
-                  </label>
-                </div>
               </div>
             </div>
 

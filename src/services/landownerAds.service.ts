@@ -53,7 +53,9 @@ export const createLandownerAd = (payload: CreateLandownerAdPayload) =>
   httpClient.post<unknown>("/v1/land-owner/ads", payload);
 
 export const getLandownerAds = () =>
-  httpClient.get<LandownerAdsListResponse>("/v1/land-owner/ads?sort=-createdAt");
+  httpClient.get<LandownerAdsListResponse>(
+    "/v1/land-owner/ads?sort=-createdAt",
+  );
 
 export const deleteLandownerAd = (adId: string) =>
   httpClient.delete<unknown>(`/v1/land-owner/ads/${adId}`);
