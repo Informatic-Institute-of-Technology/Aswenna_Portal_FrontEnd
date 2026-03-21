@@ -9,8 +9,6 @@ import {
   Home,
   Landscape,
   Mail,
-  People,
-  Search,
   Settings,
 } from "@mui/icons-material";
 import {
@@ -36,24 +34,14 @@ const LandOwnerSidebar = () => {
   const menuItems = [
     { text: "Dashboard", icon: <Home />, path: `${basePath}/dashboard` },
     {
-      text: "My Land Ads",
+      text: "My Offers",
       icon: <Landscape />,
       path: `${basePath}/dashboard/my-land-ads`,
     },
     {
-      text: "Received Requests",
+      text: "Opportunities",
       icon: <Description />,
       path: `${basePath}/dashboard/received-requests`,
-    },
-    {
-      text: "Tenant Search",
-      icon: <Search />,
-      path: `${basePath}/dashboard/tenant-search`,
-    },
-    {
-      text: "Land Analysis",
-      icon: <BarChartIcon />,
-      path: `${basePath}/dashboard/land-analysis`,
     },
     {
       text: "Income Tracker",
@@ -61,14 +49,14 @@ const LandOwnerSidebar = () => {
       path: `${basePath}/dashboard/income-tracker`,
     },
     {
-      text: "Soil & Weather",
-      icon: <Cloud />,
-      path: `${basePath}/dashboard/soil-weather`,
+      text: "Insights & Analysis",
+      icon: <BarChartIcon />,
+      path: `${basePath}/dashboard/land-analysis`,
     },
     {
-      text: "Tenant Management",
-      icon: <People />,
-      path: `${basePath}/dashboard/tenant-management`,
+      text: "Land, Soil & Weather",
+      icon: <Cloud />,
+      path: `${basePath}/dashboard/soil-weather`,
     },
   ];
 

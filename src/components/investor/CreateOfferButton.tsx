@@ -4,14 +4,22 @@ import { Button } from '@mui/material';
 interface CreateOfferButtonProps {
     onClick?: () => void;
     fullWidth?: boolean;
+    label?: string;
+    disabled?: boolean;
 }
 
-const CreateOfferButton = ({ onClick, fullWidth = false }: CreateOfferButtonProps) => {
+const CreateOfferButton = ({
+    onClick,
+    fullWidth = false,
+    label = 'Create New Offer',
+    disabled = false,
+}: CreateOfferButtonProps) => {
     return (
         <Button
             variant="contained"
             startIcon={<Add />}
             onClick={onClick}
+            disabled={disabled}
             className="create-offer-btn"
             sx={{
                 background: 'linear-gradient(135deg, var(--color-olive) 0%, var(--color-olive-light) 100%)',
@@ -29,7 +37,7 @@ const CreateOfferButton = ({ onClick, fullWidth = false }: CreateOfferButtonProp
                 },
             }}
         >
-            Create New Offer
+            {label}
         </Button>
     );
 };
