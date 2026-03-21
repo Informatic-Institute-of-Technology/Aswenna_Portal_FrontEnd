@@ -164,23 +164,34 @@ const CreateAdPopup = ({
             detail.landOwner?.landAddress ??
             detail.landOwnerDetails?.landAddress;
 
-          // Store landAddress details for display
-          if (land) {
-            setLandAddress({
-              street: land.street,
-              city: land.city,
-              province: land.province,
-              district: land.district,
-              postalCode: land.postalCode,
-              size: land.size,
-              soilType: land.soilType,
-              rentalExpectation: land.rentalExpectation,
-              dsDivision: land.dsDivision,
-              gnDivision: land.gnDivision,
-            });
+          if (land && typeof land === "object") {
+            const addressData: {
+              street?: string;
+              city?: string;
+              province?: string;
+              district?: string;
+              postalCode?: string;
+              size?: string;
+              soilType?: string;
+              rentalExpectation?: string;
+              dsDivision?: string;
+              gnDivision?: string;
+            } = {};
+            
+            if (typeof land.street === "string") addressData.street = land.street;
+            if (typeof land.city === "string") addressData.city = land.city;
+            if (typeof land.province === "string") addressData.province = land.province;
+            if (typeof land.district === "string") addressData.district = land.district;
+            if (typeof land.postalCode === "string") addressData.postalCode = land.postalCode;
+            if (typeof land.size === "string") addressData.size = land.size;
+            if (typeof land.soilType === "string") addressData.soilType = land.soilType;
+            if (typeof land.rentalExpectation === "string") addressData.rentalExpectation = land.rentalExpectation;
+            if (typeof land.dsDivision === "string") addressData.dsDivision = land.dsDivision;
+            if (typeof land.gnDivision === "string") addressData.gnDivision = land.gnDivision;
+            
+            setLandAddress(addressData);
           }
 
-          // Extract land images from the API response (landImages from landAddress)
           const landImages = land?.landImages ?? [];
           const landImageUrls = landImages
             .map((img) => mediaToUrl(img))
