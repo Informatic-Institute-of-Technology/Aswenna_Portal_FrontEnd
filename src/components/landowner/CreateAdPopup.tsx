@@ -88,6 +88,7 @@ const CreateAdPopup = ({
   const [formData, setFormData] = useState<LandAdFormValues>(EMPTY_FORM_VALUES);
   const [errors, setErrors] = useState<Partial<Record<keyof LandAdFormValues, string>>>({});
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [fetchedLandImages, setFetchedLandImages] = useState<string[]>([]);
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const uploadedObjectUrlsRef = useRef<string[]>([]);
@@ -106,33 +107,8 @@ const CreateAdPopup = ({
   );
 
   const signedUpImageOptions = useMemo(() => {
-    const userData = user as
-      | {
-          personalInfo?: {
-            profilePicture?: unknown;
-            nicFrontImage?: unknown;
-            nicBackImage?: unknown;
-          } | null;
-          landOwnerDetails?: {
-            landImages?: unknown[];
-            images?: unknown[];
-          } | null;
-        }
-      | null;
-
-    const personal = userData?.personalInfo;
-    const landOwnerDetails = userData?.landOwnerDetails;
-
-    const directImages = [
-      mediaToUrl(personal?.profilePicture),
-      mediaToUrl(personal?.nicFrontImage),
-      mediaToUrl(personal?.nicBackImage),
-      ...(landOwnerDetails?.landImages ?? []).map(mediaToUrl),
-      ...(landOwnerDetails?.images ?? []).map(mediaToUrl),
-    ];
-
-    return uniqueNonEmpty(directImages);
-  }, [user]);
+    return uniqueNonEmpty(fetchedLandImages);
+  }, [fetchedLandImages]);
 
   const allImageOptions = useMemo(
     () => uniqueNonEmpty([...uploadedImages, ...signedUpImageOptions]),
@@ -168,6 +144,14 @@ const CreateAdPopup = ({
           const land =
             detail.landOwner?.landAddress ?? detail.landOwnerDetails?.landAddress;
           const info = detail.personalInfo;
+          
+          // Extract land images from the API response (landImages from landAddress)
+          const landImages = land?.landImages ?? [];
+          const landImageUrls = landImages
+            .map((img) => mediaToUrl(img))
+            .filter((url: string) => url);
+          setFetchedLandImages(landImageUrls);
+          
           setFormData((prev) => ({
             ...prev,
             location:
@@ -181,6 +165,7 @@ const CreateAdPopup = ({
             landArea: prev.landArea || land?.size || "",
             soilType: prev.soilType || land?.soilType || "",
             rentalAmount: prev.rentalAmount || land?.rentalExpectation || "",
+            landImages: mode === "create" ? landImageUrls : prev.landImages,
           }));
         })
         .catch((error) => {
