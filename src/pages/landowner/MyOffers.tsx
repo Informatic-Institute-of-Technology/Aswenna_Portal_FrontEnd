@@ -49,6 +49,11 @@ import {
   type LandownerAdApiItem,
   type LandownerInfo,
 } from "../../services/landownerAds.service";
+import {
+  connectOfferToLandAd,
+  getInvestorOffersPaginated,
+} from "../../services/offer.service";
+import type { DirectHarvestOfferAPI } from "../../types/investor.types";
 import Notification from "../../shared/components/Notification";
 import { useNotification } from "../../shared/hooks/useNotification";
 
@@ -340,6 +345,14 @@ const MyLandAdsPage = () => {
   const [adToDeleteId, setAdToDeleteId] = useState<string | null>(null);
   const [viewingAdId, setViewingAdId] = useState<string | null>(null);
   const [landAdDetailsDialogOpen, setLandAdDetailsDialogOpen] = useState(false);
+  const [investorOffers, setInvestorOffers] = useState<DirectHarvestOfferAPI[]>(
+    [],
+  );
+  const [offersLoading, setOffersLoading] = useState(false);
+  const [connectingOfferId, setConnectingOfferId] = useState<string | null>(
+    null,
+  );
+  const [selectLandAdDialogOpen, setSelectLandAdDialogOpen] = useState(false);
 
   const userDisplayName =
     user?.fullName ||
@@ -475,6 +488,27 @@ const MyLandAdsPage = () => {
   useEffect(() => {
     if (user?._id) void fetchAds();
   }, [user?._id]);
+
+  const fetchInvestorOffers = async () => {
+    setOffersLoading(true);
+    try {
+      const response = await getInvestorOffersPaginated(1, 10);
+      const harvestOffers = (response.data || []).filter(
+        (offer): offer is DirectHarvestOfferAPI =>
+          offer.offerType === "direct-harvest",
+      );
+      setInvestorOffers(harvestOffers);
+    } catch (error) {
+      console.error("[MyOffers] Failed to fetch investor offers:", error);
+      setInvestorOffers([]);
+    } finally {
+      setOffersLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void fetchInvestorOffers();
+  }, []);
 
   const handleCreateAd = () => {
     if (hasExistingLandAd) {
@@ -625,6 +659,25 @@ const MyLandAdsPage = () => {
   const handleCancelDeleteAd = () => {
     setDeleteAdDialogOpen(false);
     setAdToDeleteId(null);
+  };
+
+  const handleConnectOffer = (offerId: string) => {
+    setConnectingOfferId(offerId);
+    setSelectLandAdDialogOpen(true);
+  };
+
+  const handleConfirmConnect = async (selectedAdId: string) => {
+    if (!connectingOfferId) return;
+    try {
+      await connectOfferToLandAd(connectingOfferId, selectedAdId);
+      showSuccess("Offer connected to your land ad successfully!");
+      setSelectLandAdDialogOpen(false);
+      setConnectingOfferId(null);
+      void fetchInvestorOffers();
+    } catch (error) {
+      console.error("[MyOffers] Failed to connect offer:", error);
+      showWarning("Failed to connect the offer. Please try again.");
+    }
   };
 
   const handleViewProjectDetails = (id: string) => {
@@ -1031,6 +1084,182 @@ const MyLandAdsPage = () => {
 
           <section className="mb-5">
             <SectionTitle
+              title="Incoming Investor Requests"
+              accent="linear-gradient(180deg, #f59e0b 0%, #fbbf24 100%)"
+            />
+            {offersLoading ? (
+              <Box sx={{ textAlign: "center", py: 6 }}>
+                <Typography color="text.secondary">
+                  Loading investor requests...
+                </Typography>
+              </Box>
+            ) : investorOffers.length > 0 ? (
+              <div className="row g-4">
+                {investorOffers.map((offer) => (
+                  <div key={offer._id} className="col-12 col-md-6 col-lg-4">
+                    <Card
+                      sx={{
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        bgcolor: "var(--surface-card)",
+                        border: "1px solid",
+                        borderColor: "divider",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          position: "relative",
+                          height: 160,
+                          overflow: "hidden",
+                        }}
+                      >
+                        <CardMedia
+                          component="img"
+                          image={offer.backgroundImage || DEFAULT_LAND_IMAGE}
+                          alt={offer.harvestBaseDetails.projectTitle}
+                          sx={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            opacity: 0.7,
+                            transition: "opacity 0.3s ease",
+                            "&:hover": { opacity: 0.85 },
+                          }}
+                        />
+                        <Box
+                          sx={{
+                            position: "absolute",
+                            inset: 0,
+                            background:
+                              "linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.75) 100%)",
+                          }}
+                        />
+                        <Box sx={{ position: "absolute", top: 12, left: 12 }}>
+                          <Chip
+                            label={
+                              offer.status === "active"
+                                ? "Pending Review"
+                                : offer.status
+                            }
+                            color={
+                              offer.status === "active"
+                                ? "warning"
+                                : "default"
+                            }
+                            size="small"
+                            sx={{ fontWeight: 600 }}
+                          />
+                        </Box>
+                        <Box sx={{ position: "absolute", bottom: 12, left: 12 }}>
+                          <Typography
+                            variant="subtitle1"
+                            sx={{
+                              fontWeight: 700,
+                              color: "#fff",
+                              textShadow: "0 1px 4px rgba(0,0,0,0.7)",
+                            }}
+                          >
+                            {offer.harvestBaseDetails.projectTitle}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: "#fff", opacity: 0.9 }}
+                          >
+                            {offer.investor.fullName}
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      <CardContent sx={{ flexGrow: 1 }}>
+                        <Stack spacing={2}>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              Crop Type
+                            </Typography>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                              {offer.harvestBaseDetails.cropType}
+                            </Typography>
+                          </Box>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              Required Quantity
+                            </Typography>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                              {offer.harvestBaseDetails.requiredQuantity}{" "}
+                              {offer.harvestBaseDetails.quantityUnit}
+                            </Typography>
+                          </Box>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              Total Budget
+                            </Typography>
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                fontWeight: 700,
+                                color: "var(--color-olive-light)",
+                              }}
+                            >
+                              {offer.currency === "LKR" ? "LKR " : ""}
+                              {new Intl.NumberFormat("en-LK").format(
+                                offer.harvestBaseDetails.totalBudget,
+                              )}
+                            </Typography>
+                          </Box>
+                        </Stack>
+                      </CardContent>
+
+                      <Box
+                        sx={{
+                          px: 2,
+                          py: 1.5,
+                          borderTop: "1px solid",
+                          borderColor: "divider",
+                          background: "var(--surface-tint)",
+                          display: "flex",
+                          gap: 1,
+                        }}
+                      >
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          fullWidth
+                          onClick={() => handleConnectOffer(offer._id)}
+                        >
+                          Connect
+                        </Button>
+                        <Tooltip title="View Details">
+                          <IconButton size="small">
+                            <Visibility sx={{ fontSize: "1.2rem" }} />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    </Card>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                icon={<HourglassEmpty sx={{ fontSize: 40, opacity: 0.5 }} />}
+                title="No Investor Requests"
+                description="Harvest-based investor requests will appear here when they're available."
+              />
+            )}
+          </section>
+
+          <hr
+            style={{
+              margin: "3rem 0",
+              border: "none",
+              height: 1,
+              background:
+                "linear-gradient(90deg, transparent, var(--border-medium), transparent)",
+            }}
+          />
+
+          <section className="mb-5">
+            <SectionTitle
               title="Active Projects"
               accent="linear-gradient(180deg, var(--color-olive) 0%, var(--color-olive-light) 100%)"
             />
@@ -1150,6 +1379,96 @@ const MyLandAdsPage = () => {
         adId={viewingAdId || undefined}
         defaultImage={DEFAULT_LAND_IMAGE}
       />
+
+      <Dialog
+        open={selectLandAdDialogOpen}
+        onClose={() => {
+          setSelectLandAdDialogOpen(false);
+          setConnectingOfferId(null);
+        }}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            background:
+              "linear-gradient(180deg, var(--bg-overlay), var(--bg-elevated))",
+            border: "1px solid var(--surface-light)",
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 700 }}>
+          Select Land Ad to Connect
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Choose which land ad you would like to connect this investor offer
+            to.
+          </Typography>
+          <Stack spacing={1.5}>
+            {landAds.length > 0 ? (
+              landAds.map((ad) => (
+                <Card
+                  key={ad.id}
+                  onClick={() => {
+                    handleConfirmConnect(ad.id);
+                  }}
+                  sx={{
+                    p: 1.5,
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    "&:hover": {
+                      bgcolor: "rgba(133, 164, 70, 0.1)",
+                      borderColor: "var(--color-olive-light)",
+                      transform: "translateY(-2px)",
+                    },
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "start",
+                      gap: 2,
+                    }}
+                  >
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        {ad.title}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ mt: 0.5, display: "block" }}
+                      >
+                        {ad.location}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ display: "block" }}
+                      >
+                        Area: {ad.landArea} acres
+                      </Typography>
+                    </Box>
+                    <Chip
+                      label={ad.soilType}
+                      size="small"
+                      sx={{ flexShrink: 0 }}
+                    />
+                  </Box>
+                </Card>
+              ))
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                No land ads available. Create a land ad first.
+              </Typography>
+            )}
+          </Stack>
+        </DialogContent>
+      </Dialog>
 
       <Notification
         open={notification.open}
