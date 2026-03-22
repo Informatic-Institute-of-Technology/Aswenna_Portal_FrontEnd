@@ -1,4 +1,10 @@
-import { ChevronLeft, ChevronRight, Delete, Edit, Visibility } from "@mui/icons-material";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Delete,
+  Edit,
+  Visibility,
+} from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -73,7 +79,7 @@ const LandAdPriorityCard = ({
 
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) =>
-        prev === imagesToDisplay.length - 1 ? 0 : prev + 1
+        prev === imagesToDisplay.length - 1 ? 0 : prev + 1,
       );
     }, 4000);
 
@@ -82,13 +88,13 @@ const LandAdPriorityCard = ({
 
   const handlePrevImage = () => {
     setCurrentImageIndex((prev) =>
-      prev === 0 ? imagesToDisplay.length - 1 : prev - 1
+      prev === 0 ? imagesToDisplay.length - 1 : prev - 1,
     );
   };
 
   const handleNextImage = () => {
     setCurrentImageIndex((prev) =>
-      prev === imagesToDisplay.length - 1 ? 0 : prev + 1
+      prev === imagesToDisplay.length - 1 ? 0 : prev + 1,
     );
   };
 
@@ -104,7 +110,7 @@ const LandAdPriorityCard = ({
     } catch (error) {
       console.error("Error loading ad details:", error);
       setLoadError(
-        error instanceof Error ? error.message : "Failed to load ad details"
+        error instanceof Error ? error.message : "Failed to load ad details",
       );
       setPayloadDialogOpen(true);
     } finally {
@@ -574,7 +580,11 @@ const LandAdPriorityCard = ({
             <Typography variant="h6" sx={{ fontWeight: 700 }}>
               {detailedAd?.title || ad.title}
             </Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ mt: 0.5 }}
+            >
               Detailed Land Advertisement Information
             </Typography>
           </Box>
@@ -614,12 +624,12 @@ const LandAdPriorityCard = ({
             </Box>
           ) : !detailedAd ? (
             <Box sx={{ textAlign: "center", py: 8 }}>
-              <Typography color="text.secondary">
-                No data available
-              </Typography>
+              <Typography color="text.secondary">No data available</Typography>
             </Box>
           ) : (
-            <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3 }}>
+            <Box
+              sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3 }}
+            >
               <Box>
                 {detailedAd.images && detailedAd.images.length > 0 && (
                   <Box sx={{ mb: 3 }}>
@@ -655,7 +665,7 @@ const LandAdPriorityCard = ({
                               setDialogImageIndex((prev) =>
                                 prev === 0
                                   ? detailedAd.images!.length - 1
-                                  : prev - 1
+                                  : prev - 1,
                               );
                             }}
                             sx={{
@@ -680,7 +690,7 @@ const LandAdPriorityCard = ({
                               setDialogImageIndex((prev) =>
                                 prev === detailedAd.images!.length - 1
                                   ? 0
-                                  : prev + 1
+                                  : prev + 1,
                               );
                             }}
                             sx={{
@@ -715,8 +725,7 @@ const LandAdPriorityCard = ({
                               fontWeight: 600,
                             }}
                           >
-                            {dialogImageIndex + 1} /{" "}
-                            {detailedAd.images.length}
+                            {dialogImageIndex + 1} / {detailedAd.images.length}
                           </Box>
 
                           <Stack
@@ -775,8 +784,7 @@ const LandAdPriorityCard = ({
                                 index === dialogImageIndex
                                   ? "var(--color-olive-light)"
                                   : "divider",
-                              opacity:
-                                index === dialogImageIndex ? 1 : 0.6,
+                              opacity: index === dialogImageIndex ? 1 : 0.6,
                               transition: "all 0.2s ease",
                               "&:hover": {
                                 opacity: 0.9,
@@ -821,7 +829,7 @@ const LandAdPriorityCard = ({
                         Size:{" "}
                         {(
                           Number(
-                            detailedAd.images[dialogImageIndex].fileSize || 0
+                            detailedAd.images[dialogImageIndex].fileSize || 0,
                           ) / 1024
                         ).toFixed(2)}{" "}
                         KB
@@ -851,13 +859,12 @@ const LandAdPriorityCard = ({
                       >
                         Landowner Information
                       </Typography>
-                      {detailedAd.landowner.personalInfo
-                        ?.profilePicture?.url && (
+                      {detailedAd.landowner.personalInfo?.profilePicture
+                        ?.url && (
                         <Box
                           component="img"
                           src={
-                            detailedAd.landowner.personalInfo.profilePicture
-                              .url
+                            detailedAd.landowner.personalInfo.profilePicture.url
                           }
                           alt="Profile"
                           sx={{
@@ -1072,7 +1079,7 @@ const LandAdPriorityCard = ({
                         }}
                       >
                         {formatRentalAmount(
-                          String(detailedAd.rentalAmount || "0")
+                          String(detailedAd.rentalAmount || "0"),
                         )}
                       </Typography>
                     </Box>
@@ -1153,8 +1160,8 @@ const LandAdPriorityCard = ({
                             variant="body2"
                             sx={{ fontWeight: 700, mt: 0.3 }}
                           >
-                            Lat: {detailedAd.location.latitude?.toFixed(4)}, Lon:{" "}
-                            {detailedAd.location.longitude?.toFixed(4)}
+                            Lat: {detailedAd.location.latitude?.toFixed(4)},
+                            Lon: {detailedAd.location.longitude?.toFixed(4)}
                           </Typography>
                         )}
                       </Box>
@@ -1218,7 +1225,11 @@ const LandAdPriorityCard = ({
 
           <Divider sx={{ my: 2 }} />
 
-          <Stack direction="row" spacing={2} sx={{ justifyContent: "flex-end" }}>
+          <Stack
+            direction="row"
+            spacing={2}
+            sx={{ justifyContent: "flex-end" }}
+          >
             <Button
               onClick={() => {
                 setPayloadDialogOpen(false);

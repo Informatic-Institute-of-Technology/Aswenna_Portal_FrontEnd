@@ -162,7 +162,7 @@ const CreateAdPopup = ({
           const land =
             detail.landOwner?.landAddress ??
             detail.landOwnerDetails?.landAddress;
-          
+
           if (land && typeof land === "object") {
             const addressData: {
               street?: string;

@@ -47,7 +47,7 @@ const LandAdDetailsDialog = ({
       } catch (error) {
         console.error("Error loading ad details:", error);
         setLoadError(
-          error instanceof Error ? error.message : "Failed to load ad details"
+          error instanceof Error ? error.message : "Failed to load ad details",
         );
       } finally {
         setIsLoadingDetails(false);
@@ -62,8 +62,8 @@ const LandAdDetailsDialog = ({
     if (!open || !detailedAd?.images || detailedAd.images.length <= 1) return;
 
     const timer = setInterval(() => {
-      setDialogImageIndex((prev) => 
-        prev === detailedAd.images!.length - 1 ? 0 : prev + 1
+      setDialogImageIndex((prev) =>
+        prev === detailedAd.images!.length - 1 ? 0 : prev + 1,
       );
     }, 3000);
 
@@ -186,9 +186,7 @@ const LandAdDetailsDialog = ({
           </Box>
         ) : !detailedAd ? (
           <Box sx={{ textAlign: "center", py: 8 }}>
-            <Typography color="text.secondary">
-              No data available
-            </Typography>
+            <Typography color="text.secondary">No data available</Typography>
           </Box>
         ) : (
           <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3 }}>
@@ -239,7 +237,7 @@ const LandAdDetailsDialog = ({
                             setDialogImageIndex((prev) =>
                               prev === 0
                                 ? detailedAd.images!.length - 1
-                                : prev - 1
+                                : prev - 1,
                             );
                           }}
                           sx={{
@@ -264,7 +262,7 @@ const LandAdDetailsDialog = ({
                             setDialogImageIndex((prev) =>
                               prev === detailedAd.images!.length - 1
                                 ? 0
-                                : prev + 1
+                                : prev + 1,
                             );
                           }}
                           sx={{
@@ -299,8 +297,7 @@ const LandAdDetailsDialog = ({
                             fontWeight: 600,
                           }}
                         >
-                          {dialogImageIndex + 1} /{" "}
-                          {detailedAd.images.length}
+                          {dialogImageIndex + 1} / {detailedAd.images.length}
                         </Box>
 
                         <Stack
@@ -360,8 +357,7 @@ const LandAdDetailsDialog = ({
                               index === dialogImageIndex
                                 ? "var(--color-olive-light)"
                                 : "divider",
-                            opacity:
-                              index === dialogImageIndex ? 1 : 0.6,
+                            opacity: index === dialogImageIndex ? 1 : 0.6,
                             transition: "all 0.2s ease",
                             "&:hover": {
                               opacity: 0.9,
@@ -398,44 +394,110 @@ const LandAdDetailsDialog = ({
                   borderColor: "divider",
                 }}
               >
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Box component="span" sx={{ width: 16, height: 2, bgcolor: 'var(--color-olive-light)', borderRadius: 1 }} />
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    fontWeight: 700,
+                    mb: 1.5,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                  }}
+                >
+                  <Box
+                    component="span"
+                    sx={{
+                      width: 16,
+                      height: 2,
+                      bgcolor: "var(--color-olive-light)",
+                      borderRadius: 1,
+                    }}
+                  />
                   Record Information
                 </Typography>
-                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: 2,
+                  }}
+                >
                   <Box>
-                    <Typography variant="caption" sx={{ color: "text.secondary", display: 'block', mb: 0.5 }}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: "text.secondary",
+                        display: "block",
+                        mb: 0.5,
+                      }}
+                    >
                       Created At
                     </Typography>
-                    <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 500 }}>
-                      {detailedAd.createdAt ? formatDate(detailedAd.createdAt) : "N/A"}
+                    <Typography
+                      variant="body2"
+                      sx={{ fontFamily: "monospace", fontWeight: 500 }}
+                    >
+                      {detailedAd.createdAt
+                        ? formatDate(detailedAd.createdAt)
+                        : "N/A"}
                     </Typography>
                   </Box>
                   <Box>
-                    <Typography variant="caption" sx={{ color: "text.secondary", display: 'block', mb: 0.5 }}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: "text.secondary",
+                        display: "block",
+                        mb: 0.5,
+                      }}
+                    >
                       Last Updated
                     </Typography>
-                    <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 500 }}>
-                      {detailedAd.updatedAt ? formatDate(detailedAd.updatedAt) : "N/A"}
+                    <Typography
+                      variant="body2"
+                      sx={{ fontFamily: "monospace", fontWeight: 500 }}
+                    >
+                      {detailedAd.updatedAt
+                        ? formatDate(detailedAd.updatedAt)
+                        : "N/A"}
                     </Typography>
                   </Box>
                   <Box>
-                    <Typography variant="caption" sx={{ color: "text.secondary", display: 'block', mb: 0.5 }}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: "text.secondary",
+                        display: "block",
+                        mb: 0.5,
+                      }}
+                    >
                       Status
                     </Typography>
                     <Chip
                       label={detailedAd.status || "UNKNOWN"}
                       size="small"
-                      color={detailedAd.status === 'ACTIVE' ? 'success' : 'default'}
+                      color={
+                        detailedAd.status === "ACTIVE" ? "success" : "default"
+                      }
                       variant="outlined"
-                      sx={{ height: 20, fontSize: '0.7rem', fontWeight: 600 }}
+                      sx={{ height: 20, fontSize: "0.7rem", fontWeight: 600 }}
                     />
                   </Box>
                   <Box>
-                    <Typography variant="caption" sx={{ color: "text.secondary", display: 'block', mb: 0.5 }}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: "text.secondary",
+                        display: "block",
+                        mb: 0.5,
+                      }}
+                    >
                       Record ID
                     </Typography>
-                    <Typography variant="caption" sx={{ fontFamily: 'monospace', color: 'text.disabled' }}>
+                    <Typography
+                      variant="caption"
+                      sx={{ fontFamily: "monospace", color: "text.disabled" }}
+                    >
                       {detailedAd._id || "N/A"}
                     </Typography>
                   </Box>
@@ -448,7 +510,8 @@ const LandAdDetailsDialog = ({
                   mt: 3,
                   p: 3,
                   borderRadius: 2,
-                  background: "linear-gradient(135deg, rgba(133, 164, 70, 0.15) 0%, rgba(133, 164, 70, 0.35) 100%)",
+                  background:
+                    "linear-gradient(135deg, rgba(133, 164, 70, 0.15) 0%, rgba(133, 164, 70, 0.35) 100%)",
                   border: "2px solid var(--color-olive)",
                   boxShadow: "0 8px 32px rgba(133, 164, 70, 0.2)",
                   display: "flex",
@@ -457,17 +520,29 @@ const LandAdDetailsDialog = ({
                   justifyContent: "center",
                   textAlign: "center",
                   position: "relative",
-                  overflow: "hidden"
+                  overflow: "hidden",
                 }}
               >
-                <Box 
-                  sx={{ 
-                    position: 'absolute', 
-                    top: 0, left: 0, right: 0, height: 4, 
-                    background: "var(--color-olive-light)" 
-                  }} 
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 4,
+                    background: "var(--color-olive-light)",
+                  }}
                 />
-                <Typography variant="overline" sx={{ color: "var(--color-olive-light)", fontWeight: 800, letterSpacing: 1.5, mb: 0.5, fontSize: '0.8rem' }}>
+                <Typography
+                  variant="overline"
+                  sx={{
+                    color: "var(--color-olive-light)",
+                    fontWeight: 800,
+                    letterSpacing: 1.5,
+                    mb: 0.5,
+                    fontSize: "0.8rem",
+                  }}
+                >
                   RENTAL AMOUNT PER MONTH
                 </Typography>
                 <Typography
@@ -476,7 +551,7 @@ const LandAdDetailsDialog = ({
                     fontWeight: 900,
                     color: "white",
                     textShadow: "0 2px 10px rgba(0,0,0,0.3)",
-                    letterSpacing: "-1px"
+                    letterSpacing: "-1px",
                   }}
                 >
                   {formatRentalAmount(String(detailedAd.rentalAmount || "0"))}
@@ -501,23 +576,40 @@ const LandAdDetailsDialog = ({
                   >
                     <Typography
                       variant="subtitle2"
-                      sx={{ fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}
+                      sx={{
+                        fontWeight: 700,
+                        mb: 2,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
                     >
-                      <Box component="span" sx={{ width: 4, height: 16, bgcolor: 'var(--color-olive-light)', borderRadius: 1 }} />
+                      <Box
+                        component="span"
+                        sx={{
+                          width: 4,
+                          height: 16,
+                          bgcolor: "var(--color-olive-light)",
+                          borderRadius: 1,
+                        }}
+                      />
                       Landowner Information
                     </Typography>
                     <Stack direction="row" spacing={2} alignItems="center">
-                      {detailedAd.landowner.personalInfo?.profilePicture?.url ? (
+                      {detailedAd.landowner.personalInfo?.profilePicture
+                        ?.url ? (
                         <Box
                           component="img"
-                          src={detailedAd.landowner.personalInfo.profilePicture.url}
+                          src={
+                            detailedAd.landowner.personalInfo.profilePicture.url
+                          }
                           alt="Profile"
                           sx={{
                             width: 64,
                             height: 64,
-                            borderRadius: '50%',
+                            borderRadius: "50%",
                             objectFit: "cover",
-                            border: '2px solid var(--color-olive-light)'
+                            border: "2px solid var(--color-olive-light)",
                           }}
                         />
                       ) : (
@@ -525,16 +617,19 @@ const LandAdDetailsDialog = ({
                           sx={{
                             width: 64,
                             height: 64,
-                            borderRadius: '50%',
-                            bgcolor: 'rgba(255,255,255,0.1)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            border: '2px solid var(--border-medium)'
+                            borderRadius: "50%",
+                            bgcolor: "rgba(255,255,255,0.1)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            border: "2px solid var(--border-medium)",
                           }}
                         >
-                          <Typography variant="h5" sx={{ color: 'text.secondary' }}>
-                            {detailedAd.landowner.fullName?.charAt(0) || 'U'}
+                          <Typography
+                            variant="h5"
+                            sx={{ color: "text.secondary" }}
+                          >
+                            {detailedAd.landowner.fullName?.charAt(0) || "U"}
                           </Typography>
                         </Box>
                       )}
@@ -542,7 +637,10 @@ const LandAdDetailsDialog = ({
                         <Typography variant="body1" sx={{ fontWeight: 700 }}>
                           {detailedAd.landowner.fullName || "Unknown Owner"}
                         </Typography>
-                        <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
+                        <Typography
+                          variant="body2"
+                          sx={{ color: "text.secondary", mt: 0.5 }}
+                        >
                           {detailedAd.landowner.email || "No email provided"}
                         </Typography>
                       </Box>
@@ -554,9 +652,23 @@ const LandAdDetailsDialog = ({
               <Box sx={{ mb: 3 }}>
                 <Typography
                   variant="subtitle2"
-                  sx={{ fontWeight: 700, mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}
+                  sx={{
+                    fontWeight: 700,
+                    mb: 1.5,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                  }}
                 >
-                  <Box component="span" sx={{ width: 4, height: 16, bgcolor: '#f59e0b', borderRadius: 1 }} />
+                  <Box
+                    component="span"
+                    sx={{
+                      width: 4,
+                      height: 16,
+                      bgcolor: "#f59e0b",
+                      borderRadius: 1,
+                    }}
+                  />
                   Land Details
                 </Typography>
                 <Stack spacing={1.5}>
@@ -662,9 +774,23 @@ const LandAdDetailsDialog = ({
               <Box sx={{ mb: 3 }}>
                 <Typography
                   variant="subtitle2"
-                  sx={{ fontWeight: 700, mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}
+                  sx={{
+                    fontWeight: 700,
+                    mb: 1.5,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                  }}
                 >
-                  <Box component="span" sx={{ width: 4, height: 16, bgcolor: '#4caf50', borderRadius: 1 }} />
+                  <Box
+                    component="span"
+                    sx={{
+                      width: 4,
+                      height: 16,
+                      bgcolor: "#4caf50",
+                      borderRadius: 1,
+                    }}
+                  />
                   Availability
                 </Typography>
                 <Stack spacing={1.5}>
@@ -777,8 +903,6 @@ const LandAdDetailsDialog = ({
             </Box>
           </Box>
         )}
-
-
       </DialogContent>
     </Dialog>
   );

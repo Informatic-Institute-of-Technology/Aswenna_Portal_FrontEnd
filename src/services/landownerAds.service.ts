@@ -105,8 +105,10 @@ export const updateLandownerAd = (
 ) => httpClient.patch<unknown>(`/v1/land-owner/ads/${adId}`, payload);
 
 export const getLandownerAdById = async (adId: string) => {
-  const response = await httpClient.get<{ data?: LandownerAdApiItem } | LandownerAdApiItem>(`/v1/land-owner/ads/${adId}`);
-  return (response as any).data || response as LandownerAdApiItem;
+  const response = await httpClient.get<
+    { data?: LandownerAdApiItem } | LandownerAdApiItem
+  >(`/v1/land-owner/ads/${adId}`);
+  return (response as any).data || (response as LandownerAdApiItem);
 };
 
 export const uploadLandAdImages = (adId: string, imageFiles: File[]) => {
