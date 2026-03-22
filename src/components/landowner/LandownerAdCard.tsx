@@ -70,3 +70,35 @@ const LandownerAdCard = ({ ad, onViewMore }: LandownerAdCardProps) => {
           boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
         }}
       ></Box>
+
+       <Payments sx={{ fontSize: 18, color: "primary.light" }} />
+        ₨{(ad.rentalAmount as unknown as number).toLocaleString()}/mo
+      </Box>
+
+      {/* Land Image */}
+      <Box sx={{ overflow: "hidden", height: 200, position: "relative" }}>
+        <CardMedia
+          component="img"
+          height="100%"
+          image={imageUrl}
+          alt={ad.title}
+          sx={{
+            objectFit: "cover",
+            transition: "transform 0.5s ease",
+            "&:hover": {
+              transform: "scale(1.05)",
+            },
+          }}
+        />
+        {/* Subtle gradient overlay at bottom of image for contrast */}
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: "40%",
+            background: "linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 100%)",
+          }}
+        />
+      </Box>
