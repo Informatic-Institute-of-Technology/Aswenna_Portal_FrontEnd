@@ -102,3 +102,69 @@ const LandOwnersPage = () => {
       </Box>
     );
   }
+
+    {/* Results Count */}
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Found {filteredAds.length} land listing{filteredAds.length !== 1 ? "s" : ""}
+        </Typography>
+
+        {/* Land Cards Grid */}
+        {filteredAds.length > 0 ? (
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))",
+              gap: 3,
+            }}
+          >
+            {filteredAds.map((ad) => (
+              <LandownerAdCard key={ad._id} ad={ad} onViewMore={handleViewMore} />
+            ))}
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              textAlign: "center",
+              py: 8,
+              bgcolor: "var(--surface-tint)",
+              borderRadius: 2,
+              color: "text.secondary",
+            }}
+          >
+            <Typography variant="h6" gutterBottom>
+              No land available matching your search
+            </Typography>
+            <Typography variant="body2">
+              Try adjusting your search criteria
+            </Typography>
+          </Box>
+        )}
+    </Box>
+
+    {/* Land Details Dialog */}
+      <Dialog
+        open={detailDialogOpen}
+        onClose={handleCloseDetailDialog}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ fontWeight: 600, pb: 1 }}>
+          {selectedAd?.title}
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          {selectedAd && (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              {/* Land Image */}
+              {selectedAd.images && selectedAd.images.length > 0 && (
+                <Box
+                  component="img"
+                  src={selectedAd.images[0].url}
+                  alt={selectedAd.title}
+                  sx={{
+                    width: "100%",
+                    height: 250,
+                    objectFit: "cover",
+                    borderRadius: 1,
+                  }}
+                />
+              )}
