@@ -1,20 +1,25 @@
-import type { AlertColor } from '@mui/material';
-import { Alert, Snackbar } from '@mui/material';
-import { useEffect, useState } from 'react';
+import type { AlertColor } from "@mui/material";
+import { Alert, Snackbar } from "@mui/material";
+import { useEffect, useState } from "react";
 
 export interface NotificationProps {
   open: boolean;
   message: string;
   severity?: AlertColor;
   duration?: number;
+  anchorOrigin?: {
+    vertical: "top" | "bottom";
+    horizontal: "left" | "center" | "right";
+  };
   onClose: () => void;
 }
 
 const Notification = ({
   open,
   message,
-  severity = 'error',
+  severity = "error",
   duration = 5000,
+  anchorOrigin = { vertical: "top", horizontal: "right" },
   onClose,
 }: NotificationProps) => {
   const [isOpen, setIsOpen] = useState(open);
@@ -25,9 +30,9 @@ const Notification = ({
 
   const handleClose = (
     _event?: React.SyntheticEvent | Event,
-    reason?: string
+    reason?: string,
   ) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     setIsOpen(false);
@@ -39,8 +44,8 @@ const Notification = ({
       open={isOpen}
       autoHideDuration={duration}
       onClose={handleClose}
-      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      sx={{ mt: 8 }}
+      anchorOrigin={anchorOrigin}
+      sx={anchorOrigin.vertical === "top" ? { mt: 8 } : { mb: 2, mr: 1 }}
     >
       <Alert
         onClose={handleClose}
@@ -48,11 +53,11 @@ const Notification = ({
         variant="filled"
         elevation={6}
         sx={{
-          width: '100%',
-          minWidth: '300px',
-          fontSize: '0.95rem',
-          '& .MuiAlert-message': {
-            padding: '8px 0',
+          width: "100%",
+          minWidth: "300px",
+          fontSize: "0.95rem",
+          "& .MuiAlert-message": {
+            padding: "8px 0",
           },
         }}
       >

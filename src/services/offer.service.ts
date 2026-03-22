@@ -28,8 +28,20 @@ export const updateDirectHarvestOffer = (
 export const updateSponsorshipOffer = (
   offerId: string,
   payload: Partial<SponsorshipOffer>,
-) =>
-  httpClient.put<SponsorshipOffer>(`/v1/investor-offer/${offerId}`, payload);
+) => httpClient.put<SponsorshipOffer>(`/v1/investor-offer/${offerId}`, payload);
 
 export const deleteInvestorOffer = (offerId: string) =>
   httpClient.delete(`/v1/investor-offer/${offerId}`);
+
+export const getInvestorOffersPaginated = (
+  page: number = 1,
+  limit: number = 10,
+) =>
+  httpClient.get<PaginatedOffersResponse>(
+    `/v1/investor-offer?page=${page}&limit=${limit}`,
+  );
+
+export const connectOfferToLandAd = (offerId: string, landAdId: string) =>
+  httpClient.post<unknown>(`/v1/investor-offer/${offerId}/connect`, {
+    landAdId,
+  });

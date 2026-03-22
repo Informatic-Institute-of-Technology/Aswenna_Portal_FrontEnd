@@ -8,6 +8,7 @@ import {
   People,
   Settings,
   Timeline,
+  ViewList,
   Warning,
 } from "@mui/icons-material";
 import {
@@ -45,6 +46,11 @@ const SuperAdminSidebar = () => {
       text: "Payment Ledger",
       icon: <AttachMoney />,
       path: `${basePath}/dashboard/admin/payments`,
+    },
+    {
+      text: "All Projects",
+      icon: <ViewList />,
+      path: `${basePath}/dashboard/admin/all-projects`,
     },
     {
       text: "Active Projects",

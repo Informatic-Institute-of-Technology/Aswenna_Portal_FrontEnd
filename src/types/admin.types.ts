@@ -341,3 +341,153 @@ export interface PerformanceMetrics {
   platformGrowthRate: number;
   userRetentionRate: number;
 }
+
+/**
+ * ============================================================================
+ * ALL PROJECTS DASHBOARD - UNIFIED PROJECT TYPES
+ * ============================================================================
+ *
+ * These types normalize data from 4 different API sources:
+ * 1. Farmer Projects (Harvest-based)
+ * 2. Farmer Projects (Commission-based)
+ * 3. Investor Offers (Direct Harvest)
+ * 4. Investor Offers (Sponsorship/Commission)
+ *
+ * Plus Landowner Projects (Monthly Rental)
+ */
+
+export type ProjectCategory =
+  | "farmer-harvest"
+  | "farmer-commission"
+  | "investor-harvest"
+  | "investor-sponsorship"
+  | "landowner-rental";
+
+export type ProjectStakeholder = "farmer" | "investor" | "landowner";
+
+/**
+ * Unified Project representation - normalized from all 4 API sources
+ * Fields are reconciled to a common structure for consistent UI rendering
+ */
+export interface UnifiedProject {
+  // Metadata
+  id: string;
+  sourceApi: "farmer-project" | "investor-offer" | "landowner-project";
+  sourceId: string; // Original ID from source API
+  category: ProjectCategory;
+  stakeholder: ProjectStakeholder;
+
+  // Core project information
+  title: string;
+  description?: string;
+  cropType?: string;
+  cropIcon?: string;
+  backgroundImage?: string;
+
+  // Parties involved
+  creator: {
+    id: string;
+    name: string;
+    email?: string;
+    image?: string;
+  };
+  otherParties?: {
+    investorId?: string;
+    investorName?: string;
+    landownerId?: string;
+    landownerName?: string;
+    farmerId?: string;
+    farmerName?: string;
+  };
+
+  // Financial details
+  financialMetric?: {
+    label: string; // e.g., "Investment Required", "Commission Rate", "Monthly Rent"
+    value: number;
+    unit?: string; // e.g., "LKR", "%", "per month"
+  };
+  totalInvestment?: number;
+  budget?: number;
+  currency?: string;
+
+  // Timeline
+  startDate: string;
+  endDate?: string;
+  deadline?: string;
+  duration?: number; // in months
+
+  // Location
+  location: string;
+  district?: string;
+  province?: string;
+  preferredRegions?: string[];
+
+  // Status & metadata
+  status: "active" | "pending" | "completed" | "cancelled" | "draft";
+  visibility?: boolean;
+  createdAt: string;
+  updatedAt: string;
+
+  // Additional context
+  landArea?: number;
+  landAreaUnit?: string;
+  expectedYield?: string;
+  expectedROI?: number;
+  applicationCount?: number;
+}
+
+/**
+ * Paginated response wrapper for all projects
+ */
+export interface PaginatedUnifiedProjects {
+  data: UnifiedProject[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
+}
+
+/**
+ * Filter options for the All Projects dashboard
+ */
+export interface AllProjectsFilters {
+  stakeholder?: ProjectStakeholder | "all"; // Farmer, Investor, Landowner
+  category?: ProjectCategory | "all"; // Specific subcategories
+  status?: "active" | "pending" | "completed" | "cancelled" | "all";
+  searchQuery?: string;
+  region?: string[];
+  minBudget?: number;
+  maxBudget?: number;
+  sortBy?: "createdAt" | "status" | "budget" | "deadline";
+  sortOrder?: "asc" | "desc";
+  page?: number;
+  limit?: number;
+}
+
+/**
+ * Statistics for active projects tab
+ */
+export interface ActiveProjectsStats {
+  totalActive: number;
+  byStakeholder: {
+    farmerHarvest: number;
+    farmerCommission: number;
+    investorHarvest: number;
+    investorSponsorship: number;
+    landownerRental: number;
+  };
+}
+
+/**
+ * Cache key for storing API responses
+ */
+export interface ProjectsCacheEntry {
+  data: UnifiedProject[];
+  timestamp: number;
+  stakeholder?: ProjectStakeholder;
+  status?: "active" | "pending" | "completed" | "cancelled" | "all";
+}
