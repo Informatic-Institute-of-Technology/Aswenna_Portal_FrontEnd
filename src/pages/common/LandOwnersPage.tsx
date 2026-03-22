@@ -87,3 +87,29 @@ const LandOwnersPage = () => {
           : false),
     );
   }, [landownerAds, searchQuery]);
+
+  const handleCloseNotification = () => {
+    setNotification((prev) => ({ ...prev, open: false }));
+  };
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "60vh",
+          bgcolor: "var(--surface-base)",
+          borderRadius: 2,
+        }}
+      >
+        <Box sx={{ textAlign: "center" }}>
+          <CircularProgress sx={{ mb: 2 }} />
+          <Typography variant="h6" color="text.secondary">
+            Loading available land...
+          </Typography>
+        </Box>
+      </Box>
+    );
+  }
