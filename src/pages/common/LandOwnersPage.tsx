@@ -113,3 +113,31 @@ const LandOwnersPage = () => {
       </Box>
     );
   }
+   return (
+    <>
+      <Box sx={{ p: 3 }}>
+        {/* Header */}
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
+            Available Land for Rent
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Search and connect with landowners offering agricultural land rental opportunities
+          </Typography>
+
+          {/* Search Bar */}
+          <TextField
+            fullWidth
+            placeholder="Search by location, soil type, landowner name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            variant="outlined"
+            size="small"
+            sx={{
+              bgcolor: "var(--surface-base)",
+              "& .MuiOutlinedInput-root": {
+                color: "text.primary",
+              },
+            }}
+          />
+        </Box>
