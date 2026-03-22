@@ -45,9 +45,9 @@ const PayInstallmentPage = lazy(
   () => import("./investor/payment/PayInstallmentPage"),
 );
 
-const MyLandAdsPage = lazy(() => import("./landowner/MyLandAdsPage"));
+const MyLandAdsPage = lazy(() => import("./landowner/MyOffers"));
 const ReceivedRequestsPage = lazy(
-  () => import("./landowner/ReceivedRequestsPage"),
+  () => import("./landowner/Opportunities"),
 );
 const TenantSearchPage = lazy(() => import("./landowner/TenantSearchPage"));
 const LandAnalysisPage = lazy(() => import("./landowner/LandAnalysisPage"));
@@ -154,8 +154,6 @@ function AppRoutes() {
             />
             <Route path="tenant-search" element={<TenantSearchPage />} />
             <Route path="land-analysis" element={<LandAnalysisPage />} />
-            <Route path="income-tracker" element={<Dashboard />} />
-            <Route path="soil-weather" element={<Dashboard />} />
             <Route path="tenant-management" element={<TenantSearchPage />} />
 
             <Route path="admin/users" element={<GlobalUserManagement />} />
