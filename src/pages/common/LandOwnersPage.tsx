@@ -265,3 +265,5 @@ const LandOwnersPage = () => {
                   </Typography>
                 </Box>
               )}
+
+export default LandOwnersPage;
