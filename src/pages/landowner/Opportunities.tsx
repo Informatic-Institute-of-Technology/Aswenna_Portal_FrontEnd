@@ -28,9 +28,9 @@ import {
 import { useState, useEffect } from "react";
 import Notification from "../../shared/components/Notification";
 import coverImagesData from "../../data/json/coverImages.json";
-import { getLandownerAds } from "../../services/landownerAds.service";
 import type { LandownerAdApiItem } from "../../services/landownerAds.service";
 import { httpClient } from "../../services/httpClient";
+import { useAuth } from "../../Context/useAuth";
 
 const coverImageMap = Object.fromEntries(
   (coverImagesData as { id: string; url: string }[]).map((img) => [
@@ -89,6 +89,7 @@ const formatDate = (dateStr: string) =>
   });
 
 const ReceivedRequestsPage = () => {
+  const { user } = useAuth();
   const [offers, setOffers] = useState<HarvestOffer[]>([]);
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState<{
@@ -148,8 +149,18 @@ const ReceivedRequestsPage = () => {
     setSelectedLandOffer(null);
     setLoadingOffers(true);
     try {
-      const response = await getLandownerAds();
-      setLandownerOffers(response.data || []);
+      if (!user?._id) {
+        throw new Error('User ID not available');
+      }
+      // Fetch only the current landowner's ads using their ID
+      const response = await httpClient.get<{
+        success?: boolean;
+        data?: LandownerAdApiItem[];
+        message?: string;
+      }>(`/v1/land-owner/ads/${user._id}`);
+      
+      const adsData = response.data || [];
+      setLandownerOffers(Array.isArray(adsData) ? adsData : [adsData]);
     } catch (err) {
       console.error('Failed to fetch landowner ads', err);
       setNotification({
