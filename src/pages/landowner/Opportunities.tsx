@@ -6,7 +6,17 @@ import {
   CardContent,
   Chip,
   Divider,
-  Button
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Radio,
+  CircularProgress
 } from "@mui/material";
 import {
   Agriculture,
@@ -18,6 +28,8 @@ import {
 import { useState, useEffect } from "react";
 import Notification from "../../shared/components/Notification";
 import coverImagesData from "../../data/json/coverImages.json";
+import { getLandownerAds } from "../../services/landownerAds.service";
+import type { LandownerAdApiItem } from "../../services/landownerAds.service";
 
 const coverImageMap = Object.fromEntries(
   (coverImagesData as { id: string; url: string }[]).map((img) => [
@@ -87,6 +99,10 @@ const ReceivedRequestsPage = () => {
     message: "",
     severity: "success",
   });
+  const [selectedOfferForMatch, setSelectedOfferForMatch] = useState<HarvestOffer | null>(null);
+  const [landownerOffers, setLandownerOffers] = useState<LandownerAdApiItem[]>([]);
+  const [selectedLandOffer, setSelectedLandOffer] = useState<string | null>(null);
+  const [loadingOffers, setLoadingOffers] = useState(false);
 
   useEffect(() => {
     const fetchOffers = async () => {
@@ -129,6 +145,55 @@ const ReceivedRequestsPage = () => {
 
   const handleCloseNotification = () => {
     setNotification((prev) => ({ ...prev, open: false }));
+  };
+
+  const handleInterestedClick = async (offer: HarvestOffer) => {
+    setSelectedOfferForMatch(offer);
+    setSelectedLandOffer(null);
+    setLoadingOffers(true);
+    try {
+      const response = await getLandownerAds();
+      setLandownerOffers(response.data || []);
+    } catch (err) {
+      console.error('Failed to fetch landowner ads', err);
+      setNotification({
+        open: true,
+        message: 'Failed to load your land offers',
+        severity: 'error',
+      });
+      setLoadingOffers(false);
+    } finally {
+      setLoadingOffers(false);
+    }
+  };
+
+  const handleConfirmMatch = async () => {
+    if (!selectedOfferForMatch || !selectedLandOffer) {
+      setNotification({
+        open: true,
+        message: 'Please select a land offer',
+        severity: 'warning',
+      });
+      return;
+    }
+
+    const matchedLandOffer = landownerOffers.find(ad => ad._id === selectedLandOffer);
+    const harvestTitle = selectedOfferForMatch.harvestBaseDetails?.projectTitle || "Harvest Offer";
+    const landTitle = matchedLandOffer?.title || "Land Offer";
+
+    setNotification({
+      open: true,
+      message: `Successfully matched "${harvestTitle}" with "${landTitle}"!`,
+      severity: 'success',
+    });
+
+    setSelectedOfferForMatch(null);
+    setSelectedLandOffer(null);
+  };
+
+  const handleCloseDialog = () => {
+    setSelectedOfferForMatch(null);
+    setSelectedLandOffer(null);
   };
 
   return (
@@ -381,13 +446,7 @@ const ReceivedRequestsPage = () => {
                           variant="contained"
                           size="small"
                           fullWidth
-                          onClick={() => {
-                            setNotification({
-                              open: true,
-                              message: `Interest registered in ${title}`,
-                              severity: "success",
-                            });
-                          }}
+                          onClick={() => handleInterestedClick(offer)}
                           sx={{ textTransform: "none", fontWeight: 600, borderRadius: 2 }}
                         >
                           Interested
@@ -426,6 +485,97 @@ const ReceivedRequestsPage = () => {
         duration={4000}
         onClose={handleCloseNotification}
       />
+
+      <Dialog 
+        open={!!selectedOfferForMatch} 
+        onClose={handleCloseDialog}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ fontWeight: 700, fontSize: "1.2rem" }}>
+          Match with Your Land
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          {selectedOfferForMatch && (
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                Selected Investor Offer:
+              </Typography>
+              <Typography variant="body1" sx={{ fontWeight: 600, color: "primary.main" }}>
+                {selectedOfferForMatch.harvestBaseDetails?.projectTitle} 
+                ({selectedOfferForMatch.harvestBaseDetails?.cropType})
+              </Typography>
+            </Box>
+          )}
+
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Select one of your land offers to match:
+          </Typography>
+
+          {loadingOffers ? (
+            <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
+              <CircularProgress size={32} />
+            </Box>
+          ) : landownerOffers.length > 0 ? (
+            <List sx={{ maxHeight: 300, overflow: "auto", border: "1px solid", borderColor: "divider", borderRadius: 2 }}>
+              {landownerOffers.map((landOffer) => (
+                <ListItemButton
+                  key={landOffer._id}
+                  selected={selectedLandOffer === landOffer._id}
+                  onClick={() => setSelectedLandOffer(landOffer._id)}
+                  sx={{
+                    py: 1.5,
+                    "&.Mui-selected": {
+                      backgroundColor: "primary.light",
+                      "&:hover": {
+                        backgroundColor: "primary.light",
+                      },
+                    },
+                  }}
+                >
+                  <Radio
+                    edge="start"
+                    checked={selectedLandOffer === landOffer._id}
+                    tabIndex={-1}
+                    disableRipple
+                    sx={{ mr: 1 }}
+                  />
+                  <ListItemText
+                    primary={landOffer.title}
+                    secondary={`${landOffer.landArea} ${typeof landOffer.landArea === "number" ? "acres" : ""} • ${
+                      typeof landOffer.location === "string" 
+                        ? landOffer.location 
+                        : (landOffer.location as any)?.district || "Location"
+                    }`}
+                  />
+                </ListItemButton>
+              ))}
+            </List>
+          ) : (
+            <Box sx={{ p: 2, textAlign: "center", bgcolor: "var(--surface-tint)", borderRadius: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                No land offers available. Please create a land ad first.
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2, gap: 1 }}>
+          <Button 
+            onClick={handleCloseDialog}
+            sx={{ textTransform: "none", fontWeight: 600 }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleConfirmMatch}
+            variant="contained"
+            disabled={!selectedLandOffer || loadingOffers}
+            sx={{ textTransform: "none", fontWeight: 600 }}
+          >
+            Confirm Match
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
