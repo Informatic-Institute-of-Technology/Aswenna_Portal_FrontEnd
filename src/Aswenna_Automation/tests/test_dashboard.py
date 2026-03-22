@@ -45,7 +45,7 @@ def test_farmer_dashboard_navigation(driver):
         except Exception as e:
             print(f"Error navigating to {tab_name}: {str(e)}")
 
-    print("👋 Attempting to logout...")
+    print(" Attempting to logout...")
     try:
         logout_btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Logout')]")))
         driver.execute_script("arguments[0].click();", logout_btn)
