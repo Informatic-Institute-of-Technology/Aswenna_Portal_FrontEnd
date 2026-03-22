@@ -30,6 +30,7 @@ import Notification from "../../shared/components/Notification";
 import coverImagesData from "../../data/json/coverImages.json";
 import { getLandownerAds } from "../../services/landownerAds.service";
 import type { LandownerAdApiItem } from "../../services/landownerAds.service";
+import { httpClient } from "../../services/httpClient";
 
 const coverImageMap = Object.fromEntries(
   (coverImagesData as { id: string; url: string }[]).map((img) => [
@@ -108,31 +109,26 @@ const ReceivedRequestsPage = () => {
     const fetchOffers = async () => {
       try {
         setLoading(true);
-        // Fetch with type=direct-harvest to get harvest opportunities
-        const response = await fetch(
-          "https://922a-175-157-100-147.ngrok-free.app/api/v1/investor-offer?type=direct-harvest&page=1&limit=10",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              "ngrok-skip-browser-warning": "true",
-            },
-          }
-        );
-        
-        const result = await response.json();
+        // Fetch with type=direct-harvest to get harvest opportunities using httpClient with auth headers
+        const result = await httpClient.get<{
+          success?: boolean;
+          data?: HarvestOffer[];
+          message?: string;
+        }>("/v1/investor-offer?type=direct-harvest&page=1&limit=10");
         
         if (result && result.data && Array.isArray(result.data)) {
           const activeOffers = (result.data as HarvestOffer[]).filter(
             (o: any) => o.harvestBaseDetails
           );
           setOffers(activeOffers);
+        } else {
+          console.warn("Unexpected API response structure", result);
         }
       } catch (err) {
         console.error('Failed to fetch investor harvest offers', err);
         setNotification({
           open: true,
-          message: 'Failed to load investment opportunities',
+          message: 'Failed to load investment opportunities. Please check your connection and try again.',
           severity: 'error',
         });
       } finally {
