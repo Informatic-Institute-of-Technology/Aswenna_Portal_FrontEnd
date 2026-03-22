@@ -1,33 +1,4 @@
 import { useAuth } from "@/Context/useAuth";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import coverImages from "../../data/json/coverImages.json";
-import CreateOfferDialog, {
-  type FarmerJobCreationPayload,
-  type FarmerProjectFormInitialData,
-} from "../farmer/JobCreation";
-import ProjectDetailsDialog from "../../components/farmer/ProjectDetailsDialog";
-import { OfferCard } from "../../components/investor";
-import {
-  deleteFarmerAd,
-  getFarmerAdsByUser,
-} from "../../services/farmerAds.service";
-import {
-  Box,
-  Typography,
-  Button,
-  Card,
-  CardContent,
-  CardMedia,
-  Chip,
-  LinearProgress,
-  Avatar,
-  IconButton,
-  Tooltip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from "@mui/material";
 import {
   Add as AddIcon,
   Agriculture,
@@ -41,6 +12,35 @@ import {
   Visibility,
   WarningAmber,
 } from "@mui/icons-material";
+import {
+  Avatar,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardMedia,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  LinearProgress,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import ProjectDetailsDialog from "../../components/farmer/ProjectDetailsDialog";
+import { OfferCard } from "../../components/investor";
+import coverImages from "../../data/json/coverImages.json";
+import {
+  deleteFarmerAd,
+  getFarmerAdsByUser,
+} from "../../services/farmerAds.service";
+import CreateOfferDialog, {
+  type FarmerJobCreationPayload,
+  type FarmerProjectFormInitialData,
+} from "../farmer/JobCreation";
 
 interface ProjectCostBreakdownItem {
   category: string;
@@ -87,7 +87,6 @@ interface Project {
   completedDate?: string;
   backgroundImage?: string;
   investmentType: "harvest" | "commission";
-  // Team members
   farmerName: string;
   farmerImage: string;
   landownerName?: string;

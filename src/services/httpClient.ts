@@ -1,8 +1,7 @@
 import { getAuthHeader, getCsrfToken } from "./tokenStore";
 
 const API_BASE_URL =
-  // "api-aswenna-prod-fya7ezfgd8cuckeq.uaenorth-01.azurewebsites.net";
-  "http://localhost:3000/api";
+  "https://4529-2402-4000-2272-c590-8035-d116-2be6-25c4.ngrok-free.app/api";
 
 export class HttpClient {
   private baseURL: string;

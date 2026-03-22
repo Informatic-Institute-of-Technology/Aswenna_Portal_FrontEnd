@@ -1,4 +1,17 @@
+import type { UnifiedProject } from "@/types/admin.types";
+import type {
+  DirectHarvestOfferAPI,
+  SponsorshipOfferAPI,
+} from "@/types/investor.types";
+import {
+  normalizeDirectHarvestOffer,
+  normalizeFarmerProject,
+  normalizeSponsorshipOffer,
+} from "@/utils/projectNormalization";
+import type { FarmerProjectApiItem } from "./farmerProject.service";
+import { getFarmerProjects } from "./farmerProject.service";
 import { httpClient } from "./httpClient";
+import { getInvestorOffers } from "./offer.service";
 
 export interface ApiRoleObject {
   _id: string;
@@ -429,6 +442,251 @@ class AdminService {
       throw error;
     }
   }
+
+  /**
+   * ============================================================================
+   * ALL PROJECTS DASHBOARD METHODS
+   * ============================================================================
+   *
+   * Handles fetching and aggregating data from multiple APIs for the
+   * All Projects dashboard (Super Admin view)
+   */
+
+  /**
+   * Fetch all active projects from all sources concurrently
+   *
+   * Data Flow:
+   * 1. Calls getFarmerProjects() → /v1/farmer-project → normalizes to UnifiedProject[]
+   * 2. Calls getInvestorOffers() → /v1/investor-offer → normalizes to UnifiedProject[]
+   * 3. Combines both results into single array
+   * 4. Caches for 5 minutes with TTL validation
+   */
+  async fetchActiveProjects(useCache = true): Promise<UnifiedProject[]> {
+    try {
+      const cacheKey = "active:all";
+
+      // Check cache
+      if (useCache && this.projectsCache.has(cacheKey)) {
+        const cached = this.projectsCache.get(cacheKey);
+        if (cached && Date.now() - cached.timestamp < 5 * 60 * 1000) {
+          console.log(
+            `✓ Using cached active projects (age: ${Math.round((Date.now() - cached.timestamp) / 1000)}s)`,
+          );
+          return cached.data;
+        }
+      }
+
+      const [farmerProjects, investorOffers] = await Promise.all([
+        this.getFarmerProjects(),
+        this.getInvestorOffers(),
+      ]);
+
+      // Combine and normalize
+      const allProjects = [...farmerProjects, ...investorOffers];
+      this.projectsCache.set(cacheKey, {
+        data: allProjects,
+        timestamp: Date.now(),
+      });
+
+      console.log(
+        `✓ Fetched & Combined: ${farmerProjects.length} farmer projects + ${investorOffers.length} investor offers = ${allProjects.length} total`,
+      );
+
+      return allProjects;
+    } catch (error) {
+      console.error("Error fetching active projects:", error);
+      const cached = this.projectsCache.get("active:all");
+      return cached?.data || [];
+    }
+  }
+
+  /**
+   * Fetch all projects from all sources (no status filter)
+   *
+   * Data Flow:
+   * 1. Same as fetchActiveProjects but includes all statuses
+   * 2. Fetches farmer projects (harvest + commission) and investor offers (direct-harvest + sponsorship)
+   * 3. Returns normalized UnifiedProject[] with 5-minute TTL cache
+   */
+  async fetchAllProjects(useCache = true): Promise<UnifiedProject[]> {
+    try {
+      const cacheKey = "all:all";
+
+      if (useCache && this.projectsCache.has(cacheKey)) {
+        const cached = this.projectsCache.get(cacheKey);
+        if (cached && Date.now() - cached.timestamp < 5 * 60 * 1000) {
+          console.log(
+            `✓ Using cached all projects (age: ${Math.round((Date.now() - cached.timestamp) / 1000)}s)`,
+          );
+          return cached.data;
+        }
+      }
+
+      const [farmerProjects, investorOffers] = await Promise.all([
+        this.getFarmerProjects(),
+        this.getInvestorOffers(),
+      ]);
+
+      const allProjects = [...farmerProjects, ...investorOffers];
+      this.projectsCache.set(cacheKey, {
+        data: allProjects,
+        timestamp: Date.now(),
+      });
+
+      console.log(
+        `✓ Fetched & Combined: ${farmerProjects.length} farmer projects + ${investorOffers.length} investor offers = ${allProjects.length} total`,
+      );
+
+      return allProjects;
+    } catch (error) {
+      console.error("Error fetching all projects:", error);
+      const cached = this.projectsCache.get("all:all");
+      return cached?.data || [];
+    }
+  }
+
+  /**
+   * Fetch farmer projects (harvest and commission-based) from API and normalize
+   *
+   * API Endpoint: GET /v1/farmer-project
+   * Returns: Paginated list of farmer projects with both harvest and commission types
+   */
+  private async getFarmerProjects(): Promise<UnifiedProject[]> {
+    try {
+      const response = await getFarmerProjects();
+      const farmerProjectsData = response?.data || [];
+
+      console.log(
+        `📊 Fetched ${farmerProjectsData.length} farmer projects from /v1/farmer-project`,
+      );
+
+      // Normalize all farmer projects to UnifiedProject format
+      const normalizedProjects = farmerProjectsData.map(
+        (project: FarmerProjectApiItem) => {
+          const normalized = normalizeFarmerProject(project);
+          console.log(
+            `  ✓ Normalized: ${project.projectName} (${project.offerType}) - Category: ${normalized.category}`,
+          );
+          return normalized;
+        },
+      );
+
+      return normalizedProjects;
+    } catch (error) {
+      console.error(
+        "❌ Error fetching farmer projects from /v1/farmer-project:",
+        error,
+      );
+      return [];
+    }
+  }
+
+  /**
+   * Fetch investor offers (direct harvest and sponsorship) from API and normalize
+   *
+   * API Endpoint: GET /v1/investor-offer
+   * Returns: Paginated list of investor offers with both direct-harvest and sponsorship types
+   */
+  private async getInvestorOffers(): Promise<UnifiedProject[]> {
+    try {
+      const response = await getInvestorOffers();
+      const investorOffersData = response?.data || [];
+
+      console.log(
+        `📊 Fetched ${investorOffersData.length} investor offers from /v1/investor-offer`,
+      );
+
+      const normalizedProjects: UnifiedProject[] = [];
+
+      // Normalize all investor offers based on their type
+      investorOffersData.forEach(
+        (offer: DirectHarvestOfferAPI | SponsorshipOfferAPI) => {
+          try {
+            if (offer.offerType === "direct-harvest") {
+              const normalized = normalizeDirectHarvestOffer(
+                offer as DirectHarvestOfferAPI,
+              );
+              console.log(
+                `  ✓ Normalized: ${offer.offerType} - ${(offer as DirectHarvestOfferAPI).harvestBaseDetails?.projectTitle} - Category: ${normalized.category}`,
+              );
+              normalizedProjects.push(normalized);
+            } else if (offer.offerType === "sponsorship") {
+              const normalized = normalizeSponsorshipOffer(
+                offer as SponsorshipOfferAPI,
+              );
+              console.log(
+                `  ✓ Normalized: ${offer.offerType} - ${(offer as SponsorshipOfferAPI).commissionDetails?.sponsorshipTitle} - Category: ${normalized.category}`,
+              );
+              normalizedProjects.push(normalized);
+            }
+          } catch (error) {
+            console.error(`  ❌ Error normalizing offer ${offer._id}:`, error);
+          }
+        },
+      );
+
+      return normalizedProjects;
+    } catch (error) {
+      console.error(
+        "❌ Error fetching investor offers from /v1/investor-offer:",
+        error,
+      );
+      return [];
+    }
+  }
+
+  /**
+   * Fetch project by ID and normalize to UnifiedProject
+   */
+  async fetchProjectById(
+    projectId: string,
+    sourceApi: "farmer-project" | "investor-offer",
+  ) {
+    try {
+      const endpoint =
+        sourceApi === "farmer-project"
+          ? `/v1/farmer-project/${projectId}`
+          : `/v1/investor-offer/${projectId}`;
+
+      const response = await httpClient.get<
+        FarmerProjectApiItem | DirectHarvestOfferAPI | SponsorshipOfferAPI
+      >(endpoint);
+
+      // Normalize based on source API
+      if (sourceApi === "farmer-project") {
+        return normalizeFarmerProject(response as FarmerProjectApiItem);
+      } else {
+        const offerData = response as
+          | DirectHarvestOfferAPI
+          | SponsorshipOfferAPI;
+        if (offerData.offerType === "direct-harvest") {
+          return normalizeDirectHarvestOffer(
+            offerData as DirectHarvestOfferAPI,
+          );
+        } else {
+          return normalizeSponsorshipOffer(offerData as SponsorshipOfferAPI);
+        }
+      }
+    } catch (error) {
+      console.error(`Error fetching project ${projectId}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Invalidate projects cache
+   */
+  invalidateProjectsCache() {
+    this.projectsCache.clear();
+  }
+
+  /**
+   * Projects cache storage - stores normalized UnifiedProject[] with TTL
+   */
+  private projectsCache = new Map<
+    string,
+    { data: UnifiedProject[]; timestamp: number }
+  >();
 }
 
 export const adminService = new AdminService();
