@@ -50,3 +50,40 @@ const LandOwnersPage = () => {
     message: string;
     severity: "success" | "error";
   }>({ open: false, message: "", severity: "success" });
+
+   useEffect(() => {
+    const loadLandownerAds = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await getLandownerAds();
+        setLandownerAds(response.data ?? []);
+      } catch {
+        setError("Failed to load land ads. Please try again.");
+        setLandownerAds([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadLandownerAds();
+  }, []);
+
+  const filteredAds = useMemo(() => {
+    if (!searchQuery.trim()) return landownerAds;
+
+    const query = searchQuery.toLowerCase();
+    return landownerAds.filter(
+      (ad) =>
+        ad.title.toLowerCase().includes(query) ||
+        (typeof ad.location === "string"
+          ? ad.location.toLowerCase().includes(query)
+          : `${(ad.location as Record<string, unknown>)?.district || ""} ${(ad.location as Record<string, unknown>)?.province || ""}`
+              .toLowerCase()
+              .includes(query)) ||
+        ad.soilType?.toLowerCase().includes(query) ||
+        (typeof ad.landowner === "object"
+          ? ad.landowner?.fullName?.toLowerCase().includes(query)
+          : false),
+    );
+  }, [landownerAds, searchQuery]);
