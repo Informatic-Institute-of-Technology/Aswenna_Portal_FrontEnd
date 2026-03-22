@@ -162,7 +162,7 @@ const CreateAdPopup = ({
           const land =
             detail.landOwner?.landAddress ??
             detail.landOwnerDetails?.landAddress;
-
+          
           if (land && typeof land === "object") {
             const addressData: {
               street?: string;
@@ -287,7 +287,6 @@ const CreateAdPopup = ({
   const handleSubmit = async () => {
     if (!validateForm()) return;
     try {
-      // Extract newly uploaded image files (those not in fetchedLandImages)
       const newImageFiles: File[] = [];
       formData.landImages.forEach((imageUrl) => {
         if (!fetchedLandImages.includes(imageUrl)) {
@@ -301,7 +300,7 @@ const CreateAdPopup = ({
       await onSubmit(formData, newImageFiles);
       onClose();
     } catch {
-      // Parent already handles the notification; keep dialog open for retry.
+      // Keep dialog open for retry
     }
   };
 

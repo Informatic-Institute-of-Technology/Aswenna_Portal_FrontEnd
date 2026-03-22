@@ -28,7 +28,9 @@ export {
 } from "./farmerProject.service";
 export {
   createLandownerAd,
+  getLandownerAdById,
   type CreateLandownerAdPayload,
+  type LandownerAdApiItem,
 } from "./landownerAds.service";
 export {
   formPersistenceService,

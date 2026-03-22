@@ -77,6 +77,8 @@ export interface LandownerAdApiItem {
   image?: string;
   images?: LandImage[];
   status?: string;
+  createdBy?: string;
+  updatedBy?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -101,6 +103,11 @@ export const updateLandownerAd = (
   adId: string,
   payload: UpdateLandownerAdPayload,
 ) => httpClient.patch<unknown>(`/v1/land-owner/ads/${adId}`, payload);
+
+export const getLandownerAdById = async (adId: string) => {
+  const response = await httpClient.get<{ data?: LandownerAdApiItem } | LandownerAdApiItem>(`/v1/land-owner/ads/${adId}`);
+  return (response as any).data || response as LandownerAdApiItem;
+};
 
 export const uploadLandAdImages = (adId: string, imageFiles: File[]) => {
   const formData = new FormData();

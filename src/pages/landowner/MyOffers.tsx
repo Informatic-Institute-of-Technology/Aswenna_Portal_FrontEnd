@@ -37,6 +37,7 @@ import {
 import CreateAdPopup, {
   type LandAdFormValues,
 } from "../../components/landowner/CreateAdPopup";
+import LandAdDetailsDialog from "../../components/landowner/LandAdDetailsDialog";
 import { comprehensiveProjectsData } from "../../data/json";
 import {
   createLandownerAd,
@@ -44,8 +45,8 @@ import {
   getLandownerAds,
   updateLandownerAd,
   uploadLandAdImages,
-  type LandownerAdApiItem,
   type LandImage,
+  type LandownerAdApiItem,
   type LandownerInfo,
 } from "../../services/landownerAds.service";
 import Notification from "../../shared/components/Notification";
@@ -125,9 +126,6 @@ const formatRentalAmount = (value: string) => {
 
   return `LKR ${value}`;
 };
-
-const formatAvailability = (ad: LandAdFormValues) =>
-  `${formatDateLabel(ad.availableFrom)} - ${formatDateLabel(ad.availableTo)}`;
 
 const normalizeAdStatus = (status?: string): LandAdStatus => {
   const normalized = status?.toLowerCase();
@@ -334,14 +332,14 @@ const MyLandAdsPage = () => {
   const [landAdDraft, setLandAdDraft] =
     useState<LandAdFormValues>(EMPTY_LAND_AD);
   const [editingLandAdId, setEditingLandAdId] = useState<string | null>(null);
-  const [selectedLandAd, setSelectedLandAd] = useState<LandAd | null>(null);
-  const [landAdDetailsOpen, setLandAdDetailsOpen] = useState(false);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<OfferCardProps | null>(
     null,
   );
   const [deleteAdDialogOpen, setDeleteAdDialogOpen] = useState(false);
   const [adToDeleteId, setAdToDeleteId] = useState<string | null>(null);
+  const [viewingAdId, setViewingAdId] = useState<string | null>(null);
+  const [landAdDetailsDialogOpen, setLandAdDetailsDialogOpen] = useState(false);
 
   const userDisplayName =
     user?.fullName ||
@@ -428,7 +426,6 @@ const MyLandAdsPage = () => {
 
       const mapped = (rawAds as LandownerAdApiItem[]).map(
         (item: LandownerAdApiItem): LandAd => {
-          // Extract landowner name
           let landownerName = "";
           if (typeof item.landowner === "object" && item.landowner) {
             landownerName = item.landowner.fullName || "";
@@ -436,13 +433,12 @@ const MyLandAdsPage = () => {
             landownerName = item.landowner;
           }
 
-          // Extract image URLs from images array
           const imageUrls = (item.images || [])
             .filter((img): img is LandImage => img && !!img.url)
             .map((img) => img);
 
-          // Use images array if available, otherwise fall back to single image
-          const primaryImage = imageUrls.length > 0 ? imageUrls[0].url : item.image;
+          const primaryImage =
+            imageUrls.length > 0 ? imageUrls[0].url : item.image;
 
           return {
             id: item._id,
@@ -581,7 +577,6 @@ const MyLandAdsPage = () => {
       throw error;
     }
 
-    // Upload new images if any
     if (newImageFiles && newImageFiles.length > 0 && createdAdId) {
       try {
         await uploadLandAdImages(createdAdId, newImageFiles);
@@ -602,14 +597,6 @@ const MyLandAdsPage = () => {
 
     showSuccess("Land advertisement published successfully.");
     void fetchAds();
-  };
-
-  const handleViewLandAd = (adId: string) => {
-    const ad = landAds.find((item) => item.id === adId);
-    if (!ad) return;
-
-    setSelectedLandAd(ad);
-    setLandAdDetailsOpen(true);
   };
 
   const handleDeleteAd = (adId: string) => {
@@ -694,12 +681,18 @@ const MyLandAdsPage = () => {
                 "linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.75) 100%)",
             }}
           />
-          {/* Status chip — top left */}
           <Box sx={{ position: "absolute", top: 12, left: 12, zIndex: 10 }}>
             <StatusLabel status={ad.status} />
           </Box>
-          {/* Title + area chip — bottom left */}
-          <Box sx={{ position: "absolute", bottom: 12, left: 12, right: 12, zIndex: 10 }}>
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: 12,
+              left: 12,
+              right: 12,
+              zIndex: 10,
+            }}
+          >
             <Typography
               variant="subtitle1"
               sx={{
@@ -740,7 +733,6 @@ const MyLandAdsPage = () => {
         </Box>
 
         <CardContent sx={{ flexGrow: 1, pb: 0 }}>
-          {/* Data grid — mirrors OfferCard's budget/ROI boxes */}
           <Box
             sx={{
               display: "grid",
@@ -801,7 +793,6 @@ const MyLandAdsPage = () => {
 
           <Divider sx={{ mb: 1.5, opacity: 0.4 }} />
 
-          {/* Location row with icon buttons — mirrors OfferCard's farmer row */}
           <Box
             sx={{
               display: "flex",
@@ -823,6 +814,23 @@ const MyLandAdsPage = () => {
               </Typography>
             </Box>
             <Box sx={{ display: "flex", gap: 0.5 }}>
+              <Tooltip title="View Details">
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    setViewingAdId(ad.id);
+                    setLandAdDetailsDialogOpen(true);
+                  }}
+                  sx={{
+                    color: "var(--color-olive-light)",
+                    "&:hover": {
+                      backgroundColor: "rgba(133, 164, 70, 0.1)",
+                    },
+                  }}
+                >
+                  <Visibility sx={{ fontSize: "1.2rem" }} />
+                </IconButton>
+              </Tooltip>
               {isOpen && (
                 <Tooltip title="Edit Ad">
                   <IconButton
@@ -839,18 +847,6 @@ const MyLandAdsPage = () => {
                   </IconButton>
                 </Tooltip>
               )}
-              <Tooltip title="View Details">
-                <IconButton
-                  size="small"
-                  onClick={() => handleViewLandAd(ad.id)}
-                  sx={{
-                    color: "primary.main",
-                    "&:hover": { backgroundColor: "var(--color-olive-muted)" },
-                  }}
-                >
-                  <Visibility sx={{ fontSize: "1.2rem" }} />
-                </IconButton>
-              </Tooltip>
               {isOpen && (
                 <Tooltip title="Delete Ad">
                   <IconButton
@@ -1103,7 +1099,6 @@ const MyLandAdsPage = () => {
         mode={landAdDialogMode}
       />
 
-      {/* Delete confirmation dialog */}
       <Dialog
         open={deleteAdDialogOpen}
         onClose={handleCancelDeleteAd}
@@ -1139,158 +1134,21 @@ const MyLandAdsPage = () => {
         </DialogActions>
       </Dialog>
 
-      <Dialog
-        open={landAdDetailsOpen}
-        onClose={() => setLandAdDetailsOpen(false)}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{
-          sx: {
-            borderRadius: 3,
-            background:
-              "linear-gradient(180deg, var(--bg-overlay), var(--bg-elevated))",
-            border: "1px solid var(--surface-light)",
-          },
-        }}
-      >
-        <DialogTitle sx={{ fontWeight: 700 }}>Land Ad Details</DialogTitle>
-        <DialogContent>
-          {selectedLandAd && (
-            <Stack spacing={2.25}>
-              <Box
-                sx={{
-                  height: 220,
-                  borderRadius: 2,
-                  overflow: "hidden",
-                  border: "1px solid var(--surface-light)",
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  image={selectedLandAd.image || DEFAULT_LAND_IMAGE}
-                  alt={selectedLandAd.title}
-                  sx={{ height: "100%", objectFit: "cover" }}
-                />
-              </Box>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  gap: 2,
-                  flexWrap: "wrap",
-                }}
-              >
-                <Box>
-                  <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                    {selectedLandAd.title}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {selectedLandAd.location}
-                  </Typography>
-                </Box>
-                <StatusLabel status={selectedLandAd.status} />
-              </Box>
-
-              <Box
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
-                  gap: 2,
-                }}
-              >
-                <Box>
-                  <Typography variant="caption" color="text.secondary">
-                    Land Area
-                  </Typography>
-                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                    {selectedLandAd.landArea}
-                  </Typography>
-                </Box>
-                <Box>
-                  <Typography variant="caption" color="text.secondary">
-                    Rental Amount
-                  </Typography>
-                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                    {formatRentalAmount(selectedLandAd.rentalAmount)} / Month
-                  </Typography>
-                </Box>
-                <Box>
-                  <Typography variant="caption" color="text.secondary">
-                    Soil Type
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    sx={{ fontWeight: 600, textTransform: "capitalize" }}
-                  >
-                    {selectedLandAd.soilType}
-                  </Typography>
-                </Box>
-                <Box>
-                  <Typography variant="caption" color="text.secondary">
-                    Water Availability
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    sx={{ fontWeight: 600, textTransform: "capitalize" }}
-                  >
-                    {selectedLandAd.waterAvailability.replace(/-/g, " ") ||
-                      "Not specified"}
-                  </Typography>
-                </Box>
-                <Box>
-                  <Typography variant="caption" color="text.secondary">
-                    Available Period
-                  </Typography>
-                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                    {formatAvailability(selectedLandAd)}
-                  </Typography>
-                </Box>
-                <Box>
-                  <Typography variant="caption" color="text.secondary">
-                    Land History
-                  </Typography>
-                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                    {selectedLandAd.landHistory.replace(/-/g, " ")}
-                  </Typography>
-                </Box>
-              </Box>
-
-              <Box
-                sx={{
-                  p: 2,
-                  borderRadius: 2,
-                  background: "var(--surface-tint)",
-                  border: "1px solid",
-                  borderColor: "divider",
-                }}
-              >
-                <Typography variant="caption" color="text.secondary">
-                  Additional Information
-                </Typography>
-                <Typography variant="body2" sx={{ mt: 0.5 }}>
-                  {selectedLandAd.additionalInfo ||
-                    "No additional notes provided."}
-                </Typography>
-              </Box>
-            </Stack>
-          )}
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2.5 }}>
-          <Button
-            onClick={() => setLandAdDetailsOpen(false)}
-            variant="outlined"
-          >
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
-
       <ProjectDetailsDialog
         open={detailsDialogOpen}
         onClose={() => setDetailsDialogOpen(false)}
         project={selectedProject}
         viewMode="landowner"
+      />
+
+      <LandAdDetailsDialog
+        open={landAdDetailsDialogOpen}
+        onClose={() => {
+          setLandAdDetailsDialogOpen(false);
+          setViewingAdId(null);
+        }}
+        adId={viewingAdId || undefined}
+        defaultImage={DEFAULT_LAND_IMAGE}
       />
 
       <Notification
