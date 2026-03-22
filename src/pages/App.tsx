@@ -44,6 +44,9 @@ const ProjectPaymentMilestonePage = lazy(
 const PayInstallmentPage = lazy(
   () => import("./investor/payment/PayInstallmentPage"),
 );
+ const FarmerPaymentControlCenterPage = lazy(
+  () => import("./farmer/payment/FarmerPaymentControlCenterPage"),
+);
 
 const MyLandAdsPage = lazy(() => import("./landowner/MyOffers"));
 const ReceivedRequestsPage = lazy(
@@ -125,7 +128,10 @@ function AppRoutes() {
             <Route path="match-making" element={<MatchMakingPage />} />
             <Route path="opportunities" element={<OpportunitiesPage />} />
             <Route path="agreement" element={<AgreementPage />} />
-
+            <Route
+              path="payments"
+              element={<FarmerPaymentControlCenterPage />}
+            />
             <Route path="my-offers" element={<MyOffersPage />} />
             <Route path="land-search" element={<LandOwnersPage />} />
             <Route path="requests" element={<RequestsRoute />} />
