@@ -160,7 +160,7 @@ const ReceivedRequestsPage = () => {
         success?: boolean;
         data?: LandownerAdApiItem[];
         message?: string;
-      }>(`/v1/land-owner/ads/${user._id}`);
+      }>(`/v1/land-owner/ads`);
 
       const adsData = response.data || [];
       setLandownerOffers(Array.isArray(adsData) ? adsData : [adsData]);
@@ -709,9 +709,9 @@ const ReceivedRequestsPage = () => {
                   sx={{
                     py: 1.5,
                     "&.Mui-selected": {
-                      backgroundColor: "primary.light",
+                      backgroundColor: "rgba(255, 255, 255, 0.12)",
                       "&:hover": {
-                        backgroundColor: "primary.light",
+                        backgroundColor: "rgba(255, 255, 255, 0.12)",
                       },
                     },
                   }}
