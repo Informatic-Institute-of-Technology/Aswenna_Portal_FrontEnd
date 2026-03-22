@@ -1,36 +1,35 @@
+import {
+  Agriculture,
+  CalendarToday,
+  LocationOn,
+  MonetizationOn,
+  ScaleOutlined,
+} from "@mui/icons-material";
 import type { AlertColor } from "@mui/material";
 import {
   Box,
-  Typography,
+  Button,
   Card,
   CardContent,
   Chip,
-  Divider,
-  Button,
+  CircularProgress,
   Dialog,
-  DialogTitle,
-  DialogContent,
   DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
   List,
-  ListItem,
   ListItemButton,
   ListItemText,
   Radio,
-  CircularProgress
+  Typography,
 } from "@mui/material";
-import {
-  Agriculture,
-  MonetizationOn,
-  ScaleOutlined,
-  CalendarToday,
-  LocationOn,
-} from "@mui/icons-material";
-import { useState, useEffect } from "react";
-import Notification from "../../shared/components/Notification";
-import coverImagesData from "../../data/json/coverImages.json";
-import type { LandownerAdApiItem } from "../../services/landownerAds.service";
-import { httpClient } from "../../services/httpClient";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../Context/useAuth";
+import coverImagesData from "../../data/json/coverImages.json";
+import { httpClient } from "../../services/httpClient";
+import type { LandownerAdApiItem } from "../../services/landownerAds.service";
+import Notification from "../../shared/components/Notification";
 
 const coverImageMap = Object.fromEntries(
   (coverImagesData as { id: string; url: string }[]).map((img) => [
@@ -101,36 +100,41 @@ const ReceivedRequestsPage = () => {
     message: "",
     severity: "success",
   });
-  const [selectedOfferForMatch, setSelectedOfferForMatch] = useState<HarvestOffer | null>(null);
-  const [landownerOffers, setLandownerOffers] = useState<LandownerAdApiItem[]>([]);
-  const [selectedLandOffer, setSelectedLandOffer] = useState<string | null>(null);
+  const [selectedOfferForMatch, setSelectedOfferForMatch] =
+    useState<HarvestOffer | null>(null);
+  const [landownerOffers, setLandownerOffers] = useState<LandownerAdApiItem[]>(
+    [],
+  );
+  const [selectedLandOffer, setSelectedLandOffer] = useState<string | null>(
+    null,
+  );
   const [loadingOffers, setLoadingOffers] = useState(false);
 
   useEffect(() => {
     const fetchOffers = async () => {
       try {
         setLoading(true);
-        // Fetch with type=direct-harvest to get harvest opportunities using httpClient with auth headers
         const result = await httpClient.get<{
           success?: boolean;
           data?: HarvestOffer[];
           message?: string;
         }>("/v1/investor-offer?type=direct-harvest&page=1&limit=10");
-        
+
         if (result && result.data && Array.isArray(result.data)) {
           const activeOffers = (result.data as HarvestOffer[]).filter(
-            (o: any) => o.harvestBaseDetails
+            (o: any) => o.harvestBaseDetails,
           );
           setOffers(activeOffers);
         } else {
           console.warn("Unexpected API response structure", result);
         }
       } catch (err) {
-        console.error('Failed to fetch investor harvest offers', err);
+        console.error("Failed to fetch investor harvest offers", err);
         setNotification({
           open: true,
-          message: 'Failed to load investment opportunities. Please check your connection and try again.',
-          severity: 'error',
+          message:
+            "Failed to load investment opportunities. Please check your connection and try again.",
+          severity: "error",
         });
       } finally {
         setLoading(false);
@@ -150,23 +154,22 @@ const ReceivedRequestsPage = () => {
     setLoadingOffers(true);
     try {
       if (!user?._id) {
-        throw new Error('User ID not available');
+        throw new Error("User ID not available");
       }
-      // Fetch only the current landowner's ads using their ID
       const response = await httpClient.get<{
         success?: boolean;
         data?: LandownerAdApiItem[];
         message?: string;
       }>(`/v1/land-owner/ads/${user._id}`);
-      
+
       const adsData = response.data || [];
       setLandownerOffers(Array.isArray(adsData) ? adsData : [adsData]);
     } catch (err) {
-      console.error('Failed to fetch landowner ads', err);
+      console.error("Failed to fetch landowner ads", err);
       setNotification({
         open: true,
-        message: 'Failed to load your land offers',
-        severity: 'error',
+        message: "Failed to load your land offers",
+        severity: "error",
       });
       setLoadingOffers(false);
     } finally {
@@ -178,20 +181,23 @@ const ReceivedRequestsPage = () => {
     if (!selectedOfferForMatch || !selectedLandOffer) {
       setNotification({
         open: true,
-        message: 'Please select a land offer',
-        severity: 'warning',
+        message: "Please select a land offer",
+        severity: "warning",
       });
       return;
     }
 
-    const matchedLandOffer = landownerOffers.find(ad => ad._id === selectedLandOffer);
-    const harvestTitle = selectedOfferForMatch.harvestBaseDetails?.projectTitle || "Harvest Offer";
+    const matchedLandOffer = landownerOffers.find(
+      (ad) => ad._id === selectedLandOffer,
+    );
+    const harvestTitle =
+      selectedOfferForMatch.harvestBaseDetails?.projectTitle || "Harvest Offer";
     const landTitle = matchedLandOffer?.title || "Land Offer";
 
     setNotification({
       open: true,
       message: `Successfully matched "${harvestTitle}" with "${landTitle}"!`,
-      severity: 'success',
+      severity: "success",
     });
 
     setSelectedOfferForMatch(null);
@@ -219,7 +225,11 @@ const ReceivedRequestsPage = () => {
           </Typography>
 
           {loading ? (
-            <Typography variant="body2" color="text.secondary" sx={{ p: 3, textAlign: 'center' }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ p: 3, textAlign: "center" }}
+            >
               Loading opportunities...
             </Typography>
           ) : offers.length > 0 ? (
@@ -235,7 +245,9 @@ const ReceivedRequestsPage = () => {
                 const title = hd?.projectTitle || "Harvest Opportunity";
                 const bgUrl = resolveBgUrl(offer.backgroundImage);
                 const deadline = offer.expiredDate;
-                const regions = hd?.deliveryLocation ? [hd.deliveryLocation] : [];
+                const regions = hd?.deliveryLocation
+                  ? [hd.deliveryLocation]
+                  : [];
 
                 return (
                   <Card
@@ -285,7 +297,14 @@ const ReceivedRequestsPage = () => {
                           justifyContent: "space-between",
                         }}
                       >
-                        <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap" }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            gap: 1,
+                            alignItems: "center",
+                            flexWrap: "wrap",
+                          }}
+                        >
                           <Chip
                             label="Harvest Offer"
                             size="small"
@@ -299,10 +318,15 @@ const ReceivedRequestsPage = () => {
                             }}
                           />
                           <Chip
-                            label={offer.status === "pending" ? "Open" : "Active"}
+                            label={
+                              offer.status === "pending" ? "Open" : "Active"
+                            }
                             size="small"
                             sx={{
-                              background: offer.status === "pending" ? "rgba(255,152,0,0.85)" : "rgba(33,150,243,0.85)",
+                              background:
+                                offer.status === "pending"
+                                  ? "rgba(255,152,0,0.85)"
+                                  : "rgba(33,150,243,0.85)",
                               color: "#fff",
                               fontWeight: 600,
                               fontSize: "0.68rem",
@@ -311,7 +335,13 @@ const ReceivedRequestsPage = () => {
                           />
                         </Box>
 
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1.5,
+                          }}
+                        >
                           <Box
                             sx={{
                               width: 48,
@@ -346,16 +376,29 @@ const ReceivedRequestsPage = () => {
                             </Typography>
                             <Typography
                               variant="caption"
-                              sx={{ color: "rgba(255,255,255,0.85)", fontSize: "0.75rem" }}
+                              sx={{
+                                color: "rgba(255,255,255,0.85)",
+                                fontSize: "0.75rem",
+                              }}
                             >
-                              {hd?.cropType || "Agriculture"} • By {offer.investor?.fullName || hd?.companyName || "Investor"}
+                              {hd?.cropType || "Agriculture"} • By{" "}
+                              {offer.investor?.fullName ||
+                                hd?.companyName ||
+                                "Investor"}
                             </Typography>
                           </Box>
                         </Box>
                       </Box>
                     </Box>
 
-                    <CardContent sx={{ p: 2, flexGrow: 1, display: "flex", flexDirection: "column" }}>
+                    <CardContent
+                      sx={{
+                        p: 2,
+                        flexGrow: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                      }}
+                    >
                       <Box
                         sx={{
                           display: "grid",
@@ -364,47 +407,131 @@ const ReceivedRequestsPage = () => {
                           mb: 2,
                         }}
                       >
-                        <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.5 }}>
-                          <MonetizationOn sx={{ fontSize: 16, color: "success.main", mt: 0.2 }} />
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "flex-start",
+                            gap: 0.5,
+                          }}
+                        >
+                          <MonetizationOn
+                            sx={{
+                              fontSize: 16,
+                              color: "success.main",
+                              mt: 0.2,
+                            }}
+                          />
                           <Box>
-                            <Typography variant="caption" color="text.secondary" display="block">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              display="block"
+                            >
                               Total Budget
                             </Typography>
-                            <Typography variant="caption" sx={{ fontWeight: 700, color: "text.primary" }}>
-                              {formatCurrency(hd?.totalBudget ?? 0, offer.currency)}
+                            <Typography
+                              variant="caption"
+                              sx={{ fontWeight: 700, color: "text.primary" }}
+                            >
+                              {formatCurrency(
+                                hd?.totalBudget ?? 0,
+                                offer.currency,
+                              )}
                             </Typography>
                           </Box>
                         </Box>
-                        <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.5 }}>
-                          <ScaleOutlined sx={{ fontSize: 16, color: "primary.main", mt: 0.2 }} />
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "flex-start",
+                            gap: 0.5,
+                          }}
+                        >
+                          <ScaleOutlined
+                            sx={{
+                              fontSize: 16,
+                              color: "primary.main",
+                              mt: 0.2,
+                            }}
+                          />
                           <Box>
-                            <Typography variant="caption" color="text.secondary" display="block">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              display="block"
+                            >
                               Quantity Needed
                             </Typography>
-                            <Typography variant="caption" sx={{ fontWeight: 700, color: "text.primary" }}>
+                            <Typography
+                              variant="caption"
+                              sx={{ fontWeight: 700, color: "text.primary" }}
+                            >
                               {hd?.requiredQuantity} {hd?.quantityUnit}
                             </Typography>
                           </Box>
                         </Box>
-                        <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.5 }}>
-                          <MonetizationOn sx={{ fontSize: 16, color: "warning.main", mt: 0.2 }} />
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "flex-start",
+                            gap: 0.5,
+                          }}
+                        >
+                          <MonetizationOn
+                            sx={{
+                              fontSize: 16,
+                              color: "warning.main",
+                              mt: 0.2,
+                            }}
+                          />
                           <Box>
-                            <Typography variant="caption" color="text.secondary" display="block">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              display="block"
+                            >
                               Price / Unit
                             </Typography>
-                            <Typography variant="caption" sx={{ fontWeight: 700, color: "text.primary" }}>
-                              {formatCurrency(hd?.pricePerUnit ?? 0, offer.currency)}
+                            <Typography
+                              variant="caption"
+                              sx={{ fontWeight: 700, color: "text.primary" }}
+                            >
+                              {formatCurrency(
+                                hd?.pricePerUnit ?? 0,
+                                offer.currency,
+                              )}
                             </Typography>
                           </Box>
                         </Box>
-                        <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.5 }}>
-                          <Agriculture sx={{ fontSize: 16, color: "info.main", mt: 0.2 }} />
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "flex-start",
+                            gap: 0.5,
+                          }}
+                        >
+                          <Agriculture
+                            sx={{ fontSize: 16, color: "info.main", mt: 0.2 }}
+                          />
                           <Box>
-                            <Typography variant="caption" color="text.secondary" display="block">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              display="block"
+                            >
                               Scale
                             </Typography>
-                            <Typography variant="caption" sx={{ fontWeight: 700, textTransform: "capitalize", color: "text.primary" }}>
-                              {hd?.durationUnit ? `${hd.projectDuration} ${hd.durationUnit}` : "Standard"}
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                fontWeight: 700,
+                                textTransform: "capitalize",
+                                color: "text.primary",
+                              }}
+                            >
+                              {hd?.durationUnit
+                                ? `${hd.projectDuration} ${hd.durationUnit}`
+                                : "Standard"}
                             </Typography>
                           </Box>
                         </Box>
@@ -413,20 +540,49 @@ const ReceivedRequestsPage = () => {
                       <Divider sx={{ mb: 1.5 }} />
 
                       <Box sx={{ flexGrow: 1 }} />
-                      
-                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          mb: 2,
+                        }}
+                      >
                         {regions.length > 0 && (
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                            <LocationOn sx={{ fontSize: 14, color: "text.secondary" }} />
-                            <Typography variant="caption" color="text.secondary">
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 0.5,
+                            }}
+                          >
+                            <LocationOn
+                              sx={{ fontSize: 14, color: "text.secondary" }}
+                            />
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
                               {regions[0]}
                             </Typography>
                           </Box>
                         )}
                         {deadline && (
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                            <CalendarToday sx={{ fontSize: 13, color: "text.secondary" }} />
-                            <Typography variant="caption" color="text.secondary">
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 0.5,
+                            }}
+                          >
+                            <CalendarToday
+                              sx={{ fontSize: 13, color: "text.secondary" }}
+                            />
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
                               Due {formatDate(deadline)}
                             </Typography>
                           </Box>
@@ -445,7 +601,11 @@ const ReceivedRequestsPage = () => {
                               severity: "info",
                             });
                           }}
-                          sx={{ textTransform: "none", fontWeight: 600, borderRadius: 2 }}
+                          sx={{
+                            textTransform: "none",
+                            fontWeight: 600,
+                            borderRadius: 2,
+                          }}
                         >
                           Details
                         </Button>
@@ -454,7 +614,11 @@ const ReceivedRequestsPage = () => {
                           size="small"
                           fullWidth
                           onClick={() => handleInterestedClick(offer)}
-                          sx={{ textTransform: "none", fontWeight: 600, borderRadius: 2 }}
+                          sx={{
+                            textTransform: "none",
+                            fontWeight: 600,
+                            borderRadius: 2,
+                          }}
                         >
                           Interested
                         </Button>
@@ -478,7 +642,8 @@ const ReceivedRequestsPage = () => {
                 No active opportunities at the moment
               </Typography>
               <Typography variant="body2">
-                Check back soon for new investor opportunities or publish your land ad to attract investors.
+                Check back soon for new investor opportunities or publish your
+                land ad to attract investors.
               </Typography>
             </Box>
           )}
@@ -493,8 +658,8 @@ const ReceivedRequestsPage = () => {
         onClose={handleCloseNotification}
       />
 
-      <Dialog 
-        open={!!selectedOfferForMatch} 
+      <Dialog
+        open={!!selectedOfferForMatch}
         onClose={handleCloseDialog}
         maxWidth="sm"
         fullWidth
@@ -508,9 +673,12 @@ const ReceivedRequestsPage = () => {
               <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                 Selected Investor Offer:
               </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 600, color: "primary.main" }}>
-                {selectedOfferForMatch.harvestBaseDetails?.projectTitle} 
-                ({selectedOfferForMatch.harvestBaseDetails?.cropType})
+              <Typography
+                variant="body1"
+                sx={{ fontWeight: 600, color: "primary.main" }}
+              >
+                {selectedOfferForMatch.harvestBaseDetails?.projectTitle}(
+                {selectedOfferForMatch.harvestBaseDetails?.cropType})
               </Typography>
             </Box>
           )}
@@ -524,7 +692,15 @@ const ReceivedRequestsPage = () => {
               <CircularProgress size={32} />
             </Box>
           ) : landownerOffers.length > 0 ? (
-            <List sx={{ maxHeight: 300, overflow: "auto", border: "1px solid", borderColor: "divider", borderRadius: 2 }}>
+            <List
+              sx={{
+                maxHeight: 300,
+                overflow: "auto",
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2,
+              }}
+            >
               {landownerOffers.map((landOffer) => (
                 <ListItemButton
                   key={landOffer._id}
@@ -550,8 +726,8 @@ const ReceivedRequestsPage = () => {
                   <ListItemText
                     primary={landOffer.title}
                     secondary={`${landOffer.landArea} ${typeof landOffer.landArea === "number" ? "acres" : ""} • ${
-                      typeof landOffer.location === "string" 
-                        ? landOffer.location 
+                      typeof landOffer.location === "string"
+                        ? landOffer.location
                         : (landOffer.location as any)?.district || "Location"
                     }`}
                   />
@@ -559,7 +735,14 @@ const ReceivedRequestsPage = () => {
               ))}
             </List>
           ) : (
-            <Box sx={{ p: 2, textAlign: "center", bgcolor: "var(--surface-tint)", borderRadius: 2 }}>
+            <Box
+              sx={{
+                p: 2,
+                textAlign: "center",
+                bgcolor: "var(--surface-tint)",
+                borderRadius: 2,
+              }}
+            >
               <Typography variant="body2" color="text.secondary">
                 No land offers available. Please create a land ad first.
               </Typography>
@@ -567,13 +750,13 @@ const ReceivedRequestsPage = () => {
           )}
         </DialogContent>
         <DialogActions sx={{ p: 2, gap: 1 }}>
-          <Button 
+          <Button
             onClick={handleCloseDialog}
             sx={{ textTransform: "none", fontWeight: 600 }}
           >
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={handleConfirmMatch}
             variant="contained"
             disabled={!selectedLandOffer || loadingOffers}

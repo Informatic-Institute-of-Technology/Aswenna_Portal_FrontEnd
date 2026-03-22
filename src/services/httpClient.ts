@@ -1,6 +1,7 @@
 import { getAuthHeader, getCsrfToken } from "./tokenStore";
 
-const API_BASE_URL = "https://922a-175-157-100-147.ngrok-free.app/api";
+const API_BASE_URL =
+  "https://4529-2402-4000-2272-c590-8035-d116-2be6-25c4.ngrok-free.app/api";
 
 export class HttpClient {
   private baseURL: string;
