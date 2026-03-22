@@ -141,7 +141,7 @@ const LandOwnersPage = () => {
         )}
     </Box>
 
-    {/* Land Details Dialog */}
+ {/* Land Details Dialog */}
       <Dialog
         open={detailDialogOpen}
         onClose={handleCloseDetailDialog}
@@ -168,3 +168,39 @@ const LandOwnersPage = () => {
                   }}
                 />
               )}
+
+
+       {/* Landowner Info */}
+              <Box sx={{ bgcolor: "var(--surface-tint)", p: 2, borderRadius: 1 }}>
+                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+                  Landowner Information
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Name:</strong>{" "}
+                  {typeof selectedAd.landowner === "object"
+                    ? selectedAd.landowner?.fullName || "N/A"
+                    : selectedAd.landowner || "N/A"}
+                </Typography>
+                {typeof selectedAd.landowner === "object" &&
+                  selectedAd.landowner?.email && (
+                    <Typography variant="body2" color="text.secondary">
+                      <strong>Email:</strong> {selectedAd.landowner.email}
+                    </Typography>
+                  )}
+              </Box>
+
+              {/* Location Details */}
+              <Box sx={{ bgcolor: "var(--surface-tint)", p: 2, borderRadius: 1 }}>
+                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+                  Location
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {typeof selectedAd.location === "object"
+                    ? (selectedAd.location?.district && selectedAd.location?.province)
+                      ? `${selectedAd.location?.street || ""} ${selectedAd.location?.city || ""} ${selectedAd.location?.district || ""} ${selectedAd.location?.province || ""}`.trim()
+                      : selectedAd.location?.latitude && selectedAd.location?.longitude
+                      ? `Latitude: ${selectedAd.location.latitude.toFixed(4)}, Longitude: ${selectedAd.location.longitude.toFixed(4)}`
+                      : "N/A"
+                    : selectedAd.location || "N/A"}
+                </Typography>
+              </Box>       
