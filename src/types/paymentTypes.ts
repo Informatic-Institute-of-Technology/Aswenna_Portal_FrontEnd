@@ -46,3 +46,14 @@ export interface UnifiedRow {
   amount: string;
   status: PaymentStatus;
 }
+export interface FarmerPaymentRow {
+  id: string;
+  projectId: string;
+  project: string;
+  milestone: string;
+  farmer: string;
+  dueDate: string;
+  paidDate?: string;
+  amount: string;
+  paymentStatus: PaymentStatus;
+}

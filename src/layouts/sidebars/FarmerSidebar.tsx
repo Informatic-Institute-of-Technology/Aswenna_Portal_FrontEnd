@@ -1,6 +1,7 @@
 import { useAuth } from "@/Context/useAuth";
 import {
   AccountCircle,
+  AttachMoney,
   BarChart as BarChartIcon,
   Handshake,
   Home,
@@ -51,6 +52,11 @@ const FarmerSidebar = () => {
       text: "Requests",
       icon: <ReqIcon />,
       path: `${basePath}/dashboard/requests`,
+    },
+    {
+      text: "Payments",
+      icon: <AttachMoney />,
+      path: `${basePath}/dashboard/payments`,
     },
   ];
 

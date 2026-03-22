@@ -31,7 +31,12 @@ const MatchMakingPage = lazy(() => import("./common/MatchMakingPage"));
 const AgreementPage = lazy(() => import("./common/AgreementPage"));
 
 const MyOffersPage = lazy(() => import("./investor/MyOffersPage"));
-const OpportunitiesPage = lazy(() => import("./investor/OpportunitiesPage"));
+const InvestorOpportunitiesPage = lazy(
+  () => import("./investor/OpportunitiesPage"),
+);
+const FarmerOpportunitiesPage = lazy(
+  () => import("./farmer/OpportunitiesPage"),
+);
 const InvestorRequestsPage = lazy(() => import("./investor/RequestsPage"));
 const FarmerRequestsPage = lazy(() => import("./farmer/RequestsPage"));
 const FinanceLedgerPage = lazy(() => import("./investor/FinanceLedgerPage"));
@@ -43,6 +48,9 @@ const ProjectPaymentMilestonePage = lazy(
 );
 const PayInstallmentPage = lazy(
   () => import("./investor/payment/PayInstallmentPage"),
+);
+ const FarmerPaymentControlCenterPage = lazy(
+  () => import("./farmer/payment/FarmerPaymentControlCenterPage"),
 );
 
 const MyLandAdsPage = lazy(() => import("./landowner/MyOffers"));
@@ -81,6 +89,16 @@ const RequestsRoute = () => {
   }
 
   return <InvestorRequestsPage />;
+};
+
+const OpportunitiesRoute = () => {
+  const { user } = useAuth();
+
+  if (user?.role === "farmer") {
+    return <FarmerOpportunitiesPage />;
+  }
+
+  return <InvestorOpportunitiesPage />;
 };
 
 function AppRoutes() {
@@ -124,9 +142,12 @@ function AppRoutes() {
             <Route path="investors" element={<InvestorsPage />} />
             <Route path="land-owners" element={<LandOwnersPage />} />
             <Route path="match-making" element={<MatchMakingPage />} />
-            <Route path="opportunities" element={<OpportunitiesPage />} />
+            <Route path="opportunities" element={<OpportunitiesRoute />} />
             <Route path="agreement" element={<AgreementPage />} />
-
+            <Route
+              path="payments"
+              element={<FarmerPaymentControlCenterPage />}
+            />
             <Route path="my-offers" element={<MyOffersPage />} />
             <Route path="land-search" element={<LandOwnersPage />} />
             <Route path="requests" element={<RequestsRoute />} />
