@@ -37,7 +37,7 @@ class SignupPage:
         self.driver.find_element(By.XPATH, "//label[contains(text(), 'Street Address')]/..//input").send_keys("57, Ramakrishna Road")
         self.driver.find_element(By.XPATH, "//label[contains(text(), 'City / Town')]/..//input").send_keys(city)
         
-        print("Waiting for Province and District selection...")
+        print("Waiting for Province and District selection.")
         time.sleep(10) 
         
         try:
