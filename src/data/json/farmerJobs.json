@@ -1,0 +1,524 @@
+[
+  {
+    "id": "HC001",
+    "farmerId": "F001",
+    "farmerName": "Sunil Perera",
+    "farmerImage": "",
+    "title": "Organic Rice Cultivation - Investment Needed",
+    "description": "Seeking investment for organic rice cultivation on 5-acre land in Anuradhapura. Project includes complete cultivation cycle from land preparation to harvest. Expected high yield with organic certification.",
+    "location": "Medawachchiya",
+    "district": "Anuradhapura",
+    "province": "North Central Province",
+    "createdAt": "2026-01-20T10:00:00Z",
+    "updatedAt": "2026-01-20T10:00:00Z",
+    "status": "OPEN",
+    "jobType": "HARVEST_CAPITAL",
+    "tags": ["Organic", "Rice", "High ROI", "Certified"],
+    "totalInvestmentRequired": 850000,
+    "investmentSecured": 250000,
+    "cropType": "Organic Rice (Samba)",
+    "landSize": 5,
+    "landSizeUnit": "acres",
+    "expectedDuration": 4,
+    "expectedYield": "8000 kg per acre",
+    "expectedROI": 35,
+    "budgetBreakdown": [
+      {
+        "id": "B001",
+        "category": "Land Preparation",
+        "description": "Plowing, leveling, and soil preparation",
+        "estimatedCost": 150000
+      },
+      {
+        "id": "B002",
+        "category": "Seeds & Seedlings",
+        "description": "Organic certified rice seeds",
+        "estimatedCost": 75000
+      },
+      {
+        "id": "B003",
+        "category": "Organic Fertilizers",
+        "description": "Compost and organic nutrients",
+        "estimatedCost": 200000
+      },
+      {
+        "id": "B004",
+        "category": "Irrigation",
+        "description": "Water management and irrigation costs",
+        "estimatedCost": 125000
+      },
+      {
+        "id": "B005",
+        "category": "Labor",
+        "description": "Planting, maintenance, and harvesting labor",
+        "estimatedCost": 200000
+      },
+      {
+        "id": "B006",
+        "category": "Equipment Rental",
+        "description": "Harvesting machinery and transport",
+        "estimatedCost": 100000
+      }
+    ],
+    "farmingMethod": "Organic",
+    "certifications": ["SLS 1137 Organic Certification", "GAP Certified"],
+    "previousExperience": "15 years of rice cultivation experience with consistent high yields",
+    "collateral": "Land ownership documents available"
+  },
+  {
+    "id": "HC002",
+    "farmerId": "F002",
+    "farmerName": "Kamala Wickramasinghe",
+    "farmerImage": "",
+    "title": "Commercial Vegetable Farm Expansion",
+    "description": "Looking for investment partners to expand existing vegetable farming operation. Planning to cultivate tomatoes, cucumbers, and bell peppers in greenhouse setup for year-round production.",
+    "location": "Nuwara Eliya Town",
+    "district": "Nuwara Eliya",
+    "province": "Central Province",
+    "createdAt": "2026-01-18T14:30:00Z",
+    "updatedAt": "2026-01-18T14:30:00Z",
+    "status": "OPEN",
+    "jobType": "HARVEST_CAPITAL",
+    "tags": ["Vegetables", "Greenhouse", "Year-round", "High Demand"],
+    "totalInvestmentRequired": 1500000,
+    "investmentSecured": 500000,
+    "cropType": "Mixed Vegetables (Tomatoes, Cucumbers, Bell Peppers)",
+    "landSize": 2,
+    "landSizeUnit": "acres",
+    "expectedDuration": 6,
+    "expectedYield": "15,000 kg total yield",
+    "expectedROI": 45,
+    "budgetBreakdown": [
+      {
+        "id": "B007",
+        "category": "Greenhouse Construction",
+        "description": "Polyhouse setup with climate control",
+        "estimatedCost": 600000
+      },
+      {
+        "id": "B008",
+        "category": "Irrigation System",
+        "description": "Drip irrigation with automation",
+        "estimatedCost": 200000
+      },
+      {
+        "id": "B009",
+        "category": "Seeds & Plants",
+        "description": "Hybrid vegetable seedlings",
+        "estimatedCost": 150000
+      },
+      {
+        "id": "B010",
+        "category": "Fertilizers & Pesticides",
+        "description": "Integrated pest management supplies",
+        "estimatedCost": 250000
+      },
+      {
+        "id": "B011",
+        "category": "Labor & Maintenance",
+        "description": "6 months operational costs",
+        "estimatedCost": 300000
+      }
+    ],
+    "farmingMethod": "Greenhouse - Controlled Environment",
+    "certifications": ["Good Agricultural Practices (GAP)"],
+    "previousExperience": "8 years of commercial vegetable farming with established buyer network"
+  },
+  {
+    "id": "HC003",
+    "farmerId": "F003",
+    "farmerName": "Chandana Fernando",
+    "farmerImage": "",
+    "title": "Coconut Plantation Rejuvenation Project",
+    "description": "Investment opportunity for rejuvenating 10-acre coconut plantation with high-yielding hybrid varieties. Includes replanting, intercropping with spices, and modern farming techniques.",
+    "location": "Kurunegala",
+    "district": "Kurunegala",
+    "province": "North Western Province",
+    "createdAt": "2026-01-15T09:00:00Z",
+    "updatedAt": "2026-01-22T11:00:00Z",
+    "status": "IN_PROGRESS",
+    "jobType": "HARVEST_CAPITAL",
+    "tags": ["Coconut", "Long-term", "Intercropping", "Spices"],
+    "totalInvestmentRequired": 2000000,
+    "investmentSecured": 1200000,
+    "cropType": "Coconut with Intercrop (Pepper, Ginger)",
+    "landSize": 10,
+    "landSizeUnit": "acres",
+    "expectedDuration": 36,
+    "expectedYield": "12,000 nuts per acre annually after 4 years",
+    "expectedROI": 28,
+    "budgetBreakdown": [
+      {
+        "id": "B012",
+        "category": "Seedlings",
+        "description": "Hybrid coconut seedlings (200 palms)",
+        "estimatedCost": 400000
+      },
+      {
+        "id": "B013",
+        "category": "Land Clearing & Preparation",
+        "description": "Remove old trees, soil preparation",
+        "estimatedCost": 300000
+      },
+      {
+        "id": "B014",
+        "category": "Planting & Initial Care",
+        "description": "Planting and first year maintenance",
+        "estimatedCost": 250000
+      },
+      {
+        "id": "B015",
+        "category": "Irrigation Infrastructure",
+        "description": "Drip irrigation system",
+        "estimatedCost": 350000
+      },
+      {
+        "id": "B016",
+        "category": "Intercrop Setup",
+        "description": "Pepper, ginger planting materials",
+        "estimatedCost": 200000
+      },
+      {
+        "id": "B017",
+        "category": "Ongoing Maintenance (3 years)",
+        "description": "Fertilizers, labor, pest control",
+        "estimatedCost": 500000
+      }
+    ],
+    "farmingMethod": "Modern Mixed Farming",
+    "certifications": ["Coconut Cultivation Board Registered"],
+    "previousExperience": "20 years coconut farming experience, family-owned plantation"
+  },
+  {
+    "id": "CJ001",
+    "farmerId": "F004",
+    "farmerName": "Priyantha Silva",
+    "farmerImage": "https://img.freepik.com/free-photo/portrait-person-eating-watermelon_23-2151553590.jpg?t=st=1769618168~exp=1769621768~hmac=e09ae0524149d72c93a5f95143003c9af1e02dd5ab1c6f6ab8daafd47fe9f50a&w=1480",
+    "title": "Professional Harvesting Services - Rice & Grain Crops",
+    "description": "Experienced harvesting team available for hire with modern equipment. We specialize in paddy harvesting, threshing, and post-harvest handling. Quick turnaround time and quality service guaranteed.",
+    "location": "Polonnaruwa Town",
+    "district": "Polonnaruwa",
+    "province": "North Central Province",
+    "createdAt": "2026-01-22T08:00:00Z",
+    "updatedAt": "2026-01-22T08:00:00Z",
+    "status": "OPEN",
+    "jobType": "COMMISSION",
+    "tags": ["Harvesting", "Rice", "Equipment Available", "Quick Service"],
+    "serviceType": "Harvesting & Post-Harvest Processing",
+    "rate": 25000,
+    "rateType": "PER_ACRE",
+    "availability": "Immediately Available - Peak Season",
+    "skills": ["Combine Harvesting", "Manual Harvesting", "Threshing", "Grain Cleaning", "Transport Coordination"],
+    "yearsOfExperience": 12,
+    "equipmentAvailable": [
+      "Combine Harvester (2 units)",
+      "Thresher Machine",
+      "Tractor with Trailer",
+      "Grain Dryer",
+      "Storage Bags & Equipment"
+    ],
+    "teamSize": 8,
+    "previousProjects": [
+      {
+        "projectName": "Large Scale Rice Harvest - Minneriya",
+        "client": "Minneriya Farmers Cooperative",
+        "description": "Harvested 150 acres of paddy within 10 days during peak season. Managed all logistics including threshing and transportation.",
+        "completedDate": "2025-11-15"
+      },
+      {
+        "projectName": "Organic Farm Harvest",
+        "client": "Green Valley Organic Farm",
+        "description": "Specialized organic paddy harvesting with careful handling to maintain organic certification standards.",
+        "completedDate": "2025-09-20"
+      }
+    ],
+    "workRadius": 50,
+    "minProjectSize": 3,
+    "maxProjectSize": 200
+  },
+  {
+    "id": "CJ002",
+    "farmerId": "F005",
+    "farmerName": "Lalith Bandara",
+    "farmerImage": "https://img.freepik.com/free-photo/portrait-person-eating-watermelon_23-2151553589.jpg?t=st=1769618072~exp=1769621672~hmac=a9fb2928ff36abc3731688179e35ac5e403d806f66dcb7e22dca6ae8c7bdd2c4&w=1480",
+    "title": "Expert Tea Plucking & Estate Maintenance Services",
+    "description": "Professional tea plucking team with 20+ years experience. Available for tea estate maintenance, plucking, pruning, and general upkeep. Well-trained workforce ensuring quality standards.",
+    "location": "Hatton",
+    "district": "Nuwara Eliya",
+    "province": "Central Province",
+    "createdAt": "2026-01-19T10:30:00Z",
+    "updatedAt": "2026-01-19T10:30:00Z",
+    "status": "OPEN",
+    "jobType": "COMMISSION",
+    "tags": ["Tea", "Plucking", "Estate Maintenance", "Experienced Team"],
+    "serviceType": "Tea Plucking & Estate Maintenance",
+    "rate": 3500,
+    "rateType": "DAILY",
+    "availability": "Year-round Availability",
+    "skills": ["Fine Tea Plucking", "Pruning", "Fertilizer Application", "Pest Management", "Estate Maintenance"],
+    "yearsOfExperience": 20,
+    "equipmentAvailable": [
+      "Pruning Tools",
+      "Spraying Equipment",
+      "Safety Gear",
+      "Transport Arrangements"
+    ],
+    "teamSize": 25,
+    "previousProjects": [
+      {
+        "projectName": "Bogawantalawa Estate Seasonal Work",
+        "client": "Ceylon Tea Plantations Ltd",
+        "description": "Provided 6-month contract plucking services for 50-acre estate during peak season. Maintained quality standards and productivity targets.",
+        "completedDate": "2025-12-30"
+      },
+      {
+        "projectName": "Small Holder Tea Garden Maintenance",
+        "client": "Multiple Small Holders (10 farms)",
+        "description": "Regular maintenance and plucking services for small tea gardens in the region.",
+        "completedDate": "2025-10-15"
+      }
+    ],
+    "workRadius": 30,
+    "minProjectSize": 2,
+    "maxProjectSize": 100
+  },
+  {
+    "id": "CJ003",
+    "farmerId": "F006",
+    "farmerName": "Nimal Jayasuriya",
+    "farmerImage": "https://img.freepik.com/free-photo/close-up-farmer-with-bananas_23-2151005955.jpg?t=st=1769618238~exp=1769621838~hmac=9632d413f8145bb2c4d7af5729876d755b3a3913b0e815d44d25904cf9d0b1e3&w=1480",
+    "title": "Specialized Fruit Cultivation & Orchard Management",
+    "description": "Offering comprehensive orchard management services including planting, pruning, pest control, and harvesting. Expertise in mango, avocado, papaya, and passion fruit cultivation.",
+    "location": "Matale",
+    "district": "Matale",
+    "province": "Central Province",
+    "createdAt": "2026-01-25T07:00:00Z",
+    "updatedAt": "2026-01-25T07:00:00Z",
+    "status": "OPEN",
+    "jobType": "COMMISSION",
+    "tags": ["Fruits", "Orchard Management", "Grafting", "IPM"],
+    "serviceType": "Fruit Orchard Management & Consultation",
+    "rate": 75000,
+    "rateType": "PROJECT",
+    "availability": "Available from February 2026",
+    "skills": [
+      "Grafting & Budding",
+      "Orchard Layout Planning",
+      "Integrated Pest Management",
+      "Pruning Techniques",
+      "Harvest Management",
+      "Post-Harvest Handling"
+    ],
+    "yearsOfExperience": 15,
+    "equipmentAvailable": [
+      "Grafting Tools",
+      "Pruning Equipment",
+      "Spraying Machinery",
+      "Quality Testing Equipment"
+    ],
+    "teamSize": 5,
+    "previousProjects": [
+      {
+        "projectName": "Mango Orchard Establishment",
+        "client": "Sunshine Fruits (Pvt) Ltd",
+        "description": "Established 5-acre commercial mango orchard from planning to first harvest. Included variety selection, planting, and 3-year maintenance.",
+        "completedDate": "2025-08-30"
+      },
+      {
+        "projectName": "Avocado Farm Rehabilitation",
+        "client": "Highland Agro Farms",
+        "description": "Rejuvenated underperforming avocado farm through proper pruning, nutrition management, and pest control.",
+        "completedDate": "2025-11-20"
+      },
+      {
+        "projectName": "Passion Fruit Trellis System",
+        "client": "Valley View Organic Farm",
+        "description": "Set up modern trellis system for passion fruit cultivation and provided training to farm staff.",
+        "completedDate": "2025-06-15"
+      }
+    ],
+    "workRadius": 40,
+    "minProjectSize": 1,
+    "maxProjectSize": 20
+  },
+  {
+    "id": "CJ004",
+    "farmerId": "F007",
+    "farmerName": "Ruwan Kumara",
+    "farmerImage": "https://img.freepik.com/free-photo/close-up-banana-farmer_23-2151005986.jpg?t=st=1769618271~exp=1769621871~hmac=d6b6f71c7819934520166df00055636adf377f8fdf9e1351a41c5bc5f53e2a4d&w=1480",
+    "title": "Land Preparation & Mechanized Farming Services",
+    "description": "Complete land preparation services with modern machinery. Offering plowing, harrowing, leveling, and bed preparation for all types of crops. Fast and efficient service with competitive rates.",
+    "location": "Hambantota",
+    "district": "Hambantota",
+    "province": "Southern Province",
+    "createdAt": "2026-01-21T11:00:00Z",
+    "updatedAt": "2026-01-21T11:00:00Z",
+    "status": "OPEN",
+    "jobType": "COMMISSION",
+    "tags": ["Land Preparation", "Mechanized", "Plowing", "Quick Service"],
+    "serviceType": "Land Preparation & Mechanization",
+    "rate": 15000,
+    "rateType": "PER_ACRE",
+    "availability": "Year-round with Advance Booking",
+    "skills": [
+      "Deep Plowing",
+      "Rotavating",
+      "Leveling",
+      "Bed Making",
+      "Drainage System Setup",
+      "Tractor Operations"
+    ],
+    "yearsOfExperience": 10,
+    "equipmentAvailable": [
+      "4WD Tractor (85 HP)",
+      "Moldboard Plow",
+      "Disc Harrow",
+      "Rotavator",
+      "Laser Land Leveler",
+      "Bed Former"
+    ],
+    "teamSize": 3,
+    "previousProjects": [
+      {
+        "projectName": "Large-scale Rice Field Preparation",
+        "client": "Ridiyagama Agricultural Project",
+        "description": "Prepared 300 acres of land for paddy cultivation including deep plowing and laser leveling.",
+        "completedDate": "2025-10-10"
+      },
+      {
+        "projectName": "Vegetable Farm Land Development",
+        "client": "Organic Harvest Lanka",
+        "description": "Prepared 15 acres for high-value vegetable cultivation with raised bed system.",
+        "completedDate": "2025-12-05"
+      }
+    ],
+    "workRadius": 60,
+    "minProjectSize": 5,
+    "maxProjectSize": 500
+  },
+  {
+    "id": "HC004",
+    "farmerId": "F008",
+    "farmerName": "Indika Rathnayake",
+    "farmerImage": "https://img.freepik.com/premium-photo/man-holding-basket-potatoes-with-beard-hat_1313119-2818.jpg?w=1480",
+    "title": "Spice Cultivation - Black Pepper & Cinnamon",
+    "description": "Seeking investment for establishing spice cultivation focusing on black pepper and cinnamon. High-demand export crops with excellent market prices and long-term returns.",
+    "location": "Galle",
+    "district": "Galle",
+    "province": "Southern Province",
+    "createdAt": "2026-01-12T13:45:00Z",
+    "updatedAt": "2026-01-12T13:45:00Z",
+    "status": "OPEN",
+    "jobType": "HARVEST_CAPITAL",
+    "tags": ["Spices", "Export Crop", "High Value", "Long-term"],
+    "totalInvestmentRequired": 1200000,
+    "investmentSecured": 300000,
+    "cropType": "Black Pepper & Ceylon Cinnamon",
+    "landSize": 3,
+    "landSizeUnit": "acres",
+    "expectedDuration": 24,
+    "expectedYield": "Pepper: 2000 kg/acre, Cinnamon: 300 kg/acre",
+    "expectedROI": 40,
+    "budgetBreakdown": [
+      {
+        "id": "B018",
+        "category": "Planting Materials",
+        "description": "Pepper cuttings and cinnamon plants",
+        "estimatedCost": 250000
+      },
+      {
+        "id": "B019",
+        "category": "Support Structures",
+        "description": "Poles and trellising for pepper vines",
+        "estimatedCost": 200000
+      },
+      {
+        "id": "B020",
+        "category": "Land Preparation",
+        "description": "Soil improvement and planting pits",
+        "estimatedCost": 150000
+      },
+      {
+        "id": "B021",
+        "category": "Irrigation Setup",
+        "description": "Drip irrigation system",
+        "estimatedCost": 180000
+      },
+      {
+        "id": "B022",
+        "category": "Fertilizers & Inputs",
+        "description": "Organic manure and nutrients (2 years)",
+        "estimatedCost": 220000
+      },
+      {
+        "id": "B023",
+        "category": "Labor & Maintenance",
+        "description": "Planting, pruning, and care (2 years)",
+        "estimatedCost": 200000
+      }
+    ],
+    "farmingMethod": "Organic & Traditional Methods",
+    "certifications": ["Export Agriculture Department Registered", "Organic Certification in Process"],
+    "previousExperience": "12 years in spice cultivation with established export connections"
+  },
+  {
+    "id": "CJ005",
+    "farmerId": "F009",
+    "farmerName": "Ajith Perera",
+    "farmerImage": "https://img.freepik.com/premium-photo/man-holding-basket-potatoes-with-beard-hat_1313119-2818.jpg?w=1480",
+    "title": "Agricultural Drone Services - Spraying & Monitoring",
+    "description": "Modern agricultural drone services for crop spraying, field monitoring, and aerial mapping. Efficient, precise, and eco-friendly farming solutions. Serving all types of farms and plantations.",
+    "location": "Anuradhapura",
+    "district": "Anuradhapura",
+    "province": "North Central Province",
+    "createdAt": "2026-01-26T09:30:00Z",
+    "updatedAt": "2026-01-26T09:30:00Z",
+    "status": "OPEN",
+    "jobType": "COMMISSION",
+    "tags": ["Technology", "Drone", "Precision Agriculture", "Modern"],
+    "serviceType": "Agricultural Drone Operations",
+    "rate": 8000,
+    "rateType": "PER_ACRE",
+    "availability": "Bookings Open - 2 Weeks Notice",
+    "skills": [
+      "Drone Piloting (Licensed)",
+      "Precision Spraying",
+      "Crop Health Monitoring",
+      "Aerial Mapping",
+      "Data Analysis",
+      "Field Assessment"
+    ],
+    "yearsOfExperience": 5,
+    "equipmentAvailable": [
+      "Agricultural Spray Drone (20L capacity)",
+      "Mapping Drone with Multispectral Camera",
+      "Ground Control Station",
+      "Data Processing Software",
+      "Safety Equipment"
+    ],
+    "teamSize": 2,
+    "previousProjects": [
+      {
+        "projectName": "Large Rice Field Pest Control",
+        "client": "Mahaweli Agricultural Project",
+        "description": "Drone spraying for 500 acres of paddy fields. Completed in 3 days with minimal chemical wastage.",
+        "completedDate": "2025-11-25"
+      },
+      {
+        "projectName": "Coconut Estate Health Monitoring",
+        "client": "Premium Coconuts Ltd",
+        "description": "Quarterly aerial monitoring of 200-acre estate to identify stressed palms and disease outbreaks.",
+        "completedDate": "2026-01-10"
+      },
+      {
+        "projectName": "Sugarcane Plantation Spraying",
+        "client": "Sweet Valley Plantation",
+        "description": "Fertilizer and pesticide application over 100 acres of sugarcane using precision drone technology.",
+        "completedDate": "2025-12-15"
+      }
+    ],
+    "workRadius": 100,
+    "minProjectSize": 5,
+    "maxProjectSize": 1000
+  }
+]

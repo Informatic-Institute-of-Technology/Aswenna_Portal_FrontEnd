@@ -1,0 +1,42 @@
+[
+  {
+    "id": "paddy-terrace",
+    "label": "Paddy terraces at sunrise",
+    "url": "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1400&q=80"
+  },
+  {
+    "id": "tea-hills",
+    "label": "Tea estates in the hills",
+    "url": "https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&w=1400&q=80"
+  },
+  {
+    "id": "veg-market",
+    "label": "Fresh vegetable harvest",
+    "url": "https://images.unsplash.com/photo-1447175008436-054170c2e979?auto=format&fit=crop&w=1400&q=80"
+  },
+  {
+    "id": "coconut-grove",
+    "label": "Coconut grove by the coast",
+    "url": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80"
+  },
+  {
+    "id": "greenhouse",
+    "label": "Modern greenhouse rows",
+    "url": "https://images.unsplash.com/photo-1492496913980-501348b61469?auto=format&fit=crop&w=1400&q=80"
+  },
+  {
+    "id": "irrigation",
+    "label": "Irrigation over paddy field",
+    "url": "https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=1400&q=80"
+  },
+  {
+    "id": "fruit-orchard",
+    "label": "Fruit orchard blossoms",
+    "url": "https://images.unsplash.com/photo-1438109491414-7198515b166b?auto=format&fit=crop&w=1400&q=80"
+  },
+  {
+    "id": "farm-workers",
+    "label": "Farm workers in field",
+    "url": "https://images.unsplash.com/photo-1509099836639-18ba02e1c6c6?auto=format&fit=crop&w=1400&q=80"
+  }
+]

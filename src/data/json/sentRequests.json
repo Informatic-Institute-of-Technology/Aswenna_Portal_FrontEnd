@@ -1,0 +1,328 @@
+[
+  {
+    "id": "SENT-2024-001",
+    "recipientType": "farmer",
+    "farmerName": "Pradeep Silva",
+    "farmerAvatar": null,
+    "farmerInitials": "PS",
+    "location": "Tea Plantation • Nuwara Eliya",
+    "statusBadge": {
+      "label": "Accepted",
+      "variant": "accepted",
+      "color": "#10b981"
+    },
+    "tags": [
+      {
+        "label": "Sent to Farmer",
+        "variant": "primary"
+      },
+      {
+        "label": "12 Acres",
+        "variant": "secondary"
+      }
+    ],
+    "description": "Investment proposal sent for premium tea cultivation project. Farmer accepted and submitted required documents.",
+    "timestamp": "Sent: 3 days ago • Accepted: 2 days ago",
+    "investmentAmount": "LKR 850,000",
+    "journeySteps": [
+      {
+        "title": "Request Sent",
+        "description": "Application submitted for Land #LP-2023-45",
+        "timestamp": "Yesterday, 2:30 PM",
+        "status": "completed",
+        "icon": "check"
+      },
+      {
+        "title": "Farmer Review",
+        "description": "Pradeep S. is viewing your profile",
+        "status": "active",
+        "icon": "visibility"
+      },
+      {
+        "title": "Connection Established",
+        "description": "Direct messaging enabled",
+        "status": "pending",
+        "icon": "3"
+      },
+      {
+        "title": "Negotiation Started",
+        "description": "Official terms discussion",
+        "status": "pending",
+        "icon": "4"
+      }
+    ],
+    "insight": "Premium tea cultivation opportunity. Farmer has 10+ years experience with export quality certifications.",
+    "highlighted": false
+  },
+  {
+    "id": "SENT-2024-002",
+    "recipientType": "landowner",
+    "farmerName": "Mahesh Gunasekara (Landowner)",
+    "farmerAvatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+    "farmerInitials": "MG",
+    "location": "Agricultural Land • Polonnaruwa",
+    "statusBadge": {
+      "label": "Pending Response",
+      "variant": "pending_response",
+      "color": "#f59e0b"
+    },
+    "tags": [
+      {
+        "label": "Sent to Landowner",
+        "variant": "primary"
+      },
+      {
+        "label": "8 Acres",
+        "variant": "secondary"
+      }
+    ],
+    "description": "Land collaboration request sent for rice cultivation project. Awaiting landowner's decision.",
+    "timestamp": "Sent: 1 day ago",
+    "investmentAmount": "LKR 520,000",
+    "journeySteps": [
+      {
+        "title": "Request Sent",
+        "description": "Application submitted for Land #LP-2023-45",
+        "timestamp": "Yesterday, 2:30 PM",
+        "status": "completed",
+        "icon": "check"
+      },
+      {
+        "title": "Landowner Review",
+        "description": "Mahesh G. is viewing your profile",
+        "status": "active",
+        "icon": "visibility"
+      },
+      {
+        "title": "Connection Established",
+        "description": "Direct messaging enabled",
+        "status": "pending",
+        "icon": "3"
+      },
+      {
+        "title": "Negotiation Started",
+        "description": "Official terms discussion",
+        "status": "pending",
+        "icon": "4"
+      }
+    ],
+    "insight": "8-acre plot with irrigation facilities. Landowner has good track record with previous collaborations.",
+    "highlighted": true
+  },
+  {
+    "id": "SENT-2024-003",
+    "recipientType": "farmer",
+    "farmerName": "Ruwan Fernando",
+    "farmerAvatar": null,
+    "farmerInitials": "RF",
+    "location": "Vegetable Farm • Badulla",
+    "statusBadge": {
+      "label": "Under Review",
+      "variant": "under_review",
+      "color": "#3b82f6"
+    },
+    "tags": [
+      {
+        "label": "Sent to Farmer",
+        "variant": "primary"
+      }
+    ],
+    "description": "Investment proposal for organic vegetable cultivation. Farmer is currently reviewing terms and conditions.",
+    "timestamp": "Sent: 6 hours ago",
+    "investmentAmount": "LKR 380,000",
+    "journeySteps": [
+      {
+        "title": "Request Sent",
+        "description": "Application submitted for Land #LP-2023-45",
+        "timestamp": "Yesterday, 2:30 PM",
+        "status": "completed",
+        "icon": "check"
+      },
+      {
+        "title": "Farmer Review",
+        "description": "Ruwan F. is viewing your profile",
+        "status": "active",
+        "icon": "visibility"
+      },
+      {
+        "title": "Connection Established",
+        "description": "Direct messaging enabled",
+        "status": "pending",
+        "icon": "3"
+      },
+      {
+        "title": "Negotiation Started",
+        "description": "Official terms discussion",
+        "status": "pending",
+        "icon": "4"
+      }
+    ],
+    "insight": "Organic vegetables with export potential. New farmer but strong business plan and certifications.",
+    "highlighted": false
+  },
+  {
+    "id": "SENT-2024-004",
+    "recipientType": "landowner",
+    "farmerName": "Chandani Perera (Landowner)",
+    "farmerAvatar": null,
+    "farmerInitials": "CP",
+    "location": "Land Plot #234 • Kurunegala",
+    "statusBadge": {
+      "label": "Rejected",
+      "variant": "rejected",
+      "color": "#ef4444"
+    },
+    "tags": [
+      {
+        "label": "Sent to Landowner",
+        "variant": "primary"
+      },
+      {
+        "label": "3 Acres",
+        "variant": "secondary"
+      }
+    ],
+    "description": "Land partnership request declined. Landowner already committed to another project.",
+    "timestamp": "Sent: 5 days ago • Rejected: 4 days ago",
+    "investmentAmount": "LKR 290,000",
+    "journeySteps": [
+      {
+        "title": "Request Sent",
+        "description": "Application submitted for Land #LP-2023-45",
+        "timestamp": "Yesterday, 2:30 PM",
+        "status": "completed",
+        "icon": "check"
+      },
+      {
+        "title": "Landowner Review",
+        "description": "Landowner rejected the proposal",
+        "status": "completed",
+        "icon": "close"
+      },
+      {
+        "title": "Connection Established",
+        "description": "Direct messaging enabled",
+        "status": "pending",
+        "icon": "3"
+      },
+      {
+        "title": "Negotiation Started",
+        "description": "Official terms discussion",
+        "status": "pending",
+        "icon": "4"
+      }
+    ],
+    "insight": "Landowner already committed to another investor. Consider alternative land options in the region.",
+    "highlighted": false
+  },
+  {
+    "id": "SENT-2024-005",
+    "recipientType": "farmer",
+    "farmerName": "Sampath Rajapaksa",
+    "farmerAvatar": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150",
+    "farmerInitials": "SR",
+    "location": "Spice Cultivation • Matale",
+    "statusBadge": {
+      "label": "Negotiating",
+      "variant": "negotiating",
+      "color": "#f59e0b"
+    },
+    "tags": [
+      {
+        "label": "Sent to Farmer",
+        "variant": "primary"
+      },
+      {
+        "label": "6 Acres",
+        "variant": "secondary"
+      }
+    ],
+    "description": "Investment proposal in discussion phase. Farmer negotiating terms regarding profit sharing and timeline.",
+    "timestamp": "Sent: 2 days ago • In negotiation since yesterday",
+    "investmentAmount": "LKR 620,000",
+    "journeySteps": [
+      {
+        "title": "Request Sent",
+        "description": "Application submitted for Land #LP-2023-45",
+        "timestamp": "Yesterday, 2:30 PM",
+        "status": "completed",
+        "icon": "check"
+      },
+      {
+        "title": "Farmer Review",
+        "description": "Sampath R. is viewing your profile",
+        "status": "completed",
+        "icon": "visibility"
+      },
+      {
+        "title": "Connection Established",
+        "description": "Direct messaging enabled",
+        "status": "completed",
+        "icon": "check"
+      },
+      {
+        "title": "Negotiation Started",
+        "description": "Official terms discussion",
+        "status": "active",
+        "icon": "handshake"
+      }
+    ],
+    "insight": "Spice cultivation expert with premium quality produce. Negotiation expected to conclude within 2 days.",
+    "highlighted": false
+  },
+  {
+    "id": "SENT-2024-006",
+    "recipientType": "landowner",
+    "farmerName": "Anura Wickramasinghe (Landowner)",
+    "farmerAvatar": null,
+    "farmerInitials": "AW",
+    "location": "Land Plot #567 • Kandy",
+    "statusBadge": {
+      "label": "Accepted",
+      "variant": "accepted",
+      "color": "#10b981"
+    },
+    "tags": [
+      {
+        "label": "Sent to Landowner",
+        "variant": "primary"
+      },
+      {
+        "label": "10 Acres",
+        "variant": "secondary"
+      }
+    ],
+    "description": "Land collaboration accepted. Site inspection scheduled and documentation in progress.",
+    "timestamp": "Sent: 1 week ago • Accepted: 5 days ago",
+    "investmentAmount": "LKR 750,000",
+    "journeySteps": [
+      {
+        "title": "Request Sent",
+        "description": "Application submitted for Land #LP-2023-45",
+        "timestamp": "Yesterday, 2:30 PM",
+        "status": "completed",
+        "icon": "check"
+      },
+      {
+        "title": "Landowner Review",
+        "description": "Anura W. reviewed your profile",
+        "status": "completed",
+        "icon": "visibility"
+      },
+      {
+        "title": "Connection Established",
+        "description": "Direct messaging enabled",
+        "status": "completed",
+        "icon": "check"
+      },
+      {
+        "title": "Negotiation Started",
+        "description": "Official terms discussion",
+        "status": "completed",
+        "icon": "check"
+      }
+    ],
+    "insight": "Premium 10-acre land with water access. All legal documents verified. Ready for agreement phase.",
+    "highlighted": false
+  }
+]

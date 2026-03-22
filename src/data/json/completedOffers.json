@@ -1,0 +1,50 @@
+[
+  {
+    "id": "dh-comp-1",
+    "offerType": "direct-harvest",
+    "investorName": "Lanka Exports",
+    "projectTitle": "Rice Purchase Completed Dec 2025",
+    "cropType": "Rice",
+    "requiredQuantity": 200,
+    "quantityUnit": "kg",
+    "pricePerUnit": 140,
+    "deliveryDeadline": "2025-12-15T00:00:00.000Z",
+    "deliveryLocation": "Colombo",
+    "totalBudget": 28000,
+    "currency": "LKR",
+    "description": "Completed rice order",
+    "status": "completed",
+    "applicationsCount": 15,
+    "selectedFarmer": {
+      "farmerId": "f3",
+      "farmerName": "Mahinda Silva",
+      "farmerImage": "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=150",
+      "location": "Anuradhapura",
+      "experience": 15,
+      "rating": 4.9
+    },
+    "paymentInstallments": [
+      {
+        "id": "p10",
+        "installmentNumber": 1,
+        "amount": 14000,
+        "dueDate": "2025-10-01",
+        "milestone": "Start",
+        "status": "paid",
+        "paidDate": "2025-09-30"
+      },
+      {
+        "id": "p11",
+        "installmentNumber": 2,
+        "amount": 14000,
+        "dueDate": "2025-12-15",
+        "milestone": "Complete",
+        "status": "paid",
+        "paidDate": "2025-12-14"
+      }
+    ],
+    "createdAt": "2025-09-01T00:00:00.000Z",
+    "updatedAt": "2025-12-15T00:00:00.000Z",
+    "completedAt": "2025-12-15T00:00:00.000Z"
+  }
+]
