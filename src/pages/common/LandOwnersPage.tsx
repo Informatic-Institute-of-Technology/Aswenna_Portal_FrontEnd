@@ -241,3 +241,27 @@ const LandOwnersPage = () => {
                   {selectedAd.availableTo ? new Date(selectedAd.availableTo).toLocaleDateString() : "N/A"}
                 </Typography>
               </Box>   
+
+
+                {/* Rental Information */}
+              <Box sx={{ bgcolor: "var(--surface-tint)", p: 2, borderRadius: 1 }}>
+                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+                  Rental Information
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Monthly Rental:</strong> ₨
+                  {(selectedAd.rentalAmount as unknown as number).toLocaleString()}
+                </Typography>
+              </Box>
+
+              {/* Additional Information */}
+              {selectedAd.additionalInfo && (
+                <Box sx={{ bgcolor: "var(--surface-tint)", p: 2, borderRadius: 1 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+                    Additional Information
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {selectedAd.additionalInfo}
+                  </Typography>
+                </Box>
+              )}
