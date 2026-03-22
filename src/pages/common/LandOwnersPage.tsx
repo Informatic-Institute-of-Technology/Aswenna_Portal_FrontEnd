@@ -1,14 +1,14 @@
 import {
   Box,
-  Button,
-  Chip,
   CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
   TextField,
   Typography,
+  InputAdornment,
 } from "@mui/material";
+import { Search as SearchIcon } from "@mui/icons-material";
 import { useEffect, useMemo, useState } from "react";
 import LandownerAdCard from "../../components/common/LandownerAdCard";
 import {
@@ -57,13 +57,13 @@ const LandOwnersPage = () => {
         ad.title.toLowerCase().includes(query) ||
         (typeof ad.location === "string"
           ? ad.location.toLowerCase().includes(query)
-          : `${(ad.location as Record<string, unknown>)?.district || ""} ${(ad.location as Record<string, unknown>)?.province || ""}`
+          : `${(ad.location as any)?.district || ""} ${(ad.location as any)?.province || ""}`
               .toLowerCase()
               .includes(query)) ||
         ad.soilType?.toLowerCase().includes(query) ||
         (typeof ad.landowner === "object"
           ? ad.landowner?.fullName?.toLowerCase().includes(query)
-          : false),
+          : false)
     );
   }, [landownerAds, searchQuery]);
 
@@ -83,187 +83,116 @@ const LandOwnersPage = () => {
 
   if (loading) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "60vh",
-          bgcolor: "var(--surface-base)",
-          borderRadius: 2,
-        }}
-      >
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
         <Box sx={{ textAlign: "center" }}>
           <CircularProgress sx={{ mb: 2 }} />
-          <Typography variant="h6" color="text.secondary">
-            Loading available land...
-          </Typography>
+          <Typography variant="h6" color="text.secondary">Loading available land...</Typography>
         </Box>
       </Box>
     );
   }
 
-    {/* Results Count */}
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Found {filteredAds.length} land listing{filteredAds.length !== 1 ? "s" : ""}
-        </Typography>
+  return (
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h4" sx={{ fontWeight: 700, mb: 3 }}>
+        Available Land Listings
+      </Typography>
 
-        {/* Land Cards Grid */}
-        {filteredAds.length > 0 ? (
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))",
-              gap: 3,
-            }}
-          >
-            {filteredAds.map((ad) => (
-              <LandownerAdCard key={ad._id} ad={ad} onViewMore={handleViewMore} />
-            ))}
-          </Box>
-        ) : (
-          <Box
-            sx={{
-              textAlign: "center",
-              py: 8,
-              bgcolor: "var(--surface-tint)",
-              borderRadius: 2,
-              color: "text.secondary",
-            }}
-          >
-            <Typography variant="h6" gutterBottom>
-              No land available matching your search
-            </Typography>
-            <Typography variant="body2">
-              Try adjusting your search criteria
-            </Typography>
-          </Box>
-        )}
-    </Box>
-
- {/* Land Details Dialog */}
-      <Dialog
-        open={detailDialogOpen}
-        onClose={handleCloseDetailDialog}
-        maxWidth="sm"
+      {/* Search Bar */}
+      <TextField
         fullWidth
-      >
-        <DialogTitle sx={{ fontWeight: 600, pb: 1 }}>
-          {selectedAd?.title}
-        </DialogTitle>
+        variant="outlined"
+        placeholder="Search by location, soil type, or owner name..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        sx={{ mb: 4, bgcolor: "white", borderRadius: 1 }}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon color="action" />
+            </InputAdornment>
+          ),
+        }}
+      />
+
+      {/* Results Count */}
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        Found {filteredAds.length} land listing{filteredAds.length !== 1 ? "s" : ""}
+      </Typography>
+
+      {/* Land Cards Grid */}
+      {filteredAds.length > 0 ? (
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))",
+            gap: 3,
+          }}
+        >
+          {filteredAds.map((ad) => (
+            <LandownerAdCard key={ad._id} ad={ad} onViewMore={handleViewMore} />
+          ))}
+        </Box>
+      ) : (
+        <Box sx={{ textAlign: "center", py: 8, bgcolor: "var(--surface-tint)", borderRadius: 2 }}>
+          <Typography variant="h6" gutterBottom>No land available matching your search</Typography>
+          <Typography variant="body2">Try adjusting your search criteria</Typography>
+        </Box>
+      )}
+
+      {/* Land Details Dialog */}
+      <Dialog open={detailDialogOpen} onClose={handleCloseDetailDialog} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontWeight: 600, pb: 1 }}>{selectedAd?.title}</DialogTitle>
         <DialogContent sx={{ pt: 2 }}>
           {selectedAd && (
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              {/* Land Image */}
               {selectedAd.images && selectedAd.images.length > 0 && (
                 <Box
                   component="img"
                   src={selectedAd.images[0].url}
                   alt={selectedAd.title}
-                  sx={{
-                    width: "100%",
-                    height: 250,
-                    objectFit: "cover",
-                    borderRadius: 1,
-                  }}
+                  sx={{ width: "100%", height: 250, objectFit: "cover", borderRadius: 1 }}
                 />
               )}
 
-
-       {/* Landowner Info */}
               <Box sx={{ bgcolor: "var(--surface-tint)", p: 2, borderRadius: 1 }}>
-                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
-                  Landowner Information
-                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>Landowner Information</Typography>
                 <Typography variant="body2" color="text.secondary">
-                  <strong>Name:</strong>{" "}
-                  {typeof selectedAd.landowner === "object"
-                    ? selectedAd.landowner?.fullName || "N/A"
-                    : selectedAd.landowner || "N/A"}
+                  <strong>Name:</strong> {typeof selectedAd.landowner === "object" ? selectedAd.landowner?.fullName || "N/A" : selectedAd.landowner || "N/A"}
                 </Typography>
-                {typeof selectedAd.landowner === "object" &&
-                  selectedAd.landowner?.email && (
-                    <Typography variant="body2" color="text.secondary">
-                      <strong>Email:</strong> {selectedAd.landowner.email}
-                    </Typography>
-                  )}
+                {typeof selectedAd.landowner === "object" && selectedAd.landowner?.email && (
+                  <Typography variant="body2" color="text.secondary"><strong>Email:</strong> {selectedAd.landowner.email}</Typography>
+                )}
               </Box>
 
-              {/* Location Details */}
               <Box sx={{ bgcolor: "var(--surface-tint)", p: 2, borderRadius: 1 }}>
-                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
-                  Location
-                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>Location</Typography>
                 <Typography variant="body2" color="text.secondary">
                   {typeof selectedAd.location === "object"
-                    ? (selectedAd.location?.district && selectedAd.location?.province)
-                      ? `${selectedAd.location?.street || ""} ${selectedAd.location?.city || ""} ${selectedAd.location?.district || ""} ${selectedAd.location?.province || ""}`.trim()
-                      : selectedAd.location?.latitude && selectedAd.location?.longitude
-                      ? `Latitude: ${selectedAd.location.latitude.toFixed(4)}, Longitude: ${selectedAd.location.longitude.toFixed(4)}`
-                      : "N/A"
+                    ? `${(selectedAd.location as any)?.street || ""} ${(selectedAd.location as any)?.city || ""} ${(selectedAd.location as any)?.district || ""} ${(selectedAd.location as any)?.province || ""}`.trim()
                     : selectedAd.location || "N/A"}
                 </Typography>
-              </Box>    
-
-
-
-               {/* Land Details */}
-              <Box sx={{ bgcolor: "var(--surface-tint)", p: 2, borderRadius: 1 }}>
-                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
-                  Land Details
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  <strong>Area:</strong> {selectedAd.landArea} acres
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  <strong>Soil Type:</strong> {selectedAd.soilType || "N/A"}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  <strong>Water Availability:</strong>{" "}
-                  {selectedAd.waterAvailability || "N/A"}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  <strong>Land History:</strong> {selectedAd.landHistory || "N/A"}
-                </Typography>
               </Box>
 
-              {/* Availability */}
               <Box sx={{ bgcolor: "var(--surface-tint)", p: 2, borderRadius: 1 }}>
-                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
-                  Availability
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  <strong>From:</strong>{" "}
-                  {selectedAd.availableFrom ? new Date(selectedAd.availableFrom).toLocaleDateString() : "N/A"}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  <strong>To:</strong>{" "}
-                  {selectedAd.availableTo ? new Date(selectedAd.availableTo).toLocaleDateString() : "N/A"}
-                </Typography>
-              </Box>   
-
-
-                {/* Rental Information */}
-              <Box sx={{ bgcolor: "var(--surface-tint)", p: 2, borderRadius: 1 }}>
-                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
-                  Rental Information
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  <strong>Monthly Rental:</strong> ₨
-                  {(selectedAd.rentalAmount as unknown as number).toLocaleString()}
-                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>Land Details</Typography>
+                <Typography variant="body2" color="text.secondary"><strong>Area:</strong> {selectedAd.landArea} acres</Typography>
+                <Typography variant="body2" color="text.secondary"><strong>Soil Type:</strong> {selectedAd.soilType || "N/A"}</Typography>
+                <Typography variant="body2" color="text.secondary"><strong>Rental:</strong> ₨ {(selectedAd.rentalAmount as any).toLocaleString()}</Typography>
               </Box>
+            </Box>
+          )}
+        </DialogContent>
+      </Dialog>
 
-              {/* Additional Information */}
-              {selectedAd.additionalInfo && (
-                <Box sx={{ bgcolor: "var(--surface-tint)", p: 2, borderRadius: 1 }}>
-                  <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
-                    Additional Information
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {selectedAd.additionalInfo}
-                  </Typography>
-                </Box>
-              )}
+      <Notification
+        open={notification.open}
+        message={notification.message}
+        severity={notification.severity}
+        onClose={handleCloseNotification}
+      />
+    </Box>
+  );
+};
 
 export default LandOwnersPage;
