@@ -61,3 +61,39 @@ def test_signup_validation_errors(driver, email, password, confirm_password, exp
     print(f"Negative Test Passed for: {expected_error}")
 
 
+
+#Login Page Negative Tests
+
+@pytest.mark.negative
+@pytest.mark.parametrize("email, password, expected_error", [
+    ("dhananjanavg@gmail.com", "wrongpassword123", "Invalid credentials"),
+    ("netyhueuibjhjdb", "anypassword", "Please include an '@'"),
+])
+def test_login_negative_scenarios(driver, email, password, expected_error):
+    driver.get("http://localhost:5173/login")
+    login_pg = LoginPage(driver)
+    login_pg.login(email, password)
+
+    wait = WebDriverWait(driver, 15)
+
+    try:
+       
+        error_xpath = f"//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '{expected_error.lower()}')]"
+        
+        error_element = wait.until(EC.visibility_of_element_located((By.XPATH, error_xpath)))
+        actual_text = error_element.text
+        
+        print(f"Negative Test Passed: UI error found - {actual_text}")
+        assert expected_error.lower() in actual_text.lower()
+
+    except Exception as e:
+        email_input = driver.find_element(By.XPATH, "//input[@type='email']")
+        msg = driver.execute_script("return arguments[0].validationMessage;", email_input)
+
+        if msg and len(msg) > 0:
+            print(f"Negative Test Passed: Browser validation - {msg}")
+            assert expected_error.lower() in msg.lower()
+        else:
+        
+            driver.save_screenshot("login_error_missing.png")
+            pytest.fail(f"Could not find UI or Browser error for: {expected_error}")
