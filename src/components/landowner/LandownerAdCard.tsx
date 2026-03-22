@@ -50,3 +50,23 @@ const LandownerAdCard = ({ ad, onViewMore }: LandownerAdCardProps) => {
         },
       }}
     >  </Card>
+
+     <Box
+        sx={{
+          position: "absolute",
+          top: 16,
+          right: 16,
+          bgcolor: "rgba(0, 0, 0, 0.7)",
+          backdropFilter: "blur(4px)",
+          color: "white",
+          px: 2,
+          py: 0.75,
+          borderRadius: 2,
+          fontWeight: 700,
+          zIndex: 1,
+          display: "flex",
+          alignItems: "center",
+          gap: 0.5,
+          boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+        }}
+      ></Box>
