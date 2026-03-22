@@ -203,4 +203,41 @@ const LandOwnersPage = () => {
                       : "N/A"
                     : selectedAd.location || "N/A"}
                 </Typography>
-              </Box>       
+              </Box>    
+
+
+
+               {/* Land Details */}
+              <Box sx={{ bgcolor: "var(--surface-tint)", p: 2, borderRadius: 1 }}>
+                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+                  Land Details
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Area:</strong> {selectedAd.landArea} acres
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Soil Type:</strong> {selectedAd.soilType || "N/A"}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Water Availability:</strong>{" "}
+                  {selectedAd.waterAvailability || "N/A"}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Land History:</strong> {selectedAd.landHistory || "N/A"}
+                </Typography>
+              </Box>
+
+              {/* Availability */}
+              <Box sx={{ bgcolor: "var(--surface-tint)", p: 2, borderRadius: 1 }}>
+                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+                  Availability
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>From:</strong>{" "}
+                  {selectedAd.availableFrom ? new Date(selectedAd.availableFrom).toLocaleDateString() : "N/A"}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>To:</strong>{" "}
+                  {selectedAd.availableTo ? new Date(selectedAd.availableTo).toLocaleDateString() : "N/A"}
+                </Typography>
+              </Box>   
