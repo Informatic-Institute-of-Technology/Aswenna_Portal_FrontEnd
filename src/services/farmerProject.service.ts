@@ -17,6 +17,11 @@ export interface FarmerProjectHarvestBasedDetails {
   expectedLandArea?: number;
 }
 
+export interface FarmerProjectCommissionBasedDetails {
+  commissionPercentage: number;
+  expectedLandArea?: number;
+}
+
 export interface FarmerProjectFarmerRef {
   _id: string;
   fullName: string;
@@ -45,6 +50,8 @@ export interface FarmerProjectApiItem {
   status: string;
   visibility: boolean;
   harvestBasedDetails?: FarmerProjectHarvestBasedDetails;
+  commissionBasedDetails?: FarmerProjectCommissionBasedDetails;
+  landAvailability?: string;
   createdAt: string;
   updatedAt: string;
 }
