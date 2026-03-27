@@ -1,4 +1,5 @@
 import type { FarmerJob, InvestmentRequest } from "@/types/farmer.types";
+import type { DirectHarvestOfferAPI } from "@/types/investor.types";
 import {
   AccountBalanceWallet,
   Handshake,
@@ -408,12 +409,17 @@ const OpportunitiesPage = () => {
     setSelectedLandAd(null);
   };
 
-  const handleHireLandowner = (ad: LandownerAdApiItem) => {
+  const handleHireLandowner = (
+    ad: LandownerAdApiItem,
+    project?: DirectHarvestOfferAPI,
+  ) => {
     setLandDetailOpen(false);
     setSelectedLandAd(null);
     setNotification({
       open: true,
-      message: `Hire request sent to ${typeof ad.landowner === "object" && ad.landowner?.fullName ? ad.landowner.fullName : "Landowner"} for "${ad.title}"`,
+      message: project
+        ? `Linked "${project.harvestBaseDetails.projectTitle}" to ${typeof ad.landowner === "object" && ad.landowner?.fullName ? ad.landowner.fullName : "Landowner"} for "${ad.title}"`
+        : `Hire request sent to ${typeof ad.landowner === "object" && ad.landowner?.fullName ? ad.landowner.fullName : "Landowner"} for "${ad.title}"`,
     });
   };
 
