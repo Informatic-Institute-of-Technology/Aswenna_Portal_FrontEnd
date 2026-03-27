@@ -1,17 +1,16 @@
 import {
+  ArrowBack,
   CalendarToday,
   Close,
-  Email,
+  Download,
   Grain,
   Handshake,
-  History,
-  Info,
   Landscape,
   LocationOn,
-  NavigateBefore,
-  NavigateNext,
-  PaidOutlined,
+  Mail,
+  Message,
   Person,
+  Verified,
   WaterDrop,
 } from "@mui/icons-material";
 import {
@@ -21,10 +20,7 @@ import {
   Chip,
   Dialog,
   DialogContent,
-  Divider,
   IconButton,
-  Stack,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
@@ -41,7 +37,7 @@ interface LandAdDetailDialogProps {
   onHire?: (ad: LandownerAdApiItem) => void;
 }
 
-const formatCurrency = (amount?: string | number) => {
+const formatCurrency = (amount?: string | number): string => {
   const num = typeof amount === "string" ? parseFloat(amount) : (amount ?? 0);
   return new Intl.NumberFormat("en-LK", {
     style: "currency",
@@ -51,13 +47,9 @@ const formatCurrency = (amount?: string | number) => {
   }).format(num);
 };
 
-const formatDate = (dateStr?: string) => {
+const formatDate = (dateStr?: string): string => {
   if (!dateStr) return "—";
-  return new Date(dateStr).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
+  return new Date(dateStr).toLocaleDateString("en-CA"); // YYYY-MM-DD
 };
 
 const getLandownerInfo = (landowner?: string | LandownerInfo) => {
@@ -75,21 +67,22 @@ const getLocationString = (location?: string | LocationData): string => {
   if (!location) return "Location not specified";
   if (typeof location === "string") return location;
   const loc: LocationData = location;
-  const parts = [
-    loc.street,
-    loc.city,
-    loc.district,
-    loc.province,
-    loc.postalCode,
-  ].filter(Boolean);
+  const parts = [loc.city, loc.district, loc.province].filter(Boolean);
   if (parts.length > 0) return parts.join(", ");
   if (loc.latitude && loc.longitude)
-    return `${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)}`;
+    return `${loc.latitude.toFixed(4)}° N, ${loc.longitude.toFixed(4)}° E`;
   return "Location not specified";
 };
 
+const getCoordinates = (location?: string | LocationData): { lat: number; lng: number } | null => {
+  if (!location || typeof location === "string") return null;
+  const loc = location as LocationData;
+  if (loc.latitude && loc.longitude) return { lat: loc.latitude, lng: loc.longitude };
+  return null;
+};
+
 const soilColorMap: Record<string, string> = {
-  loamy: "#9ca3af",
+  loamy: "#84cc16",
   clay: "#f97316",
   sandy: "#eab308",
   peaty: "#8b5cf6",
@@ -98,69 +91,14 @@ const soilColorMap: Record<string, string> = {
 };
 
 const getSoilColor = (soilType?: string) =>
-  soilColorMap[(soilType ?? "").toLowerCase()] ?? "#9ca3af";
+  soilColorMap[(soilType ?? "").toLowerCase()] ?? "#84cc16";
 
 const landHistoryLabels: Record<string, string> = {
-  "organic-previous": "🌿 Previously Organic",
-  "chemical-previous": "⚗️ Previously Chemical",
-  fallow: "🌾 Fallow",
-  new: "✨ New Land",
+  "organic-previous": "organic-previous",
+  "chemical-previous": "chemical-previous",
+  fallow: "fallow",
+  new: "new",
 };
-
-interface InfoRowProps {
-  label: string;
-  value: React.ReactNode;
-  accent?: string;
-  iconEl: React.ReactElement<{ sx?: object }>;
-}
-
-const InfoRow: React.FC<InfoRowProps> = ({
-  iconEl,
-  label,
-  value,
-  accent = "#9ca3af",
-}) => (
-  <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1.5, py: 0.5 }}>
-    <Box
-      sx={{
-        mt: 0.1,
-        width: 32,
-        height: 32,
-        borderRadius: "8px",
-        bgcolor: `${accent}14`,
-        border: `1px solid ${accent}30`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexShrink: 0,
-        "& svg": { fontSize: 16, color: accent },
-      }}
-    >
-      {iconEl}
-    </Box>
-    <Box>
-      <Typography
-        sx={{
-          color: "var(--text-secondary)",
-          fontSize: "0.72rem",
-          lineHeight: 1,
-        }}
-      >
-        {label}
-      </Typography>
-      <Typography
-        sx={{
-          color: "var(--text-primary)",
-          fontWeight: 600,
-          fontSize: "0.9rem",
-          mt: 0.3,
-        }}
-      >
-        {value}
-      </Typography>
-    </Box>
-  </Box>
-);
 
 const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
   open,
@@ -168,552 +106,590 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
   ad,
   onHire,
 }) => {
-  const [imgIdx, setImgIdx] = useState(0);
+  const [mainImgIdx, setMainImgIdx] = useState(0);
   const [imgError, setImgError] = useState(false);
 
   if (!ad) return null;
 
-  const images = ad.images?.filter((i) => i.url) ?? [];
-  const coverImg = !imgError && images.length > 0 ? images[imgIdx]?.url : null;
+  const images = (ad.images ?? []).filter((i) => i.url);
+  const mainImg = !imgError && images.length > 0 ? images[mainImgIdx]?.url : null;
   const landowner = getLandownerInfo(ad.landowner);
   const locationStr = getLocationString(ad.location);
+  const coords = getCoordinates(ad.location);
   const soilColor = getSoilColor(ad.soilType);
-  const historyLabel =
-    landHistoryLabels[ad.landHistory ?? ""] ?? ad.landHistory;
+  const historyLabel = landHistoryLabels[ad.landHistory ?? ""] ?? ad.landHistory ?? "";
 
-  const handlePrev = () =>
-    setImgIdx((p) => (p - 1 + images.length) % images.length);
-  const handleNext = () => setImgIdx((p) => (p + 1) % images.length);
+  const extraPhotos = Math.max(0, images.length - 3);
+  const thumbImages = images.slice(0, 3);
 
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="md"
+      maxWidth="lg"
       fullWidth
       PaperProps={{
         sx: {
-          bgcolor: "#0b0b0b",
+          bgcolor: "#0d1610",
           backgroundImage: "none",
           border: "1px solid rgba(255,255,255,0.08)",
-          borderRadius: "20px",
+          borderRadius: "16px",
           overflow: "hidden",
-          boxShadow:
-            "0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)",
+          maxHeight: "92vh",
+          boxShadow: "0 24px 80px rgba(0,0,0,0.7)",
         },
       }}
     >
-      {/* ── Image Gallery Header ── */}
-      <Box sx={{ position: "relative", height: 280, bgcolor: "#0f0f0f" }}>
-        {coverImg ? (
-          <Box
-            component="img"
-            src={coverImg}
-            alt={ad.title}
-            onError={() => setImgError(true)}
-            sx={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              display: "block",
-            }}
-          />
-        ) : (
+      <DialogContent sx={{ p: 0, overflow: "auto" }}>
+        <Box sx={{ bgcolor: "#0d1610", minHeight: "100%" }}>
+          {/* ── Top Bar (breadcrumb + close) ── */}
           <Box
             sx={{
-              height: "100%",
-              background:
-                "linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%)",
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
+              justifyContent: "space-between",
+              px: 3,
+              py: 1.8,
+              borderBottom: "1px solid rgba(255,255,255,0.07)",
             }}
           >
-            <Landscape sx={{ fontSize: 80, color: "rgba(255,255,255,0.18)" }} />
-          </Box>
-        )}
-
-        {/* Gradient overlay */}
-        <Box
-          sx={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, transparent 40%, rgba(0,0,0,0.85) 100%)",
-          }}
-        />
-
-        {/* Image nav arrows */}
-        {images.length > 1 && (
-          <>
-            <IconButton
-              onClick={handlePrev}
-              sx={{
-                position: "absolute",
-                left: 12,
-                top: "50%",
-                transform: "translateY(-50%)",
-                bgcolor: "rgba(0,0,0,0.55)",
-                color: "#fff",
-                backdropFilter: "blur(6px)",
-                "&:hover": { bgcolor: "rgba(255,255,255,0.12)" },
-              }}
-            >
-              <NavigateBefore />
-            </IconButton>
-            <IconButton
-              onClick={handleNext}
-              sx={{
-                position: "absolute",
-                right: 12,
-                top: "50%",
-                transform: "translateY(-50%)",
-                bgcolor: "rgba(0,0,0,0.55)",
-                color: "#fff",
-                backdropFilter: "blur(6px)",
-                "&:hover": { bgcolor: "rgba(255,255,255,0.12)" },
-              }}
-            >
-              <NavigateNext />
-            </IconButton>
-            {/* Dot indicators */}
-            <Stack
-              direction="row"
-              spacing={0.6}
-              sx={{
-                position: "absolute",
-                bottom: 14,
-                left: "50%",
-                transform: "translateX(-50%)",
-              }}
-            >
-              {images.map((_, i) => (
-                <Box
-                  key={i}
-                  onClick={() => setImgIdx(i)}
-                  sx={{
-                    width: i === imgIdx ? 20 : 7,
-                    height: 7,
-                    borderRadius: "4px",
-                    bgcolor:
-                      i === imgIdx ? "#e5e7eb" : "rgba(255,255,255,0.35)",
-                    cursor: "pointer",
-                    transition: "all 0.25s ease",
-                  }}
-                />
-              ))}
-            </Stack>
-          </>
-        )}
-
-        {/* Close button */}
-        <IconButton
-          onClick={onClose}
-          sx={{
-            position: "absolute",
-            top: 12,
-            right: 12,
-            bgcolor: "rgba(0,0,0,0.5)",
-            color: "#fff",
-            backdropFilter: "blur(6px)",
-            "&:hover": { bgcolor: "rgba(255,255,255,0.1)" },
-          }}
-        >
-          <Close />
-        </IconButton>
-
-        {/* Status badge */}
-        {ad.status === "ACTIVE" && (
-          <Chip
-            label="● Active"
-            size="small"
-            sx={{
-              position: "absolute",
-              top: 14,
-              left: 14,
-              bgcolor: "rgba(255,255,255,0.08)",
-              color: "#e5e7eb",
-              border: "1px solid rgba(255,255,255,0.2)",
-              fontWeight: 700,
-              fontSize: "0.72rem",
-              backdropFilter: "blur(8px)",
-            }}
-          />
-        )}
-
-        {/* Bottom-left: land area */}
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: 16,
-            left: 18,
-            display: "flex",
-            alignItems: "center",
-            gap: 0.6,
-          }}
-        >
-          <Landscape sx={{ fontSize: 16, color: "#e5e7eb" }} />
-          <Typography
-            sx={{
-              color: "#fff",
-              fontWeight: 800,
-              fontSize: "1.1rem",
-              textShadow: "0 2px 8px rgba(0,0,0,0.8)",
-            }}
-          >
-            {ad.landArea} acres
-          </Typography>
-        </Box>
-      </Box>
-
-      <DialogContent sx={{ p: 0 }}>
-        <Box sx={{ p: 3 }}>
-          {/* ── Title & Location ── */}
-          <Typography
-            variant="h5"
-            sx={{
-              color: "var(--text-primary)",
-              fontWeight: 800,
-              mb: 0.8,
-              lineHeight: 1.2,
-            }}
-          >
-            {ad.title}
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 2 }}>
-            <LocationOn sx={{ fontSize: 16, color: "#e5e7eb" }} />
-            <Typography
-              sx={{ color: "var(--text-secondary)", fontSize: "0.88rem" }}
-            >
-              {locationStr}
-            </Typography>
-          </Box>
-
-          {/* ── Tags Row ── */}
-          <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 2.5 }}>
-            {ad.soilType && (
-              <Chip
-                icon={
-                  <Grain
-                    sx={{
-                      fontSize: "14px !important",
-                      color: `${soilColor} !important`,
-                    }}
-                  />
-                }
-                label={`${ad.soilType} Soil`}
-                size="small"
-                sx={{
-                  bgcolor: `${soilColor}14`,
-                  border: `1px solid ${soilColor}40`,
-                  color: soilColor,
-                  fontWeight: 600,
-                }}
-              />
-            )}
-            {historyLabel && (
-              <Chip
-                label={historyLabel}
-                size="small"
-                sx={{
-                  bgcolor: "rgba(99,102,241,0.12)",
-                  border: "1px solid rgba(99,102,241,0.3)",
-                  color: "#818cf8",
-                  fontWeight: 600,
-                }}
-              />
-            )}
-            {ad.waterAvailability && (
-              <Chip
-                icon={
-                  <WaterDrop
-                    sx={{
-                      fontSize: "14px !important",
-                      color: "#06b6d4 !important",
-                    }}
-                  />
-                }
-                label={ad.waterAvailability}
-                size="small"
-                sx={{
-                  bgcolor: "rgba(6,182,212,0.1)",
-                  border: "1px solid rgba(6,182,212,0.3)",
-                  color: "#06b6d4",
-                  fontWeight: 600,
-                }}
-              />
-            )}
-          </Box>
-
-          {/* ── Rental Highlight ── */}
-          <Box
-            sx={{
-              background:
-                "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              borderRadius: "14px",
-              p: 2,
-              mb: 2.5,
-              display: "flex",
-              alignItems: "center",
-              gap: 1.5,
-            }}
-          >
-            <Box
-              sx={{
-                width: 44,
-                height: 44,
-                borderRadius: "12px",
-                bgcolor: "rgba(255,255,255,0.07)",
-                border: "1px solid rgba(255,255,255,0.12)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <PaidOutlined sx={{ color: "#e5e7eb", fontSize: 22 }} />
-            </Box>
-            <Box>
-              <Typography
-                sx={{ color: "var(--text-secondary)", fontSize: "0.72rem" }}
-              >
-                Rental Amount per Month
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <IconButton onClick={onClose} size="small" sx={{ color: "#9ca3af", p: 0.5 }}>
+                <ArrowBack sx={{ fontSize: 18 }} />
+              </IconButton>
+              <Typography sx={{ color: "#6b7280", fontSize: "0.8rem" }}>
+                Marketplace
               </Typography>
+              <Typography sx={{ color: "#6b7280", fontSize: "0.8rem" }}>/</Typography>
+              <Typography sx={{ color: "#e5e7eb", fontSize: "0.8rem", fontWeight: 600 }}>
+                Land Detail
+              </Typography>
+            </Box>
+            <IconButton
+              onClick={onClose}
+              size="small"
+              sx={{ color: "#9ca3af", "&:hover": { color: "#e5e7eb" } }}
+            >
+              <Close sx={{ fontSize: 18 }} />
+            </IconButton>
+          </Box>
+
+          {/* ── Title Row ── */}
+          <Box
+            sx={{
+              px: 3,
+              pt: 2.5,
+              pb: 1.5,
+              display: "flex",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              gap: 2,
+              flexWrap: "wrap",
+            }}
+          >
+            <Box sx={{ flex: 1, minWidth: 0 }}>
               <Typography
+                variant="h4"
                 sx={{
-                  color: "#f5f5f5",
+                  color: "#f0f4f0",
                   fontWeight: 800,
-                  fontSize: "1.4rem",
                   lineHeight: 1.2,
+                  mb: 1,
+                  fontSize: { xs: "1.5rem", sm: "2rem" },
                 }}
               >
-                {formatCurrency(ad.rentalAmount)}
+                {ad.title}
               </Typography>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                  <LocationOn sx={{ fontSize: 16, color: "#84cc16" }} />
+                  <Typography sx={{ color: "#9ca3af", fontSize: "0.9rem" }}>
+                    {locationStr}
+                  </Typography>
+                </Box>
+                {ad.status === "ACTIVE" && (
+                  <Chip
+                    icon={<Verified sx={{ fontSize: "14px !important", color: "#84cc16 !important" }} />}
+                    label="VERIFIED LAND"
+                    size="small"
+                    sx={{
+                      bgcolor: "rgba(132,204,22,0.1)",
+                      border: "1px solid rgba(132,204,22,0.35)",
+                      color: "#84cc16",
+                      fontWeight: 700,
+                      fontSize: "0.65rem",
+                      letterSpacing: "0.06em",
+                    }}
+                  />
+                )}
+              </Box>
+            </Box>
+
+            {/* Action buttons */}
+            <Box sx={{ display: "flex", gap: 1.5, flexShrink: 0 }}>
+              <Button
+                variant="outlined"
+                startIcon={<Download sx={{ fontSize: 16 }} />}
+                sx={{
+                  borderColor: "rgba(255,255,255,0.25)",
+                  color: "#d1d5db",
+                  borderRadius: "8px",
+                  textTransform: "none",
+                  fontWeight: 600,
+                  fontSize: "0.82rem",
+                  px: 2,
+                  py: 0.8,
+                  "&:hover": {
+                    borderColor: "rgba(255,255,255,0.45)",
+                    bgcolor: "rgba(255,255,255,0.05)",
+                  },
+                }}
+              >
+                Download Documentation
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<Handshake sx={{ fontSize: 16 }} />}
+                onClick={() => onHire && onHire(ad)}
+                sx={{
+                  bgcolor: "#84cc16",
+                  color: "#0a120c",
+                  borderRadius: "8px",
+                  textTransform: "none",
+                  fontWeight: 700,
+                  fontSize: "0.82rem",
+                  px: 2.2,
+                  py: 0.8,
+                  "&:hover": {
+                    bgcolor: "#a3e635",
+                    boxShadow: "0 4px 16px rgba(132,204,22,0.4)",
+                  },
+                }}
+              >
+                Request Connection
+              </Button>
             </Box>
           </Box>
 
-          {/* ── Info Grid ── */}
+          {/* ── Main Content: Image Left + Panel Right ── */}
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 1.5,
-              p: 2,
-              bgcolor: "rgba(255,255,255,0.02)",
-              borderRadius: "12px",
-              border: "1px solid rgba(255,255,255,0.06)",
-              mb: 2.5,
+              gridTemplateColumns: { xs: "1fr", md: "1fr 320px" },
+              gap: 0,
+              px: 3,
+              pb: 3,
             }}
           >
-            <InfoRow
-              iconEl={<CalendarToday />}
-              label="Available From"
-              value={formatDate(ad.availableFrom)}
-              accent="#06b6d4"
-            />
-            <InfoRow
-              iconEl={<CalendarToday />}
-              label="Available To"
-              value={formatDate(ad.availableTo)}
-              accent="#f97316"
-            />
-          </Box>
-
-          {/* ── Additional Info ── */}
-          {ad.additionalInfo && (
-            <Box
-              sx={{
-                p: 2,
-                bgcolor: "rgba(255,255,255,0.025)",
-                borderRadius: "12px",
-                border: "1px solid rgba(255,255,255,0.06)",
-                mb: 2.5,
-              }}
-            >
+            {/* LEFT: Image + Gallery + Narrative */}
+            <Box sx={{ pr: { md: 3 } }}>
+              {/* Main Image */}
               <Box
-                sx={{ display: "flex", alignItems: "center", gap: 0.8, mb: 1 }}
-              >
-                <Info sx={{ fontSize: 16, color: "#818cf8" }} />
-                <Typography
-                  sx={{ color: "#818cf8", fontWeight: 700, fontSize: "0.8rem" }}
-                >
-                  Additional Information
-                </Typography>
-              </Box>
-              <Typography
                 sx={{
-                  color: "var(--text-secondary)",
-                  fontSize: "0.875rem",
-                  lineHeight: 1.6,
+                  borderRadius: "12px",
+                  overflow: "hidden",
+                  height: 310,
+                  bgcolor: "#1a2a1a",
+                  mb: 1.5,
                 }}
               >
-                {ad.additionalInfo}
-              </Typography>
-            </Box>
-          )}
-
-          {/* ── Land History (verbose) ── */}
-          {ad.landHistory && (
-            <Box
-              sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2.5 }}
-            >
-              <History sx={{ fontSize: 16, color: "#a78bfa" }} />
-              <Typography
-                sx={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}
-              >
-                <span style={{ color: "#a78bfa", fontWeight: 600 }}>
-                  Land History:{" "}
-                </span>
-                {historyLabel || ad.landHistory}
-              </Typography>
-            </Box>
-          )}
-
-          <Divider sx={{ borderColor: "rgba(255,255,255,0.07)", mb: 2.5 }} />
-
-          {/* ── Landowner Card ── */}
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-              p: 2,
-              bgcolor: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              borderRadius: "14px",
-              mb: 3,
-            }}
-          >
-            <Avatar
-              src={landowner.avatar ?? undefined}
-              sx={{
-                width: 52,
-                height: 52,
-                fontSize: "1.25rem",
-                fontWeight: 800,
-                bgcolor: "rgba(255,255,255,0.08)",
-                color: "#f5f5f5",
-                border: "2px solid rgba(255,255,255,0.18)",
-              }}
-            >
-              {landowner.name.charAt(0).toUpperCase()}
-            </Avatar>
-            <Box sx={{ flex: 1 }}>
-              <Typography
-                sx={{
-                  color: "var(--text-primary)",
-                  fontWeight: 700,
-                  fontSize: "1rem",
-                }}
-              >
-                {landowner.name}
-              </Typography>
-              {landowner.email && (
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 0.5,
-                    mt: 0.3,
-                  }}
-                >
-                  <Email
-                    sx={{ fontSize: 13, color: "var(--text-secondary)" }}
+                {mainImg ? (
+                  <Box
+                    component="img"
+                    src={mainImg}
+                    alt={ad.title}
+                    onError={() => setImgError(true)}
+                    sx={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                   />
-                  <Typography
-                    sx={{ color: "var(--text-secondary)", fontSize: "0.8rem" }}
+                ) : (
+                  <Box
+                    sx={{
+                      height: "100%",
+                      background: "linear-gradient(135deg, #1a3320 0%, #2d5a3d 50%, #1e4028 100%)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
                   >
-                    {landowner.email}
-                  </Typography>
+                    <Landscape sx={{ fontSize: 80, color: "rgba(132,204,22,0.2)" }} />
+                  </Box>
+                )}
+              </Box>
+
+              {/* Thumbnail strip */}
+              {images.length > 0 && (
+                <Box sx={{ display: "flex", gap: 1, mb: 3, overflowX: "auto" }}>
+                  {thumbImages.map((img, i) => (
+                    <Box
+                      key={i}
+                      onClick={() => setMainImgIdx(i)}
+                      sx={{
+                        width: 80,
+                        height: 60,
+                        borderRadius: "8px",
+                        overflow: "hidden",
+                        flexShrink: 0,
+                        cursor: "pointer",
+                        border: mainImgIdx === i
+                          ? "2px solid #84cc16"
+                          : "2px solid rgba(255,255,255,0.08)",
+                        transition: "border-color 0.2s",
+                      }}
+                    >
+                      <Box
+                        component="img"
+                        src={img.url}
+                        alt={`Photo ${i + 1}`}
+                        sx={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      />
+                    </Box>
+                  ))}
+                  {extraPhotos > 0 && (
+                    <Box
+                      sx={{
+                        width: 80,
+                        height: 60,
+                        borderRadius: "8px",
+                        flexShrink: 0,
+                        bgcolor: "rgba(255,255,255,0.05)",
+                        border: "2px solid rgba(255,255,255,0.08)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <Typography sx={{ color: "#9ca3af", fontSize: "0.72rem", fontWeight: 700 }}>
+                        +{extraPhotos} Photos
+                      </Typography>
+                    </Box>
+                  )}
                 </Box>
               )}
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 0.5,
-                  mt: 0.2,
-                }}
-              >
-                <Person sx={{ fontSize: 13, color: "var(--text-secondary)" }} />
+
+              {/* Land Narrative */}
+              <Box sx={{ mb: 3 }}>
                 <Typography
-                  sx={{ color: "var(--text-secondary)", fontSize: "0.75rem" }}
+                  sx={{
+                    color: "#f0f4f0",
+                    fontWeight: 800,
+                    fontSize: "0.85rem",
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    mb: 1.5,
+                  }}
                 >
-                  Land Owner
+                  LAND NARRATIVE
                 </Typography>
+
+                {/* Description text */}
+                <Typography
+                  sx={{ color: "#9ca3af", fontSize: "0.875rem", lineHeight: 1.7, mb: 2 }}
+                >
+                  {ad.additionalInfo ||
+                    `This land parcel in ${locationStr} offers excellent agricultural potential. ${
+                      ad.soilType ? `The soil is of ${ad.soilType} type, ideal for farming.` : ""
+                    } ${
+                      ad.waterAvailability
+                        ? `Water availability includes ${ad.waterAvailability}.`
+                        : ""
+                    }`}
+                </Typography>
+
+                {/* Land History + Additional Info tags */}
+                <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1.5 }}>
+                  {ad.landHistory && (
+                    <Box
+                      sx={{
+                        bgcolor: "rgba(255,255,255,0.04)",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        borderRadius: "8px",
+                        p: 1.5,
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          color: "#6b7280",
+                          fontSize: "0.65rem",
+                          fontWeight: 700,
+                          letterSpacing: "0.08em",
+                          textTransform: "uppercase",
+                          mb: 0.5,
+                        }}
+                      >
+                        LAND HISTORY
+                      </Typography>
+                      <Typography sx={{ color: "#84cc16", fontSize: "0.82rem", fontWeight: 600 }}>
+                        {historyLabel || ad.landHistory}
+                      </Typography>
+                    </Box>
+                  )}
+                  {ad.additionalInfo && (
+                    <Box
+                      sx={{
+                        bgcolor: "rgba(255,255,255,0.04)",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        borderRadius: "8px",
+                        p: 1.5,
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          color: "#6b7280",
+                          fontSize: "0.65rem",
+                          fontWeight: 700,
+                          letterSpacing: "0.08em",
+                          textTransform: "uppercase",
+                          mb: 0.5,
+                        }}
+                      >
+                        ADDITIONAL INFO
+                      </Typography>
+                      <Typography sx={{ color: "#e5e7eb", fontSize: "0.82rem", fontWeight: 600 }}>
+                        {ad.additionalInfo}
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
               </Box>
             </Box>
-            <Chip
-              label="Contact"
-              size="small"
-              sx={{
-                bgcolor: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.18)",
-                color: "#f5f5f5",
-                fontWeight: 700,
-                cursor: "pointer",
-                "&:hover": { bgcolor: "rgba(255,255,255,0.14)" },
-              }}
-              onClick={() =>
-                landowner.email && window.open(`mailto:${landowner.email}`)
-              }
-            />
-          </Box>
 
-          {/* ── CTA Buttons ── */}
-          <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
-            <Button
-              onClick={onClose}
-              variant="outlined"
-              sx={{
-                borderColor: "rgba(255,255,255,0.2)",
-                color: "#d1d5db",
-                fontWeight: 600,
-                borderRadius: "10px",
-                textTransform: "none",
-                px: 2.5,
-                py: 0.9,
-                fontSize: "0.9rem",
-                "&:hover": {
-                  borderColor: "rgba(255,255,255,0.35)",
-                  bgcolor: "rgba(255,255,255,0.06)",
-                  color: "#f5f5f5",
-                },
-              }}
-            >
-              Close
-            </Button>
-            <Tooltip title={!onHire ? "Hire feature coming soon" : ""}>
-              <span>
+            {/* RIGHT: Investment Panel + Landowner + Map */}
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              {/* Monthly Investment Panel */}
+              <Box
+                sx={{
+                  bgcolor: "#141e14",
+                  border: "1px solid rgba(132,204,22,0.15)",
+                  borderRadius: "12px",
+                  p: 2.5,
+                }}
+              >
+                <Typography sx={{ color: "#6b7280", fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", mb: 0.8 }}>
+                  MONTHLY INVESTMENT
+                </Typography>
+                <Typography sx={{ color: "#f0f4f0", fontSize: "1.8rem", fontWeight: 800, lineHeight: 1, mb: 0.4 }}>
+                  {formatCurrency(ad.rentalAmount)}
+                  <Typography component="span" sx={{ color: "#6b7280", fontSize: "0.9rem", fontWeight: 400 }}>
+                    {" "}/ month
+                  </Typography>
+                </Typography>
+
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5, mt: 2 }}>
+                  {/* Land Area */}
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.2, py: 0.8, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                    <Landscape sx={{ fontSize: 18, color: "#9ca3af" }} />
+                    <Typography sx={{ color: "#9ca3af", fontSize: "0.82rem", flex: 1 }}>Land Area</Typography>
+                    <Typography sx={{ color: "#f0f4f0", fontSize: "0.85rem", fontWeight: 700 }}>
+                      {ad.landArea ? `${ad.landArea} Acres` : "—"}
+                    </Typography>
+                  </Box>
+
+                  {/* Soil Type */}
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.2, py: 0.8, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                    <Grain sx={{ fontSize: 18, color: "#9ca3af" }} />
+                    <Typography sx={{ color: "#9ca3af", fontSize: "0.82rem", flex: 1 }}>Soil Type</Typography>
+                    <Typography sx={{ color: soilColor, fontSize: "0.85rem", fontWeight: 700 }}>
+                      {ad.soilType ? ad.soilType.charAt(0).toUpperCase() + ad.soilType.slice(1) : "—"}
+                    </Typography>
+                  </Box>
+
+                  {/* Available From */}
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.2, py: 0.8, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                    <CalendarToday sx={{ fontSize: 18, color: "#9ca3af" }} />
+                    <Typography sx={{ color: "#9ca3af", fontSize: "0.82rem", flex: 1 }}>Available From</Typography>
+                    <Typography sx={{ color: "#f0f4f0", fontSize: "0.85rem", fontWeight: 700 }}>
+                      {formatDate(ad.availableFrom)}
+                    </Typography>
+                  </Box>
+
+                  {/* Term End */}
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.2, py: 0.8 }}>
+                    <CalendarToday sx={{ fontSize: 18, color: "#9ca3af" }} />
+                    <Typography sx={{ color: "#9ca3af", fontSize: "0.82rem", flex: 1 }}>Term End</Typography>
+                    <Typography sx={{ color: "#f0f4f0", fontSize: "0.85rem", fontWeight: 700 }}>
+                      {formatDate(ad.availableTo)}
+                    </Typography>
+                  </Box>
+
+                  {/* Water/Irrigation */}
+                  {ad.waterAvailability && (
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.2, py: 0.8, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                      <WaterDrop sx={{ fontSize: 18, color: "#06b6d4" }} />
+                      <Typography sx={{ color: "#9ca3af", fontSize: "0.82rem", flex: 1 }}>Irrigation</Typography>
+                      <Typography sx={{ color: "#f0f4f0", fontSize: "0.85rem", fontWeight: 700 }}>
+                        {ad.waterAvailability}
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+
+                {/* INITIATE AGREEMENT */}
                 <Button
+                  fullWidth
                   variant="contained"
-                  disabled={!onHire}
-                  startIcon={<Handshake />}
                   onClick={() => onHire && onHire(ad)}
                   sx={{
-                    bgcolor: "#f5f5f5",
-                    color: "#1a1a1a",
-                    fontWeight: 700,
-                    borderRadius: "10px",
-                    textTransform: "none",
-                    px: 2.5,
-                    py: 0.9,
-                    fontSize: "0.9rem",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
+                    mt: 2.5,
+                    bgcolor: "#3b82f6",
+                    color: "#fff",
+                    fontWeight: 800,
+                    fontSize: "0.82rem",
+                    letterSpacing: "0.1em",
+                    borderRadius: "8px",
+                    py: 1.2,
+                    textTransform: "uppercase",
                     "&:hover": {
-                      bgcolor: "#e5e7eb",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
-                    },
-                    "&.Mui-disabled": {
-                      bgcolor: "rgba(255,255,255,0.1)",
-                      color: "rgba(255,255,255,0.35)",
+                      bgcolor: "#2563eb",
+                      boxShadow: "0 4px 16px rgba(59,130,246,0.4)",
                     },
                   }}
                 >
-                  Hire Landowner
+                  INITIATE AGREEMENT
                 </Button>
-              </span>
-            </Tooltip>
+                <Typography sx={{ color: "#4b5563", fontSize: "0.62rem", textAlign: "center", mt: 0.8, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                  SUBJECT TO SOVEREIGN LEDGER VERIFICATION
+                </Typography>
+              </Box>
+
+              {/* Landowner Profile */}
+              <Box
+                sx={{
+                  bgcolor: "#141e14",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                  borderRadius: "12px",
+                  p: 2,
+                }}
+              >
+                <Typography sx={{ color: "#6b7280", fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", mb: 1.5 }}>
+                  LANDOWNER PROFILE
+                </Typography>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5 }}>
+                  <Avatar
+                    src={landowner.avatar ?? undefined}
+                    sx={{
+                      width: 44,
+                      height: 44,
+                      fontWeight: 800,
+                      fontSize: "1rem",
+                      bgcolor: "rgba(132,204,22,0.15)",
+                      color: "#84cc16",
+                      border: "2px solid rgba(132,204,22,0.3)",
+                    }}
+                  >
+                    {landowner.name.charAt(0).toUpperCase()}
+                  </Avatar>
+                  <Box>
+                    <Typography sx={{ color: "#f0f4f0", fontWeight: 700, fontSize: "0.9rem" }}>
+                      {landowner.name}
+                    </Typography>
+                    {landowner.email && (
+                      <Typography sx={{ color: "#6b7280", fontSize: "0.75rem" }}>
+                        {landowner.email}
+                      </Typography>
+                    )}
+                  </Box>
+                </Box>
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <Button
+                    variant="outlined"
+                    startIcon={<Message sx={{ fontSize: 14 }} />}
+                    size="small"
+                    sx={{
+                      flex: 1,
+                      borderColor: "rgba(255,255,255,0.2)",
+                      color: "#d1d5db",
+                      textTransform: "none",
+                      fontWeight: 600,
+                      fontSize: "0.78rem",
+                      borderRadius: "8px",
+                      "&:hover": { borderColor: "rgba(255,255,255,0.4)", bgcolor: "rgba(255,255,255,0.04)" },
+                    }}
+                    onClick={() => landowner.email && window.open(`mailto:${landowner.email}`)}
+                  >
+                    Message
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    startIcon={<Person sx={{ fontSize: 14 }} />}
+                    size="small"
+                    sx={{
+                      flex: 1,
+                      borderColor: "rgba(255,255,255,0.2)",
+                      color: "#d1d5db",
+                      textTransform: "none",
+                      fontWeight: 600,
+                      fontSize: "0.78rem",
+                      borderRadius: "8px",
+                      "&:hover": { borderColor: "rgba(255,255,255,0.4)", bgcolor: "rgba(255,255,255,0.04)" },
+                    }}
+                  >
+                    Profile
+                  </Button>
+                </Box>
+              </Box>
+
+              {/* Regional Location / Map */}
+              {coords && (
+                <Box
+                  sx={{
+                    bgcolor: "#141e14",
+                    border: "1px solid rgba(255,255,255,0.06)",
+                    borderRadius: "12px",
+                    overflow: "hidden",
+                  }}
+                >
+                  <Box sx={{ px: 2, pt: 1.5, pb: 1, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <Typography sx={{ color: "#6b7280", fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                      REGIONAL LOCATION
+                    </Typography>
+                    <Typography sx={{ color: "#4b5563", fontSize: "0.65rem" }}>
+                      {coords.lat.toFixed(4)}° N, {coords.lng.toFixed(4)}° E
+                    </Typography>
+                  </Box>
+                  <Box
+                    component="iframe"
+                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${coords.lng - 0.05},${coords.lat - 0.05},${coords.lng + 0.05},${coords.lat + 0.05}&layer=mapnik&marker=${coords.lat},${coords.lng}`}
+                    sx={{
+                      width: "100%",
+                      height: 200,
+                      border: "none",
+                      display: "block",
+                      filter: "invert(0.85) hue-rotate(180deg) brightness(0.85) contrast(0.9)",
+                    }}
+                    title="Land Location Map"
+                    loading="lazy"
+                  />
+                </Box>
+              )}
+
+              {!coords && (
+                <Box
+                  sx={{
+                    bgcolor: "#141e14",
+                    border: "1px solid rgba(255,255,255,0.06)",
+                    borderRadius: "12px",
+                    p: 2,
+                  }}
+                >
+                  <Typography sx={{ color: "#6b7280", fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", mb: 1 }}>
+                    REGIONAL LOCATION
+                  </Typography>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                    <LocationOn sx={{ fontSize: 14, color: "#84cc16" }} />
+                    <Typography sx={{ color: "#9ca3af", fontSize: "0.82rem" }}>
+                      {locationStr}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 0.5 }}>
+                    <Mail sx={{ fontSize: 14, color: "#6b7280" }} />
+                    <Typography sx={{ color: "#4b5563", fontSize: "0.72rem" }}>
+                      Coordinates unavailable
+                    </Typography>
+                  </Box>
+                </Box>
+              )}
+            </Box>
           </Box>
         </Box>
       </DialogContent>

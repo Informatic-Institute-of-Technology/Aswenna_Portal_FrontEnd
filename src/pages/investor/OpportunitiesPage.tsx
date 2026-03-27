@@ -1,5 +1,9 @@
 import type { FarmerJob, InvestmentRequest } from "@/types/farmer.types";
-import { AccountBalanceWallet, Handshake, Landscape } from "@mui/icons-material";
+import {
+  AccountBalanceWallet,
+  Handshake,
+  Landscape,
+} from "@mui/icons-material";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import {
@@ -19,7 +23,10 @@ import {
   getFarmerProjects,
   type FarmerProjectApiItem,
 } from "../../services/farmerProject.service";
-import { getLandownerAds, type LandownerAdApiItem } from "../../services/landownerAds.service";
+import {
+  getLandownerAds,
+  type LandownerAdApiItem,
+} from "../../services/landownerAds.service";
 import { getInvestorOffers } from "../../services/offer.service";
 import Notification from "../../shared/components/Notification";
 import { FarmerJobType } from "../../types/farmer.types";
@@ -139,8 +146,8 @@ const buildInstallmentSchedule = (
     const dueDate =
       range > 0
         ? new Date(
-          start + (range * (index + 1)) / milestones.length,
-        ).toISOString()
+            start + (range * (index + 1)) / milestones.length,
+          ).toISOString()
         : project.effectiveDateFrom;
 
     return {
@@ -217,9 +224,9 @@ const mapFarmerProjectToInvestmentRequest = (
 };
 
 const OpportunitiesPage = () => {
-  const [activeTab, setActiveTab] = useState<"investments" | "hire" | "land-search">(
-    "investments",
-  );
+  const [activeTab, setActiveTab] = useState<
+    "investments" | "hire" | "land-search"
+  >("investments");
   const [selectedRequest, setSelectedRequest] =
     useState<InvestmentRequest | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -240,7 +247,8 @@ const OpportunitiesPage = () => {
   const [landAds, setLandAds] = useState<LandownerAdApiItem[]>([]);
   const [landAdsLoading, setLandAdsLoading] = useState(false);
   const [landAdsError, setLandAdsError] = useState<string | null>(null);
-  const [selectedLandAd, setSelectedLandAd] = useState<LandownerAdApiItem | null>(null);
+  const [selectedLandAd, setSelectedLandAd] =
+    useState<LandownerAdApiItem | null>(null);
   const [landDetailOpen, setLandDetailOpen] = useState(false);
 
   const [notification, setNotification] = useState<{
@@ -331,16 +339,21 @@ const OpportunitiesPage = () => {
         setLandAdsError(null);
         const response = await getLandownerAds();
         if (mounted) {
-          setLandAds((response.data ?? []).filter((ad) => ad.status === "ACTIVE"));
+          setLandAds(
+            (response.data ?? []).filter((ad) => ad.status === "ACTIVE"),
+          );
         }
       } catch {
-        if (mounted) setLandAdsError("Failed to load land listings. Please try again.");
+        if (mounted)
+          setLandAdsError("Failed to load land listings. Please try again.");
       } finally {
         if (mounted) setLandAdsLoading(false);
       }
     };
     loadLandAds();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const allFarmerJobs = farmerJobsData as FarmerJob[];
@@ -441,7 +454,9 @@ const OpportunitiesPage = () => {
         <TabNavigation
           activeTab={activeTab}
           tabs={tabs}
-          onChange={(value) => setActiveTab(value as "investments" | "hire" | "land-search")}
+          onChange={(value) =>
+            setActiveTab(value as "investments" | "hire" | "land-search")
+          }
           variant="dark"
         />
 
@@ -585,8 +600,14 @@ const OpportunitiesPage = () => {
 
             {landAdsLoading ? (
               <Box sx={{ textAlign: "center", py: 10 }}>
-                <CircularProgress size={40} sx={{ color: "var(--color-brand-accent)" }} />
-                <Typography variant="body2" sx={{ mt: 2, color: "text.secondary" }}>
+                <CircularProgress
+                  size={40}
+                  sx={{ color: "var(--color-brand-accent)" }}
+                />
+                <Typography
+                  variant="body2"
+                  sx={{ mt: 2, color: "text.secondary" }}
+                >
                   Loading land listings…
                 </Typography>
               </Box>
@@ -600,7 +621,9 @@ const OpportunitiesPage = () => {
                   color: "text.secondary",
                 }}
               >
-                <Typography variant="h6" gutterBottom>Couldn&apos;t load land listings</Typography>
+                <Typography variant="h6" gutterBottom>
+                  Couldn&apos;t load land listings
+                </Typography>
                 <Typography variant="body2">{landAdsError}</Typography>
               </Box>
             ) : landAds.length > 0 ? (
@@ -629,9 +652,15 @@ const OpportunitiesPage = () => {
                   color: "text.secondary",
                 }}
               >
-                <Landscape sx={{ fontSize: 56, color: "rgba(132,204,22,0.3)", mb: 1 }} />
-                <Typography variant="h6" gutterBottom>No land listings available</Typography>
-                <Typography variant="body2">Check back later for new land rental opportunities</Typography>
+                <Landscape
+                  sx={{ fontSize: 56, color: "rgba(132,204,22,0.3)", mb: 1 }}
+                />
+                <Typography variant="h6" gutterBottom>
+                  No land listings available
+                </Typography>
+                <Typography variant="body2">
+                  Check back later for new land rental opportunities
+                </Typography>
               </Box>
             )}
           </Box>
