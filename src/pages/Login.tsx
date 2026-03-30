@@ -7,6 +7,7 @@ import { Eye, EyeOff } from "lucide-react";
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { AppButton } from "../shared/components";
 import Notification from "../shared/components/Notification";
 import { useNotification } from "../shared/hooks/useNotification";
 import AccountProcessingDialog from "./components/AccountProcessingDialog";
@@ -152,13 +153,20 @@ const Login = () => {
                 </Link>
               </div>
 
-              <button type="submit" className="login-button" disabled={loading}>
+              <AppButton
+                type="submit"
+                variant="success"
+                size="md"
+                fullWidth
+                disabled={loading}
+                className="login-button"
+              >
                 {loading ? (
                   <CircularProgress size={20} color="success" />
                 ) : (
                   "Login"
                 )}
-              </button>
+              </AppButton>
             </form>
 
             <div className="signup-link-container">

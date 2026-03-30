@@ -14,7 +14,6 @@ import {
 import {
   Avatar,
   Box,
-  Button,
   Chip,
   Dialog,
   IconButton,
@@ -30,6 +29,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
+import { AppButton } from "../../shared/components";
 
 export interface InvestmentRequestDialogProps {
   request: InvestmentRequest | null;
@@ -971,80 +971,25 @@ const InvestmentRequestDialog = ({
           gap: 2,
         }}
       >
-        <Button
-          variant="outlined"
-          size="large"
-          onClick={onClose}
-          sx={{
-            borderColor: "var(--border-medium)",
-            color: "var(--text-secondary)",
-            fontWeight: 600,
-            textTransform: "none",
-            px: 4,
-            "&:hover": {
-              borderColor: "var(--neutral-700)",
-              bgcolor: "var(--surface-tint)",
-            },
-          }}
-        >
+        <AppButton variant="outline" size="md" onClick={onClose}>
           Close
-        </Button>
+        </AppButton>
         <Stack direction="row" spacing={2}>
-          <Button
-            variant="contained"
-            size="large"
-            startIcon={<GetApp />}
-            sx={{
-              bgcolor: "var(--color-lime)",
-              color: "var(--text-primary)",
-              fontWeight: 700,
-              textTransform: "none",
-              px: 4,
-              boxShadow: "0 4px 12px var(--color-lime-border)",
-              "&:hover": {
-                bgcolor: "var(--color-lime-hover)",
-                boxShadow: "0 6px 16px var(--color-lime-border)",
-              },
-            }}
-          >
+          <AppButton variant="success" size="md" leadingIcon={<GetApp />}>
             Download Full Report
-          </Button>
-          <Button
-            variant="contained"
-            size="large"
-            startIcon={<TrendingUp />}
+          </AppButton>
+          <AppButton
+            variant={request.status === "open" ? "success" : "neutral"}
+            size="md"
+            leadingIcon={<TrendingUp />}
             onClick={() => {
               onInvest?.(request.id);
               onClose();
             }}
             disabled={request.status !== "open"}
-            sx={{
-              bgcolor:
-                request.status === "open"
-                  ? "var(--color-lime)"
-                  : "var(--neutral-700)",
-              color: "var(--text-primary)",
-              fontWeight: 700,
-              textTransform: "none",
-              px: 4,
-              boxShadow:
-                request.status === "open"
-                  ? "0 4px 12px var(--color-lime-border)"
-                  : "none",
-              "&:hover": {
-                bgcolor:
-                  request.status === "open"
-                    ? "var(--color-lime-hover)"
-                    : "var(--neutral-700)",
-                boxShadow:
-                  request.status === "open"
-                    ? "0 6px 16px var(--color-lime-border)"
-                    : "none",
-              },
-            }}
           >
             {request.status === "open" ? "Invest Now" : "Not Available"}
-          </Button>
+          </AppButton>
         </Stack>
       </Box>
     </Dialog>

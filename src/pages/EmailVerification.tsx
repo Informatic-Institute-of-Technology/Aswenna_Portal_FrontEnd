@@ -76,23 +76,32 @@ const EmailVerification = () => {
       return;
     }
 
-    const newCode = [...code];
-    newCode[index] = value;
-    setCode(newCode);
-
-    if (value && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
+              <AppButton
+                type="button"
+                onClick={handleResendCode}
+                variant="outline"
+                size="sm"
+                disabled={!canResend || loading}
+                className={`resend-link ${canResend ? "active" : ""}`}
+              >
+                Resend Code
+              </AppButton>
 
   const handleKeyDown = (index: number, e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && !code[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
-
-  const handlePaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
+            <AppButton
+              type="submit"
+              variant="success"
+              size="md"
+              fullWidth
+              disabled={loading}
+              className="verify-button"
+            >
+              {loading ? (
+                <CircularProgress size={20} color="success" />
+              ) : (
+                "Verify"
+              )}
+            </AppButton>
     const pastedData = e.clipboardData.getData("text").slice(0, 6);
     if (!/^\d+$/.test(pastedData)) return;
 

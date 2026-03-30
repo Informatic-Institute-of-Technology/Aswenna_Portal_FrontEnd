@@ -90,15 +90,15 @@ export interface PaymentDetailProps {
 }
 
 const fmtD = (iso: string) =>
-  iso
-    ? new Date(iso).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      })
-    : "";
-
-export function PaymentDetailContent({
+  import {
+    AccountBalanceWallet,
+    CalendarToday,
+    Download,
+    LocationOn,
+    Payments,
+    ShowChart,
+    Tag,
+  } from "@mui/icons-material";
   type,
   projectId,
   paymentId,
@@ -109,6 +109,7 @@ export function PaymentDetailContent({
 }: PaymentDetailProps) {
   const [payOpen, setPayOpen] = useState(false);
   const [payInitialIds, setPayInitialIds] = useState<string[] | undefined>(
+  import { AppButton } from "../../../shared/components";
     undefined,
   );
 
@@ -365,16 +366,14 @@ export function PaymentDetailContent({
               </div>
             </div>
           </div>
-          <button
-            className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg transition-all hover:text-white"
-            style={{
-              background: "var(--bg-overlay)",
-              border: "1px solid var(--border-medium)",
-              color: "var(--text-secondary)",
-            }}
+          <AppButton
+            variant="outline"
+            size="sm"
+            leadingIcon={<Download sx={{ fontSize: 15 }} />}
+            className="!px-3 !py-2"
           >
-            <Download sx={{ fontSize: 15 }} /> {downloadLabel}
-          </button>
+            {downloadLabel}
+          </AppButton>
         </div>
 
         <div
@@ -425,17 +424,15 @@ export function PaymentDetailContent({
                 </span>
               </div>
               {pendingPayments.length > 1 && (
-                <button
+                <AppButton
                   onClick={openPayForAll}
-                  className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg text-white transition-all hover:opacity-90"
-                  style={{
-                    background: "linear-gradient(135deg, #6b8e23, #5a7519)",
-                    boxShadow: "0 2px 8px rgba(107, 142, 35, 0.4)",
-                  }}
+                  variant="success"
+                  size="sm"
+                  leadingIcon={<Payments sx={{ fontSize: 14 }} />}
+                  className="px-3 py-2 text-xs"
                 >
-                  <Payments sx={{ fontSize: 14 }} />
                   Pay All Pending ({pendingPayments.length})
-                </button>
+                </AppButton>
               )}
             </div>
 
