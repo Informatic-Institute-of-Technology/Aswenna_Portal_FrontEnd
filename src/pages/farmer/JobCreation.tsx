@@ -269,7 +269,7 @@ const textFieldStyles = {
     "&.Mui-focused fieldset": { borderColor: "#85A446" },
   },
   "& .MuiInputLabel-root": { color: "rgba(226,232,240,0.65)" },
-  "& .MuiInputLabel-root.Mui-focused": { color: "#A3E635" },
+  "& .MuiInputLabel-root.Mui-focused": { color: "#85a446" },
   "& .MuiOutlinedInput-input": { color: "#E2E8F0" },
   "& .MuiInputBase-input::placeholder": {
     color: "rgba(148,163,184,0.55)",
@@ -1051,7 +1051,7 @@ const CreateOfferDialog = ({
             Onboarding Progress
           </Typography>
           <Typography
-            sx={{ fontSize: "0.85rem", color: "#A3E635", fontWeight: 700 }}
+            sx={{ fontSize: "0.85rem", color: "#85a446", fontWeight: 700 }}
           >
             1 of 2
           </Typography>
@@ -1199,7 +1199,7 @@ const CreateOfferDialog = ({
 
                 <Typography
                   sx={{
-                    color: "#A3E635",
+                    color: "#85a446",
                     fontWeight: 800,
                     fontSize: "0.98rem",
                     display: "flex",
@@ -1276,7 +1276,7 @@ const CreateOfferDialog = ({
               fontSize: "0.7rem",
               textTransform: "uppercase",
               letterSpacing: 1,
-              color: "#A3E635",
+              color: "#85a446",
               fontWeight: 800,
               mb: 0.1,
             }}
@@ -1866,7 +1866,7 @@ const CreateOfferDialog = ({
                     variant="outlined"
                     sx={{
                       mt: 1.6,
-                      color: "#A3E635",
+                      color: "#85a446",
                       borderColor: "rgba(163,230,53,0.38)",
                       textTransform: "none",
                       fontWeight: 700,
@@ -2116,7 +2116,7 @@ const CreateOfferDialog = ({
                     variant="outlined"
                     sx={{
                       mt: 1.6,
-                      color: "#A3E635",
+                      color: "#85a446",
                       borderColor: "rgba(163,230,53,0.38)",
                       textTransform: "none",
                       fontWeight: 700,
@@ -2355,7 +2355,7 @@ const CreateOfferDialog = ({
                     size="small"
                     sx={{
                       ml: "auto",
-                      color: "#A3E635",
+                      color: "#85a446",
                       textTransform: "none",
                       fontWeight: 700,
                       fontSize: "0.68rem",

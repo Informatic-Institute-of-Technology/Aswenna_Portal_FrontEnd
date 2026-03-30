@@ -148,7 +148,7 @@
 }
 
 .form-input.success {
-  border-bottom-color: #16a34a;
+  border-bottom-color: #93b34e;
 }
 
 .email-input-wrapper {
@@ -166,7 +166,7 @@
 .email-check-icon {
   position: absolute;
   right: 0.25rem;
-  color: #16a34a;
+  color: #93b34e;
   flex-shrink: 0;
 }
 
@@ -185,7 +185,7 @@
 }
 
 .field-success {
-  color: #16a34a;
+  color: #93b34e;
   font-size: 0.85rem;
   margin-top: 0.25rem;
   display: block;

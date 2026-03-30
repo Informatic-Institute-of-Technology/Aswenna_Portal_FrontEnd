@@ -6,7 +6,7 @@ export const theme = createTheme({
     mode: "dark",
     primary: {
       main: color.brand.primary,
-      light: "#4ade80",
+      light: "#93b34e",
       dark: color.brand.primaryHover,
       contrastText: color.text.onBrand,
     },
@@ -28,7 +28,7 @@ export const theme = createTheme({
     },
     success: {
       main: color.status.success,
-      light: "#4ade80",
+      light: "#93b34e",
       dark: color.brand.primaryHover,
     },
     info: {
@@ -278,7 +278,7 @@ export const theme = createTheme({
           "&.Mui-selected": {
             backgroundColor: color.bg.selected,
             borderLeftColor: color.brand.primary,
-            "&:hover": { backgroundColor: "rgba(34,197,94,0.2)" },
+            "&:hover": { backgroundColor: "rgba(133, 164, 70,0.2)" },
           },
         },
       },

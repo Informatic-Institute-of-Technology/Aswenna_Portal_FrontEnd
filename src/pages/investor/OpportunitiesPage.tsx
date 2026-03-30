@@ -659,7 +659,7 @@ const OpportunitiesPage = () => {
                 }}
               >
                 <Landscape
-                  sx={{ fontSize: 56, color: "rgba(132,204,22,0.3)", mb: 1 }}
+                  sx={{ fontSize: 56, color: "rgba(133, 164, 70,0.3)", mb: 1 }}
                 />
                 <Typography variant="h6" gutterBottom>
                   No land listings available

@@ -309,7 +309,7 @@ const ReceivedRequestsPage = () => {
                             label="Harvest Offer"
                             size="small"
                             sx={{
-                              background: "rgba(76,175,80,0.85)",
+                              background: "rgba(133, 164, 70,0.85)",
                               color: "#fff",
                               fontWeight: 600,
                               fontSize: "0.68rem",

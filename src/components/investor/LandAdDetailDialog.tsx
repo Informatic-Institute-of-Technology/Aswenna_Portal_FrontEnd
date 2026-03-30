@@ -95,7 +95,7 @@ const getCoordinates = (
 };
 
 const soilColorMap: Record<string, string> = {
-  loamy: "#84cc16",
+  loamy: "#85a446",
   clay: "#f97316",
   sandy: "#eab308",
   peaty: "#8b5cf6",
@@ -104,7 +104,7 @@ const soilColorMap: Record<string, string> = {
 };
 
 const getSoilColor = (soilType?: string) =>
-  soilColorMap[(soilType ?? "").toLowerCase()] ?? "#84cc16";
+  soilColorMap[(soilType ?? "").toLowerCase()] ?? "#85a446";
 
 const landHistoryLabels: Record<string, string> = {
   "organic-previous": "organic-previous",
@@ -310,7 +310,7 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                   }}
                 >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                    <LocationOn sx={{ fontSize: 16, color: "#84cc16" }} />
+                    <LocationOn sx={{ fontSize: 16, color: "#85a446" }} />
                     <Typography sx={{ color: "#9ca3af", fontSize: "0.9rem" }}>
                       {locationStr}
                     </Typography>
@@ -321,16 +321,16 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                         <Verified
                           sx={{
                             fontSize: "14px !important",
-                            color: "#84cc16 !important",
+                            color: "#85a446 !important",
                           }}
                         />
                       }
                       label="VERIFIED LAND"
                       size="small"
                       sx={{
-                        bgcolor: "rgba(132,204,22,0.1)",
-                        border: "1px solid rgba(132,204,22,0.35)",
-                        color: "#84cc16",
+                        bgcolor: "rgba(133, 164, 70,0.1)",
+                        border: "1px solid rgba(133, 164, 70,0.35)",
+                        color: "#85a446",
                         fontWeight: 700,
                         fontSize: "0.65rem",
                         letterSpacing: "0.06em",
@@ -367,7 +367,7 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                   startIcon={<Handshake sx={{ fontSize: 16 }} />}
                   onClick={handleRequestConnectionClick}
                   sx={{
-                    bgcolor: "#84cc16",
+                    bgcolor: "#85a446",
                     color: "#0a120c",
                     borderRadius: "8px",
                     textTransform: "none",
@@ -376,8 +376,8 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                     px: 2.2,
                     py: 0.8,
                     "&:hover": {
-                      bgcolor: "#a3e635",
-                      boxShadow: "0 4px 16px rgba(132,204,22,0.4)",
+                      bgcolor: "#85a446",
+                      boxShadow: "0 4px 16px rgba(133, 164, 70,0.4)",
                     },
                   }}
                 >
@@ -433,7 +433,7 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                       }}
                     >
                       <Landscape
-                        sx={{ fontSize: 80, color: "rgba(132,204,22,0.2)" }}
+                        sx={{ fontSize: 80, color: "rgba(133, 164, 70,0.2)" }}
                       />
                     </Box>
                   )}
@@ -457,7 +457,7 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                           cursor: "pointer",
                           border:
                             mainImgIdx === i
-                              ? "2px solid #84cc16"
+                              ? "2px solid #85a446"
                               : "2px solid rgba(255,255,255,0.08)",
                           transition: "border-color 0.2s",
                         }}
@@ -570,7 +570,7 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                         </Typography>
                         <Typography
                           sx={{
-                            color: "#84cc16",
+                            color: "#85a446",
                             fontSize: "0.82rem",
                             fontWeight: 600,
                           }}
@@ -621,7 +621,7 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                 <Box
                   sx={{
                     bgcolor: "#141e14",
-                    border: "1px solid rgba(132,204,22,0.15)",
+                    border: "1px solid rgba(133, 164, 70,0.15)",
                     borderRadius: "12px",
                     p: 2.5,
                   }}
@@ -850,9 +850,9 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                         height: 44,
                         fontWeight: 800,
                         fontSize: "1rem",
-                        bgcolor: "rgba(132,204,22,0.15)",
-                        color: "#84cc16",
-                        border: "2px solid rgba(132,204,22,0.3)",
+                        bgcolor: "rgba(133, 164, 70,0.15)",
+                        color: "#85a446",
+                        border: "2px solid rgba(133, 164, 70,0.3)",
                       }}
                     >
                       {landowner.name.charAt(0).toUpperCase()}
@@ -1002,7 +1002,7 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                     <Box
                       sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
                     >
-                      <LocationOn sx={{ fontSize: 14, color: "#84cc16" }} />
+                      <LocationOn sx={{ fontSize: 14, color: "#85a446" }} />
                       <Typography
                         sx={{ color: "#9ca3af", fontSize: "0.82rem" }}
                       >
@@ -1099,7 +1099,7 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                 color: "#9ca3af",
               }}
             >
-              <CircularProgress size={20} sx={{ color: "#84cc16" }} />
+              <CircularProgress size={20} sx={{ color: "#85a446" }} />
               <Typography variant="body2">Loading harvest offers...</Typography>
             </Box>
           ) : harvestProjects.length === 0 ? (
@@ -1122,10 +1122,10 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                       borderRadius: 2,
                       border: "1px solid",
                       borderColor: selected
-                        ? "#84cc16"
+                        ? "#85a446"
                         : "rgba(255,255,255,0.08)",
                       bgcolor: selected
-                        ? "rgba(132,204,22,0.08)"
+                        ? "rgba(133, 164, 70,0.08)"
                         : "rgba(255,255,255,0.02)",
                       display: "flex",
                       gap: 1,
@@ -1137,8 +1137,8 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                       checked={selected}
                       onChange={() => setSelectedProjectId(offer._id)}
                       sx={{
-                        color: "#84cc16",
-                        "&.Mui-checked": { color: "#84cc16" },
+                        color: "#85a446",
+                        "&.Mui-checked": { color: "#85a446" },
                       }}
                     />
                     <Box sx={{ flex: 1 }}>
@@ -1162,7 +1162,7 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                       </Typography>
                     </Box>
                     <Box sx={{ textAlign: "right" }}>
-                      <Typography sx={{ color: "#84cc16", fontWeight: 800 }}>
+                      <Typography sx={{ color: "#85a446", fontWeight: 800 }}>
                         {(() => {
                           const budget =
                             offer.harvestBaseDetails?.totalBudget ?? 0;
@@ -1194,14 +1194,14 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
             onClick={handleConfirmProject}
             disabled={connecting || harvestProjects.length === 0}
             sx={{
-              bgcolor: "#84cc16",
+              bgcolor: "#85a446",
               color: "#0a120c",
               borderRadius: "10px",
               textTransform: "none",
               fontWeight: 800,
               px: 2.5,
               py: 1,
-              "&:hover": { bgcolor: "#a3e635" },
+              "&:hover": { bgcolor: "#85a446" },
             }}
           >
             {connecting

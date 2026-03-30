@@ -89,7 +89,7 @@ const inputStyle = {
     borderRadius: "8px",
     "& fieldset": { borderColor: "#333" },
     "&:hover fieldset": { borderColor: "#555" },
-    "&.Mui-focused fieldset": { borderColor: "#4ade80" },
+    "&.Mui-focused fieldset": { borderColor: "#85a446" },
   },
   "& .MuiInputLabel-root": { color: "#888" },
   "& .MuiInputBase-input": { color: "#fff" },
@@ -771,7 +771,7 @@ const AccountPage = () => {
     ? `${resolvedRole.charAt(0).toUpperCase()}${resolvedRole.slice(1)}`
     : "Member";
   const statusColor =
-    statusLabel.toLowerCase() === "active" ? "#4ade80" : "#f59e0b";
+    statusLabel.toLowerCase() === "active" ? "#85a446" : "#f59e0b";
 
   return (
     <Box
@@ -852,7 +852,7 @@ const AccountPage = () => {
                   borderRadius: "50%",
                   border: "2px solid #1A1D1A",
                   boxShadow: `0 0 0 4px ${
-                    statusColor === "#4ade80"
+                    statusColor === "#85a446"
                       ? "rgba(74,222,128,0.15)"
                       : "rgba(245,158,11,0.15)"
                   }`,
@@ -882,13 +882,13 @@ const AccountPage = () => {
                     size="small"
                     sx={{
                       bgcolor:
-                        statusColor === "#4ade80"
+                        statusColor === "#85a446"
                           ? "rgba(74, 222, 128, 0.12)"
                           : "rgba(245,158,11,0.12)",
                       color: statusColor,
                       fontWeight: 700,
                       border: `1px solid ${
-                        statusColor === "#4ade80"
+                        statusColor === "#85a446"
                           ? "rgba(74, 222, 128, 0.35)"
                           : "rgba(245,158,11,0.35)"
                       }`,
@@ -977,7 +977,7 @@ const AccountPage = () => {
                 alignItems: "center",
               }}
             >
-              <PersonOutline sx={{ mr: 1, color: "#4ade80" }} /> Personal
+              <PersonOutline sx={{ mr: 1, color: "#85a446" }} /> Personal
               Information
             </Typography>
             <Grid container spacing={{ xs: 1.5, sm: 1.75, md: 2 }}>
@@ -1003,7 +1003,7 @@ const AccountPage = () => {
                       <Typography
                         variant="caption"
                         sx={{
-                          color: user?.emailVerified ? "#4ade80" : "#f59e0b",
+                          color: user?.emailVerified ? "#85a446" : "#f59e0b",
                           fontWeight: "bold",
                         }}
                       >
@@ -1088,7 +1088,7 @@ const AccountPage = () => {
                 alignItems: "center",
               }}
             >
-              <LocationOn sx={{ mr: 1, color: "#4ade80" }} /> Residential
+              <LocationOn sx={{ mr: 1, color: "#85a446" }} /> Residential
               Address
             </Typography>
             <Grid container spacing={{ xs: 1.5, sm: 1.75, md: 2 }}>
@@ -1105,12 +1105,12 @@ const AccountPage = () => {
                           onClick={handleUseMyLocation}
                           disabled={isLoadingLocation}
                           title="Use My Location"
-                          sx={{ color: "#4ade80" }}
+                          sx={{ color: "#85a446" }}
                         >
                           {isLoadingLocation ? (
                             <CircularProgress
                               size={20}
-                              sx={{ color: "#4ade80" }}
+                              sx={{ color: "#85a446" }}
                             />
                           ) : (
                             <MyLocation />
@@ -1284,7 +1284,7 @@ const AccountPage = () => {
                     alignItems: "center",
                   }}
                 >
-                  <BusinessCenter sx={{ mr: 1, color: "#4ade80" }} />
+                  <BusinessCenter sx={{ mr: 1, color: "#85a446" }} />
                   Professional Details
                 </Typography>
                 <Grid container spacing={{ xs: 1.5, sm: 1.75, md: 2 }}>
@@ -1339,7 +1339,7 @@ const AccountPage = () => {
                     alignItems: "center",
                   }}
                 >
-                  <FavoriteBorder sx={{ mr: 1, color: "#4ade80" }} />
+                  <FavoriteBorder sx={{ mr: 1, color: "#85a446" }} />
                   Investment Preferences
                 </Typography>
                 <Typography
@@ -1356,12 +1356,12 @@ const AccountPage = () => {
                       label={crop}
                       sx={{
                         bgcolor: "rgba(74, 222, 128, 0.1)",
-                        color: "#4ade80",
+                        color: "#85a446",
                         border: "1px solid rgba(74, 222, 128, 0.3)",
                         borderRadius: "4px",
                         "&:hover": { bgcolor: "rgba(74, 222, 128, 0.2)" },
                         "& .MuiChip-deleteIcon": {
-                          color: "#4ade80",
+                          color: "#85a446",
                           "&:hover": { color: "#86efac" },
                         },
                       }}
@@ -1397,10 +1397,10 @@ const AccountPage = () => {
                           variant="contained"
                           onClick={handleAddCropFocus}
                           sx={{
-                            bgcolor: "#4ade80",
+                            bgcolor: "#85a446",
                             color: "#000",
                             fontWeight: 600,
-                            "&:hover": { bgcolor: "#22c55e" },
+                            "&:hover": { bgcolor: "#85a446" },
                           }}
                         >
                           Add
@@ -1454,7 +1454,7 @@ const AccountPage = () => {
                   alignItems: "center",
                 }}
               >
-                <VerifiedUser sx={{ mr: 1, color: "#4ade80" }} /> Document
+                <VerifiedUser sx={{ mr: 1, color: "#85a446" }} /> Document
                 Verification (KYC)
               </Typography>
               <Box
@@ -1627,10 +1627,10 @@ const AccountPage = () => {
                 disabled={loading || fetchingProfile || !isDirty}
                 fullWidth
                 sx={{
-                  bgcolor: "#4ade80",
+                  bgcolor: "#85a446",
                   color: "#000",
                   fontWeight: 600,
-                  "&:hover": { bgcolor: "#22c55e" },
+                  "&:hover": { bgcolor: "#85a446" },
                 }}
               >
                 {loading

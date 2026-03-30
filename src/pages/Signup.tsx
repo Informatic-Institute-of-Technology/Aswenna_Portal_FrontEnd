@@ -354,7 +354,6 @@ const Signup = () => {
                 size="md"
                 fullWidth
                 disabled={loading}
-                className="signup-button"
               >
                 {loading ? (
                   <CircularProgress size={20} color="success" />

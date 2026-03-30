@@ -321,7 +321,7 @@ const AgreementPage = () => {
             ref={agreementRef}
             sx={{
               backgroundColor: "#111a11",
-              border: "1px solid rgba(76, 175, 80, 0.15)",
+              border: "1px solid rgba(133, 164, 70, 0.15)",
               borderRadius: 2,
             }}
           >
@@ -376,7 +376,7 @@ const AgreementPage = () => {
                   label={`Effective Date: ${agreementData.effectiveDate}`}
                   size="small"
                   sx={{
-                    backgroundColor: "rgba(76, 175, 80, 0.15)",
+                    backgroundColor: "rgba(133, 164, 70, 0.15)",
                     color: "#4CAF50",
                     fontSize: "0.7rem",
                     height: 26,
@@ -693,7 +693,7 @@ const AgreementPage = () => {
                   icon={<CheckCircle sx={{ fontSize: 16 }} />}
                   label="DOCUMENT FULLY EXECUTED & LEGALLY BINDING"
                   sx={{
-                    backgroundColor: "rgba(76, 175, 80, 0.2)",
+                    backgroundColor: "rgba(133, 164, 70, 0.2)",
                     color: "#4CAF50",
                     fontWeight: 600,
                     fontSize: "0.7rem",

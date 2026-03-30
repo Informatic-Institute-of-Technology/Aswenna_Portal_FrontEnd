@@ -159,7 +159,6 @@ const Login = () => {
                 size="md"
                 fullWidth
                 disabled={loading}
-                className="login-button"
               >
                 {loading ? (
                   <CircularProgress size={20} color="success" />

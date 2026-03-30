@@ -1510,7 +1510,7 @@ const MyProjectsPage = () => {
                   size="small"
                   sx={{
                     background: isHarvestOffer
-                      ? "rgba(76,175,80,0.85)"
+                      ? "rgba(133, 164, 70,0.85)"
                       : "rgba(33,150,243,0.85)",
                     color: "#fff",
                     fontWeight: 600,
@@ -1822,9 +1822,9 @@ const MyProjectsPage = () => {
                   size="small"
                   onClick={() => handleOpenEdit(project)}
                   sx={{
-                    color: "#22c55e",
+                    color: "#85a446",
                     "&:hover": {
-                      backgroundColor: "rgba(34, 197, 94, 0.12)",
+                      backgroundColor: "rgba(133, 164, 70, 0.12)",
                     },
                   }}
                 >
@@ -1888,7 +1888,7 @@ const MyProjectsPage = () => {
             fontSize: "0.875rem",
             "&:hover": {
               borderColor: "#4CAF50",
-              backgroundColor: "rgba(76, 175, 80, 0.1)",
+              backgroundColor: "rgba(133, 164, 70, 0.1)",
             },
           }}
         >

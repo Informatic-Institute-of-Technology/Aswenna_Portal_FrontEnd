@@ -208,7 +208,7 @@ const LandOwnersPage = () => {
       <Box sx={{ mb: 3 }}>
         <Typography
           sx={{
-            color: "#84cc16",
+            color: "#85a446",
             fontSize: "0.7rem",
             fontWeight: 700,
             letterSpacing: "0.15em",
@@ -424,7 +424,7 @@ const LandOwnersPage = () => {
       </Box>
       {loading ? (
         <Box sx={{ textAlign: "center", py: 12 }}>
-          <CircularProgress size={44} sx={{ color: "#84cc16" }} />
+          <CircularProgress size={44} sx={{ color: "#85a446" }} />
           <Typography variant="body2" sx={{ mt: 2, color: "#6b7280" }}>
             Loading land listings…
           </Typography>
@@ -528,9 +528,9 @@ const LandOwnersPage = () => {
                       borderRadius: "6px",
                       border:
                         page === n
-                          ? "1px solid #84cc16"
+                          ? "1px solid #85a446"
                           : "1px solid rgba(255,255,255,0.1)",
-                      bgcolor: page === n ? "#84cc16" : "transparent",
+                      bgcolor: page === n ? "#85a446" : "transparent",
                       color: page === n ? "#0a120c" : "#9ca3af",
                       cursor: "pointer",
                       fontWeight: page === n ? 700 : 400,
@@ -582,11 +582,11 @@ const LandOwnersPage = () => {
             py: 10,
             bgcolor: "rgba(255,255,255,0.02)",
             borderRadius: 3,
-            border: "1px dashed rgba(132,204,22,0.15)",
+            border: "1px dashed rgba(133, 164, 70,0.15)",
           }}
         >
           <Landscape
-            sx={{ fontSize: 64, color: "rgba(132,204,22,0.2)", mb: 1.5 }}
+            sx={{ fontSize: 64, color: "rgba(133, 164, 70,0.2)", mb: 1.5 }}
           />
           <Typography variant="h6" gutterBottom sx={{ color: "#e5e7eb" }}>
             No land listings match your filters
@@ -597,14 +597,14 @@ const LandOwnersPage = () => {
           <Button
             onClick={handleClear}
             sx={{
-              color: "#84cc16",
-              border: "1px solid rgba(132,204,22,0.3)",
+              color: "#85a446",
+              border: "1px solid rgba(133, 164, 70,0.3)",
               borderRadius: "8px",
               textTransform: "none",
               fontWeight: 600,
               px: 2.5,
               py: 0.9,
-              "&:hover": { bgcolor: "rgba(132,204,22,0.08)" },
+              "&:hover": { bgcolor: "rgba(133, 164, 70,0.08)" },
             }}
           >
             Clear Filters

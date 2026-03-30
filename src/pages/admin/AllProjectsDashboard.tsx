@@ -367,7 +367,7 @@ export const AllProjectsDashboard: React.FC = () => {
                     backgroundColor: "transparent",
                     "&:hover": {
                       backgroundColor: "rgba(39, 39, 42, 0.5)",
-                      borderLeft: "3px solid #22C55E",
+                      borderLeft: "3px solid #85a446",
                       paddingLeft: "12px",
                     },
                     "&:not(:last-child)": {
@@ -405,7 +405,7 @@ export const AllProjectsDashboard: React.FC = () => {
                   <TableCell sx={{ textAlign: "right", py: 1.75, pr: 2 }}>
                     <Typography
                       variant="body2"
-                      sx={{ fontWeight: 700, color: "#22C55E" }}
+                      sx={{ fontWeight: 700, color: "#85a446" }}
                     >
                       {project.financialMetric?.unit === "%"
                         ? `${project.financialMetric?.value}%`
@@ -552,8 +552,8 @@ export const AllProjectsDashboard: React.FC = () => {
                           color: "#6B7280",
                           transition: "all 0.2s ease",
                           "&:hover": {
-                            backgroundColor: "rgba(34, 197, 94, 0.1)",
-                            color: "#22C55E",
+                            backgroundColor: "rgba(133, 164, 70, 0.1)",
+                            color: "#85a446",
                           },
                         }}
                       >

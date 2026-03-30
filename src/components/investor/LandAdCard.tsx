@@ -106,7 +106,7 @@ const LandAdCard: React.FC<LandAdCardProps> = ({ ad, onViewDetails }) => {
         flexDirection: "column",
         transition: "all 0.25s ease",
         "&:hover": {
-          border: "1px solid rgba(132,204,22,0.3)",
+          border: "1px solid rgba(133, 164, 70,0.3)",
           boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
           transform: "translateY(-2px)",
         },
@@ -175,7 +175,7 @@ const LandAdCard: React.FC<LandAdCardProps> = ({ ad, onViewDetails }) => {
               px: 1.2,
               py: 0.35,
               backdropFilter: "blur(8px)",
-              border: `1px solid ${isActive ? "rgba(132,204,22,0.3)" : "rgba(251,146,60,0.4)"}`,
+              border: `1px solid ${isActive ? "rgba(133, 164, 70,0.3)" : "rgba(251,146,60,0.4)"}`,
             }}
           >
             <Box
@@ -183,8 +183,8 @@ const LandAdCard: React.FC<LandAdCardProps> = ({ ad, onViewDetails }) => {
                 width: 6,
                 height: 6,
                 borderRadius: "50%",
-                bgcolor: isActive ? "#84cc16" : "#fb923c",
-                boxShadow: isActive ? "0 0 6px #84cc16" : "0 0 6px #fb923c",
+                bgcolor: isActive ? "#85a446" : "#fb923c",
+                boxShadow: isActive ? "0 0 6px #85a446" : "0 0 6px #fb923c",
               }}
             />
             <Typography
@@ -213,7 +213,7 @@ const LandAdCard: React.FC<LandAdCardProps> = ({ ad, onViewDetails }) => {
       >
         {/* Location row */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-          <LocationOn sx={{ fontSize: 13, color: "#84cc16" }} />
+          <LocationOn sx={{ fontSize: 13, color: "#85a446" }} />
           <Typography
             sx={{ color: "#9ca3af", fontSize: "0.75rem", lineHeight: 1.2 }}
           >
@@ -290,7 +290,7 @@ const LandAdCard: React.FC<LandAdCardProps> = ({ ad, onViewDetails }) => {
             </Typography>
             <Typography
               sx={{
-                color: "#84cc16",
+                color: "#85a446",
                 fontSize: "0.82rem",
                 fontWeight: 700,
                 mt: 0.2,
@@ -364,7 +364,7 @@ const LandAdCard: React.FC<LandAdCardProps> = ({ ad, onViewDetails }) => {
           mx: 2,
           mb: 2,
           py: 1.1,
-          background: "linear-gradient(90deg, #84cc16 0%, #65a30d 100%)",
+          background: "linear-gradient(90deg, #85a446 0%, #93b34e 100%)",
           borderRadius: "8px",
           display: "flex",
           alignItems: "center",
@@ -373,8 +373,8 @@ const LandAdCard: React.FC<LandAdCardProps> = ({ ad, onViewDetails }) => {
           cursor: "pointer",
           transition: "all 0.2s ease",
           "&:hover": {
-            background: "linear-gradient(90deg, #a3e635 0%, #84cc16 100%)",
-            boxShadow: "0 4px 16px rgba(132,204,22,0.35)",
+            background: "linear-gradient(90deg, #85a446 0%, #85a446 100%)",
+            boxShadow: "0 4px 16px rgba(133, 164, 70,0.35)",
           },
           "&:active": {
             transform: "scale(0.98)",

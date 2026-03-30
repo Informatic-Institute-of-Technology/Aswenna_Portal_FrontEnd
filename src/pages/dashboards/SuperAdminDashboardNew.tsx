@@ -298,7 +298,7 @@ const SuperAdminDashboard = () => {
                 {
                   label: "Active",
                   value: userStats.activeUsers,
-                  bg: "linear-gradient(135deg, #16a34a 0%, #22c55e 100%)",
+                  bg: "linear-gradient(135deg, #93b34e 0%, #85a446 100%)",
                   icon: <CheckCircle sx={{ fontSize: 64, opacity: 0.3 }} />,
                   note: "Active accounts",
                 },

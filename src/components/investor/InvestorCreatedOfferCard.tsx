@@ -135,7 +135,7 @@ const InvestorCreatedOfferCard = ({
               size="small"
               sx={{
                 background: isHarvest
-                  ? "rgba(76,175,80,0.85)"
+                  ? "rgba(133, 164, 70,0.85)"
                   : "rgba(33,150,243,0.85)",
                 color: "#fff",
                 fontWeight: 600,
