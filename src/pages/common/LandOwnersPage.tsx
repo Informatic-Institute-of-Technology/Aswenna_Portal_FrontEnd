@@ -6,16 +6,22 @@ import {
   Landscape,
   Map as MapIcon,
 } from "@mui/icons-material";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
   Button,
   CircularProgress,
+  Dialog,
+  DialogContent,
+  DialogTitle,
   FormControl,
+  IconButton,
   MenuItem,
   Select,
   Typography,
 } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
+import SriLankaMap from "../../components/SriLankaMap";
 import LandAdCard from "../../components/investor/LandAdCard";
 import LandAdDetailDialog from "../../components/investor/LandAdDetailDialog";
 import {
@@ -58,6 +64,7 @@ const LandOwnersPage = () => {
   const [allAds, setAllAds] = useState<LandownerAdApiItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mapOpen, setMapOpen] = useState(false);
   const [selectedAd, setSelectedAd] = useState<LandownerAdApiItem | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [notification, setNotification] = useState<{
@@ -264,6 +271,7 @@ const LandOwnersPage = () => {
             <Button
               variant="contained"
               startIcon={<MapIcon sx={{ fontSize: 16 }} />}
+              onClick={() => setMapOpen(true)}
               sx={{
                 bgcolor: "#3b82f6",
                 color: "#fff",
@@ -604,7 +612,67 @@ const LandOwnersPage = () => {
         </Box>
       )}
 
-      {/* ── Dialogs & Notifications ── */}
+      <Dialog
+        open={mapOpen}
+        onClose={() => setMapOpen(false)}
+        fullWidth
+        maxWidth="lg"
+        PaperProps={{
+          sx: {
+            bgcolor: "#0b120d",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 2,
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            color: "#e5e7eb",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            borderBottom: "1px solid rgba(255,255,255,0.08)",
+            py: 1.5,
+          }}
+        >
+          <Box>
+            <Typography sx={{ fontWeight: 700, fontSize: "1rem" }}>
+              All Land Ads - Sri Lanka Map
+            </Typography>
+            <Typography sx={{ color: "#9ca3af", fontSize: "0.8rem", mt: 0.3 }}>
+              Google map view for all land ads with Land Ad IDs on each marker
+            </Typography>
+          </Box>
+          <IconButton
+            onClick={() => setMapOpen(false)}
+            sx={{ color: "#9ca3af" }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent sx={{ p: 2.5 }}>
+          {allAds.length > 0 ? (
+            <SriLankaMap landAds={allAds} />
+          ) : (
+            <Box
+              sx={{
+                minHeight: 260,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+                color: "#9ca3af",
+              }}
+            >
+              <Typography variant="body2">
+                No land ads available to display on map.
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+      </Dialog>
+
       <LandAdDetailDialog
         open={detailOpen}
         onClose={handleClose}
