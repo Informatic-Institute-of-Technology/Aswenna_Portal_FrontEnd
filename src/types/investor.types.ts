@@ -43,6 +43,10 @@ interface OfferAPIBase {
   expiredDate: string;
   status: OfferStatus;
   applicationsCount: number;
+  farmerId?: string;
+  farmerName?: string;
+  landOwnerId?: string;
+  landOwnerName?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -173,11 +177,11 @@ export interface LandOwnerMatch {
 export interface ProjectProgress {
   offerId: string;
   currentPhase:
-  | "planning"
-  | "planting"
-  | "growing"
-  | "harvesting"
-  | "completed";
+    | "planning"
+    | "planting"
+    | "growing"
+    | "harvesting"
+    | "completed";
   progressPercentage: number;
   startDate: string;
   expectedEndDate: string;
@@ -218,12 +222,12 @@ export interface Agreement {
     additionalTerms?: Record<string, string | number | boolean>;
   };
   status:
-  | "draft"
-  | "pending-signature"
-  | "signed"
-  | "active"
-  | "completed"
-  | "terminated";
+    | "draft"
+    | "pending-signature"
+    | "signed"
+    | "active"
+    | "completed"
+    | "terminated";
   createdAt: string;
   signedAt?: string;
   documentUrl?: string;

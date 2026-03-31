@@ -27,9 +27,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 interface FarmerSidebarProps {
   collapsed?: boolean;
+  onLogoutRequest?: () => void;
 }
 
-const FarmerSidebar = ({ collapsed = false }: FarmerSidebarProps) => {
+const FarmerSidebar = ({
+  collapsed = false,
+  onLogoutRequest,
+}: FarmerSidebarProps) => {
   const { sessionId, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -178,7 +182,7 @@ const FarmerSidebar = ({ collapsed = false }: FarmerSidebarProps) => {
           <Button
             variant="contained"
             fullWidth
-            onClick={logout}
+            onClick={onLogoutRequest ?? logout}
             sx={{ py: 1.5 }}
           >
             Logout

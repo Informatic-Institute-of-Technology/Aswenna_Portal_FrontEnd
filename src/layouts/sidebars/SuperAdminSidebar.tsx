@@ -27,9 +27,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 interface SuperAdminSidebarProps {
   collapsed?: boolean;
+  onLogoutRequest?: () => void;
 }
 
-const SuperAdminSidebar = ({ collapsed = false }: SuperAdminSidebarProps) => {
+const SuperAdminSidebar = ({
+  collapsed = false,
+  onLogoutRequest,
+}: SuperAdminSidebarProps) => {
   const { sessionId, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -192,7 +196,7 @@ const SuperAdminSidebar = ({ collapsed = false }: SuperAdminSidebarProps) => {
           fullWidth
           variant="contained"
           startIcon={collapsed ? undefined : <Logout />}
-          onClick={handleLogout}
+          onClick={onLogoutRequest ?? handleLogout}
           sx={{
             py: collapsed ? 1.2 : 1.5,
             fontWeight: 600,
