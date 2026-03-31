@@ -24,9 +24,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 interface LandOwnerSidebarProps {
   collapsed?: boolean;
+  onLogoutRequest?: () => void;
 }
 
-const LandOwnerSidebar = ({ collapsed = false }: LandOwnerSidebarProps) => {
+const LandOwnerSidebar = ({
+  collapsed = false,
+  onLogoutRequest,
+}: LandOwnerSidebarProps) => {
   const { sessionId, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -190,7 +194,7 @@ const LandOwnerSidebar = ({ collapsed = false }: LandOwnerSidebarProps) => {
           <Button
             variant="contained"
             fullWidth
-            onClick={logout}
+            onClick={onLogoutRequest ?? logout}
             sx={{ py: 1.5 }}
           >
             Logout

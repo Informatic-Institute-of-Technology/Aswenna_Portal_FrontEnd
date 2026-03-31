@@ -5,14 +5,17 @@ import {
   Mail,
   Menu,
   Notifications,
-  Settings,
-  SupportAgent,
 } from "@mui/icons-material";
 import {
   Avatar,
   Badge,
   Box,
+  Button,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Drawer,
   IconButton,
   List,
@@ -52,6 +55,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const [profileAnchorEl, setProfileAnchorEl] = useState<HTMLElement | null>(
     null,
   );
+  const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
   const [sidebarPinned, setSidebarPinned] = useState(false);
   const [isSidebarHovered, setIsSidebarHovered] = useState(false);
 
@@ -106,9 +110,20 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     setProfileAnchorEl(null);
   };
 
-  const handleLogout = () => {
+  const openLogoutConfirm = () => setConfirmLogoutOpen(true);
+
+  const handleLogoutRequest = () => {
     handleProfileClose();
+    openLogoutConfirm();
+  };
+
+  const handleConfirmLogout = () => {
+    setConfirmLogoutOpen(false);
     logout();
+  };
+
+  const handleCancelLogout = () => {
+    setConfirmLogoutOpen(false);
   };
 
   useEffect(() => {
@@ -121,13 +136,33 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const renderSidebar = () => {
     switch (user?.role) {
       case "farmer":
-        return <FarmerSidebar collapsed={!isSidebarExpanded} />;
+        return (
+          <FarmerSidebar
+            collapsed={!isSidebarExpanded}
+            onLogoutRequest={openLogoutConfirm}
+          />
+        );
       case "investor":
-        return <InvestorSidebar collapsed={!isSidebarExpanded} />;
+        return (
+          <InvestorSidebar
+            collapsed={!isSidebarExpanded}
+            onLogoutRequest={openLogoutConfirm}
+          />
+        );
       case "landowner":
-        return <LandOwnerSidebar collapsed={!isSidebarExpanded} />;
+        return (
+          <LandOwnerSidebar
+            collapsed={!isSidebarExpanded}
+            onLogoutRequest={openLogoutConfirm}
+          />
+        );
       case "superadmin":
-        return <SuperAdminSidebar collapsed={!isSidebarExpanded} />;
+        return (
+          <SuperAdminSidebar
+            collapsed={!isSidebarExpanded}
+            onLogoutRequest={openLogoutConfirm}
+          />
+        );
     }
   };
 
@@ -311,19 +346,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                 </ListItemIcon>
                 <ListItemText primary="Edit profile" />
               </ListItemButton>
-              <ListItemButton onClick={handleProfileClose}>
-                <ListItemIcon>
-                  <Settings fontSize="small" />
-                </ListItemIcon>
-                <ListItemText primary="Account settings" />
-              </ListItemButton>
-              <ListItemButton onClick={handleProfileClose}>
-                <ListItemIcon>
-                  <SupportAgent fontSize="small" />
-                </ListItemIcon>
-                <ListItemText primary="Support" />
-              </ListItemButton>
-              <ListItemButton onClick={handleLogout}>
+              <ListItemButton onClick={handleLogoutRequest}>
                 <ListItemIcon>
                   <Logout fontSize="small" />
                 </ListItemIcon>
@@ -332,6 +355,33 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             </List>
           </Stack>
         </Popover>
+
+        <Dialog
+          open={confirmLogoutOpen}
+          onClose={handleCancelLogout}
+          maxWidth="xs"
+          fullWidth
+        >
+          <DialogTitle sx={{ fontWeight: 700 }}>Sign out?</DialogTitle>
+          <DialogContent>
+            <Typography variant="body2" color="text.secondary">
+              You will be signed out of the portal. Any unsaved changes may be
+              lost. Do you want to continue?
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ px: 3, pb: 2 }}>
+            <Button onClick={handleCancelLogout} color="inherit">
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmLogout}
+              color="error"
+              variant="contained"
+            >
+              Sign out
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         {loading ? (
           <Container maxWidth="xl">

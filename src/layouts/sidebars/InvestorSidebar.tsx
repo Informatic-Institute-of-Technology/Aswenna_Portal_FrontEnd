@@ -29,9 +29,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 interface InvestorSidebarProps {
   collapsed?: boolean;
+  onLogoutRequest?: () => void;
 }
 
-const InvestorSidebar = ({ collapsed = false }: InvestorSidebarProps) => {
+const InvestorSidebar = ({
+  collapsed = false,
+  onLogoutRequest,
+}: InvestorSidebarProps) => {
   const { sessionId, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -260,7 +264,7 @@ const InvestorSidebar = ({ collapsed = false }: InvestorSidebarProps) => {
           <Button
             variant="contained"
             fullWidth
-            onClick={logout}
+            onClick={onLogoutRequest ?? logout}
             sx={{ py: 1.5 }}
           >
             Logout

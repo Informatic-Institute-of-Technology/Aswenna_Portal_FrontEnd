@@ -84,6 +84,7 @@ const CROP_EMOJIS = [
 
 type CoverImage = { id: string; label: string; url: string };
 const coverImageList = coverImages as CoverImage[];
+const fallbackCoverUrl = coverImageList[0]?.url;
 
 export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
   onBack,
@@ -656,8 +657,9 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
                   alt={selectedCover.label}
                   referrerPolicy="no-referrer"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src =
-                      `https://picsum.photos/seed/${selectedCover.id}/600/340`;
+                    const target = e.target as HTMLImageElement;
+                    target.onerror = null;
+                    if (fallbackCoverUrl) target.src = fallbackCoverUrl;
                   }}
                   className="w-full h-full object-cover"
                 />
@@ -687,8 +689,9 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
                     alt={image.label}
                     referrerPolicy="no-referrer"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        `https://picsum.photos/seed/${image.id}/200/200`;
+                      const target = e.target as HTMLImageElement;
+                      target.onerror = null;
+                      if (fallbackCoverUrl) target.src = fallbackCoverUrl;
                     }}
                     className="w-full h-full object-cover"
                   />

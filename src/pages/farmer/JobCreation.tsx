@@ -43,8 +43,8 @@ import {
 } from "../../components/common/FlashcardNotification";
 import {
   createFarmerAd,
-  type CreateFarmerAdPayload,
   updateFarmerAd,
+  type CreateFarmerAdPayload,
 } from "../../services/farmerAds.service";
 import type { BudgetItem } from "../../types/farmer.types";
 
@@ -88,6 +88,13 @@ interface MilestoneBreakdownItem {
 }
 
 type CoverImage = { id: string; label: string; url: string };
+
+const coverImageList = coverImages as CoverImage[];
+const coverImageById = new Map(
+  coverImageList.map((image) => [image.id, image.url]),
+);
+const getCoverUrl = (id: string, fallbackIndex = 0) =>
+  coverImageById.get(id) || coverImageList[fallbackIndex]?.url || "";
 
 export interface FarmerJobCreationPayload {
   offerType: OfferType;
@@ -182,8 +189,7 @@ const OFFER_CARDS: {
       "Request capital support based on your expected harvest output.",
     helper: "Great for seasonal cultivation cycles",
     badge: "Most Popular",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuD-qCNSlEKFbeDeI1OLuWmLTAAouKOLLT0bkFcEdosjgMW8Iei_jVlkOVXFWjIqFvrTUbuMV6MXBH5euZEU3KoPI75y5RbEfPPav1lvSLihn7UrpPkQ9dQaAqojNpvN311FgQIz9olI46NuiQ9m2rjBbk8EqYbwXoMWlzTno_sp62oTujNFGF-F2BTWr1Cei7tJBl_2HC8wMlphhMK7BmFJkqplfm9H641SpNoEPSBigzr23oPrwoIXVl80mso2EwtENs-fV3Kw4TM",
+    image: getCoverUrl("veg-market"),
   },
   {
     type: "commission",
@@ -191,8 +197,7 @@ const OFFER_CARDS: {
     description:
       "Define investment terms and commission for investor partnerships.",
     helper: "Best for structured milestone-based projects",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBgMccLyNAKEbbmyEJhHfQ1KJwij8Di4GY_zkGd38PlbCn3r8itTjEPMu1cSmxhFVHDQKqlpKjywK87OTiAvfO4osSQiDdR_bcIIX7MOTZb4lgtymisVirHKNQ2UW8mqqKPGgfM50VJqmleKzZkKF4csZsQpxkHLIXM2nQon9NzBcD6mPK5xLSl0br8EaNi_QRFVzQyYlSTQFLAYqMCV9xzmcRAEVMhgxR3nPcFs5zmbXybsnqDiYXlB5t9HqHLTLiGHO0ScvIchtw",
+    image: getCoverUrl("coconut-grove", 1),
   },
 ];
 
@@ -208,8 +213,6 @@ const CROP_EMOJIS = [
   "🥬",
   "🫑",
 ];
-
-const coverImageList = coverImages as CoverImage[];
 
 const createInitialCostBreakdown = (): BudgetItem[] => [
   {

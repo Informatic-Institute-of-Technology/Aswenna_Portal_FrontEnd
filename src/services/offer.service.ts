@@ -45,3 +45,11 @@ export const connectOfferToLandAd = (offerId: string, landAdId: string) =>
   httpClient.post<unknown>(`/v1/investor-offer/${offerId}/connect`, {
     landAdId,
   });
+
+export const matchLandOwnerOffer = (
+  offerId: string,
+  landownerProjectId: string,
+) =>
+  httpClient.patch<unknown>(`/v1/land-owner-offer/${offerId}`, {
+    landownerProjectId,
+  });
