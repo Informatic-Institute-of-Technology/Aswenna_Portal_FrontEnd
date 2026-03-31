@@ -2,7 +2,7 @@ import AswendLogo from "@/assets/Aswenna Logo.png";
 import { otpService } from "@/services";
 import "@/styles/EmailVerification.css";
 import { CircularProgress, Step, StepLabel, Stepper } from "@mui/material";
-import type { FormEvent, KeyboardEvent } from "react";
+import type { ClipboardEvent, FormEvent, KeyboardEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Notification from "../shared/components/Notification";
@@ -75,44 +75,54 @@ const EmailVerification = () => {
     if (!/^\d*$/.test(value)) {
       return;
     }
-
-              <AppButton
-                type="button"
-                onClick={handleResendCode}
-                variant="outline"
-                size="sm"
-                disabled={!canResend || loading}
-                className={`resend-link ${canResend ? "active" : ""}`}
-              >
-                Resend Code
-              </AppButton>
-
-  const handleKeyDown = (index: number, e: KeyboardEvent<HTMLInputElement>) => {
-            <AppButton
-              type="submit"
-              variant="success"
-              size="md"
-              fullWidth
-              disabled={loading}
-              className="verify-button"
-            >
-              {loading ? (
-                <CircularProgress size={20} color="success" />
-              ) : (
-                "Verify"
-              )}
-            </AppButton>
-    const pastedData = e.clipboardData.getData("text").slice(0, 6);
-    if (!/^\d+$/.test(pastedData)) return;
-
     const newCode = [...code];
-    for (let i = 0; i < pastedData.length && i < 6; i++) {
-      newCode[i] = pastedData[i];
-    }
+    newCode[index] = value;
     setCode(newCode);
 
-    const nextIndex = Math.min(pastedData.length, 5);
-    inputRefs.current[nextIndex]?.focus();
+    if (value && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (index: number, e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace") {
+      e.preventDefault();
+      const newCode = [...code];
+      if (newCode[index]) {
+        newCode[index] = "";
+        setCode(newCode);
+      } else if (index > 0) {
+        newCode[index - 1] = "";
+        setCode(newCode);
+        inputRefs.current[index - 1]?.focus();
+      }
+      return;
+    }
+
+    if (e.key === "ArrowLeft" && index > 0) {
+      e.preventDefault();
+      inputRefs.current[index - 1]?.focus();
+    }
+    if (e.key === "ArrowRight" && index < 5) {
+      e.preventDefault();
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e: ClipboardEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const pasted = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, 6);
+    if (!pasted) return;
+
+    const newCode = [...code];
+    for (let i = 0; i < pasted.length; i++) {
+      newCode[i] = pasted[i];
+    }
+    setCode(newCode);
+    inputRefs.current[Math.min(pasted.length, 5)]?.focus();
   };
 
   const handleVerify = async (e: FormEvent) => {

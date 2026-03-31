@@ -1,4 +1,5 @@
-import { AppButton, ButtonSize } from "../../../../shared/components";
+import type { ButtonSize } from "../../../../shared/components";
+import { AppButton } from "../../../../shared/components";
 
 interface PayNowButtonProps {
   onClick: () => void;

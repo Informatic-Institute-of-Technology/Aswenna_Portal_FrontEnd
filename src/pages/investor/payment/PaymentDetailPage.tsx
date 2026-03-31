@@ -16,6 +16,7 @@ import {
 } from "@mui/icons-material";
 import { Dialog, DialogContent, IconButton } from "@mui/material";
 import { useMemo, useState } from "react";
+import { AppButton } from "../../../shared/components";
 import { RingChart } from "./components";
 import { PayInstallmentDialog } from "./PayInstallmentPage";
 
@@ -90,15 +91,15 @@ export interface PaymentDetailProps {
 }
 
 const fmtD = (iso: string) =>
-  import {
-    AccountBalanceWallet,
-    CalendarToday,
-    Download,
-    LocationOn,
-    Payments,
-    ShowChart,
-    Tag,
-  } from "@mui/icons-material";
+  iso
+    ? new Date(iso).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "—";
+
+function PaymentDetailContent({
   type,
   projectId,
   paymentId,
@@ -109,7 +110,6 @@ const fmtD = (iso: string) =>
 }: PaymentDetailProps) {
   const [payOpen, setPayOpen] = useState(false);
   const [payInitialIds, setPayInitialIds] = useState<string[] | undefined>(
-  import { AppButton } from "../../../shared/components";
     undefined,
   );
 
