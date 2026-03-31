@@ -7,7 +7,6 @@ import {
 import {
   AccessTime,
   Agriculture,
-  Assessment,
   AssignmentOutlined,
   BarChartOutlined,
   Block,
@@ -16,7 +15,6 @@ import {
   Landscape,
   MapOutlined,
   People,
-  PersonAdd,
   RefreshOutlined,
   Verified,
   Warning,
@@ -968,56 +966,6 @@ const SuperAdminDashboard = () => {
                   </TableContainer>
                 </CardContent>
               </TabPanel>
-            </Card>
-
-            <Card>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Quick Actions
-                </Typography>
-                <Grid container spacing={2} sx={{ mt: 1 }}>
-                  <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <Button
-                      fullWidth
-                      variant="outlined"
-                      startIcon={<PersonAdd />}
-                      sx={{ py: 1.5 }}
-                    >
-                      Add New User
-                    </Button>
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <Button
-                      fullWidth
-                      variant="outlined"
-                      startIcon={<Assessment />}
-                      sx={{ py: 1.5 }}
-                    >
-                      Generate Report
-                    </Button>
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <Button
-                      fullWidth
-                      variant="outlined"
-                      startIcon={<Verified />}
-                      sx={{ py: 1.5 }}
-                    >
-                      Verify Users
-                    </Button>
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <Button
-                      fullWidth
-                      variant="outlined"
-                      startIcon={<BarChartOutlined />}
-                      sx={{ py: 1.5 }}
-                    >
-                      View Analytics
-                    </Button>
-                  </Grid>
-                </Grid>
-              </CardContent>
             </Card>
           </>
         )}
