@@ -9,7 +9,6 @@ import {
 } from "@mui/icons-material";
 import {
   Box,
-  Button,
   Container,
   IconButton,
   Step,
@@ -19,6 +18,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AppButton } from "../shared/components";
 import Notification from "../shared/components/Notification";
 import { useNotification } from "../shared/hooks/useNotification";
 
@@ -202,11 +202,12 @@ const RoleSelection = () => {
               <Typography className="role-section-description">
                 {role.description}
               </Typography>
-              <Button
-                variant="contained"
+              <AppButton
                 onClick={() => handleRoleSelect(role.id)}
-                endIcon={<East />}
-                startIcon={
+                variant="success"
+                size="md"
+                className="w-full"
+                leadingIcon={
                   role.id === "farmer" ? (
                     <Agriculture />
                   ) : role.id === "investor" ? (
@@ -215,25 +216,10 @@ const RoleSelection = () => {
                     <Villa />
                   )
                 }
-                sx={{
-                  backgroundColor: "var(--color-success)",
-                  color: "white",
-                  borderRadius: "12px",
-                  padding: "12px 24px",
-                  fontSize: "1rem",
-                  fontWeight: 600,
-                  textTransform: "none",
-                  boxShadow: "0 4px 14px 0 var(--overlay-sm)",
-                  "&:hover": {
-                    backgroundColor: "var(--color-brand-primary-hover)",
-                    transform: "translateY(-2px)",
-                    boxShadow: "0 6px 20px var(--overlay-sm)",
-                  },
-                  transition: "all 0.2s ease-in-out",
-                }}
+                trailingIcon={<East />}
               >
                 {role.title}
-              </Button>
+              </AppButton>
             </Box>
           ))}
         </Box>

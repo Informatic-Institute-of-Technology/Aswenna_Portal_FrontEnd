@@ -2,10 +2,6 @@ import { useAuth } from "@/Context/useAuth";
 import { authService } from "@/services";
 import { Navigate, Outlet, useParams } from "react-router-dom";
 
-/**
- * Layout route guard — renders nested <Outlet /> when authenticated,
- * redirects to /login otherwise.
- */
 const ProtectedRoute = () => {
   const { user, loading, sessionId } = useAuth();
   const { sessionId: urlSessionId } = useParams<{ sessionId: string }>();

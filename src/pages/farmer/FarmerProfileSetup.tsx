@@ -1164,13 +1164,13 @@ const FarmerProfileSetup = () => {
                           Array.isArray(errorData.message)
                         ) {
                           errorMessage =
-                            "Please fix the following errors:\n" +
+                            "Please fix the following errors: " +
                             errorData.message
                               .map(
                                 (msg: string, idx: number) =>
                                   `${idx + 1}. ${msg}`,
                               )
-                              .join("\n");
+                              .join(" ");
                         } else if (errorData.message) {
                           errorMessage = errorData.message;
                         } else {

@@ -14,6 +14,7 @@ import {
   Upload,
 } from "@mui/icons-material";
 import React, { useState } from "react";
+import { AppButton } from "../../shared/components";
 
 interface SponsorshipDetailsProps {
   onBack: () => void;
@@ -704,18 +705,21 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
         className="shrink-0 flex items-center justify-between gap-3 px-5 py-3.5"
         style={{ background: "#0a0a0a" }}
       >
-        <button
+        <AppButton
+          variant="outline"
+          size="md"
           onClick={() => onSaveDraft(formData)}
-          className="text-slate-500 text-sm font-semibold px-4 py-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] hover:text-slate-300 transition-all"
         >
           Save Draft
-        </button>
-        <button
+        </AppButton>
+        <AppButton
+          variant="primary"
+          size="md"
+          trailingIcon={<ArrowForward fontSize="inherit" />}
           onClick={handleSubmitClick}
-          className="flex items-center gap-2 bg-[#85a446] hover:bg-[#93b34e] active:scale-[0.98] text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all shadow-lg shadow-[#85a446]/20"
         >
-          {submitLabel} <ArrowForward style={{ fontSize: 18 }} />
-        </button>
+          {submitLabel}
+        </AppButton>
       </div>
     </div>
   );

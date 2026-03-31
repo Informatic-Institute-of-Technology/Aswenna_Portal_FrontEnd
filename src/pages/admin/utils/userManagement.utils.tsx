@@ -131,7 +131,7 @@ export const getAvatarColor = (name: string) => {
     "#ef4444",
     "#f97316",
     "#eab308",
-    "#22c55e",
+    "#85a446",
     "#14b8a6",
     "#3b82f6",
     "#8b5cf6",
@@ -156,7 +156,7 @@ export const normalizeStatus = (
 
 export const statusColor: Record<string, string> = {
   Pending: "#f59e0b",
-  Active: "#22c55e",
+  Active: "#85a446",
   Inactive: "#ef4444",
   Suspended: "#f97316",
 };

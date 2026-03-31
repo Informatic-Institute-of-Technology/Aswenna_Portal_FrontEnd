@@ -564,7 +564,7 @@ export default function PaymentControlCenterPage() {
             </div>
           ))}
           <div className="ml-auto flex items-center gap-1.5 opacity-50">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#85a446]" />
             <span>System: Stable</span>
           </div>
         </div>

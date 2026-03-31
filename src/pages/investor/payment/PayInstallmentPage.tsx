@@ -19,6 +19,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { useEffect, useState } from "react";
+import { AppButton } from "../../../shared/components";
 import { StatusBadge } from "./components";
 
 const STATUS_COLORS: Record<InstallmentStatus, string> = {
@@ -197,7 +198,7 @@ export function PayInstallmentContent({
             processed successfully.
           </p>
         </div>
-        <button
+        <AppButton
           onClick={() => {
             const paidIds = selected.map((i) => i.id);
             setDone(false);
@@ -207,15 +208,11 @@ export function PayInstallmentContent({
             onPaymentSuccess?.(paidIds);
             onClose?.();
           }}
-          className="px-8 py-3 rounded-lg font-semibold text-sm text-white transition-all hover:opacity-90 active:scale-[0.98]"
-          style={{
-            background:
-              "linear-gradient(135deg,var(--color-olive),var(--color-olive-light))",
-            fontFamily: "Inter, sans-serif",
-          }}
+          variant="success"
+          size="md"
         >
           Done
-        </button>
+        </AppButton>
       </div>
     );
   }

@@ -126,13 +126,13 @@ const HireFarmerDialog: React.FC<HireFarmerDialogProps> = ({ open, onClose, farm
                 sx={{ 
                   cursor: 'pointer',
                   border: '1px solid',
-                  borderColor: selectedOfferId === offer.id ? '#84cc16' : 'var(--surface-light)',
-                  bgcolor: selectedOfferId === offer.id ? 'rgba(132, 204, 22, 0.05)' : 'var(--bg-subtle)',
+                  borderColor: selectedOfferId === offer.id ? '#85a446' : 'var(--surface-light)',
+                  bgcolor: selectedOfferId === offer.id ? 'rgba(133, 164, 70, 0.05)' : 'var(--bg-subtle)',
                   transition: 'all 0.2s ease',
                   borderRadius: 2,
-                  boxShadow: selectedOfferId === offer.id ? '0 4px 12px rgba(132, 204, 22, 0.15)' : 'none',
+                  boxShadow: selectedOfferId === offer.id ? '0 4px 12px rgba(133, 164, 70, 0.15)' : 'none',
                   '&:hover': {
-                    borderColor: selectedOfferId === offer.id ? '#84cc16' : 'var(--text-secondary)',
+                    borderColor: selectedOfferId === offer.id ? '#85a446' : 'var(--text-secondary)',
                   }
                 }}
               >
@@ -141,7 +141,7 @@ const HireFarmerDialog: React.FC<HireFarmerDialogProps> = ({ open, onClose, farm
                     checked={selectedOfferId === offer.id}
                     sx={{ 
                       color: 'var(--surface-light)',
-                      '&.Mui-checked': { color: '#84cc16' },
+                      '&.Mui-checked': { color: '#85a446' },
                       mr: 2
                     }}
                   />
@@ -188,14 +188,14 @@ const HireFarmerDialog: React.FC<HireFarmerDialogProps> = ({ open, onClose, farm
           disabled={!selectedOfferId}
           size="large"
           sx={{
-            bgcolor: '#84cc16',
+            bgcolor: '#85a446',
             color: '#1a2d32',
             fontWeight: 700,
             px: 4,
             textTransform: 'none',
             borderRadius: 1.5,
             boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-            '&:hover': { bgcolor: '#65a30d', boxShadow: '0 4px 8px rgba(0,0,0,0.3)' },
+            '&:hover': { bgcolor: '#93b34e', boxShadow: '0 4px 8px rgba(0,0,0,0.3)' },
             '&.Mui-disabled': {
               bgcolor: 'var(--surface-muted)',
               color: 'var(--text-muted)'

@@ -12,12 +12,12 @@ import {
   CardContent,
   CardMedia,
   Chip,
-  IconButton,
   LinearProgress,
   Tooltip,
   Typography,
 } from "@mui/material";
 import { useMemo } from "react";
+import { AppButton } from "../../shared/components";
 
 export interface PaymentInstallment {
   id: string;
@@ -288,7 +288,11 @@ const OfferCard = ({
           backgroundColor: "var(--color-info-blue-muted)",
           textColor: "var(--color-info-blue)",
           icon: <BusinessCenter sx={{ fontSize: 10, color: "white" }} />,
-          avatar: <BusinessCenter sx={{ fontSize: 20, color: "var(--color-info-blue)" }} />,
+          avatar: (
+            <BusinessCenter
+              sx={{ fontSize: 20, color: "var(--color-info-blue)" }}
+            />
+          ),
         }
       : secondaryRoleType === "farmer"
         ? {
@@ -296,14 +300,18 @@ const OfferCard = ({
             backgroundColor: "var(--color-lime-muted)",
             textColor: "var(--color-lime)",
             icon: <Agriculture sx={{ fontSize: 10, color: "white" }} />,
-            avatar: <Agriculture sx={{ fontSize: 20, color: "var(--color-lime)" }} />,
+            avatar: (
+              <Agriculture sx={{ fontSize: 20, color: "var(--color-lime)" }} />
+            ),
           }
         : {
             borderColor: "var(--color-orange)",
             backgroundColor: "var(--color-orange-muted)",
             textColor: "var(--color-orange)",
             icon: <Landscape sx={{ fontSize: 10, color: "white" }} />,
-            avatar: <Landscape sx={{ fontSize: 20, color: "var(--color-orange)" }} />,
+            avatar: (
+              <Landscape sx={{ fontSize: 20, color: "var(--color-orange)" }} />
+            ),
           };
 
   return (
@@ -673,18 +681,15 @@ const OfferCard = ({
             </Box>
             {!secondaryName && (
               <Tooltip title="View Details">
-                <IconButton
-                  size="small"
+                <AppButton
+                  variant="outline"
+                  size="sm"
                   onClick={() => onViewDetails?.(id)}
-                  sx={{
-                    color: "primary.main",
-                    "&:hover": {
-                      backgroundColor: "var(--color-olive-muted)",
-                    },
-                  }}
+                  leadingIcon={<Visibility fontSize="small" />}
+                  className="!px-2.5 !py-1"
                 >
-                  <Visibility fontSize="small" />
-                </IconButton>
+                  View
+                </AppButton>
               </Tooltip>
             )}
           </Box>
@@ -763,18 +768,15 @@ const OfferCard = ({
                 </Box>
               </Box>
               <Tooltip title="View Details">
-                <IconButton
-                  size="small"
+                <AppButton
+                  variant="outline"
+                  size="sm"
                   onClick={() => onViewDetails?.(id)}
-                  sx={{
-                    color: "primary.main",
-                    "&:hover": {
-                      backgroundColor: "var(--color-olive-muted)",
-                    },
-                  }}
+                  leadingIcon={<Visibility fontSize="small" />}
+                  className="!px-2.5 !py-1"
                 >
-                  <Visibility fontSize="small" />
-                </IconButton>
+                  View
+                </AppButton>
               </Tooltip>
             </Box>
           )}

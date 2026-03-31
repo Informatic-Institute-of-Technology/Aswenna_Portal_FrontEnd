@@ -60,7 +60,7 @@ const ConnectionJourney = ({ farmerName, steps }: ConnectionJourneyProps) => {
                       }
                     : step.status === "completed"
                       ? {
-                          background: "#4ade80",
+                          background: "#85a446",
                           border: "2px solid rgba(74,222,128,0.3)",
                         }
                       : step.status === "active"

@@ -49,9 +49,9 @@ const LandownerAdCard = ({ ad, onViewMore }: LandownerAdCardProps) => {
           borderColor: "primary.main",
         },
       }}
-    >  </Card>
-
-     <Box
+    >
+      {/* Price badge */}
+      <Box
         sx={{
           position: "absolute",
           top: 16,
@@ -69,10 +69,11 @@ const LandownerAdCard = ({ ad, onViewMore }: LandownerAdCardProps) => {
           gap: 0.5,
           boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
         }}
-      ></Box>
-
-       <Payments sx={{ fontSize: 18, color: "primary.light" }} />
-        ₨{(ad.rentalAmount as unknown as number).toLocaleString()}/mo
+      >
+        <Payments sx={{ fontSize: 18, color: "primary.light" }} />
+        <Typography sx={{ fontSize: "0.85rem", fontWeight: 700 }}>
+          ₨{Number(ad.rentalAmount || 0).toLocaleString()}/mo
+        </Typography>
       </Box>
 
       {/* Land Image */}
@@ -90,7 +91,6 @@ const LandownerAdCard = ({ ad, onViewMore }: LandownerAdCardProps) => {
             },
           }}
         />
-        {/* Subtle gradient overlay at bottom of image for contrast */}
         <Box
           sx={{
             position: "absolute",
@@ -102,8 +102,8 @@ const LandownerAdCard = ({ ad, onViewMore }: LandownerAdCardProps) => {
           }}
         />
       </Box>
-    
-     <CardContent sx={{ flexGrow: 1, display: "flex", flexDirection: "column", p: 3 }}>
+
+      <CardContent sx={{ flexGrow: 1, display: "flex", flexDirection: "column", p: 3 }}>
         {/* Title */}
         <Typography
           variant="h6"
@@ -154,8 +154,7 @@ const LandownerAdCard = ({ ad, onViewMore }: LandownerAdCardProps) => {
               </Typography>
             </Box>
           </Box>
-          
-          {/* Optional Soil Type if you want to highlight it */}
+
           {ad.soilType && (
             <Chip
               label={ad.soilType}
@@ -166,7 +165,6 @@ const LandownerAdCard = ({ ad, onViewMore }: LandownerAdCardProps) => {
           )}
         </Box>
 
-        {/* Push button to bottom if content varied */}
         <Box sx={{ flexGrow: 1 }} />
       </CardContent>
 
@@ -196,6 +194,3 @@ const LandownerAdCard = ({ ad, onViewMore }: LandownerAdCardProps) => {
 };
 
 export default LandownerAdCard;
-
-
-
