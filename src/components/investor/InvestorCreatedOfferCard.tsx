@@ -89,15 +89,16 @@ const InvestorCreatedOfferCard = ({
     id?: string,
     fallback: string = "Not assigned",
   ) => {
-    if (name && id) return `${name} (${id})`;
     if (name) return name;
     if (id) return `ID: ${id}`;
     return fallback;
   };
 
+  const resolvedFarmerName = offer.farmer?.fullName ?? offer.farmerName;
+  const resolvedFarmerId = offer.farmer?._id ?? offer.farmerId;
   const farmerLabel = formatPartyLabel(
-    offer.farmerName,
-    offer.farmerId,
+    resolvedFarmerName,
+    resolvedFarmerId,
     "Farmer not assigned",
   );
 
