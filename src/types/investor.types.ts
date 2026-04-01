@@ -47,6 +47,20 @@ interface OfferAPIBase {
   farmerName?: string;
   landOwnerId?: string;
   landOwnerName?: string;
+  landowner?: {
+    _id: string;
+    fullName?: string;
+    email?: string;
+    phoneNumber?: string;
+    personalInfo?: Record<string, unknown>;
+  };
+
+  landownerProject?: {
+    _id: string;
+    title?: string;
+    name?: string;
+    status?: string;
+  };
   createdAt: string;
   updatedAt: string;
 }

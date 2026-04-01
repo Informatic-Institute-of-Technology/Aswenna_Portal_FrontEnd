@@ -5,8 +5,8 @@ import {
   Close,
   DeleteOutline,
   Handshake,
-  RadioButtonUnchecked,
   RadioButtonChecked,
+  RadioButtonUnchecked,
   TrendingUp,
 } from "@mui/icons-material";
 import {
@@ -18,6 +18,8 @@ import {
   DialogTitle,
   Divider,
   IconButton,
+  InputAdornment,
+  Paper,
   Radio,
   Stack,
   TextField,
@@ -31,7 +33,6 @@ import {
   type TabItem,
 } from "../../components/common";
 import FarmerOpportunityOfferCard from "../../components/farmer/FarmerOpportunityOfferCard";
-import { createInvestorHarvestBaseContract } from "../../services/contract.service";
 import {
   getFarmerProjects,
   type FarmerProjectApiItem,
@@ -39,6 +40,7 @@ import {
 import {
   getInvestorOfferById,
   getInvestorOffers,
+  updateFarmerOfferBreakdown,
 } from "../../services/offer.service";
 import Notification from "../../shared/components/Notification";
 
@@ -54,8 +56,10 @@ type EditableCostRow = {
 type EditableMilestoneRow = {
   id: string;
   milestone: string;
-  description: string;
-  estimatedAmount: string;
+  fromDate: string;
+  toDate: string;
+  paymentDueDate: string;
+  budget: string;
 };
 
 const makeRowId = () =>
@@ -199,30 +203,41 @@ const buildInitialCostRows = (offer: InvestorOfferAPI): EditableCostRow[] => {
 const buildInitialMilestoneRows = (
   offer: InvestorOfferAPI,
 ): EditableMilestoneRow[] => {
+  const defaultFrom = formatDateForApi(offer.createdAt);
+  const defaultTo = formatDateForApi(offer.expiredDate);
+  const defaultDue = defaultTo;
+
   if (offer.offerType === "direct-harvest") {
     const budget = offer.harvestBaseDetails.totalBudget || 0;
     return [
       {
         id: makeRowId(),
         milestone: "Land Preparation",
-        description: "Soil prep and initial setup",
-        estimatedAmount: budget > 0 ? String(Math.round(budget * 0.4)) : "",
+        fromDate: defaultFrom,
+        toDate: defaultTo,
+        paymentDueDate: defaultDue,
+        budget: budget > 0 ? String(Math.round(budget * 0.4)) : "",
       },
       {
         id: makeRowId(),
         milestone: "Harvest & Delivery",
-        description: "Final harvest and transport",
-        estimatedAmount: budget > 0 ? String(Math.round(budget * 0.6)) : "",
+        fromDate: defaultFrom,
+        toDate: defaultTo,
+        paymentDueDate: defaultDue,
+        budget: budget > 0 ? String(Math.round(budget * 0.6)) : "",
       },
     ];
   }
 
+  const minInvest = offer.commissionDetails.minimumInvestment || 0;
   return [
     {
       id: makeRowId(),
       milestone: "Initial Funding",
-      description: "Kick-off investment release",
-      estimatedAmount: String(offer.commissionDetails.minimumInvestment || ""),
+      fromDate: defaultFrom,
+      toDate: defaultTo,
+      paymentDueDate: defaultDue,
+      budget: String(minInvest),
     },
   ];
 };
@@ -454,14 +469,11 @@ const FarmerOpportunitiesPage = () => {
       return;
     }
 
-    if (!user?._id) {
-      setNotification({
-        open: true,
-        message: "Unable to send request. Farmer account was not found.",
-        severity: "error",
-      });
-      return;
-    }
+    const hasIncompleteCostRow = editableCostRows.some((row) => {
+      const title = row.category.trim();
+      const amount = parsePositiveAmount(row.estimatedCost);
+      return title === "" || amount === null;
+    });
 
     const financialBreakdown = editableCostRows
       .map((row) => {
@@ -486,18 +498,32 @@ const FarmerOpportunitiesPage = () => {
         } => item !== null,
       );
 
-    const startDate = formatDateForApi(selectedOffer.createdAt);
-    const endDate = formatDateForApi(selectedOffer.expiredDate);
+    const hasIncompleteMilestoneRow = editableMilestoneRows.some((row) => {
+      const title = row.milestone.trim();
+      const amount = parsePositiveAmount(row.budget);
+      return title === "" || amount === null;
+    });
 
     const milestones = editableMilestoneRows
       .map((row) => {
         const title = row.milestone.trim();
-        const description = row.description.trim();
-        const payment = parsePositiveAmount(row.estimatedAmount);
+        const payment = parsePositiveAmount(row.budget);
 
         if (!title || payment === null) {
           return null;
         }
+
+        const startDate = formatDateForApi(
+          row.fromDate || selectedOffer.createdAt,
+        );
+        const endDate = formatDateForApi(
+          row.toDate || selectedOffer.expiredDate,
+        );
+        const paymentDueDate = formatDateForApi(
+          row.paymentDueDate || selectedOffer.expiredDate,
+        );
+
+        const description = `Payment due by ${formatDate(paymentDueDate)}`;
 
         return {
           title,
@@ -505,6 +531,7 @@ const FarmerOpportunitiesPage = () => {
           startDate,
           endDate,
           payment,
+          paymentDueDate,
         };
       })
       .filter(
@@ -516,14 +543,20 @@ const FarmerOpportunitiesPage = () => {
           startDate: string;
           endDate: string;
           payment: number;
+          paymentDueDate: string;
         } => item !== null,
       );
 
-    if (milestones.length === 0 || financialBreakdown.length === 0) {
+    if (
+      hasIncompleteCostRow ||
+      hasIncompleteMilestoneRow ||
+      milestones.length === 0 ||
+      financialBreakdown.length === 0
+    ) {
       setNotification({
         open: true,
         message:
-          "Please add at least one valid milestone and one financial breakdown item.",
+          "Please fill every cost and milestone row with valid values before sending.",
         severity: "error",
       });
       return;
@@ -560,13 +593,18 @@ const FarmerOpportunitiesPage = () => {
     try {
       setSubmittingRequest(true);
 
-      await createInvestorHarvestBaseContract({
-        type: "investor-harvest-base",
-        offer: selectedOffer._id,
-        farmer: user._id,
-        projectName: selectedOffer.harvestBaseDetails.projectTitle,
-        milestones,
-        financialBreakdown,
+      await updateFarmerOfferBreakdown(selectedOffer._id, {
+        costBreakdown: financialBreakdown.map((item) => ({
+          title: item.category,
+          estimatedCost: item.amount,
+        })),
+        milestoneBreakdown: milestones.map((item) => ({
+          title: item.title,
+          estimatedAmount: item.payment,
+          paymentOverDueDate: item.paymentDueDate,
+          startDate: item.startDate,
+          endDate: item.endDate,
+        })),
       });
 
       setNotification({
@@ -636,8 +674,10 @@ const FarmerOpportunitiesPage = () => {
       {
         id: makeRowId(),
         milestone: "",
-        description: "",
-        estimatedAmount: "",
+        fromDate: formatDateForApi(new Date().toISOString()),
+        toDate: formatDateForApi(new Date().toISOString()),
+        paymentDueDate: formatDateForApi(new Date().toISOString()),
+        budget: "",
       },
     ]);
   };
@@ -1180,134 +1220,345 @@ const FarmerOpportunitiesPage = () => {
               </Typography>
 
               {selectedOffer?.offerType === "direct-harvest" ? (
-                <Stack spacing={2}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-                    Cost Breakdown
-                  </Typography>
-                  <Stack spacing={1.25}>
-                    {editableCostRows.map((row) => (
-                      <Stack
-                        key={row.id}
-                        direction={{ xs: "column", md: "row" }}
-                        spacing={1}
-                      >
-                        <TextField
-                          size="small"
-                          label="Category"
-                          value={row.category}
-                          onChange={(event) =>
-                            updateCostRow(
-                              row.id,
-                              "category",
-                              event.target.value,
-                            )
-                          }
-                          fullWidth
-                        />
-                        <TextField
-                          size="small"
-                          label="Description"
-                          value={row.description}
-                          onChange={(event) =>
-                            updateCostRow(
-                              row.id,
-                              "description",
-                              event.target.value,
-                            )
-                          }
-                          fullWidth
-                        />
-                        <TextField
-                          size="small"
-                          label="Amount"
-                          type="number"
-                          value={row.estimatedCost}
-                          onChange={(event) =>
-                            updateCostRow(
-                              row.id,
-                              "estimatedCost",
-                              event.target.value,
-                            )
-                          }
-                          sx={{ minWidth: 160 }}
-                        />
-                        <IconButton onClick={() => removeCostRow(row.id)}>
-                          <DeleteOutline fontSize="small" />
-                        </IconButton>
-                      </Stack>
-                    ))}
-                    <Button
-                      startIcon={<Add />}
-                      onClick={addCostRow}
-                      sx={{ textTransform: "none", alignSelf: "flex-start" }}
+                <Stack spacing={3}>
+                  <Paper
+                    elevation={6}
+                    sx={{
+                      borderRadius: 3,
+                      p: 2,
+                      border: "1px solid #2a2a2a",
+                      bgcolor: "#0f0f10",
+                    }}
+                  >
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      justifyContent="space-between"
+                      sx={{ mb: 1.5 }}
                     >
-                      Add Cost Row
-                    </Button>
-                  </Stack>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
+                        Cost Breakdown
+                      </Typography>
+                      <Button
+                        startIcon={<Add />}
+                        onClick={addCostRow}
+                        size="small"
+                        variant="contained"
+                        sx={{ textTransform: "none" }}
+                      >
+                        Add Row
+                      </Button>
+                    </Stack>
 
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-                    Milestone Breakdown
-                  </Typography>
-                  <Stack spacing={1.25}>
-                    {editableMilestoneRows.map((row) => (
-                      <Stack
-                        key={row.id}
-                        direction={{ xs: "column", md: "row" }}
-                        spacing={1}
+                    <Stack spacing={1.25}>
+                      <Box
+                        sx={{
+                          display: "grid",
+                          gridTemplateColumns: {
+                            xs: "1fr",
+                            md: "1fr 0.6fr auto",
+                          },
+                          gap: 1,
+                          alignItems: "center",
+                          px: 1,
+                          py: 0.75,
+                          bgcolor: "#1c1c1e",
+                          borderRadius: 0,
+                          border: "1px solid #2e2e2e",
+                          color: "#e6e6e6",
+                          fontWeight: 700,
+                        }}
                       >
-                        <TextField
-                          size="small"
-                          label="Milestone"
-                          value={row.milestone}
-                          onChange={(event) =>
-                            updateMilestoneRow(
-                              row.id,
-                              "milestone",
-                              event.target.value,
-                            )
-                          }
-                          fullWidth
-                        />
-                        <TextField
-                          size="small"
-                          label="Description"
-                          value={row.description}
-                          onChange={(event) =>
-                            updateMilestoneRow(
-                              row.id,
-                              "description",
-                              event.target.value,
-                            )
-                          }
-                          fullWidth
-                        />
-                        <TextField
-                          size="small"
-                          label="Amount"
-                          type="number"
-                          value={row.estimatedAmount}
-                          onChange={(event) =>
-                            updateMilestoneRow(
-                              row.id,
-                              "estimatedAmount",
-                              event.target.value,
-                            )
-                          }
-                          sx={{ minWidth: 160 }}
-                        />
-                        <IconButton onClick={() => removeMilestoneRow(row.id)}>
-                          <DeleteOutline fontSize="small" />
-                        </IconButton>
-                      </Stack>
-                    ))}
-                    <Button
-                      startIcon={<Add />}
-                      onClick={addMilestoneRow}
-                      sx={{ textTransform: "none", alignSelf: "flex-start" }}
+                        <Typography sx={{ fontWeight: 700 }}>
+                          Purpose
+                        </Typography>
+                        <Typography sx={{ fontWeight: 700 }}>Cost</Typography>
+                        <Box />
+                      </Box>
+
+                      {editableCostRows.map((row, index) => (
+                        <Box
+                          key={row.id}
+                          sx={{
+                            display: "grid",
+                            gridTemplateColumns: {
+                              xs: "1fr",
+                              md: "1fr 0.6fr auto",
+                            },
+                            gap: 1,
+                            alignItems: "center",
+                            px: 1,
+                            py: 0.85,
+                            bgcolor: index % 2 === 0 ? "#131313" : "#1a1a1d",
+                            color: "#f5f5f5",
+                            borderRadius: 0,
+                            border: "1px solid #2e2e2e",
+                          }}
+                        >
+                          <TextField
+                            size="small"
+                            placeholder="Purpose"
+                            value={row.category}
+                            onChange={(event) =>
+                              updateCostRow(
+                                row.id,
+                                "category",
+                                event.target.value,
+                              )
+                            }
+                            fullWidth
+                          />
+                          <TextField
+                            size="small"
+                            placeholder="Cost"
+                            type="number"
+                            value={row.estimatedCost}
+                            onChange={(event) =>
+                              updateCostRow(
+                                row.id,
+                                "estimatedCost",
+                                event.target.value,
+                              )
+                            }
+                            fullWidth
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  LKR
+                                </InputAdornment>
+                              ),
+                            }}
+                          />
+                          <IconButton onClick={() => removeCostRow(row.id)}>
+                            <DeleteOutline fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      ))}
+
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "flex-end",
+                          gap: 1,
+                          alignItems: "center",
+                          mt: 0.5,
+                          px: 1,
+                          py: 0.75,
+                          borderRadius: 0,
+                          bgcolor: "#1c1c1e",
+                          border: "1px solid #2e2e2e",
+                          color: "#e6e6e6",
+                        }}
+                      >
+                        <Typography
+                          sx={{ fontWeight: 700, color: "text.secondary" }}
+                        >
+                          Total
+                        </Typography>
+                        <Typography sx={{ fontWeight: 800 }}>
+                          {formatCurrency(
+                            editableCostRows.reduce(
+                              (sum, row) =>
+                                sum + (Number(row.estimatedCost) || 0),
+                              0,
+                            ),
+                          )}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </Paper>
+
+                  <Paper
+                    elevation={6}
+                    sx={{
+                      borderRadius: 3,
+                      p: 2,
+                      border: "1px solid #2a2a2a",
+                      bgcolor: "#0f0f10",
+                    }}
+                  >
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      justifyContent="space-between"
+                      sx={{ mb: 1.5 }}
                     >
-                      Add Milestone Row
-                    </Button>
-                  </Stack>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
+                        Milestone Breakdown
+                      </Typography>
+                      <Button
+                        startIcon={<Add />}
+                        onClick={addMilestoneRow}
+                        size="small"
+                        variant="contained"
+                        sx={{ textTransform: "none" }}
+                      >
+                        Add Row
+                      </Button>
+                    </Stack>
+
+                    <Stack spacing={1.25}>
+                      <Box
+                        sx={{
+                          display: "grid",
+                          gridTemplateColumns: {
+                            xs: "1fr",
+                            md: "1fr 0.7fr 0.7fr 0.7fr 0.6fr auto",
+                          },
+                          gap: 1,
+                          alignItems: "center",
+                          px: 1,
+                          py: 0.75,
+                          bgcolor: "#1c1c1e",
+                          borderRadius: 0,
+                          border: "1px solid #2e2e2e",
+                          color: "#e6e6e6",
+                          fontWeight: 700,
+                        }}
+                      >
+                        <Typography sx={{ fontWeight: 700 }}>
+                          Milestone
+                        </Typography>
+                        <Typography sx={{ fontWeight: 700 }}>From</Typography>
+                        <Typography sx={{ fontWeight: 700 }}>To</Typography>
+                        <Typography sx={{ fontWeight: 700 }}>
+                          Payment Due
+                        </Typography>
+                        <Typography sx={{ fontWeight: 700 }}>Budget</Typography>
+                        <Box />
+                      </Box>
+
+                      {editableMilestoneRows.map((row, index) => (
+                        <Box
+                          key={row.id}
+                          sx={{
+                            display: "grid",
+                            gridTemplateColumns: {
+                              xs: "1fr",
+                              md: "1fr 0.7fr 0.7fr 0.7fr 0.6fr auto",
+                            },
+                            gap: 1,
+                            alignItems: "center",
+                            px: 1,
+                            py: 0.85,
+                            bgcolor: index % 2 === 0 ? "#131313" : "#1a1a1d",
+                            color: "#f5f5f5",
+                            borderRadius: 0,
+                            border: "1px solid #2e2e2e",
+                          }}
+                        >
+                          <TextField
+                            size="small"
+                            placeholder="Milestone name"
+                            value={row.milestone}
+                            onChange={(event) =>
+                              updateMilestoneRow(
+                                row.id,
+                                "milestone",
+                                event.target.value,
+                              )
+                            }
+                            fullWidth
+                          />
+                          <TextField
+                            size="small"
+                            type="date"
+                            value={row.fromDate}
+                            onChange={(event) =>
+                              updateMilestoneRow(
+                                row.id,
+                                "fromDate",
+                                event.target.value,
+                              )
+                            }
+                            fullWidth
+                          />
+                          <TextField
+                            size="small"
+                            type="date"
+                            value={row.toDate}
+                            onChange={(event) =>
+                              updateMilestoneRow(
+                                row.id,
+                                "toDate",
+                                event.target.value,
+                              )
+                            }
+                            fullWidth
+                          />
+                          <TextField
+                            size="small"
+                            type="date"
+                            value={row.paymentDueDate}
+                            onChange={(event) =>
+                              updateMilestoneRow(
+                                row.id,
+                                "paymentDueDate",
+                                event.target.value,
+                              )
+                            }
+                            fullWidth
+                          />
+                          <TextField
+                            size="small"
+                            placeholder="Budget"
+                            type="number"
+                            value={row.budget}
+                            onChange={(event) =>
+                              updateMilestoneRow(
+                                row.id,
+                                "budget",
+                                event.target.value,
+                              )
+                            }
+                            fullWidth
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  LKR
+                                </InputAdornment>
+                              ),
+                            }}
+                          />
+                          <IconButton
+                            onClick={() => removeMilestoneRow(row.id)}
+                          >
+                            <DeleteOutline fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      ))}
+
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "flex-end",
+                          gap: 1,
+                          alignItems: "center",
+                          mt: 0.5,
+                          px: 1,
+                          py: 0.75,
+                          borderRadius: 0,
+                          bgcolor: "#1c1c1e",
+                          border: "1px solid #2e2e2e",
+                          color: "#e6e6e6",
+                        }}
+                      >
+                        <Typography
+                          sx={{ fontWeight: 700, color: "text.secondary" }}
+                        >
+                          Total Budget
+                        </Typography>
+                        <Typography sx={{ fontWeight: 800 }}>
+                          {formatCurrency(
+                            editableMilestoneRows.reduce(
+                              (sum, row) => sum + (Number(row.budget) || 0),
+                              0,
+                            ),
+                          )}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </Paper>
                 </Stack>
               ) : (
                 <Stack spacing={1.25}>
@@ -1466,7 +1717,7 @@ const FarmerOpportunitiesPage = () => {
         open={notification.open}
         message={notification.message}
         severity={notification.severity}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
         duration={4500}
         onClose={closeNotification}
       />

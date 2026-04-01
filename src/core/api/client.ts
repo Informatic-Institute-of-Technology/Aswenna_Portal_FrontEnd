@@ -1,8 +1,3 @@
-/**
- * API Client Configuration
- * Centralized HTTP client for making API requests
- */
-
 import { API_BASE_URL, API_TIMEOUT } from '@/constants'
 import type { ApiResponse } from '@/types'
 
@@ -25,7 +20,6 @@ class ApiClient {
   ): Promise<ApiResponse<T>> {
     const { params, ...options } = config
 
-    // Build URL with query params
     let url = `${this.baseURL}${endpoint}`
     if (params) {
       const queryString = new URLSearchParams(
@@ -34,7 +28,6 @@ class ApiClient {
       url += `?${queryString}`
     }
 
-    // Set default headers
     const headers = {
       'Content-Type': 'application/json',
       ...options.headers,
