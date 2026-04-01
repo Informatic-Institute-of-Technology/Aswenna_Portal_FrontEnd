@@ -100,11 +100,13 @@ const InvestorCreatedOfferCard = ({
     offer.farmerId,
     "Farmer not assigned",
   );
-  const landOwnerLabel = formatPartyLabel(
-    offer.landOwnerName,
-    offer.landOwnerId,
-    "Landowner not assigned",
-  );
+
+  const resolvedLandownerName =
+    offer.landOwnerName ?? offer.landowner?.fullName;
+  const landOwnerLabel = resolvedLandownerName ?? "Landowner not assigned";
+
+  const landProjectName =
+    offer.landownerProject?.title ?? offer.landownerProject?.name;
 
   return (
     <Card
@@ -419,6 +421,11 @@ const InvestorCreatedOfferCard = ({
               <Typography variant="caption" sx={{ fontWeight: 700 }}>
                 {landOwnerLabel}
               </Typography>
+              {landProjectName && (
+                <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                  {landProjectName}
+                </Typography>
+              )}
             </Box>
           </Box>
           {deadline && (
