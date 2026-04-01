@@ -1,5 +1,10 @@
 export type OfferType = "direct-harvest" | "sponsorship";
-export type OfferStatus = "active" | "pending" | "completed" | "cancelled";
+export type OfferStatus =
+  | "open"
+  | "active"
+  | "pending"
+  | "closed"
+  | "expired";
 export type PaymentStatus = "pending" | "paid" | "overdue";
 
 export interface InvestorRef {

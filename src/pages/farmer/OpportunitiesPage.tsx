@@ -284,7 +284,7 @@ const FarmerOpportunitiesPage = () => {
         setLoading(true);
         setError(null);
 
-        const response = await getInvestorOffers();
+        const response = await getInvestorOffers({ status: "open" });
         const activeOffers = (response.data ?? [])
           .filter(
             (offer) =>

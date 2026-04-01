@@ -142,7 +142,7 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
     setProjectsError(null);
     setLoadingProjects(true);
     try {
-      const res = await getInvestorOffers();
+      const res = await getInvestorOffers({ status: "open" });
       const data = res?.data ?? [];
       const filtered = data.filter((offer) => {
         const isHarvest = offer.offerType === "direct-harvest";
