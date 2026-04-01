@@ -287,8 +287,7 @@ const FarmerOpportunitiesPage = () => {
         const response = await getInvestorOffers({ status: "open" });
         const activeOffers = (response.data ?? [])
           .filter(
-            (offer) =>
-              offer.status !== "completed" && offer.status !== "cancelled",
+            (offer) => offer.status !== "closed" && offer.status !== "expired",
           )
           .map((offer) => ({
             ...offer,
@@ -627,7 +626,7 @@ const FarmerOpportunitiesPage = () => {
           fullName: user.fullName || undefined,
           email: user.email || undefined,
         },
-      });
+      } as Parameters<typeof updateFarmerOfferBreakdown>[1]);
 
       setNotification({
         open: true,

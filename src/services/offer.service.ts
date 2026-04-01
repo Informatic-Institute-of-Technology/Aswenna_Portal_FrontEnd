@@ -85,6 +85,11 @@ export interface FarmerOfferMilestonePayload {
 export interface FarmerOfferBreakdownPayload {
   costBreakdown: Array<{ title: string; estimatedCost: number }>;
   milestoneBreakdown: FarmerOfferMilestonePayload[];
+  farmer?: {
+    _id: string;
+    fullName?: string;
+    email?: string;
+  };
 }
 
 export const updateFarmerOfferBreakdown = (
