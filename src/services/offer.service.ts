@@ -53,3 +53,21 @@ export const matchLandOwnerOffer = (
   httpClient.patch<unknown>(`/v1/land-owner-offer/${offerId}`, {
     landownerProjectId,
   });
+
+export interface FarmerOfferMilestonePayload {
+  title: string;
+  estimatedAmount: number;
+  paymentOverDueDate?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface FarmerOfferBreakdownPayload {
+  costBreakdown: Array<{ title: string; estimatedCost: number }>;
+  milestoneBreakdown: FarmerOfferMilestonePayload[];
+}
+
+export const updateFarmerOfferBreakdown = (
+  offerId: string,
+  payload: FarmerOfferBreakdownPayload,
+) => httpClient.patch<unknown>(`/v1/farmer-offer/${offerId}`, payload);
