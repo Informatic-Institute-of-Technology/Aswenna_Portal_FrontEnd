@@ -8,6 +8,12 @@ export interface InvestorRef {
   email: string;
 }
 
+export interface FarmerRef {
+  _id: string;
+  fullName?: string;
+  email?: string;
+}
+
 export interface HarvestBaseDetails {
   projectTitle: string;
   cropType: string;
@@ -43,6 +49,7 @@ interface OfferAPIBase {
   expiredDate: string;
   status: OfferStatus;
   applicationsCount: number;
+  farmer?: FarmerRef;
   farmerId?: string;
   farmerName?: string;
   landOwnerId?: string;

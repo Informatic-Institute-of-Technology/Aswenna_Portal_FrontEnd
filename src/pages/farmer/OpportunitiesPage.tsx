@@ -285,10 +285,18 @@ const FarmerOpportunitiesPage = () => {
         setError(null);
 
         const response = await getInvestorOffers();
-        const activeOffers = (response.data ?? []).filter(
-          (offer) =>
-            offer.status !== "completed" && offer.status !== "cancelled",
-        );
+        const activeOffers = (response.data ?? [])
+          .filter(
+            (offer) =>
+              offer.status !== "completed" && offer.status !== "cancelled",
+          )
+          .map((offer) => ({
+            ...offer,
+            farmerName: offer.farmer?.fullName || offer.farmerName,
+            farmerId: offer.farmer?._id || offer.farmerId,
+            landOwnerName: offer.landowner?.fullName || offer.landOwnerName,
+            landOwnerId: offer.landowner?._id || offer.landOwnerId,
+          }));
 
         if (mounted) {
           setOffers(activeOffers);
@@ -469,6 +477,15 @@ const FarmerOpportunitiesPage = () => {
       return;
     }
 
+    if (!user?._id) {
+      setNotification({
+        open: true,
+        message: "Unable to send request. Farmer account was not found.",
+        severity: "error",
+      });
+      return;
+    }
+
     const hasIncompleteCostRow = editableCostRows.some((row) => {
       const title = row.category.trim();
       const amount = parsePositiveAmount(row.estimatedCost);
@@ -605,6 +622,11 @@ const FarmerOpportunitiesPage = () => {
           startDate: item.startDate,
           endDate: item.endDate,
         })),
+        farmer: {
+          _id: user._id,
+          fullName: user.fullName || undefined,
+          email: user.email || undefined,
+        },
       });
 
       setNotification({
