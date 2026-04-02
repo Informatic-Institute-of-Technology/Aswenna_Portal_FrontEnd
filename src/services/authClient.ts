@@ -64,6 +64,7 @@ class AuthClient {
       headers: {
         "Content-Type": "application/json",
         Authorization: authorizationHeader,
+              "ngrok-skip-browser-warning": "true",
       },
       body: body ? JSON.stringify(body) : undefined,
       credentials: "same-origin",

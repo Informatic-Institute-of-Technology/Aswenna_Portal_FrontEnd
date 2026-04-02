@@ -5,7 +5,7 @@ export const config = {
     environment: import.meta.env.MODE,
   },
   api: {
-    baseUrl: import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api",
+    baseUrl: import.meta.env.VITE_API_BASE_URL || "https://burt-superwise-indispensably.ngrok-free.dev/api",
     timeout: 30000,
   },
   storage: {
