@@ -1,4 +1,3 @@
-// ─── Shared constants & formatters used across dashboard sub-components ─────
 
 export const CHART_COLORS = [
     "#3b82f6",
@@ -16,12 +15,10 @@ export const TOOLTIP_STYLE = {
     borderRadius: "8px",
 };
 
-/** Generic formatter – returns numbers as locale strings, strings as-is. */
 export const genericFormatter = (value: number | string | undefined) => {
     if (typeof value === "number") return value.toLocaleString();
     return value !== undefined ? value.toString() : "";
 };
 
-/** Formats numbers as USD amounts. */
 export const moneyFormatter = (value: number | undefined) =>
     value !== undefined ? `$${value.toLocaleString()}` : "";

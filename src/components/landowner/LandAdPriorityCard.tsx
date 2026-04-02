@@ -163,7 +163,6 @@ const LandAdPriorityCard = ({
           },
         }}
       >
-        {/* Image carousel header */}
         <Box sx={{ position: "relative", height: 160, overflow: "hidden" }}>
           <CardMedia
             component="img"
@@ -207,7 +206,6 @@ const LandAdPriorityCard = ({
                 <ChevronLeft />
               </IconButton>
 
-              {/* Next button */}
               <IconButton
                 onClick={handleNextImage}
                 sx={{
@@ -369,7 +367,6 @@ const LandAdPriorityCard = ({
               </Typography>
             </Box>
 
-            {/* Soil Type */}
             <Box
               sx={{
                 p: 1.5,
@@ -489,7 +486,6 @@ const LandAdPriorityCard = ({
           </Box>
         </Box>
 
-        {/* Action buttons */}
         <Box
           sx={{
             display: "flex",
@@ -841,7 +837,6 @@ const LandAdPriorityCard = ({
                   </Box>
                 )}
 
-                {/* Landowner Card */}
                 {detailedAd.landowner &&
                   typeof detailedAd.landowner === "object" && (
                     <Box
@@ -1048,7 +1043,6 @@ const LandAdPriorityCard = ({
                   </Stack>
                 </Box>
 
-                {/* Rental & Availability */}
                 <Box sx={{ mb: 3 }}>
                   <Typography
                     variant="subtitle2"
@@ -1126,7 +1120,6 @@ const LandAdPriorityCard = ({
                   </Stack>
                 </Box>
 
-                {/* Location & Additional Info */}
                 <Box sx={{ mb: 3 }}>
                   <Typography
                     variant="subtitle2"
@@ -1191,7 +1184,6 @@ const LandAdPriorityCard = ({
                   </Stack>
                 </Box>
 
-                {/* Record Info */}
                 <Box
                   sx={{
                     p: 1.5,

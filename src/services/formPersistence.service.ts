@@ -4,7 +4,6 @@ const STORE_NAME = "formData";
 
 export type UserRole = "farmer" | "investor" | "landowner";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FormData = Record<string, any>;
 
 interface FormDataEntry {

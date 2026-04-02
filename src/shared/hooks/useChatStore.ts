@@ -1,4 +1,3 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AuthClientError } from "@/services/authClient";
 import { chatApi } from "@/services/chatApi.service";
 import { chatSocket } from "@/services/chatSocket.service";
@@ -7,6 +6,7 @@ import type {
   ConversationMemberRole,
   Message,
 } from "@/types/chat.types";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type ConnectionStatus = "disconnected" | "connecting" | "connected" | "error";
 
@@ -298,9 +298,7 @@ export const useChatStore = ({
       await chatSocket.connect();
       setConnectionStatus("connected");
     } catch (error) {
-      // Socket.io will automatically keep retrying, so we show it as "connecting" in the background
       setConnectionStatus("connecting");
-      // Optionally suppress the hard error dialog so it doesn't annoy the user
       console.warn(
         "Socket connection failed. Retrying in background...",
         error,
@@ -584,7 +582,6 @@ export const useChatStore = ({
         console.log("[chat][store] received conversation:sync", payload);
       }
       if (payload.action === "created") {
-        // Fetch conversations again to get the new one.
         loadConversations();
       } else if (payload.action === "deleted") {
         const conversationId = payload.conversationId;
@@ -688,10 +685,6 @@ export const useChatStore = ({
       const ids = payload.messageIds || [];
       if (ids.length === 0) return;
 
-      // If backend provides the userId of who read it, use it.
-      // Otherwise, infer it: if we receive 'message:read', it implies the peer read it.
-      // We look up the message to see who sent it. If we sent it, and someone read it,
-      // and we don't know who (group chat without userId), we just put "peer" so it turns blue.
       const fallbackReaderId = payload.userId || "peer";
 
       setMessagesByConversationId((prev) => ({

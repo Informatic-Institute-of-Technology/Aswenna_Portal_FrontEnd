@@ -243,7 +243,6 @@ const ReceivedRequestsPage = () => {
           </Typography>
         </Box>
 
-        {/* Active Investment Opportunities */}
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
             Investment Opportunities ({offers.length})

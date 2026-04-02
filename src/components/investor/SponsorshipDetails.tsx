@@ -183,7 +183,6 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
       className="font-['Manrope'] text-slate-100 rounded-2xl flex flex-col overflow-hidden"
       style={{ background: "#0a0a0a", width: 920, maxHeight: "92vh" }}
     >
-      {/* ── Header ── */}
       <div
         className="shrink-0 flex items-center gap-3 px-5 py-4"
         style={{ background: "#0a0a0a" }}
@@ -227,11 +226,8 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
         </div>
       </div>
 
-      {/* ── Body (two-column) ── */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Left column */}
         <div className="flex-1 overflow-y-auto px-6 py-7 space-y-8">
-          {/* Offer Info */}
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-1.5 h-5 rounded-full bg-[#85a446]" />
@@ -268,8 +264,6 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
               </label>
             </div>
           </div>
-
-          {/* Preferred Regions */}
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-1.5 h-5 rounded-full bg-[#85a446]" />
@@ -374,8 +368,6 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
               )}
             </div>
           </div>
-
-          {/* Investment Details */}
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-1.5 h-5 rounded-full bg-[#85a446]" />
@@ -454,8 +446,6 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
               </div>
             </div>
           </div>
-
-          {/* Offer Expiry Date */}
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-1.5 h-5 rounded-full bg-[#85a446]" />
@@ -480,7 +470,6 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
             </label>
           </div>
 
-          {/* Farming & Support */}
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-1.5 h-5 rounded-full bg-[#85a446]" />
@@ -545,9 +534,7 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
           </div>
         </div>
 
-        {/* Right column */}
         <div className="w-[320px] shrink-0 overflow-y-auto px-5 py-7 space-y-6">
-          {/* Investor card */}
           <div
             className="rounded-xl overflow-hidden"
             style={{
@@ -595,7 +582,6 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
             </div>
           </div>
 
-          {/* Crop Icon */}
           <div>
             <div className="flex items-center gap-2 mb-3">
               <div className="w-1.5 h-5 rounded-full bg-[#85a446]" />
@@ -638,7 +624,6 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
             {errMsg("cropIcon")}
           </div>
 
-          {/* Cover Image */}
           <div>
             <div className="flex items-center gap-2 mb-2.5">
               <div className="w-1 h-4 rounded-full bg-[#85a446]" />
@@ -703,7 +688,6 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
         </div>
       </div>
 
-      {/* ── Footer ── */}
       <div
         className="shrink-0 flex items-center justify-between gap-3 px-5 py-3.5"
         style={{ background: "#0a0a0a" }}

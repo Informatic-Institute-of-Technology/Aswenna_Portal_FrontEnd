@@ -16,7 +16,6 @@ type ImageWithUrl = { url?: string };
 const isImageWithUrl = (image: unknown): image is ImageWithUrl =>
   typeof image === "object" && image !== null && "url" in image;
 
-/** Resolve image URL from ad data */
 const resolveCoverUrl = (ad: LandownerAdApiItem): string | null => {
   if (ad.images && ad.images.length > 0 && ad.images[0].url)
     return ad.images[0].url;
@@ -112,7 +111,6 @@ const LandAdCard: React.FC<LandAdCardProps> = ({ ad, onViewDetails }) => {
         },
       }}
     >
-      {/* ── Image ── */}
       <Box
         sx={{
           position: "relative",
@@ -160,7 +158,6 @@ const LandAdCard: React.FC<LandAdCardProps> = ({ ad, onViewDetails }) => {
           />
         )}
 
-        {/* Status badge */}
         {(isActive || isPending) && (
           <Box
             sx={{
@@ -201,7 +198,6 @@ const LandAdCard: React.FC<LandAdCardProps> = ({ ad, onViewDetails }) => {
         )}
       </Box>
 
-      {/* ── Body ── */}
       <Box
         sx={{
           p: 2,
@@ -211,7 +207,6 @@ const LandAdCard: React.FC<LandAdCardProps> = ({ ad, onViewDetails }) => {
           gap: 0.8,
         }}
       >
-        {/* Location row */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
           <LocationOn sx={{ fontSize: 13, color: "#85a446" }} />
           <Typography
@@ -221,7 +216,6 @@ const LandAdCard: React.FC<LandAdCardProps> = ({ ad, onViewDetails }) => {
           </Typography>
         </Box>
 
-        {/* Title */}
         <Typography
           sx={{
             color: "#f0f4f0",
@@ -237,14 +231,12 @@ const LandAdCard: React.FC<LandAdCardProps> = ({ ad, onViewDetails }) => {
           {ad.title}
         </Typography>
 
-        {/* Subtitle */}
         {subtitle && (
           <Typography sx={{ color: "#6b7280", fontSize: "0.73rem" }}>
             {subtitle}
           </Typography>
         )}
 
-        {/* Info grid */}
         <Box
           sx={{
             display: "grid",
@@ -357,7 +349,6 @@ const LandAdCard: React.FC<LandAdCardProps> = ({ ad, onViewDetails }) => {
         </Box>
       </Box>
 
-      {/* ── View More Button ── */}
       <Box
         onClick={() => onViewDetails(ad)}
         sx={{

@@ -46,7 +46,6 @@ export const LandImageCarousel = ({
         borderRadius: "8px 8px 0 0",
       }}
     >
-      {/* Background gradient overlay */}
       <Box
         sx={{
           position: "absolute",
@@ -57,7 +56,6 @@ export const LandImageCarousel = ({
         }}
       />
 
-      {/* Image */}
       <Box
         component="img"
         src={currentImage.url || defaultImage}
@@ -75,7 +73,6 @@ export const LandImageCarousel = ({
         }}
       />
 
-      {/* Gradient overlay for text readability */}
       <Box
         sx={{
           position: "absolute",
@@ -86,10 +83,8 @@ export const LandImageCarousel = ({
         }}
       />
 
-      {/* Carousel controls - show only if multiple images */}
       {imagesToDisplay.length > 1 && (
         <>
-          {/* Previous button */}
           <IconButton
             onClick={handlePrevious}
             sx={{
@@ -109,7 +104,6 @@ export const LandImageCarousel = ({
             <ChevronLeft />
           </IconButton>
 
-          {/* Next button */}
           <IconButton
             onClick={handleNext}
             sx={{
@@ -128,8 +122,6 @@ export const LandImageCarousel = ({
           >
             <ChevronRight />
           </IconButton>
-
-          {/* Image counter */}
           <Box
             sx={{
               position: "absolute",
@@ -147,8 +139,6 @@ export const LandImageCarousel = ({
           >
             {currentImageIndex + 1} / {imagesToDisplay.length}
           </Box>
-
-          {/* Dot indicators */}
           <Stack
             direction="row"
             spacing={0.5}
