@@ -550,7 +550,6 @@ const LandOwnersPage = () => {
                 ),
               )}
 
-              {/* Next */}
               <Box
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 sx={{

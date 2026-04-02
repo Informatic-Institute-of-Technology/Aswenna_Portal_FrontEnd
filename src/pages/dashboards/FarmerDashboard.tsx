@@ -14,7 +14,6 @@ import {
 import { Box, Card, CardContent, CardHeader, Typography } from "@mui/material";
 import { farmerProjectsData } from "../../data/json";
 
-// Import mock projects from JSON
 const mockProjects = farmerProjectsData;
 
 const getDaysInMonth = (year: number, month: number) => {

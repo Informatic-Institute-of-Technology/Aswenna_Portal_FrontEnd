@@ -331,7 +331,6 @@ const OpportunitiesPage = () => {
     };
   }, []);
 
-  // ── Land Ads fetch ──
   useEffect(() => {
     let mounted = true;
     const loadLandAds = async () => {

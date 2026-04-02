@@ -109,10 +109,8 @@ const SuperAdminDashboard = () => {
     try {
       setError(null);
 
-      // Single paginated fetch — all subsequent stats derived from this
       const allUsers = await adminService.getAllUsersPaginated();
 
-      // ── Compute stats inline ──
       const stats = {
         totalUsers: allUsers.filter((u) => getRoleKey(u.role) !== "superadmin")
           .length,
@@ -137,7 +135,6 @@ const SuperAdminDashboard = () => {
         ).length,
       };
 
-      // ── Compute province distribution inline ──
       const ROLE_PROVINCE_MAP: Record<
         string,
         "farmers" | "investors" | "landowners"
@@ -183,7 +180,6 @@ const SuperAdminDashboard = () => {
 
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleRefresh = () => {
