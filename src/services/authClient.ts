@@ -39,6 +39,16 @@ const extractErrorMessage = (payload: unknown, fallback: string): string => {
 class AuthClient {
   private readonly baseUrl = config.api.baseUrl;
 
+  private buildHeaders(authorizationHeader: string): HeadersInit {
+    return {
+      "Content-Type": "application/json",
+      Authorization: authorizationHeader,
+      "X-Requested-With": "XMLHttpRequest",
+      "Cache-Control": "no-store",
+      "ngrok-skip-browser-warning": "true",
+    };
+  }
+
   async getAuthorizationHeader(): Promise<string | null> {
     return authService.getToken();
   }
@@ -71,9 +81,26 @@ class AuthClient {
     });
 
     const text = await response.text();
-    const payload = text
-      ? (JSON.parse(text) as unknown)
-      : ({ message: "No response body" } as unknown);
+    let payload: unknown = { message: "No response body" };
+
+    if (text) {
+      try {
+        payload = JSON.parse(text) as unknown;
+      } catch {
+        const ngrokErrorCode = response.headers.get("ngrok-error-code");
+        if (ngrokErrorCode) {
+          throw new AuthClientError(
+            response.status,
+            `Ngrok rejected this request (${ngrokErrorCode}). Ensure ngrok allows your origin and that 'ngrok-skip-browser-warning: true' is sent.`,
+          );
+        }
+
+        throw new AuthClientError(
+          response.status,
+          `Expected JSON response but received non-JSON content (content-type: ${response.headers.get("content-type") || "unknown"}).`,
+        );
+      }
+    }
 
     if (!response.ok) {
       throw new AuthClientError(

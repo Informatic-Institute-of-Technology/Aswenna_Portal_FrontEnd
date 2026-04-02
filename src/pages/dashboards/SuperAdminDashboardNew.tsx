@@ -41,13 +41,20 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
   value: number;
 }
+
+const ROLE_MAP: Record<string, string> = {
+  "696e40fda4f896e9f40c8b93": "farmer",
+  "696e6163b558abe269548099": "investor",
+  "696e616db558abe26954809c": "landowner",
+  "696f008a3e12fb6fd9ed945b": "superadmin",
+};
 
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
@@ -92,27 +99,18 @@ const SuperAdminDashboard = () => {
   }>({});
   const [error, setError] = useState<string | null>(null);
 
-  const ROLE_MAP: Record<string, string> = {
-    "696e40fda4f896e9f40c8b93": "farmer",
-    "696e6163b558abe269548099": "investor",
-    "696e616db558abe26954809c": "landowner",
-    "696f008a3e12fb6fd9ed945b": "superadmin",
-  };
-
-  const getRoleKey = (role: string | ApiRoleObject): string => {
+  const getRoleKey = useCallback((role: string | ApiRoleObject): string => {
     if (typeof role === "object" && role !== null)
       return ROLE_MAP[role._id] ?? "unknown";
     return ROLE_MAP[role] ?? "unknown";
-  };
+  }, []);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setError(null);
 
-      // Single paginated fetch — all subsequent stats derived from this
       const allUsers = await adminService.getAllUsersPaginated();
 
-      // ── Compute stats inline ──
       const stats = {
         totalUsers: allUsers.filter((u) => getRoleKey(u.role) !== "superadmin")
           .length,
@@ -137,7 +135,6 @@ const SuperAdminDashboard = () => {
         ).length,
       };
 
-      // ── Compute province distribution inline ──
       const ROLE_PROVINCE_MAP: Record<
         string,
         "farmers" | "investors" | "landowners"
@@ -179,12 +176,11 @@ const SuperAdminDashboard = () => {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [getRoleKey]);
 
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchData]);
 
   const handleRefresh = () => {
     setRefreshing(true);

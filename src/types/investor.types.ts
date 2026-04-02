@@ -1,11 +1,22 @@
 export type OfferType = "direct-harvest" | "sponsorship";
-export type OfferStatus = "active" | "pending" | "completed" | "cancelled";
+export type OfferStatus =
+  | "open"
+  | "active"
+  | "pending"
+  | "closed"
+  | "expired";
 export type PaymentStatus = "pending" | "paid" | "overdue";
 
 export interface InvestorRef {
   _id: string;
   fullName: string;
   email: string;
+}
+
+export interface FarmerRef {
+  _id: string;
+  fullName?: string;
+  email?: string;
 }
 
 export interface HarvestBaseDetails {
@@ -43,10 +54,25 @@ interface OfferAPIBase {
   expiredDate: string;
   status: OfferStatus;
   applicationsCount: number;
+  farmer?: FarmerRef;
   farmerId?: string;
   farmerName?: string;
   landOwnerId?: string;
   landOwnerName?: string;
+  landowner?: {
+    _id: string;
+    fullName?: string;
+    email?: string;
+    phoneNumber?: string;
+    personalInfo?: Record<string, unknown>;
+  };
+
+  landownerProject?: {
+    _id: string;
+    title?: string;
+    name?: string;
+    status?: string;
+  };
   createdAt: string;
   updatedAt: string;
 }

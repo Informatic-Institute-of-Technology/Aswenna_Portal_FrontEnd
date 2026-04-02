@@ -166,7 +166,7 @@ const mapFarmerProjectToInvestmentRequest = (
   project: FarmerProjectApiItem,
 ): InvestmentRequest => {
   const expectedHarvest = project.harvestBasedDetails?.expectedHarvest;
-  const commissionDetails = (project as any).commissionBasedDetails;
+  const commissionDetails = project.commissionBasedDetails;
 
   return {
     id: project._id,
@@ -211,8 +211,14 @@ const mapFarmerProjectToInvestmentRequest = (
         : "TBD",
     expectedROI: 0,
     commissionPercentage: commissionDetails?.commissionPercentage,
-    investmentAmount: commissionDetails?.investmentAmount,
-    numberOfInstallments: commissionDetails?.noOfInstallments,
+    investmentAmount:
+      project.offerType === "commission"
+        ? project.totalInvestmentRequired
+        : undefined,
+    numberOfInstallments:
+      project.offerType === "commission"
+        ? (project.milestoneBreakdown?.length ?? 0)
+        : undefined,
     expectedLandArea: commissionDetails?.expectedLandArea,
     status: normalizeStatus(project.status),
     farmingMethod: normalizeFarmingMethod(project.farmingMethods),
@@ -222,6 +228,16 @@ const mapFarmerProjectToInvestmentRequest = (
     createdAt: project.createdAt,
     updatedAt: project.updatedAt,
   };
+};
+
+type HireDialogOffer = {
+  id: string;
+  projectTitle: string;
+  cropType: string;
+  cropIcon: string;
+  requiredQuantity: number;
+  quantityUnit: string;
+  totalBudget: number;
 };
 
 const OpportunitiesPage = () => {
@@ -235,7 +251,7 @@ const OpportunitiesPage = () => {
   const [hireDialogOpen, setHireDialogOpen] = useState(false);
   const [selectedFarmerForHire, setSelectedFarmerForHire] =
     useState<FarmerJob | null>(null);
-  const [liveOffers, setLiveOffers] = useState<any[]>([]);
+  const [liveOffers, setLiveOffers] = useState<HireDialogOffer[]>([]);
   const [investmentRequests, setInvestmentRequests] = useState<
     InvestmentRequest[]
   >([]);
@@ -263,13 +279,13 @@ const OpportunitiesPage = () => {
         if (res.data) {
           const mappedOffers = res.data
             .filter(
-              (offer) =>
+              (offer): offer is DirectHarvestOfferAPI =>
                 offer.offerType === "direct-harvest" &&
-                offer.status !== "completed" &&
-                offer.status !== "cancelled",
+                offer.status !== "closed" &&
+                offer.status !== "expired",
             )
             .map((offer) => {
-              const details = (offer as any).harvestBaseDetails;
+              const details = offer.harvestBaseDetails;
               return {
                 id: offer._id,
                 projectTitle: details?.projectTitle || "Untitled Harvest",
@@ -310,7 +326,7 @@ const OpportunitiesPage = () => {
         if (mounted) {
           setInvestmentRequests(requests);
         }
-      } catch (error) {
+      } catch {
         if (mounted) {
           setInvestmentRequestsError(
             "Failed to load farmer projects. Please try again.",
@@ -331,7 +347,6 @@ const OpportunitiesPage = () => {
     };
   }, []);
 
-  // ── Land Ads fetch ──
   useEffect(() => {
     let mounted = true;
     const loadLandAds = async () => {
@@ -386,7 +401,7 @@ const OpportunitiesPage = () => {
     setSelectedFarmerForHire(null);
   };
 
-  const handleHireSubmit = (farmer: FarmerJob, offer: any) => {
+  const handleHireSubmit = (farmer: FarmerJob, offer: HireDialogOffer) => {
     setNotification({
       open: true,
       message: `The Project ${offer.projectTitle} ${farmer.farmerName} has been requested`,

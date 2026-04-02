@@ -89,22 +89,25 @@ const InvestorCreatedOfferCard = ({
     id?: string,
     fallback: string = "Not assigned",
   ) => {
-    if (name && id) return `${name} (${id})`;
     if (name) return name;
     if (id) return `ID: ${id}`;
     return fallback;
   };
 
+  const resolvedFarmerName = offer.farmer?.fullName ?? offer.farmerName;
+  const resolvedFarmerId = offer.farmer?._id ?? offer.farmerId;
   const farmerLabel = formatPartyLabel(
-    offer.farmerName,
-    offer.farmerId,
+    resolvedFarmerName,
+    resolvedFarmerId,
     "Farmer not assigned",
   );
-  const landOwnerLabel = formatPartyLabel(
-    offer.landOwnerName,
-    offer.landOwnerId,
-    "Landowner not assigned",
-  );
+
+  const resolvedLandownerName =
+    offer.landOwnerName ?? offer.landowner?.fullName;
+  const landOwnerLabel = resolvedLandownerName ?? "Landowner not assigned";
+
+  const landProjectName =
+    offer.landownerProject?.title ?? offer.landownerProject?.name;
 
   return (
     <Card
@@ -419,6 +422,11 @@ const InvestorCreatedOfferCard = ({
               <Typography variant="caption" sx={{ fontWeight: 700 }}>
                 {landOwnerLabel}
               </Typography>
+              {landProjectName && (
+                <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                  {landProjectName}
+                </Typography>
+              )}
             </Box>
           </Box>
           {deadline && (
