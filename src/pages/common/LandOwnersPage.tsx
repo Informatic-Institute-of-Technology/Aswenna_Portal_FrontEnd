@@ -1,4 +1,3 @@
-import type { DirectHarvestOfferAPI } from "@/types/investor.types";
 import {
   Bookmark,
   Clear,
@@ -163,10 +162,7 @@ const LandOwnersPage = () => {
     setSelectedAd(null);
   };
 
-  const handleHire = (
-    ad: LandownerAdApiItem,
-    _project?: DirectHarvestOfferAPI,
-  ) => {
+  const handleHire = (ad: LandownerAdApiItem) => {
     setDetailOpen(false);
     setSelectedAd(null);
     const ownerName =

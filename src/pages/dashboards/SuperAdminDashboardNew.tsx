@@ -41,13 +41,20 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
   value: number;
 }
+
+const ROLE_MAP: Record<string, string> = {
+  "696e40fda4f896e9f40c8b93": "farmer",
+  "696e6163b558abe269548099": "investor",
+  "696e616db558abe26954809c": "landowner",
+  "696f008a3e12fb6fd9ed945b": "superadmin",
+};
 
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
@@ -92,20 +99,13 @@ const SuperAdminDashboard = () => {
   }>({});
   const [error, setError] = useState<string | null>(null);
 
-  const ROLE_MAP: Record<string, string> = {
-    "696e40fda4f896e9f40c8b93": "farmer",
-    "696e6163b558abe269548099": "investor",
-    "696e616db558abe26954809c": "landowner",
-    "696f008a3e12fb6fd9ed945b": "superadmin",
-  };
-
-  const getRoleKey = (role: string | ApiRoleObject): string => {
+  const getRoleKey = useCallback((role: string | ApiRoleObject): string => {
     if (typeof role === "object" && role !== null)
       return ROLE_MAP[role._id] ?? "unknown";
     return ROLE_MAP[role] ?? "unknown";
-  };
+  }, []);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setError(null);
 
@@ -176,11 +176,11 @@ const SuperAdminDashboard = () => {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [getRoleKey]);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const handleRefresh = () => {
     setRefreshing(true);
