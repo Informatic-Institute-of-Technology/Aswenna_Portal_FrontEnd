@@ -1,4 +1,4 @@
-import { PaymentDetailContent } from "./PaymentDetailPage";
+import { ProjectPaymentMilestoneContent } from "./PaymentDetailPage";
 
 export {
   ProjectPaymentMilestoneContent,
@@ -8,7 +8,7 @@ export {
 export default function ProjectPaymentMilestonePage() {
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg-surface)" }}>
-      <PaymentDetailContent type="farmer" />
+      <ProjectPaymentMilestoneContent />
     </div>
   );
 }
