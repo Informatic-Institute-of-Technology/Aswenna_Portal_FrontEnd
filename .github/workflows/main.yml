@@ -1,64 +1,55 @@
-name: Build Frontend
-
+name: Build and Deploy Aswenna to the production
+ 
 on:
   push:
-    branches: [PRODUCTION, DEVELOPMENT]
-  pull_request:
-    branches: [PRODUCTION, DEVELOPMENT]
-
+    branches:
+      - DEVELOPMENT
+ 
+env:
+  AZURE_WEBAPP_NAME: acciovac-prod-api
+  DOTNET_VERSION: '10.0.x'
+  IMAGE_NAME: aswenna-portal-frontend
+ 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [20.x]
-
+ 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      # - name: Checkout
+      #   uses: actions/checkout@v4
+ 
+      # - name: Setup .NET
+      #   uses: actions/setup-dotnet@v4
+      #   with:
+      #     dotnet-version: ${{ env.DOTNET_VERSION }}
+ 
+      # - name: Restore
+      #   run: dotnet restore src/acciovac.API/acciovac.API.csproj
+ 
+      # - name: Build
+      #   run: dotnet build src/acciovac.API/acciovac.API.csproj -c Release --no-restore
+ 
+      # 🔐 Login to ACR
+      - name: Login to Azure Container Registry
+        uses: docker/login-action@v3
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-
-      - name: Build
-        run: npm run build
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist/
-          retention-days: 7
-
-      - name: Check build output
+          registry: ${{ secrets.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+ 
+      # 🐳 Build & Push Docker Image
+      - name: Build and Push Docker Image
         run: |
-          echo "Build completed successfully!"
-          ls -la dist/
-
-  deploy-to-azure:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/DEVELOPMENT' && github.event_name == 'push'
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: dist
-
-      - name: Deploy to Azure App Service
+          docker build \
+            -t ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest \
+            -f Dockerfile .
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest
+ 
+      # 🚀 Deploy Container to Azure Web App
+      - name: Deploy to Azure Web App (Container)
         uses: azure/webapps-deploy@v3
         with:
-          app-name: portal-aswenna-dev
-          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          package: dist
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          images: |
+            ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest

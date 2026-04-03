@@ -10,7 +10,6 @@ import {
 import { Dialog, DialogContent, IconButton } from "@mui/material";
 import { useMemo, useState } from "react";
 import { RingChart } from "./components";
-import { FarmerPaymentInstallmentDialog } from "./FarmerPaymentInstallmentPage";
 
 interface RawProjMs {
   id: string;
