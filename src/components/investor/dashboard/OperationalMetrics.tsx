@@ -22,14 +22,12 @@ interface Props {
 
 const headCellSx = { color: "text.secondary", fontWeight: "bold" };
 
-/** Proof-of-work chip colour helper */
 const getPowChipColor = (pow: string): "success" | "warning" | "default" => {
     if (pow === "Verified") return "success";
     if (pow === "In Review") return "warning";
     return "default";
 };
 
-/** Deal-lock chip styles */
 const getDealLockChipSx = (status: string) => ({
     bgcolor: status === "Locked" ? "rgba(59,130,246,0.1)" : "rgba(244,63,94,0.1)",
     color: status === "Locked" ? "#3b82f6" : "#f43f5e",

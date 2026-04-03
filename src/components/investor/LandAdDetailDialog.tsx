@@ -59,7 +59,7 @@ const formatCurrency = (amount?: string | number): string => {
 
 const formatDate = (dateStr?: string): string => {
   if (!dateStr) return "—";
-  return new Date(dateStr).toLocaleDateString("en-CA"); // YYYY-MM-DD
+  return new Date(dateStr).toLocaleDateString("en-CA");
 };
 
 const getLandownerInfo = (landowner?: string | LandownerInfo) => {
@@ -235,7 +235,6 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
       >
         <DialogContent sx={{ p: 0, overflow: "auto" }}>
           <Box sx={{ bgcolor: "#0d1610", minHeight: "100%" }}>
-            {/* ── Top Bar (breadcrumb + close) ── */}
             <Box
               sx={{
                 display: "flex",
@@ -275,7 +274,6 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
               </IconButton>
             </Box>
 
-            {/* ── Title Row ── */}
             <Box
               sx={{
                 px: 3,
@@ -340,7 +338,6 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                 </Box>
               </Box>
 
-              {/* Action buttons */}
               <Box sx={{ display: "flex", gap: 1.5, flexShrink: 0 }}>
                 <Button
                   variant="outlined"
@@ -385,8 +382,6 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                 </Button>
               </Box>
             </Box>
-
-            {/* ── Main Content: Image Left + Panel Right ── */}
             <Box
               sx={{
                 display: "grid",
@@ -396,9 +391,7 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                 pb: 3,
               }}
             >
-              {/* LEFT: Image + Gallery + Narrative */}
               <Box sx={{ pr: { md: 3 } }}>
-                {/* Main Image */}
                 <Box
                   sx={{
                     borderRadius: "12px",
@@ -439,7 +432,6 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                   )}
                 </Box>
 
-                {/* Thumbnail strip */}
                 {images.length > 0 && (
                   <Box
                     sx={{ display: "flex", gap: 1, mb: 3, overflowX: "auto" }}
@@ -503,7 +495,6 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                   </Box>
                 )}
 
-                {/* Land Narrative */}
                 <Box sx={{ mb: 3 }}>
                   <Typography
                     sx={{
@@ -518,7 +509,6 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                     LAND NARRATIVE
                   </Typography>
 
-                  {/* Description text */}
                   <Typography
                     sx={{
                       color: "#9ca3af",
@@ -539,7 +529,6 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                       }`}
                   </Typography>
 
-                  {/* Land History + Additional Info tags */}
                   <Box
                     sx={{
                       display: "grid",
@@ -615,9 +604,7 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                 </Box>
               </Box>
 
-              {/* RIGHT: Investment Panel + Landowner + Map */}
               <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                {/* Monthly Investment Panel */}
                 <Box
                   sx={{
                     bgcolor: "#141e14",
@@ -669,7 +656,6 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                       mt: 2,
                     }}
                   >
-                    {/* Land Area */}
                     <Box
                       sx={{
                         display: "flex",
@@ -696,7 +682,6 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                       </Typography>
                     </Box>
 
-                    {/* Soil Type */}
                     <Box
                       sx={{
                         display: "flex",
@@ -726,7 +711,6 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                       </Typography>
                     </Box>
 
-                    {/* Available From */}
                     <Box
                       sx={{
                         display: "flex",
@@ -753,7 +737,6 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                       </Typography>
                     </Box>
 
-                    {/* Term End */}
                     <Box
                       sx={{
                         display: "flex",
@@ -779,7 +762,6 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                       </Typography>
                     </Box>
 
-                    {/* Water/Irrigation */}
                     {ad.waterAvailability && (
                       <Box
                         sx={{
@@ -814,7 +796,6 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                   </Box>
                 </Box>
 
-                {/* Landowner Profile */}
                 <Box
                   sx={{
                     bgcolor: "#141e14",
@@ -924,7 +905,6 @@ const LandAdDetailDialog: React.FC<LandAdDetailDialogProps> = ({
                   </Box>
                 </Box>
 
-                {/* Regional Location / Map */}
                 {coords && (
                   <Box
                     sx={{

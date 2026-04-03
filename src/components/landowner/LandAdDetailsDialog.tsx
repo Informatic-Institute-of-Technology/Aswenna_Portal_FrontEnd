@@ -57,7 +57,6 @@ const LandAdDetailsDialog = ({
     fetchDetails();
   }, [open, adId]);
 
-  // Auto-moving carousel effect
   useEffect(() => {
     if (!open || !detailedAd?.images || detailedAd.images.length <= 1) return;
 
@@ -190,9 +189,7 @@ const LandAdDetailsDialog = ({
           </Box>
         ) : (
           <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3 }}>
-            {/* Left Column - Images & Primary Info */}
             <Box>
-              {/* Image Carousel */}
               {detailedAd.images && detailedAd.images.length > 0 && (
                 <Box sx={{ mb: 3 }}>
                   <Box
@@ -335,7 +332,6 @@ const LandAdDetailsDialog = ({
                     )}
                   </Box>
 
-                  {/* Thumbnail Gallery */}
                   {detailedAd.images.length > 1 && (
                     <Stack
                       direction="row"
@@ -381,9 +377,6 @@ const LandAdDetailsDialog = ({
                 </Box>
               )}
 
-              {/* Image Metadata section removed */}
-
-              {/* Record Info below Image Gallery */}
               <Box
                 sx={{
                   p: 2,
@@ -504,7 +497,6 @@ const LandAdDetailsDialog = ({
                 </Box>
               </Box>
 
-              {/* Highlighted Rental Fee */}
               <Box
                 sx={{
                   mt: 3,
@@ -559,9 +551,7 @@ const LandAdDetailsDialog = ({
               </Box>
             </Box>
 
-            {/* Right Column - Details */}
             <Box>
-              {/* Landowner Card */}
               {detailedAd.landowner &&
                 typeof detailedAd.landowner === "object" && (
                   <Box
@@ -648,7 +638,6 @@ const LandAdDetailsDialog = ({
                   </Box>
                 )}
 
-              {/* Key Land Details */}
               <Box sx={{ mb: 3 }}>
                 <Typography
                   variant="subtitle2"
@@ -770,7 +759,6 @@ const LandAdDetailsDialog = ({
                 </Stack>
               </Box>
 
-              {/* Availability */}
               <Box sx={{ mb: 3 }}>
                 <Typography
                   variant="subtitle2"
@@ -836,7 +824,6 @@ const LandAdDetailsDialog = ({
                 </Stack>
               </Box>
 
-              {/* Location & Additional Info */}
               <Box sx={{ mb: 3 }}>
                 <Typography
                   variant="subtitle2"

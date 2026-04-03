@@ -77,7 +77,6 @@ export const ProfileAvatar = ({
         )}
       </Box>
 
-      {/* Upload Dialog - UI Only */}
       <Dialog 
         open={uploadDialogOpen} 
         onClose={() => setUploadDialogOpen(false)}

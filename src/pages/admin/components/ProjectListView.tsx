@@ -66,7 +66,6 @@ export const ProjectListView: React.FC<ProjectListViewProps> = ({
     Map<string, string | null>
   >(new Map());
 
-  // Load profile pictures for all unique creators
   useEffect(() => {
     const loadProfilePictures = async () => {
       const uniqueCreatorIds = Array.from(
@@ -75,13 +74,11 @@ export const ProjectListView: React.FC<ProjectListViewProps> = ({
 
       const picturesMap = new Map<string, string | null>();
 
-      // Load profile pictures in parallel
       await Promise.all(
         uniqueCreatorIds.map(async (creatorId) => {
           try {
             const userProfile = await userService.getUserProfile(creatorId);
 
-            // Extract profile picture URL
             let profilePicUrl: string | null = null;
             if (userProfile.personalInfo?.profilePicture) {
               const pic = userProfile.personalInfo.profilePicture;

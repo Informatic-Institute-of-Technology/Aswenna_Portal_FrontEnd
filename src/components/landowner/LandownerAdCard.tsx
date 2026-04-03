@@ -50,7 +50,6 @@ const LandownerAdCard = ({ ad, onViewMore }: LandownerAdCardProps) => {
         },
       }}
     >
-      {/* Price badge */}
       <Box
         sx={{
           position: "absolute",
@@ -76,7 +75,6 @@ const LandownerAdCard = ({ ad, onViewMore }: LandownerAdCardProps) => {
         </Typography>
       </Box>
 
-      {/* Land Image */}
       <Box sx={{ overflow: "hidden", height: 200, position: "relative" }}>
         <CardMedia
           component="img"
@@ -104,7 +102,6 @@ const LandownerAdCard = ({ ad, onViewMore }: LandownerAdCardProps) => {
       </Box>
 
       <CardContent sx={{ flexGrow: 1, display: "flex", flexDirection: "column", p: 3 }}>
-        {/* Title */}
         <Typography
           variant="h6"
           sx={{
@@ -120,7 +117,6 @@ const LandownerAdCard = ({ ad, onViewMore }: LandownerAdCardProps) => {
           {ad.title}
         </Typography>
 
-        {/* Location */}
         <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1, mb: 2 }}>
           <LocationOn sx={{ fontSize: 20, color: "primary.main", mt: "-2px" }} />
           <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
@@ -130,7 +126,6 @@ const LandownerAdCard = ({ ad, onViewMore }: LandownerAdCardProps) => {
 
         <Divider sx={{ my: 2, borderColor: "var(--border-subtle)" }} />
 
-        {/* Key Details */}
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Box
@@ -168,7 +163,6 @@ const LandownerAdCard = ({ ad, onViewMore }: LandownerAdCardProps) => {
         <Box sx={{ flexGrow: 1 }} />
       </CardContent>
 
-      {/* View More Button */}
       <Box sx={{ p: 3, pt: 0 }}>
         <Button
           fullWidth

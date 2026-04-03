@@ -94,7 +94,6 @@ const InvestmentRequestDialog = ({
         },
       }}
     >
-      {/* Header */}
       <Box
         sx={{
           p: 2.5,
@@ -168,9 +167,7 @@ const InvestmentRequestDialog = ({
         </Stack>
       </Box>
 
-      {/* Content */}
       <Box sx={{ p: 3, overflowY: "auto", maxHeight: "calc(92vh - 180px)" }}>
-        {/* Farmer Profile Section */}
         <Box sx={{ mb: 3 }}>
           <Stack direction="row" spacing={2} alignItems="center">
             <Avatar
@@ -229,7 +226,6 @@ const InvestmentRequestDialog = ({
           </Stack>
         </Box>
 
-        {/* Full Financial Summary - Investment Transparency */}
         <Box
           sx={{
             bgcolor: "var(--bg-overlay)",
@@ -256,7 +252,6 @@ const InvestmentRequestDialog = ({
             Investment Financial Summary
           </Typography>
 
-          {/* Investment Overview Grid */}
           <Box
             sx={{
               display: "grid",
@@ -390,7 +385,6 @@ const InvestmentRequestDialog = ({
             </Box>
           </Box>
 
-          {/* Investment Type and Details */}
           <Box
             sx={{
               mb: 3,
@@ -508,7 +502,6 @@ const InvestmentRequestDialog = ({
           </Box>
         </Box>
 
-        {/* Tabs for detailed information */}
         <Box sx={{ mb: 3 }}>
           <Tabs
             value={activeTab}
@@ -537,7 +530,6 @@ const InvestmentRequestDialog = ({
             <Tab label="Payment Schedule" />
           </Tabs>
 
-          {/* Tab Panel 0: Project Details */}
           {activeTab === 0 && (
             <Box>
               <Box
@@ -658,7 +650,6 @@ const InvestmentRequestDialog = ({
             </Box>
           )}
 
-          {/* Tab Panel 1: Cost Breakdown */}
           {activeTab === 1 && (
             <Box
               sx={{
@@ -782,7 +773,6 @@ const InvestmentRequestDialog = ({
             </Box>
           )}
 
-          {/* Tab Panel 2: Payment Schedule */}
           {activeTab === 2 && (
             <Box
               sx={{
@@ -960,7 +950,6 @@ const InvestmentRequestDialog = ({
         </Box>
       </Box>
 
-      {/* Footer */}
       <Box
         sx={{
           p: 2.5,

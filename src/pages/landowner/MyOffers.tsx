@@ -658,7 +658,6 @@ const MyLandAdsPage = () => {
           },
         }}
       >
-        {/* Image header */}
         <Box sx={{ position: "relative", height: 160, overflow: "hidden" }}>
           <CardMedia
             component="img"
@@ -891,8 +890,6 @@ const MyLandAdsPage = () => {
             </Typography>
           )}
         </CardContent>
-
-        {/* Footer — mirrors OfferCard's start/end date footer */}
         <Box
           sx={{
             display: "flex",

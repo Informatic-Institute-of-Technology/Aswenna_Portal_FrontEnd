@@ -192,7 +192,6 @@ export const AllProjectsDashboard: React.FC = () => {
         `  • Commission-based (%): ${commissionData.length} projects, avg rate: ${commissionData.length > 0 ? (commissionData.reduce((sum, p) => sum + (p.financialMetric?.value || 0), 0) / commissionData.length).toFixed(1) : 0}%`,
       );
 
-      // Log status breakdown
       console.log("📌 Status Breakdown:");
       const statusBreakdown = {
         "✓ Active": allData.filter((p) => p.status === "active").length,
@@ -227,7 +226,6 @@ export const AllProjectsDashboard: React.FC = () => {
       });
     }
 
-    // Apply sub-filter for investor projects
     if (stakeholder === "investor" && investorSubFilter !== "all") {
       filtered = filtered.filter((p) => {
         const category = p.category;
@@ -1003,7 +1001,7 @@ export const AllProjectsDashboard: React.FC = () => {
                     sx={{
                       width: 48,
                       height: 48,
-                      backgroundColor: "#555", // Adding default color for text avatars
+                      backgroundColor: "#555",
                       fontSize: "1.2rem",
                       fontWeight: 600,
                     }}

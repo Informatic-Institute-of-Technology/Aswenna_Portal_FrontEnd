@@ -462,7 +462,6 @@ const OpportunitiesPage = () => {
   return (
     <>
       <Box sx={{ p: 3 }}>
-        {/* Header */}
         <Box sx={{ mb: 3 }}>
           <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
             Opportunities
@@ -609,7 +608,6 @@ const OpportunitiesPage = () => {
           </Box>
         )}
 
-        {/* ── Land Search Tab ── */}
         {activeTab === "land-search" && (
           <Box>
             <SectionHeader

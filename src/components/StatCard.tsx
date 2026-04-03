@@ -7,7 +7,7 @@ interface StatCardProps {
   iconColor: string;
   label: string;
   value: string | number;
-  subValue?: string; // Optional subtitle
+  subValue?: string;
 }
 
 const StatCard = ({ icon: Icon, iconBgColor, iconColor, label, value, subValue }: StatCardProps) => {

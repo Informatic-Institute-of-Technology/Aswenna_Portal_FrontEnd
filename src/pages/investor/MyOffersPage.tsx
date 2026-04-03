@@ -207,7 +207,6 @@ const MyOffersPage = () => {
         </div>
       </Box>
 
-      {/* Active Projects Section */}
       <section className="mb-5">
         <Typography
           variant="h5"

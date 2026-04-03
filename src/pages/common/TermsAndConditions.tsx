@@ -85,7 +85,6 @@ const TermsAndConditions = () => {
       localStorage.removeItem("email_verified");
       registrationStore.clear();
 
-      // Clear form persistence data from IndexedDB
       await formPersistenceService.clearAllFormData();
 
       setShowSuccessDialog(true);
@@ -603,7 +602,6 @@ const TermsAndConditions = () => {
         </Box>
       </Container>
 
-      {/* Loading Dialog */}
       <Dialog
         open={isSubmitting}
         PaperProps={{

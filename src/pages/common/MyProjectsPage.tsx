@@ -184,9 +184,6 @@ const initialProjects: Project[] = [
   },
 ];
 
-// TODO: Fetch projects dynamically from API
-// API endpoint: GET /api/farmer/projects
-
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat("en-LK", {
     style: "currency",
@@ -1854,7 +1851,6 @@ const MyProjectsPage = () => {
 
   return (
     <Box sx={{ p: 3, minHeight: "100vh", backgroundColor: "#0a0f0a" }}>
-      {/* Header Section */}
       <Box
         sx={{
           display: "flex",
@@ -1896,7 +1892,6 @@ const MyProjectsPage = () => {
         </Button>
       </Box>
 
-      {/* Active Projects Section */}
       <Box sx={{ mb: 4 }}>
         <Typography
           variant="h5"
@@ -2082,7 +2077,6 @@ const MyProjectsPage = () => {
         )}
       </section>
 
-      {/* Create Offer Dialog */}
       <CreateOfferDialog
         open={dialogOpen}
         onClose={handleCloseDialog}
@@ -2187,7 +2181,6 @@ const MyProjectsPage = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Project Details Dialog */}
       <ProjectDetailsDialog
         open={detailsDialogOpen}
         onClose={handleCloseDetails}

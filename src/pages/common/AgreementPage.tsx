@@ -1,24 +1,24 @@
-import { useRef } from "react";
+import {
+  ArrowBack,
+  CheckCircle,
+  Download,
+  Print,
+  VerifiedUser,
+} from "@mui/icons-material";
 import {
   Box,
-  Typography,
   Button,
   Card,
   CardContent,
   Chip,
   Divider,
   IconButton,
+  Typography,
 } from "@mui/material";
-import {
-  ArrowBack,
-  Download,
-  Print,
-  VerifiedUser,
-  CheckCircle,
-} from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 const agreementData = {
   projectId: "GH-RICE-042",
@@ -254,495 +254,477 @@ const AgreementPage = () => {
 
   return (
     <Box sx={{ minHeight: "100vh", backgroundColor: "#0a0f0a" }}>
-        {/* Header */}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            px: 3,
-            py: 2,
-            borderBottom: "1px solid rgba(255,255,255,0.1)",
-            backgroundColor: "#0d120d",
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <IconButton
-              onClick={() => navigate(-1)}
-              sx={{ color: "rgba(255,255,255,0.6)" }}
-            >
-              <ArrowBack />
-            </IconButton>
-            <Typography
-              variant="body2"
-              sx={{
-                color: "rgba(255,255,255,0.7)",
-                letterSpacing: "1px",
-                fontWeight: 500,
-              }}
-            >
-              LEGAL AGREEMENT VIEW
-            </Typography>
-          </Box>
-          <Box sx={{ display: "flex", gap: 1.5 }}>
-            <Button
-              variant="text"
-              startIcon={<Download />}
-              onClick={handleDownloadPDF}
-              sx={{
-                color: "rgba(255,255,255,0.7)",
-                textTransform: "none",
-                fontSize: "0.8rem",
-              }}
-            >
-              Download PDF
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<Print />}
-              onClick={handlePrint}
-              sx={{
-                backgroundColor: "#4CAF50",
-                textTransform: "none",
-                fontSize: "0.8rem",
-                px: 2,
-                "&:hover": { backgroundColor: "#3d8b40" },
-              }}
-            >
-              Print
-            </Button>
-          </Box>
-        </Box>
-
-        {/* Main Content */}
-        <Box sx={{ p: 3, maxWidth: 800, mx: "auto" }}>
-          <Card
-            ref={agreementRef}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          px: 3,
+          py: 2,
+          borderBottom: "1px solid rgba(255,255,255,0.1)",
+          backgroundColor: "#0d120d",
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <IconButton
+            onClick={() => navigate(-1)}
+            sx={{ color: "rgba(255,255,255,0.6)" }}
+          >
+            <ArrowBack />
+          </IconButton>
+          <Typography
+            variant="body2"
             sx={{
-              backgroundColor: "#111a11",
-              border: "1px solid rgba(133, 164, 70, 0.15)",
-              borderRadius: 2,
+              color: "rgba(255,255,255,0.7)",
+              letterSpacing: "1px",
+              fontWeight: 500,
             }}
           >
-            <CardContent sx={{ p: 4 }}>
-              {/* Title & Project ID */}
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                  mb: 2,
-                }}
-              >
-                <Box>
-                  <Typography
-                    variant="h5"
-                    sx={{ color: "#fff", fontWeight: 700, mb: 0.5 }}
-                  >
-                    Legal Investment Agreement
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: "rgba(255,255,255,0.4)", fontSize: "0.7rem" }}
-                  >
-                    Serial No: {agreementData.serialNo}
-                  </Typography>
-                </Box>
-                <Box sx={{ textAlign: "right" }}>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: "rgba(255,255,255,0.4)",
-                      display: "block",
-                      fontSize: "0.6rem",
-                      letterSpacing: "0.5px",
-                    }}
-                  >
-                    PROJECT ID
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "#4CAF50", fontWeight: 600 }}
-                  >
-                    {agreementData.projectId}
-                  </Typography>
-                </Box>
+            LEGAL AGREEMENT VIEW
+          </Typography>
+        </Box>
+        <Box sx={{ display: "flex", gap: 1.5 }}>
+          <Button
+            variant="text"
+            startIcon={<Download />}
+            onClick={handleDownloadPDF}
+            sx={{
+              color: "rgba(255,255,255,0.7)",
+              textTransform: "none",
+              fontSize: "0.8rem",
+            }}
+          >
+            Download PDF
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<Print />}
+            onClick={handlePrint}
+            sx={{
+              backgroundColor: "#4CAF50",
+              textTransform: "none",
+              fontSize: "0.8rem",
+              px: 2,
+              "&:hover": { backgroundColor: "#3d8b40" },
+            }}
+          >
+            Print
+          </Button>
+        </Box>
+      </Box>
+
+      <Box sx={{ p: 3, maxWidth: 800, mx: "auto" }}>
+        <Card
+          ref={agreementRef}
+          sx={{
+            backgroundColor: "#111a11",
+            border: "1px solid rgba(133, 164, 70, 0.15)",
+            borderRadius: 2,
+          }}
+        >
+          <CardContent sx={{ p: 4 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+                mb: 2,
+              }}
+            >
+              <Box>
+                <Typography
+                  variant="h5"
+                  sx={{ color: "#fff", fontWeight: 700, mb: 0.5 }}
+                >
+                  Legal Investment Agreement
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{ color: "rgba(255,255,255,0.4)", fontSize: "0.7rem" }}
+                >
+                  Serial No: {agreementData.serialNo}
+                </Typography>
               </Box>
-
-              {/* Date & Jurisdiction Chips */}
-              <Box sx={{ display: "flex", gap: 1.5, mb: 3 }}>
-                <Chip
-                  label={`Effective Date: ${agreementData.effectiveDate}`}
-                  size="small"
-                  sx={{
-                    backgroundColor: "rgba(133, 164, 70, 0.15)",
-                    color: "#4CAF50",
-                    fontSize: "0.7rem",
-                    height: 26,
-                  }}
-                />
-                <Chip
-                  label={`Jurisdiction: ${agreementData.jurisdiction}`}
-                  size="small"
-                  sx={{
-                    backgroundColor: "rgba(255,255,255,0.08)",
-                    color: "rgba(255,255,255,0.7)",
-                    fontSize: "0.7rem",
-                    height: 26,
-                  }}
-                />
-              </Box>
-
-              {/* Agreement Sections */}
-              <Box sx={{ "& > div": { mb: 2.5 } }}>
-                {/* Section 1 */}
-                <Box>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ color: "#fff", fontWeight: 600, mb: 0.75 }}
-                  >
-                    1. PARTIES INVOLVED
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: "rgba(255,255,255,0.6)",
-                      fontSize: "0.8rem",
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    This Agricultural Investment Agreement ("Agreement") is
-                    entered into as of the Effective Date by and between{" "}
-                    <strong style={{ color: "#4CAF50" }}>
-                      {agreementData.farmer.name}
-                    </strong>
-                    , hereinafter referred to as the "Farmer", and{" "}
-                    <strong style={{ color: "#4CAF50" }}>
-                      {agreementData.investor.name}
-                    </strong>
-                    , hereinafter referred to as the "Investor".
-                  </Typography>
-                </Box>
-
-                {/* Section 2 */}
-                <Box>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ color: "#fff", fontWeight: 600, mb: 0.75 }}
-                  >
-                    2. SCOPE OF INVESTMENT
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: "rgba(255,255,255,0.6)",
-                      fontSize: "0.8rem",
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    The Investor agrees to provide capital in the amount of{" "}
-                    <strong style={{ color: "#fff" }}>
-                      {agreementData.investmentAmount}
-                    </strong>{" "}
-                    for the specific purpose of cultivating{" "}
-                    {agreementData.cropDetails}. These funds shall be utilized
-                    exclusively for seeds, organic fertilizers, labor, and
-                    specialized irrigation maintenance.
-                  </Typography>
-                </Box>
-
-                {/* Section 3 */}
-                <Box>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ color: "#fff", fontWeight: 600, mb: 0.75 }}
-                  >
-                    3. PROFIT SHARING & DISTRIBUTIONS
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: "rgba(255,255,255,0.6)",
-                      fontSize: "0.8rem",
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    Net profits from the harvest shall be distributed as
-                    follows: Sixty percent ({agreementData.profitSplit.investor}
-                    %) to the Investor and Forty percent (
-                    {agreementData.profitSplit.farmer}%) to the Farmer.
-                    Distributions will be executed within{" "}
-                    {agreementData.distributionDays} business days following the
-                    successful sale of the crop to certified organic
-                    wholesalers.
-                  </Typography>
-                </Box>
-
-                {/* Section 4 */}
-                <Box>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ color: "#fff", fontWeight: 600, mb: 0.75 }}
-                  >
-                    4. RISK DISCLOSURE
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: "rgba(255,255,255,0.6)",
-                      fontSize: "0.8rem",
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    Both parties acknowledge that agricultural ventures are
-                    subject to environmental factors. In the event of a total
-                    crop failure due to "Act of God" circumstances, the
-                    liability of the Farmer shall be limited to the salvage
-                    value of the assets remaining, as per the catastrophic
-                    insurance policy attached in Annex A.
-                  </Typography>
-                </Box>
-
-                {/* Section 5 */}
-                <Box>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ color: "#fff", fontWeight: 600, mb: 0.75 }}
-                  >
-                    5. GOVERNING LAW
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: "rgba(255,255,255,0.6)",
-                      fontSize: "0.8rem",
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    This Agreement shall be governed by and construed in
-                    accordance with the laws of the Republic, specifically under
-                    the Commercial Agriculture Act of 2018. Any disputes shall
-                    be resolved through binding arbitration in the regional
-                    court of commerce.
-                  </Typography>
-                </Box>
-              </Box>
-
-              <Divider sx={{ borderColor: "rgba(255,255,255,0.1)", my: 3 }} />
-
-              {/* E-Signature Section */}
-              <Box sx={{ textAlign: "center", mb: 3 }}>
+              <Box sx={{ textAlign: "right" }}>
                 <Typography
                   variant="caption"
                   sx={{
                     color: "rgba(255,255,255,0.4)",
-                    letterSpacing: "1px",
-                    fontSize: "0.65rem",
+                    display: "block",
+                    fontSize: "0.6rem",
+                    letterSpacing: "0.5px",
                   }}
                 >
-                  E-SIGNATURE VERIFICATION
+                  PROJECT ID
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "#4CAF50", fontWeight: 600 }}
+                >
+                  {agreementData.projectId}
+                </Typography>
+              </Box>
+            </Box>
+
+            <Box sx={{ display: "flex", gap: 1.5, mb: 3 }}>
+              <Chip
+                label={`Effective Date: ${agreementData.effectiveDate}`}
+                size="small"
+                sx={{
+                  backgroundColor: "rgba(133, 164, 70, 0.15)",
+                  color: "#4CAF50",
+                  fontSize: "0.7rem",
+                  height: 26,
+                }}
+              />
+              <Chip
+                label={`Jurisdiction: ${agreementData.jurisdiction}`}
+                size="small"
+                sx={{
+                  backgroundColor: "rgba(255,255,255,0.08)",
+                  color: "rgba(255,255,255,0.7)",
+                  fontSize: "0.7rem",
+                  height: 26,
+                }}
+              />
+            </Box>
+
+            <Box sx={{ "& > div": { mb: 2.5 } }}>
+              <Box>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ color: "#fff", fontWeight: 600, mb: 0.75 }}
+                >
+                  1. PARTIES INVOLVED
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "rgba(255,255,255,0.6)",
+                    fontSize: "0.8rem",
+                    lineHeight: 1.6,
+                  }}
+                >
+                  This Agricultural Investment Agreement ("Agreement") is
+                  entered into as of the Effective Date by and between{" "}
+                  <strong style={{ color: "#4CAF50" }}>
+                    {agreementData.farmer.name}
+                  </strong>
+                  , hereinafter referred to as the "Farmer", and{" "}
+                  <strong style={{ color: "#4CAF50" }}>
+                    {agreementData.investor.name}
+                  </strong>
+                  , hereinafter referred to as the "Investor".
                 </Typography>
               </Box>
 
-              {/* Signatures Grid */}
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-around",
-                  gap: 3,
-                  mb: 3,
-                }}
-              >
-                {/* Farmer Signature */}
-                <Box sx={{ textAlign: "center", flex: 1 }}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 0.5,
-                      mb: 1,
-                    }}
-                  >
-                    <VerifiedUser sx={{ color: "#4CAF50", fontSize: 14 }} />
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: "#4CAF50",
-                        fontSize: "0.6rem",
-                        letterSpacing: "0.5px",
-                      }}
-                    >
-                      VERIFIED DIGITALLY
-                    </Typography>
-                  </Box>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      color: "#4CAF50",
-                      fontFamily: "'Brush Script MT', cursive",
-                      fontSize: "1.5rem",
-                      mb: 1,
-                    }}
-                  >
-                    {agreementData.farmer.name}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: "rgba(255,255,255,0.4)",
-                      display: "block",
-                      fontSize: "0.6rem",
-                    }}
-                  >
-                    Digital ID: {agreementData.farmer.digitalId}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: "rgba(255,255,255,0.4)",
-                      display: "block",
-                      fontSize: "0.6rem",
-                    }}
-                  >
-                    Timestamp: {agreementData.farmer.timestamp}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: "rgba(255,255,255,0.4)",
-                      display: "block",
-                      fontSize: "0.6rem",
-                    }}
-                  >
-                    IP: {agreementData.farmer.ip}
-                  </Typography>
-                </Box>
-
-                {/* Investor Signature */}
-                <Box sx={{ textAlign: "center", flex: 1 }}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 0.5,
-                      mb: 1,
-                    }}
-                  >
-                    <VerifiedUser sx={{ color: "#4CAF50", fontSize: 14 }} />
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: "#4CAF50",
-                        fontSize: "0.6rem",
-                        letterSpacing: "0.5px",
-                      }}
-                    >
-                      VERIFIED DIGITALLY
-                    </Typography>
-                  </Box>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      color: "#4CAF50",
-                      fontFamily: "'Brush Script MT', cursive",
-                      fontSize: "1.5rem",
-                      mb: 1,
-                    }}
-                  >
-                    {agreementData.investor.name}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: "rgba(255,255,255,0.4)",
-                      display: "block",
-                      fontSize: "0.6rem",
-                    }}
-                  >
-                    Digital ID: {agreementData.investor.digitalId}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: "rgba(255,255,255,0.4)",
-                      display: "block",
-                      fontSize: "0.6rem",
-                    }}
-                  >
-                    Timestamp: {agreementData.investor.timestamp}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: "rgba(255,255,255,0.4)",
-                      display: "block",
-                      fontSize: "0.6rem",
-                    }}
-                  >
-                    IP: {agreementData.investor.ip}
-                  </Typography>
-                </Box>
-              </Box>
-
-              {/* Executed Badge */}
-              <Box sx={{ textAlign: "center", mb: 2 }}>
-                <Chip
-                  icon={<CheckCircle sx={{ fontSize: 16 }} />}
-                  label="DOCUMENT FULLY EXECUTED & LEGALLY BINDING"
+              <Box>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ color: "#fff", fontWeight: 600, mb: 0.75 }}
+                >
+                  2. SCOPE OF INVESTMENT
+                </Typography>
+                <Typography
+                  variant="body2"
                   sx={{
-                    backgroundColor: "rgba(133, 164, 70, 0.2)",
-                    color: "#4CAF50",
-                    fontWeight: 600,
-                    fontSize: "0.7rem",
-                    py: 2,
-                    px: 1,
-                    "& .MuiChip-icon": { color: "#4CAF50" },
+                    color: "rgba(255,255,255,0.6)",
+                    fontSize: "0.8rem",
+                    lineHeight: 1.6,
                   }}
-                />
+                >
+                  The Investor agrees to provide capital in the amount of{" "}
+                  <strong style={{ color: "#fff" }}>
+                    {agreementData.investmentAmount}
+                  </strong>{" "}
+                  for the specific purpose of cultivating{" "}
+                  {agreementData.cropDetails}. These funds shall be utilized
+                  exclusively for seeds, organic fertilizers, labor, and
+                  specialized irrigation maintenance.
+                </Typography>
               </Box>
 
-              {/* Blockchain Hash */}
-              <Typography
-                variant="caption"
-                sx={{
-                  color: "rgba(255,255,255,0.3)",
-                  display: "block",
-                  textAlign: "center",
-                  fontSize: "0.6rem",
-                  mb: 2,
-                }}
-              >
-                Blockchain Hash: 7a3e8f4a-89c1-4fd3-aeb3-893bb2249919
-              </Typography>
+              <Box>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ color: "#fff", fontWeight: 600, mb: 0.75 }}
+                >
+                  3. PROFIT SHARING & DISTRIBUTIONS
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "rgba(255,255,255,0.6)",
+                    fontSize: "0.8rem",
+                    lineHeight: 1.6,
+                  }}
+                >
+                  Net profits from the harvest shall be distributed as follows:
+                  Sixty percent ({agreementData.profitSplit.investor}
+                  %) to the Investor and Forty percent (
+                  {agreementData.profitSplit.farmer}%) to the Farmer.
+                  Distributions will be executed within{" "}
+                  {agreementData.distributionDays} business days following the
+                  successful sale of the crop to certified organic wholesalers.
+                </Typography>
+              </Box>
 
-              <Divider sx={{ borderColor: "rgba(255,255,255,0.1)", my: 2 }} />
+              <Box>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ color: "#fff", fontWeight: 600, mb: 0.75 }}
+                >
+                  4. RISK DISCLOSURE
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "rgba(255,255,255,0.6)",
+                    fontSize: "0.8rem",
+                    lineHeight: 1.6,
+                  }}
+                >
+                  Both parties acknowledge that agricultural ventures are
+                  subject to environmental factors. In the event of a total crop
+                  failure due to "Act of God" circumstances, the liability of
+                  the Farmer shall be limited to the salvage value of the assets
+                  remaining, as per the catastrophic insurance policy attached
+                  in Annex A.
+                </Typography>
+              </Box>
 
-              {/* Footer */}
+              <Box>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ color: "#fff", fontWeight: 600, mb: 0.75 }}
+                >
+                  5. GOVERNING LAW
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "rgba(255,255,255,0.6)",
+                    fontSize: "0.8rem",
+                    lineHeight: 1.6,
+                  }}
+                >
+                  This Agreement shall be governed by and construed in
+                  accordance with the laws of the Republic, specifically under
+                  the Commercial Agriculture Act of 2018. Any disputes shall be
+                  resolved through binding arbitration in the regional court of
+                  commerce.
+                </Typography>
+              </Box>
+            </Box>
+
+            <Divider sx={{ borderColor: "rgba(255,255,255,0.1)", my: 3 }} />
+
+            <Box sx={{ textAlign: "center", mb: 3 }}>
               <Typography
                 variant="caption"
                 sx={{
                   color: "rgba(255,255,255,0.4)",
-                  display: "block",
-                  textAlign: "center",
+                  letterSpacing: "1px",
                   fontSize: "0.65rem",
-                  lineHeight: 1.6,
                 }}
               >
-                This is a legally binding electronic record under the Electronic
-                Transactions Act.
-                <br />
-                Need assistance?{" "}
-                <span style={{ color: "#4CAF50", cursor: "pointer" }}>
-                  Contact our legal support team
-                </span>
-                .
+                E-SIGNATURE VERIFICATION
               </Typography>
-            </CardContent>
-          </Card>
-        </Box>
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-around",
+                gap: 3,
+                mb: 3,
+              }}
+            >
+              <Box sx={{ textAlign: "center", flex: 1 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 0.5,
+                    mb: 1,
+                  }}
+                >
+                  <VerifiedUser sx={{ color: "#4CAF50", fontSize: 14 }} />
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: "#4CAF50",
+                      fontSize: "0.6rem",
+                      letterSpacing: "0.5px",
+                    }}
+                  >
+                    VERIFIED DIGITALLY
+                  </Typography>
+                </Box>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    color: "#4CAF50",
+                    fontFamily: "'Brush Script MT', cursive",
+                    fontSize: "1.5rem",
+                    mb: 1,
+                  }}
+                >
+                  {agreementData.farmer.name}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "rgba(255,255,255,0.4)",
+                    display: "block",
+                    fontSize: "0.6rem",
+                  }}
+                >
+                  Digital ID: {agreementData.farmer.digitalId}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "rgba(255,255,255,0.4)",
+                    display: "block",
+                    fontSize: "0.6rem",
+                  }}
+                >
+                  Timestamp: {agreementData.farmer.timestamp}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "rgba(255,255,255,0.4)",
+                    display: "block",
+                    fontSize: "0.6rem",
+                  }}
+                >
+                  IP: {agreementData.farmer.ip}
+                </Typography>
+              </Box>
+
+              <Box sx={{ textAlign: "center", flex: 1 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 0.5,
+                    mb: 1,
+                  }}
+                >
+                  <VerifiedUser sx={{ color: "#4CAF50", fontSize: 14 }} />
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: "#4CAF50",
+                      fontSize: "0.6rem",
+                      letterSpacing: "0.5px",
+                    }}
+                  >
+                    VERIFIED DIGITALLY
+                  </Typography>
+                </Box>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    color: "#4CAF50",
+                    fontFamily: "'Brush Script MT', cursive",
+                    fontSize: "1.5rem",
+                    mb: 1,
+                  }}
+                >
+                  {agreementData.investor.name}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "rgba(255,255,255,0.4)",
+                    display: "block",
+                    fontSize: "0.6rem",
+                  }}
+                >
+                  Digital ID: {agreementData.investor.digitalId}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "rgba(255,255,255,0.4)",
+                    display: "block",
+                    fontSize: "0.6rem",
+                  }}
+                >
+                  Timestamp: {agreementData.investor.timestamp}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "rgba(255,255,255,0.4)",
+                    display: "block",
+                    fontSize: "0.6rem",
+                  }}
+                >
+                  IP: {agreementData.investor.ip}
+                </Typography>
+              </Box>
+            </Box>
+
+            <Box sx={{ textAlign: "center", mb: 2 }}>
+              <Chip
+                icon={<CheckCircle sx={{ fontSize: 16 }} />}
+                label="DOCUMENT FULLY EXECUTED & LEGALLY BINDING"
+                sx={{
+                  backgroundColor: "rgba(133, 164, 70, 0.2)",
+                  color: "#4CAF50",
+                  fontWeight: 600,
+                  fontSize: "0.7rem",
+                  py: 2,
+                  px: 1,
+                  "& .MuiChip-icon": { color: "#4CAF50" },
+                }}
+              />
+            </Box>
+
+            <Typography
+              variant="caption"
+              sx={{
+                color: "rgba(255,255,255,0.3)",
+                display: "block",
+                textAlign: "center",
+                fontSize: "0.6rem",
+                mb: 2,
+              }}
+            >
+              Blockchain Hash: 7a3e8f4a-89c1-4fd3-aeb3-893bb2249919
+            </Typography>
+
+            <Divider sx={{ borderColor: "rgba(255,255,255,0.1)", my: 2 }} />
+
+            <Typography
+              variant="caption"
+              sx={{
+                color: "rgba(255,255,255,0.4)",
+                display: "block",
+                textAlign: "center",
+                fontSize: "0.65rem",
+                lineHeight: 1.6,
+              }}
+            >
+              This is a legally binding electronic record under the Electronic
+              Transactions Act.
+              <br />
+              Need assistance?{" "}
+              <span style={{ color: "#4CAF50", cursor: "pointer" }}>
+                Contact our legal support team
+              </span>
+              .
+            </Typography>
+          </CardContent>
+        </Card>
       </Box>
+    </Box>
   );
 };
 

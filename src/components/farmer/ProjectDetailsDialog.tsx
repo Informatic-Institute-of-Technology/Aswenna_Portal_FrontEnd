@@ -182,7 +182,6 @@ const ProjectDetailsDialog = ({
     }
   };
 
-  // Use project data or defaults
   const projectData = project || {
     id: "PRJ-156",
     name: "Premium Rice Cultivation",
@@ -358,7 +357,6 @@ const ProjectDetailsDialog = ({
         },
       }}
     >
-      {/* Header */}
       <Box
         sx={{
           p: 2,
@@ -402,7 +400,6 @@ const ProjectDetailsDialog = ({
           </IconButton>
         </Box>
 
-        {/* Tabs */}
         <Tabs
           value={activeTab}
           onChange={handleTabChange}
@@ -430,12 +427,10 @@ const ProjectDetailsDialog = ({
       </Box>
 
       <DialogContent sx={{ p: 0 }}>
-        {/* Overview Tab */}
         <TabPanel value={activeTab} index={0}>
           <Box sx={{ px: 3 }}>
             {showHarvestOnlySections ? (
               <>
-                {/* Overall Progress */}
                 <Box
                   sx={{
                     p: 2.5,
@@ -498,9 +493,7 @@ const ProjectDetailsDialog = ({
                   />
                 </Box>
 
-                {/* Financial Summary & Milestone Status */}
                 <div className="row g-3">
-                  {/* Financial Summary */}
                   <div className="col-12 col-md-6">
                     <Box
                       sx={{
@@ -615,7 +608,6 @@ const ProjectDetailsDialog = ({
                     </Box>
                   </div>
 
-                  {/* Milestone Status */}
                   <div className="col-12 col-md-6">
                     <Box
                       sx={{
@@ -737,7 +729,6 @@ const ProjectDetailsDialog = ({
                   </div>
                 </div>
 
-                {/* Latest Notifications */}
                 <Box
                   sx={{
                     mt: 3,
@@ -902,7 +893,6 @@ const ProjectDetailsDialog = ({
           </Box>
         </TabPanel>
 
-        {/* Milestones & Progress Tab */}
         {showHarvestOnlySections && (
           <TabPanel value={activeTab} index={milestonesTabIndex}>
             <Box sx={{ px: 3 }}>
@@ -1083,7 +1073,6 @@ const ProjectDetailsDialog = ({
           </TabPanel>
         )}
 
-        {/* Payments & Finance Tab */}
         {showHarvestOnlySections && (
           <TabPanel value={activeTab} index={paymentsTabIndex}>
             <Box sx={{ px: 3 }}>
@@ -1094,7 +1083,6 @@ const ProjectDetailsDialog = ({
                 Payment Schedule & Financial Breakdown
               </Typography>
 
-              {/* Budget Breakdown */}
               <Box
                 sx={{
                   p: 2.5,
@@ -1211,7 +1199,6 @@ const ProjectDetailsDialog = ({
                 )}
               </Box>
 
-              {/* Payment Installments */}
               <Box
                 sx={{
                   p: 2.5,
@@ -1347,7 +1334,6 @@ const ProjectDetailsDialog = ({
           </TabPanel>
         )}
 
-        {/* Team Members Tab */}
         {showTeamAndAgreement && (
           <TabPanel value={activeTab} index={teamMembersTabIndex}>
             <Box sx={{ px: 3 }}>
@@ -1828,7 +1814,6 @@ const ProjectDetailsDialog = ({
         )}
       </DialogContent>
 
-      {/* Footer */}
       <DialogActions
         sx={{
           p: 2,

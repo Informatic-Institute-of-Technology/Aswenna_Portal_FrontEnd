@@ -299,9 +299,7 @@ const CreateAdPopup = ({
 
       await onSubmit(formData, newImageFiles);
       onClose();
-    } catch {
-      // Keep dialog open for retry
-    }
+    } catch {}
   };
 
   const landHistoryOptions = [

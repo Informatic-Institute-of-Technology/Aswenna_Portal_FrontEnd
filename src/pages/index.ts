@@ -2,5 +2,4 @@ export { default as App } from "./App";
 export { default as Dashboard } from "./Dashboard";
 export { default as Login } from "./Login";
 
-// Investor pages
-export * from './investor';
+export * from "./investor";

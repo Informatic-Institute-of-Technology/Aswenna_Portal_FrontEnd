@@ -58,7 +58,7 @@ const ProjectDetailsDialog = ({
   const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
-    id: "google-map-script", // Same ID as LocationMapDialog to share loading
+    id: "google-map-script",
   });
   const [budgetExpanded, setBudgetExpanded] = useState(false);
 
@@ -289,9 +289,7 @@ const ProjectDetailsDialog = ({
             icon: "🚨",
             timestamp: milestone.endDate,
           });
-        }
-        // Warning: In-progress milestone nearing deadline
-        else if (
+        } else if (
           milestone.status === "in-progress" &&
           daysDiff >= 0 &&
           daysDiff <= 5
@@ -516,7 +514,6 @@ const ProjectDetailsDialog = ({
 
         <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.05)" }} />
 
-        {/* Tabs */}
         <Box
           sx={{
             borderBottom: 1,
@@ -1331,7 +1328,6 @@ const ProjectDetailsDialog = ({
                     <LocationOn /> Location Details
                   </Typography>
                   <Box sx={{ mt: 2, display: "flex", gap: 3 }}>
-                    {/* Left side - Location text details */}
                     <Box
                       sx={{
                         flex: 1,
@@ -1389,7 +1385,6 @@ const ProjectDetailsDialog = ({
                       )}
                     </Box>
 
-                    {/* Right side - Embedded Map */}
                     {project.coordinates && isLoaded && (
                       <Box
                         sx={{
@@ -1527,7 +1522,6 @@ const ProjectDetailsDialog = ({
                     )}
                   </Box>
 
-                  {/* Button below both sections */}
                   {project.coordinates && (
                     <Button
                       variant="outlined"
@@ -1552,7 +1546,6 @@ const ProjectDetailsDialog = ({
                   )}
                 </Box>
 
-                {/* Risk Assessment */}
                 <Box
                   sx={{
                     flex: 1,
@@ -1621,7 +1614,6 @@ const ProjectDetailsDialog = ({
             </Box>
           )}
 
-          {/* Milestones Tab */}
           {activeTab === 1 && !isLandownerView && (
             <Box>
               <Box
@@ -1807,7 +1799,6 @@ const ProjectDetailsDialog = ({
             </Box>
           )}
 
-          {/* Payments Tab */}
           {activeTab === (isLandownerView ? 1 : 2) && (
             <Box>
               <Typography
@@ -1822,7 +1813,6 @@ const ProjectDetailsDialog = ({
                   : "Payment Schedule & Financial Breakdown"}
               </Typography>
 
-              {/* Financial Breakdown - Auto-Calculated */}
               {!isLandownerView && calculatedBudgetBreakdown.length > 0 && (
                 <Box
                   sx={{
@@ -1981,7 +1971,6 @@ const ProjectDetailsDialog = ({
                 </Box>
               )}
 
-              {/* Payment Schedule */}
               {!isLandownerView &&
               project.payments &&
               project.payments.length > 0 ? (
@@ -2005,7 +1994,6 @@ const ProjectDetailsDialog = ({
                   >
                     {project.payments.map((payment) => {
                       const daysRemaining = getDaysRemaining(payment.dueDate);
-                      // Determine actual display status: if pending and overdue, show as overdue
                       const displayStatus =
                         payment.status === "pending" && daysRemaining < 0
                           ? "overdue"
@@ -2135,7 +2123,6 @@ const ProjectDetailsDialog = ({
                     })}
                   </Box>
 
-                  {/* Commission Earnings Summary for Commission-Based Projects */}
                   {project.investmentType === "commission" &&
                     project.earnedCommission !== undefined &&
                     project.earnedCommission > 0 && (
@@ -2221,7 +2208,6 @@ const ProjectDetailsDialog = ({
                 </Typography>
               ) : null}
 
-              {/* Land Rental Section */}
               {isLandownerView && (
                 <Box sx={{ mt: 4 }}>
                   <Box
@@ -2608,7 +2594,6 @@ const ProjectDetailsDialog = ({
                     </Box>
                   </Box>
 
-                  {/* Other Team Members */}
                   {project.partyMembers.map((member) => (
                     <Box
                       key={member.id}
@@ -2812,7 +2797,6 @@ const ProjectDetailsDialog = ({
         </DialogActions>
       </Dialog>
 
-      {/* Location Map Dialog - Separate from main dialog */}
       {project.partyMembers && project.coordinates && (
         <LocationMapDialog
           open={mapDialogOpen}
