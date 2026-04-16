@@ -1,10 +1,5 @@
 export type OfferType = "direct-harvest" | "sponsorship";
-export type OfferStatus =
-  | "open"
-  | "active"
-  | "pending"
-  | "closed"
-  | "expired";
+export type OfferStatus = "open" | "active" | "pending" | "closed" | "expired";
 export type PaymentStatus = "pending" | "paid" | "overdue";
 
 export interface InvestorRef {
@@ -43,6 +38,14 @@ export interface CommissionDetails {
   preferredRegions: string[];
 }
 
+export interface MilestoneBreakdownAPI {
+  title: string;
+  estimatedAmount: number;
+  paymentOverDueDate: string;
+  startDate: string;
+  endDate: string;
+}
+
 interface OfferAPIBase {
   _id: string;
   investor: InvestorRef;
@@ -54,6 +57,7 @@ interface OfferAPIBase {
   expiredDate: string;
   status: OfferStatus;
   applicationsCount: number;
+  milestoneBreakdown?: MilestoneBreakdownAPI[];
   farmer?: FarmerRef;
   farmerId?: string;
   farmerName?: string;
