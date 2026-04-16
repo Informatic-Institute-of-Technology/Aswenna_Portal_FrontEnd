@@ -23,14 +23,24 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
+  AgreementCard,
+  AgreementPreviewModal,
   ConnectionJourney,
   RequestCard,
+  type AgreementCardData,
 } from "../../components/investor/requests";
-import agreementsPendingData from "../../data/json/agreementsPending.json";
+import { useAuth } from "../../Context/useAuth";
 import farmerRequestsData from "../../data/json/farmerRequests.json";
 import sentRequestsData from "../../data/json/sentRequests.json";
+import { usePendingAgreements } from "../../hooks/usePendingAgreements";
+import { getLandownerAdById } from "../../services/landownerAds.service";
+import { userService } from "../../services/user.service";
+import {
+  type AgreementDetails,
+  type AgreementMilestone,
+} from "../../utils/agreementGenerator";
 
 interface RequestData {
   id: string;
@@ -69,6 +79,109 @@ interface RequestData {
   insight: string;
   highlighted: boolean;
 }
+
+const formatDateForAgreement = (dateLike?: string): string | undefined => {
+  if (!dateLike) return undefined;
+  const date = new Date(dateLike);
+  if (Number.isNaN(date.getTime())) return undefined;
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
+
+const toNumeric = (value: unknown): number | undefined => {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string") {
+    const parsed = Number(value.replace(/[^\d.-]/g, ""));
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
+  return undefined;
+};
+
+const locationToText = (location: unknown): string | undefined => {
+  if (!location) return undefined;
+  if (typeof location === "string") return location;
+  if (typeof location === "object") {
+    const record = location as Record<string, unknown>;
+    const parts = [
+      record.street,
+      record.city,
+      record.district,
+      record.province,
+      record.postalCode,
+    ]
+      .map((v) => (typeof v === "string" ? v.trim() : ""))
+      .filter(Boolean);
+
+    if (parts.length > 0) return parts.join(", ");
+  }
+  return undefined;
+};
+
+const monthDiffInclusive = (
+  start?: string,
+  end?: string,
+): number | undefined => {
+  if (!start || !end) return undefined;
+  const s = new Date(start);
+  const e = new Date(end);
+  if (Number.isNaN(s.getTime()) || Number.isNaN(e.getTime())) return undefined;
+  const months =
+    (e.getFullYear() - s.getFullYear()) * 12 +
+    (e.getMonth() - s.getMonth()) +
+    1;
+  return months > 0 ? months : undefined;
+};
+
+const buildDefaultMilestones = (
+  totalGrossInvestment?: number,
+  startDate?: string,
+  endDate?: string,
+): AgreementMilestone[] | undefined => {
+  if (!totalGrossInvestment || totalGrossInvestment <= 0) return undefined;
+
+  const labels = [
+    "Land Preparation",
+    "Planting & Inputs",
+    "Crop Maintenance",
+    "Harvest & Delivery",
+  ];
+  const perMilestone =
+    Math.round((totalGrossInvestment / labels.length) * 100) / 100;
+  const lastMilestone =
+    Math.round(
+      (totalGrossInvestment - perMilestone * (labels.length - 1)) * 100,
+    ) / 100;
+
+  const s = startDate ? new Date(startDate) : null;
+  const e = endDate ? new Date(endDate) : null;
+  const validRange =
+    !!s &&
+    !!e &&
+    !Number.isNaN(s.getTime()) &&
+    !Number.isNaN(e.getTime()) &&
+    e.getTime() >= s.getTime();
+
+  return labels.map((task, idx) => {
+    let targetDate = "Not specified";
+
+    if (validRange && s && e) {
+      const ratio = labels.length === 1 ? 1 : idx / (labels.length - 1);
+      const ms = s.getTime() + (e.getTime() - s.getTime()) * ratio;
+      targetDate =
+        formatDateForAgreement(new Date(ms).toISOString()) ?? "Not specified";
+    }
+
+    return {
+      no: idx + 1,
+      task,
+      targetDate,
+      grossAmount: idx === labels.length - 1 ? lastMilestone : perMilestone,
+    };
+  });
+};
 
 const SubNavPill = ({
   label,
@@ -360,6 +473,7 @@ const SentCard = ({
 };
 
 const RequestsPage = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<"incoming" | "sent" | "history">(
     "incoming",
   );
@@ -372,14 +486,249 @@ const RequestsPage = () => {
   const [selectedRequest, setSelectedRequest] = useState<RequestData | null>(
     null,
   );
+  const [selectedAgreementCard, setSelectedAgreementCard] =
+    useState<AgreementCardData | null>(null);
+  const [selectedAgreementDetails, setSelectedAgreementDetails] = useState<
+    Partial<AgreementDetails> | undefined
+  >(undefined);
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
+
+  const handleUploadAgreement = useCallback((card?: AgreementCardData) => {
+    console.log("handleUploadAgreement called with card:", card?.id);
+    if (card) {
+      console.log("Setting selectedAgreementCard:", card.id);
+      setSelectedAgreementCard(card);
+    } else {
+      console.log("WARNING: handleUploadAgreement called without card context");
+    }
+    console.log("Opening preview modal");
+    setPreviewModalOpen(true);
+  }, []);
+
+
+  const { agreements: agreementsPendingData, isLoading: agreementsLoading } =
+    usePendingAgreements(
+      handleUploadAgreement,
+      () => {},
+    );
+
+  const selectAgreementCard = (card: AgreementCardData) => {
+    setSelectedAgreementCard(card);
+    setSelectedRequest((prev) => {
+      if (prev?.id === card.id) return null;
+      return {
+        id: card.id,
+        projectId: card.projectId,
+        partyType: card.partyType,
+        farmerName: card.partyName,
+        farmerAvatar: card.partyAvatar,
+        farmerInitials: card.partyInitials,
+        location: card.location,
+        isVerified: card.isVerified,
+        statusBadge: {
+          label: card.agreementStatus,
+          variant: "action" as const,
+        },
+        tags: [
+          {
+            label:
+              card.partyType === "farmer"
+                ? "Farmer Agreement"
+                : "Landowner Agreement",
+            variant: "primary" as const,
+          },
+          { label: card.cropType, variant: "secondary" as const },
+        ],
+        description: card.projectTitle,
+        timestamp: card.submittedAt,
+        journeySteps: [
+          {
+            title: "Offer Created",
+            description: "Investor posted the offer",
+            status: "completed" as const,
+          },
+          {
+            title: "Party Matched",
+            description: `${card.partyType === "farmer" ? "Farmer" : "Landowner"} linked to project`,
+            status: "completed" as const,
+          },
+          {
+            title: "Agreement Ready",
+            description: "Contract prepared for signing",
+            status: "active" as const,
+            icon: "upload_file",
+          },
+          {
+            title: "Execution",
+            description: "Both parties sign & execute",
+            status: "pending" as const,
+          },
+        ],
+        insight: `${card.progressLabel} — ${card.progressPercent}% complete`,
+        highlighted: card.highlighted ?? false,
+      };
+    });
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const hydrateAgreementDetails = async () => {
+      console.log(
+        "hydrationEffect: Started with card:",
+        selectedAgreementCard?.id,
+      );
+
+      if (!selectedAgreementCard) {
+        console.log("hydrationEffect: No card selected, clearing details");
+        setSelectedAgreementDetails(undefined);
+        return;
+      }
+
+      const card = selectedAgreementCard;
+      const investorId = card.investorId ?? user?._id ?? undefined;
+
+      console.log("hydrationEffect: Fetching profiles for card", card.id, {
+        investorId,
+        counterpartyId: card.counterpartyId,
+        landownerProjectId: card.landownerProjectId,
+      });
+
+      const [investorProfile, counterpartyProfile, landAd] = await Promise.all([
+        investorId
+          ? userService.getUserProfile(investorId).catch(() => null)
+          : Promise.resolve(null),
+        card.counterpartyId
+          ? userService.getUserProfile(card.counterpartyId).catch(() => null)
+          : Promise.resolve(null),
+        card.partyType === "landowner" && card.landownerProjectId
+          ? getLandownerAdById(card.landownerProjectId).catch(() => null)
+          : Promise.resolve(null),
+      ]);
+
+      console.log("hydrationEffect: API responses received", {
+        investorProfile: investorProfile ? "OK" : "NULL",
+        counterpartyProfile: counterpartyProfile ? "OK" : "NULL",
+        landAd: landAd ? "OK" : "NULL",
+      });
+
+      if (cancelled) {
+        console.log("hydrationEffect: Cancelled, returning");
+        return;
+      }
+
+      const landLocation = locationToText(landAd?.location) ?? card.location;
+      const availableFrom = landAd?.availableFrom;
+      const availableTo = landAd?.availableTo;
+      const totalGrossInvestment = card.totalBudget;
+
+      const nextDetails: Partial<AgreementDetails> = {
+        agreementType:
+          card.partyType === "landowner"
+            ? "Investor-Landowner"
+            : "Investor-Farmer",
+        investorName:
+          investorProfile?.fullName ??
+          user?.fullName ??
+          card.investorName ??
+          "N/A",
+        investorNIC:
+          investorProfile?.personalInfo?.nicNumber ??
+          user?.personalInfo?.nicNumber ??
+          "N/A",
+        investorContact:
+          investorProfile?.phoneNumber ??
+          user?.phoneNumber ??
+          card.investorEmail ??
+          "N/A",
+
+        counterpartyName: card.partyName,
+        counterpartyNIC: counterpartyProfile?.personalInfo?.nicNumber ?? "N/A",
+        counterpartyContact:
+          counterpartyProfile?.phoneNumber ??
+          card.counterpartyPhone ??
+          card.counterpartyEmail ??
+          "N/A",
+
+        projectRefId: card.projectId,
+        targetCrop: card.cropType,
+        propertyLocation: landLocation,
+
+        acreage:
+          landAd?.landArea !== undefined && landAd?.landArea !== null
+            ? String(landAd.landArea)
+            : undefined,
+
+        designatedCultivator:
+          card.farmerPartyName && card.farmerPartyName !== "Not Assigned"
+            ? card.farmerPartyName
+            : undefined,
+
+        leaseDurationMonths: monthDiffInclusive(availableFrom, availableTo),
+        leaseStartDate: formatDateForAgreement(availableFrom),
+        leaseEndDate: formatDateForAgreement(availableTo),
+        grossMonthlyRental: toNumeric(landAd?.rentalAmount),
+
+        estimatedStartDate:
+          formatDateForAgreement(card.startDate) ??
+          formatDateForAgreement(card.submittedAt),
+        estimatedEndDate:
+          formatDateForAgreement(card.expectedCompletionDate) ??
+          formatDateForAgreement(card.expiresAt),
+        totalGrossInvestment,
+        milestones:
+          card.milestoneBreakdown && card.milestoneBreakdown.length > 0
+            ? card.milestoneBreakdown.map((m, i) => ({
+                no: i + 1,
+                task: m.title || "N/A",
+                targetDate:
+                  formatDateForAgreement(m.paymentOverDueDate) ??
+                  "Not specified",
+                grossAmount: m.estimatedAmount || 0,
+              }))
+            : buildDefaultMilestones(
+                totalGrossInvestment,
+                card.startDate,
+                card.expectedCompletionDate,
+              ),
+      };
+
+      console.log("hydrationEffect: Setting details", nextDetails);
+      setSelectedAgreementDetails(nextDetails);
+    };
+
+    void hydrateAgreementDetails();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedAgreementCard, user]);
 
   const handleTabChange = (_: unknown, val: string) => {
     setActiveTab(val as typeof activeTab);
     setSelectedRequest(null);
   };
-  const handleUploadAgreement = () => console.log("Upload agreement");
+
+
+
+  const handleConfirmUpload = () => {
+
+    console.log("User confirmed upload of agreement");
+
+
+
+
+  };
   const handleSelect = (r: RequestData) =>
     setSelectedRequest((prev) => (prev?.id === r.id ? null : r));
+
+
+  const selectedAgreementType: AgreementDetails["agreementType"] | undefined =
+    selectedAgreementCard?.partyType === "landowner"
+      ? "Investor-Landowner"
+      : selectedAgreementCard?.partyType === "farmer"
+        ? "Investor-Farmer"
+        : undefined;
 
   const journeySteps =
     selectedRequest?.journeySteps.map((step) =>
@@ -387,7 +736,7 @@ const RequestsPage = () => {
         ? {
             ...step,
             uploadArea: {
-              text: "Click to upload PDF",
+              text: "Click to upload signed PDF",
               onUpload: handleUploadAgreement,
             },
           }
@@ -656,62 +1005,88 @@ const RequestsPage = () => {
 
               {incomingSubTab === "agreements" && (
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                  {agreementsLoading ? (
                     <Box
                       sx={{
-                        width: 4,
-                        height: 20,
-                        borderRadius: 2,
-                        background:
-                          "linear-gradient(180deg, #fb923c 0%, #f59e0b 100%)",
-                      }}
-                    />
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        fontWeight: 800,
-                        color: "#fb923c",
-                        fontSize: "0.82rem",
-                        letterSpacing: 0.5,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                        py: 2,
                       }}
                     >
-                      AGREEMENTS AWAITING YOUR ACTION
-                    </Typography>
-                    <Chip
-                      label={agreementsPendingData.length}
-                      size="small"
-                      sx={{
-                        height: 20,
-                        fontSize: "0.65rem",
-                        fontWeight: 800,
-                        bgcolor: "rgba(251,146,60,0.15)",
-                        color: "#fb923c",
-                        border: "1px solid rgba(251,146,60,0.4)",
-                      }}
-                    />
-                  </Box>
-                  {(agreementsPendingData as RequestData[]).map((a) => (
-                    <div key={a.id} onClick={() => handleSelect(a)}>
-                      <RequestCard
-                        type="agreement"
-                        name={a.farmerName}
-                        avatarUrl={a.farmerAvatar || undefined}
-                        avatarInitials={a.farmerInitials}
-                        location={a.location}
-                        statusBadge={a.statusBadge}
-                        tags={a.tags}
-                        description={a.description}
-                        timestamp={a.timestamp}
-                        primaryAction={{
-                          label: "Upload Agreement",
-                          icon: "upload_file",
-                          onClick: handleUploadAgreement,
+                      <Box
+                        sx={{
+                          width: 4,
+                          height: 20,
+                          borderRadius: 2,
+                          background:
+                            "linear-gradient(180deg, #fb923c 0%, #f59e0b 100%)",
                         }}
-                        highlighted={a.highlighted}
-                        isSelected={selectedRequest?.id === a.id}
                       />
-                    </div>
-                  ))}
+                      <Typography
+                        variant="body2"
+                        sx={{ color: "#71717A", fontStyle: "italic" }}
+                      >
+                        Loading pending agreements...
+                      </Typography>
+                    </Box>
+                  ) : (
+                    <>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
+                      >
+                        <Box
+                          sx={{
+                            width: 4,
+                            height: 20,
+                            borderRadius: 2,
+                            background:
+                              "linear-gradient(180deg, #fb923c 0%, #f59e0b 100%)",
+                          }}
+                        />
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontWeight: 800,
+                            color: "#fb923c",
+                            fontSize: "0.82rem",
+                            letterSpacing: 0.5,
+                          }}
+                        >
+                          AGREEMENTS AWAITING YOUR ACTION
+                        </Typography>
+                        <Chip
+                          label={agreementsPendingData.length}
+                          size="small"
+                          sx={{
+                            height: 20,
+                            fontSize: "0.65rem",
+                            fontWeight: 800,
+                            bgcolor: "rgba(251,146,60,0.15)",
+                            color: "#fb923c",
+                            border: "1px solid rgba(251,146,60,0.4)",
+                          }}
+                        />
+                      </Box>
+                      {agreementsPendingData.length > 0 ? (
+                        agreementsPendingData.map((a) => (
+                          <AgreementCard
+                            key={a.id}
+                            {...a}
+                            isSelected={selectedRequest?.id === a.id}
+                            onViewDetails={() => selectAgreementCard(a)}
+                            onUploadAgreement={handleUploadAgreement}
+                          />
+                        ))
+                      ) : (
+                        <Box sx={{ py: 3, textAlign: "center", opacity: 0.5 }}>
+                          <Typography variant="body2" sx={{ color: "#71717A" }}>
+                            No pending agreements
+                          </Typography>
+                        </Box>
+                      )}
+                    </>
+                  )}
                 </Box>
               )}
 
@@ -888,6 +1263,8 @@ const RequestsPage = () => {
               requestId={selectedRequest.id}
               farmerName={selectedRequest.farmerName}
               steps={journeySteps}
+              agreementType={selectedAgreementType}
+              agreementDetails={selectedAgreementDetails}
             />
           ) : (
             <Box
@@ -917,6 +1294,16 @@ const RequestsPage = () => {
           )}
         </Box>
       </Box>
+
+      
+      <AgreementPreviewModal
+        open={previewModalOpen}
+        onClose={() => setPreviewModalOpen(false)}
+        onConfirmUpload={handleConfirmUpload}
+        agreementType={selectedAgreementType}
+        agreementDetails={selectedAgreementDetails}
+        counterpartyName={selectedRequest?.farmerName ?? "Party"}
+      />
     </Box>
   );
 };

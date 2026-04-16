@@ -1,7 +1,9 @@
 import { getAuthHeader, getCsrfToken } from "./tokenStore";
 
-const API_BASE_URL = 'https://burt-superwise-indispensably.ngrok-free.dev/api';
- export class HttpClient {
+
+const API_BASE_URL = "http://localhost:3000/api";
+
+export class HttpClient {
   private baseURL: string;
 
   constructor(baseURL: string = API_BASE_URL) {
