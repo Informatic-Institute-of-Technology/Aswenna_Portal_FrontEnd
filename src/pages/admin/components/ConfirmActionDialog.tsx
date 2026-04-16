@@ -37,8 +37,8 @@ const ACTION_CONFIGS: Record<ActionType, ActionConfig> = {
   approve: {
     title: "Approve Account",
     body: "This will activate the account and grant the user full access to the portal.",
-    color: "#22c55e",
-    icon: <CheckCircleOutline sx={{ fontSize: 40, color: "#22c55e" }} />,
+    color: "#85a446",
+    icon: <CheckCircleOutline sx={{ fontSize: 40, color: "#85a446" }} />,
   },
   reject: {
     title: "Reject Account",
@@ -55,8 +55,8 @@ const ACTION_CONFIGS: Record<ActionType, ActionConfig> = {
   reactivate: {
     title: "Reactivate Account",
     body: "This will restore the user's access to the portal.",
-    color: "#22c55e",
-    icon: <CheckCircleOutline sx={{ fontSize: 40, color: "#22c55e" }} />,
+    color: "#85a446",
+    icon: <CheckCircleOutline sx={{ fontSize: 40, color: "#85a446" }} />,
   },
   set_pending: {
     title: "Set to Pending",

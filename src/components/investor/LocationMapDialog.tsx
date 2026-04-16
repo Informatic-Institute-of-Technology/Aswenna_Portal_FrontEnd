@@ -38,7 +38,6 @@ import { useEffect, useState } from "react";
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
-// Function to geocode address to coordinates
 const geocodeAddress = async (
   address: string,
 ): Promise<{ lat: number; lng: number } | null> => {
@@ -64,7 +63,6 @@ const geocodeAddress = async (
   }
 };
 
-// Debug logging
 if (!GOOGLE_MAPS_API_KEY) {
   console.error("Google Maps API key is not defined in environment variables");
 } else {
@@ -79,7 +77,7 @@ interface PartyMember {
   phone: string;
   image?: string;
   location?: string;
-  coordinates?: string; // format: "lat, lng"
+  coordinates?: string;
   rating?: number;
   specialization?: string;
   experience?: string;
@@ -90,7 +88,7 @@ interface LocationMapDialogProps {
   onClose: () => void;
   partyMembers: PartyMember[];
   projectLocation: string;
-  coordinates: string; // format: "lat, lng"
+  coordinates: string;
   district: string;
   province: string;
 }
@@ -100,16 +98,15 @@ const mapContainerStyle = {
   height: "500px",
 };
 
-// Custom marker icons for each role with distinct colors - LARGER SIZE
 const getMarkerIcon = (
   role: "farmer" | "investor" | "landowner" | "project",
   size: number = 70,
 ) => {
   const colors = {
-    farmer: "#4CAF50", // Green
-    investor: "#2196F3", // Blue
-    landowner: "#FF9800", // Orange
-    project: "#E91E63", // Pink for project location
+    farmer: "#4CAF50",
+    investor: "#2196F3",
+    landowner: "#FF9800",
+    project: "#E91E63",
   };
 
   const icons = {
@@ -234,22 +231,18 @@ const LocationMapDialog = ({
   const [userCoordinates, setUserCoordinates] = useState<string | null>(null);
   const { user } = useAuth();
 
-  // Move hook to top before any conditional returns
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY || "",
-    id: "google-map-script", // Prevents multiple loads
+    id: "google-map-script",
   });
 
-  // Geocode user address if no coordinates available
   useEffect(() => {
     const fetchUserCoordinates = async () => {
-      // Skip if user already has coordinates or no address
       if (!user?.address) {
-        setUserCoordinates("6.9271, 79.8612"); // Default Colombo
+        setUserCoordinates("6.9271, 79.8612");
         return;
       }
 
-      // Try to geocode the user's address
       const geocoded = await geocodeAddress(user.address);
       if (geocoded) {
         setUserCoordinates(`${geocoded.lat}, ${geocoded.lng}`);
@@ -257,7 +250,6 @@ const LocationMapDialog = ({
           `User address "${user.address}" geocoded to: ${geocoded.lat}, ${geocoded.lng}`,
         );
       } else {
-        // Fall back to Colombo if geocoding fails
         setUserCoordinates("6.9271, 79.8612");
         console.log("Geocoding failed, using Colombo default coordinates");
       }
@@ -268,7 +260,6 @@ const LocationMapDialog = ({
     }
   }, [user?.address, open]);
 
-  // Check if API key is available
   if (!GOOGLE_MAPS_API_KEY) {
     return (
       <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
@@ -299,7 +290,6 @@ const LocationMapDialog = ({
     );
   }
 
-  // Parse main project coordinates safely
   const parseCoordinates = (coordString: string) => {
     try {
       const [lat, lng] = coordString
@@ -317,9 +307,8 @@ const LocationMapDialog = ({
   };
 
   const centerCoords = parseCoordinates(coordinates);
-  const center = centerCoords || { lat: 7.8731, lng: 80.7718 }; // Default to Sri Lanka center
+  const center = centerCoords || { lat: 7.8731, lng: 80.7718 };
 
-  // Add current user as investor to the party members
   const currentUserAsMember: PartyMember = {
     id: user?._id ? `INV-${user._id.slice(-6).toUpperCase()}` : "INV-USER",
     name: user?.fullName || user?.firstName || "You",
@@ -327,25 +316,21 @@ const LocationMapDialog = ({
     email: user?.email || "",
     phone: user?.phoneNumber || "",
     location: user?.address || "Colombo, Western Province",
-    coordinates: userCoordinates || "6.9271, 79.8612", // Use geocoded or default Colombo coordinates
+    coordinates: userCoordinates || "6.9271, 79.8612",
     specialization: "Agricultural Investment Portfolio",
     experience: "Active Investor",
   };
 
-  // Combine current user with other party members
   const allMembers = [currentUserAsMember, ...partyMembers];
 
-  // Create markers for each party member using their actual coordinates
   const memberMarkers = allMembers.map((member, index) => {
-    let position = center; // Default to project location if no coordinates
+    let position = center;
 
-    // Use member's actual coordinates if available
     if (member.coordinates) {
       const memberCoords = parseCoordinates(member.coordinates);
       if (memberCoords) {
         position = memberCoords;
 
-        // If member is at same location as project, apply a small offset to make marker visible
         const isSameAsProject =
           centerCoords &&
           Math.abs(memberCoords.lat - centerCoords.lat) < 0.0001 &&
@@ -355,9 +340,8 @@ const LocationMapDialog = ({
           console.warn(
             `${member.role} - ${member.name} is at project location, applying offset`,
           );
-          // Apply offset based on index (circular distribution)
-          const angle = index * 120 * (Math.PI / 180); // 120 degrees apart
-          const offsetDistance = 0.015; // ~1.5km offset
+          const angle = index * 120 * (Math.PI / 180);
+          const offsetDistance = 0.015;
           position = {
             lat: memberCoords.lat + offsetDistance * Math.cos(angle),
             lng: memberCoords.lng + offsetDistance * Math.sin(angle),
@@ -492,7 +476,6 @@ const LocationMapDialog = ({
       </DialogTitle>
 
       <DialogContent sx={{ p: 0 }}>
-        {/* Legend */}
         <Box
           sx={{
             p: 2,
@@ -553,7 +536,6 @@ const LocationMapDialog = ({
           </Typography>
         </Box>
 
-        {/* Map */}
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
           center={center}
@@ -583,7 +565,6 @@ const LocationMapDialog = ({
             ],
           }}
         >
-          {/* Project Location Marker - Pink/Red */}
           <Marker
             position={center}
             icon={{
@@ -602,9 +583,7 @@ const LocationMapDialog = ({
             title="Project Cultivation Location"
           />
 
-          {/* Markers for each party member */}
           {memberMarkers.map((member, index) => {
-            // Set z-index to ensure party members appear above project marker
             const zIndex = 1100 + index;
 
             return (
@@ -629,7 +608,6 @@ const LocationMapDialog = ({
             );
           })}
 
-          {/* Info Window for Project Location */}
           {selectedProject && (
             <InfoWindow
               position={center}
@@ -705,8 +683,6 @@ const LocationMapDialog = ({
               </Box>
             </InfoWindow>
           )}
-
-          {/* Info Window for Party Members */}
           {selectedMember && (
             <InfoWindow
               position={selectedMember.position}
@@ -813,7 +789,6 @@ const LocationMapDialog = ({
           )}
         </GoogleMap>
 
-        {/* Party Members Table */}
         <Box sx={{ p: 2, bgcolor: "var(--surface-muted)" }}>
           <Typography variant="h6" sx={{ mb: 2, color: "white" }}>
             Team Members & Locations
@@ -846,7 +821,6 @@ const LocationMapDialog = ({
                 </TableRow>
               </TableHead>
               <TableBody>
-                {/* Project Location Row */}
                 <TableRow
                   sx={{ "&:hover": { bgcolor: "var(--surface-muted)" } }}
                 >
@@ -896,7 +870,6 @@ const LocationMapDialog = ({
                   <TableCell sx={{ color: "var(--text-on-dark)" }}>-</TableCell>
                 </TableRow>
 
-                {/* Party Members Rows */}
                 {memberMarkers.map((member) => (
                   <TableRow
                     key={member.id}

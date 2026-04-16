@@ -29,9 +29,9 @@ export interface FinancialKPIs {
 }
 
 export interface ProjectHealthKPIs {
-  successRate: number; // % of projects reaching harvest
-  averageDisputeResolutionTime: number; // in days
-  overduePaymentRatio: number; // %
+  successRate: number;
+  averageDisputeResolutionTime: number;
+  overduePaymentRatio: number;
   activeDisputes: number;
   completionRate: number;
 }
@@ -58,7 +58,7 @@ export interface GlobalUser {
   lastLogin: string;
   isVerified: boolean;
   isActive: boolean;
-  apiStatus?: string; // raw status from API (PENDING | ACTIVE | SUSPENDED)
+  apiStatus?: string;
   avatar?: string;
   address?: string;
   totalProjects: number;
@@ -342,20 +342,6 @@ export interface PerformanceMetrics {
   userRetentionRate: number;
 }
 
-/**
- * ============================================================================
- * ALL PROJECTS DASHBOARD - UNIFIED PROJECT TYPES
- * ============================================================================
- *
- * These types normalize data from 4 different API sources:
- * 1. Farmer Projects (Harvest-based)
- * 2. Farmer Projects (Commission-based)
- * 3. Investor Offers (Direct Harvest)
- * 4. Investor Offers (Sponsorship/Commission)
- *
- * Plus Landowner Projects (Monthly Rental)
- */
-
 export type ProjectCategory =
   | "farmer-harvest"
   | "farmer-commission"
@@ -365,26 +351,19 @@ export type ProjectCategory =
 
 export type ProjectStakeholder = "farmer" | "investor" | "landowner";
 
-/**
- * Unified Project representation - normalized from all 4 API sources
- * Fields are reconciled to a common structure for consistent UI rendering
- */
 export interface UnifiedProject {
-  // Metadata
   id: string;
   sourceApi: "farmer-project" | "investor-offer" | "landowner-project";
-  sourceId: string; // Original ID from source API
+  sourceId: string;
   category: ProjectCategory;
   stakeholder: ProjectStakeholder;
 
-  // Core project information
   title: string;
   description?: string;
   cropType?: string;
   cropIcon?: string;
   backgroundImage?: string;
 
-  // Parties involved
   creator: {
     id: string;
     name: string;
@@ -400,35 +379,30 @@ export interface UnifiedProject {
     farmerName?: string;
   };
 
-  // Financial details
   financialMetric?: {
-    label: string; // e.g., "Investment Required", "Commission Rate", "Monthly Rent"
+    label: string;
     value: number;
-    unit?: string; // e.g., "LKR", "%", "per month"
+    unit?: string;
   };
   totalInvestment?: number;
   budget?: number;
   currency?: string;
 
-  // Timeline
   startDate: string;
   endDate?: string;
   deadline?: string;
-  duration?: number; // in months
+  duration?: number;
 
-  // Location
   location: string;
   district?: string;
   province?: string;
   preferredRegions?: string[];
 
-  // Status & metadata
   status: "active" | "pending" | "completed" | "cancelled" | "draft";
   visibility?: boolean;
   createdAt: string;
   updatedAt: string;
 
-  // Additional context
   landArea?: number;
   landAreaUnit?: string;
   expectedYield?: string;
@@ -436,9 +410,6 @@ export interface UnifiedProject {
   applicationCount?: number;
 }
 
-/**
- * Paginated response wrapper for all projects
- */
 export interface PaginatedUnifiedProjects {
   data: UnifiedProject[];
   pagination: {
@@ -451,12 +422,9 @@ export interface PaginatedUnifiedProjects {
   };
 }
 
-/**
- * Filter options for the All Projects dashboard
- */
 export interface AllProjectsFilters {
-  stakeholder?: ProjectStakeholder | "all"; // Farmer, Investor, Landowner
-  category?: ProjectCategory | "all"; // Specific subcategories
+  stakeholder?: ProjectStakeholder | "all";
+  category?: ProjectCategory | "all";
   status?: "active" | "pending" | "completed" | "cancelled" | "all";
   searchQuery?: string;
   region?: string[];
@@ -468,9 +436,6 @@ export interface AllProjectsFilters {
   limit?: number;
 }
 
-/**
- * Statistics for active projects tab
- */
 export interface ActiveProjectsStats {
   totalActive: number;
   byStakeholder: {
@@ -482,9 +447,6 @@ export interface ActiveProjectsStats {
   };
 }
 
-/**
- * Cache key for storing API responses
- */
 export interface ProjectsCacheEntry {
   data: UnifiedProject[];
   timestamp: number;

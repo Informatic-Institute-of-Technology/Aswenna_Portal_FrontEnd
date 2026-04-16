@@ -1,9 +1,11 @@
+import AswendLogo from "@/assets/Aswenna Logo.png";
 import { useAuth } from "@/Context/useAuth";
 import {
   AccountCircle,
   Description,
   Home,
   Landscape,
+  Logout,
   Mail,
   Settings,
 } from "@mui/icons-material";
@@ -20,8 +22,16 @@ import {
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 
-const LandOwnerSidebar = () => {
-  const { user, sessionId, logout } = useAuth();
+interface LandOwnerSidebarProps {
+  collapsed?: boolean;
+  onLogoutRequest?: () => void;
+}
+
+const LandOwnerSidebar = ({
+  collapsed = false,
+  onLogoutRequest,
+}: LandOwnerSidebarProps) => {
+  const { sessionId, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -43,7 +53,7 @@ const LandOwnerSidebar = () => {
       text: "Smart Matchmaking",
       icon: <Description />,
       path: `${basePath}/dashboard/smart-matchmaking`,
-    }
+    },
   ];
 
   const secondaryItems = [
@@ -62,30 +72,27 @@ const LandOwnerSidebar = () => {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      <Box sx={{ p: 3, textAlign: "center" }}>
+      <Box sx={{ p: collapsed ? 1.5 : 3, textAlign: "center" }}>
         <Avatar
-          src={(() => {
-            const p = user?.personalInfo?.profilePicture;
-            if (!p) return undefined;
-            if (typeof p === "string") return p;
-            return p.url || undefined;
-          })()}
-          alt={user?.fullName || "null"}
+          src={AswendLogo}
+          alt="Aswenna Logo"
           sx={{
-            width: 120,
-            height: 120,
+            width: collapsed ? 44 : 120,
+            height: collapsed ? 44 : 120,
             mx: "auto",
-            mb: 2,
-            border: "4px solid",
-            borderColor: "primary.main",
+            mb: collapsed ? 0 : 2,
           }}
         />
-        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-          {user?.fullName || "null"}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {user?.role || "null"}
-        </Typography>
+        {!collapsed && (
+          <>
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              Aswenna.lk
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Land Owner Portal
+            </Typography>
+          </>
+        )}
       </Box>
 
       <Divider />
@@ -96,23 +103,39 @@ const LandOwnerSidebar = () => {
             key={item.path}
             selected={location.pathname === item.path}
             onClick={() => navigate(item.path)}
+            sx={{
+              justifyContent: collapsed ? "center" : "initial",
+              px: collapsed ? 1.5 : 2,
+              py: 1.25,
+            }}
           >
             <ListItemIcon
               sx={{
                 color:
                   location.pathname === item.path ? "primary.main" : "inherit",
+                minWidth: collapsed ? 0 : 40,
+                mr: collapsed ? 0 : 1,
+                justifyContent: "center",
               }}
             >
               {item.icon}
             </ListItemIcon>
-            <ListItemText primary={item.text} />
+            {!collapsed && <ListItemText primary={item.text} />}
           </ListItemButton>
         ))}
       </List>
 
       <Divider />
 
-      <Box sx={{ px: 2, pt: 1.5, pb: 0.5 }}>
+      <Box
+        sx={{
+          px: 2,
+          pt: 1.5,
+          pb: 0.5,
+          minHeight: 30,
+          visibility: collapsed ? "hidden" : "visible",
+        }}
+      >
         <Typography
           variant="caption"
           sx={{
@@ -135,24 +158,48 @@ const LandOwnerSidebar = () => {
             key={item.path}
             selected={location.pathname === item.path}
             onClick={() => navigate(item.path)}
+            sx={{
+              justifyContent: collapsed ? "center" : "initial",
+              px: collapsed ? 1.5 : 2,
+              py: 1.25,
+            }}
           >
             <ListItemIcon
               sx={{
                 color:
                   location.pathname === item.path ? "primary.main" : "inherit",
+                minWidth: collapsed ? 0 : 40,
+                mr: collapsed ? 0 : 1,
+                justifyContent: "center",
               }}
             >
               {item.icon}
             </ListItemIcon>
-            <ListItemText primary={item.text} />
+            {!collapsed && <ListItemText primary={item.text} />}
           </ListItemButton>
         ))}
       </List>
 
       <Box sx={{ p: 2 }}>
-        <Button variant="contained" fullWidth onClick={logout} sx={{ py: 1.5 }}>
-          Logout
-        </Button>
+        {collapsed ? (
+          <Button
+            variant="contained"
+            fullWidth
+            onClick={logout}
+            sx={{ py: 1.2 }}
+          >
+            <Logout fontSize="small" />
+          </Button>
+        ) : (
+          <Button
+            variant="contained"
+            fullWidth
+            onClick={onLogoutRequest ?? logout}
+            sx={{ py: 1.5 }}
+          >
+            Logout
+          </Button>
+        )}
       </Box>
     </Box>
   );

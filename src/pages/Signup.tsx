@@ -7,6 +7,7 @@ import { CheckCircle, Eye, EyeOff } from "lucide-react";
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { AppButton } from "../shared/components";
 import Notification from "../shared/components/Notification";
 import { useNotification } from "../shared/hooks/useNotification";
 
@@ -347,9 +348,11 @@ const Signup = () => {
                 )}
               </div>
 
-              <button
+              <AppButton
                 type="submit"
-                className="signup-button"
+                variant="success"
+                size="md"
+                fullWidth
                 disabled={loading}
               >
                 {loading ? (
@@ -357,7 +360,7 @@ const Signup = () => {
                 ) : (
                   "Sign up!"
                 )}
-              </button>
+              </AppButton>
             </form>
 
             <div className="login-link-container">

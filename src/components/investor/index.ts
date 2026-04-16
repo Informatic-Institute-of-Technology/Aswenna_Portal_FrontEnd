@@ -1,4 +1,6 @@
 export { default as CreateOfferButton } from "./CreateOfferButton";
+export { default as LandAdCard } from "./LandAdCard";
+export { default as LandAdDetailDialog } from "./LandAdDetailDialog";
 export { default as CreateOfferDialog } from "./CreateOfferDialog";
 export { default as EditOfferDialog } from "./EditOfferDialog";
 export { default as InvestmentRequestCard } from "./InvestmentRequestCard";

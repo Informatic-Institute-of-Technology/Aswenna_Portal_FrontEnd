@@ -7,7 +7,7 @@ export interface FlashcardNotificationContent {
   id: string;
   type: NotificationType;
   message: string;
-  duration?: number; // milliseconds, 0 = persistent
+  duration?: number;
 }
 
 interface FlashcardNotificationProps {

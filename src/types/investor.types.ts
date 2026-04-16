@@ -1,11 +1,17 @@
 export type OfferType = "direct-harvest" | "sponsorship";
-export type OfferStatus = "active" | "pending" | "completed" | "cancelled";
+export type OfferStatus = "open" | "active" | "pending" | "closed" | "expired";
 export type PaymentStatus = "pending" | "paid" | "overdue";
 
 export interface InvestorRef {
   _id: string;
   fullName: string;
   email: string;
+}
+
+export interface FarmerRef {
+  _id: string;
+  fullName?: string;
+  email?: string;
 }
 
 export interface HarvestBaseDetails {
@@ -32,6 +38,14 @@ export interface CommissionDetails {
   preferredRegions: string[];
 }
 
+export interface MilestoneBreakdownAPI {
+  title: string;
+  estimatedAmount: number;
+  paymentOverDueDate: string;
+  startDate: string;
+  endDate: string;
+}
+
 interface OfferAPIBase {
   _id: string;
   investor: InvestorRef;
@@ -43,6 +57,26 @@ interface OfferAPIBase {
   expiredDate: string;
   status: OfferStatus;
   applicationsCount: number;
+  milestoneBreakdown?: MilestoneBreakdownAPI[];
+  farmer?: FarmerRef;
+  farmerId?: string;
+  farmerName?: string;
+  landOwnerId?: string;
+  landOwnerName?: string;
+  landowner?: {
+    _id: string;
+    fullName?: string;
+    email?: string;
+    phoneNumber?: string;
+    personalInfo?: Record<string, unknown>;
+  };
+
+  landownerProject?: {
+    _id: string;
+    title?: string;
+    name?: string;
+    status?: string;
+  };
   createdAt: string;
   updatedAt: string;
 }
@@ -173,11 +207,11 @@ export interface LandOwnerMatch {
 export interface ProjectProgress {
   offerId: string;
   currentPhase:
-  | "planning"
-  | "planting"
-  | "growing"
-  | "harvesting"
-  | "completed";
+    | "planning"
+    | "planting"
+    | "growing"
+    | "harvesting"
+    | "completed";
   progressPercentage: number;
   startDate: string;
   expectedEndDate: string;
@@ -218,12 +252,12 @@ export interface Agreement {
     additionalTerms?: Record<string, string | number | boolean>;
   };
   status:
-  | "draft"
-  | "pending-signature"
-  | "signed"
-  | "active"
-  | "completed"
-  | "terminated";
+    | "draft"
+    | "pending-signature"
+    | "signed"
+    | "active"
+    | "completed"
+    | "terminated";
   createdAt: string;
   signedAt?: string;
   documentUrl?: string;

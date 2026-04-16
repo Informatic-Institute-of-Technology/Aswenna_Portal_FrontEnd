@@ -10,8 +10,7 @@ import {
 import { Dialog, DialogContent, IconButton } from "@mui/material";
 import { useMemo, useState } from "react";
 import { RingChart } from "./components";
-import { FarmerPaymentInstallmentDialog } from "./FarmerPaymentInstallmentPage";
- 
+
 interface RawProjMs {
   id: string;
   title: string;
@@ -21,7 +20,7 @@ interface RawProjMs {
   payment?: number;
   tasks?: { total: number };
 }
- 
+
 interface RawProjPmt {
   id: string;
   milestoneId: string;
@@ -30,7 +29,7 @@ interface RawProjPmt {
   paidDate?: string;
   status: string;
 }
- 
+
 interface RawFarmerProject {
   id: string;
   projectId: string;
@@ -49,7 +48,7 @@ interface RawFarmerProject {
   investorName?: string;
   investorAmount?: number;
 }
- 
+
 interface LineItem {
   id: string;
   title: string;
@@ -61,14 +60,14 @@ interface LineItem {
   detail: string;
   showReceiptLink?: boolean;
 }
- 
+
 export interface FarmerPaymentDetailProps {
   projectId?: string;
   paymentId?: string;
   onClose?: () => void;
   isDialog?: boolean;
 }
- 
+
 const fmtD = (iso: string) =>
   iso
     ? new Date(iso).toLocaleDateString("en-US", {
@@ -77,7 +76,7 @@ const fmtD = (iso: string) =>
         year: "numeric",
       })
     : "";
- 
+
 export function FarmerPaymentDetailContent({
   projectId,
   paymentId,
@@ -86,12 +85,12 @@ export function FarmerPaymentDetailContent({
   const [payInitialIds, setPayInitialIds] = useState<string[] | undefined>(
     undefined,
   );
- 
+
   const openPayForItem = (itemId: string) => {
     setPayInitialIds([itemId]);
     setPayOpen(true);
   };
- 
+
   const project = useMemo((): RawFarmerProject | null => {
     if (!projectId) return null;
     return (
@@ -100,7 +99,7 @@ export function FarmerPaymentDetailContent({
       ) ?? null
     );
   }, [projectId]);
- 
+
   const repaymentItems = useMemo((): LineItem[] => {
     if (!project) return [];
     const paymentMap: Record<string, RawProjPmt> = Object.fromEntries(
@@ -118,7 +117,7 @@ export function FarmerPaymentDetailContent({
         : isActive
           ? "pending"
           : "upcoming";
- 
+
       return {
         id: pmt?.id ?? ms.id,
         title: ms.title,
@@ -136,7 +135,7 @@ export function FarmerPaymentDetailContent({
       };
     });
   }, [project]);
- 
+
   const TOTAL = repaymentItems.reduce((s, i) => s + i.amount, 0);
   const PAID = repaymentItems
     .filter((i) => i.status === "paid")
@@ -145,7 +144,7 @@ export function FarmerPaymentDetailContent({
     .filter((i) => i.status === "pending")
     .reduce((s, i) => s + i.amount, 0);
   const PCT = TOTAL > 0 ? Math.round((PAID / TOTAL) * 100) : 0;
- 
+
   const pendingPayments = useMemo(
     (): PaymentItem[] =>
       repaymentItems
@@ -161,7 +160,7 @@ export function FarmerPaymentDetailContent({
         })),
     [repaymentItems],
   );
- 
+
   const projName = project?.projectName ?? "—";
   const projId = project ? `#${project.projectId}` : "—";
   const projLoc = project ? `${project.location}, LK` : "—";
@@ -172,7 +171,7 @@ export function FarmerPaymentDetailContent({
     (s, cb) => s + cb.estimatedCost,
     0,
   );
- 
+
   const titleSuffix = cropLabel ? ` — ${cropLabel}` : "";
   const badgeLabel = "Active Investment";
   const progressLabel = "Repayment Progress";
@@ -181,13 +180,13 @@ export function FarmerPaymentDetailContent({
   const helpText = "Questions about investment or repayment schedule?";
   const accentColor = (raw: string) =>
     raw === "overdue" ? "var(--color-overdue)" : "var(--color-olive)";
- 
+
   const currencyFmt = new Intl.NumberFormat("en-LK", {
     style: "currency",
     currency: "LKR",
     minimumFractionDigits: 0,
   });
- 
+
   return (
     <>
       <div style={{ background: "var(--bg-surface)", fontFamily: "Inter" }}>
@@ -235,7 +234,7 @@ export function FarmerPaymentDetailContent({
                 </div>
               </div>
             </div>
- 
+
             <div className="grid grid-cols-3 gap-4">
               <div
                 className="rounded-lg p-4"
@@ -281,7 +280,7 @@ export function FarmerPaymentDetailContent({
                 </p>
               </div>
             </div>
- 
+
             <div
               className="grid grid-cols-2 gap-6 pt-4"
               style={{ borderTop: "1px solid var(--bg-subtle)" }}
@@ -320,7 +319,7 @@ export function FarmerPaymentDetailContent({
                   </div>
                 </div>
               </div>
- 
+
               <div className="space-y-3">
                 <p className="text-sm font-bold">{timelineLabel}</p>
                 <div className="space-y-2 max-h-96 overflow-y-auto">
@@ -406,7 +405,7 @@ export function FarmerPaymentDetailContent({
                 </div>
               </div>
             </div>
- 
+
             <div
               className="pt-4"
               style={{ borderTop: "1px solid var(--bg-subtle)" }}
@@ -418,7 +417,7 @@ export function FarmerPaymentDetailContent({
           </div>
         </div>
       </div>
- 
+
       {payOpen && (
         <FarmerPaymentInstallmentDialog
           open={payOpen}
@@ -432,12 +431,12 @@ export function FarmerPaymentDetailContent({
     </>
   );
 }
- 
+
 export const FarmerPaymentDetailDialog = (
   props: FarmerPaymentDetailProps & { open?: boolean },
 ) => {
   if (!props.open) return null;
- 
+
   return (
     <Dialog
       open={true}
@@ -473,30 +472,21 @@ export const FarmerPaymentDetailDialog = (
     </Dialog>
   );
 };
- 
+
 export const FarmerPaymentDetailPage = (props: FarmerPaymentDetailProps) => {
   return <FarmerPaymentDetailContent {...props} />;
 };
- 
- 
+
+import { AccountBalanceWallet, Close as CloseIcon } from "@mui/icons-material";
 import {
-  AccountBalanceWallet,
-  CheckCircle,
-  Close as CloseIcon,
-} from "@mui/icons-material";
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   Box,
-  Typography,
+  Button,
+  DialogActions,
+  DialogTitle,
   LinearProgress,
+  Typography,
 } from "@mui/material";
-import { useState } from "react";
-import type { PaymentItem } from "@/types/paymentTypes";
- 
+
 export interface FarmerPaymentInstallmentDialogProps {
   open: boolean;
   paymentItems: PaymentItem[];
@@ -505,7 +495,7 @@ export interface FarmerPaymentInstallmentDialogProps {
   onClose: () => void;
   onSuccess?: (paidIds: string[]) => void;
 }
- 
+
 export const FarmerPaymentInstallmentDialog = ({
   open,
   paymentItems,
@@ -519,10 +509,10 @@ export const FarmerPaymentInstallmentDialog = ({
   );
   const [isProcessing, setIsProcessing] = useState(false);
   const [completed, setCompleted] = useState(false);
- 
+
   const selectedItems = paymentItems.filter((p) => selectedIds.has(p.id));
   const totalAmount = selectedItems.reduce((sum, item) => sum + item.amount, 0);
- 
+
   const handleToggle = (id: string) => {
     const newSet = new Set(selectedIds);
     if (newSet.has(id)) {
@@ -532,14 +522,13 @@ export const FarmerPaymentInstallmentDialog = ({
     }
     setSelectedIds(newSet);
   };
- 
+
   const handleSubmit = async () => {
     setIsProcessing(true);
-    // Simulate payment processing
     await new Promise((resolve) => setTimeout(resolve, 2000));
     setIsProcessing(false);
     setCompleted(true);
- 
+
     setTimeout(() => {
       onSuccess?.(Array.from(selectedIds));
       onClose();
@@ -547,13 +536,13 @@ export const FarmerPaymentInstallmentDialog = ({
       setSelectedIds(new Set());
     }, 1500);
   };
- 
+
   const currencyFmt = new Intl.NumberFormat("en-LK", {
     style: "currency",
     currency: "LKR",
     minimumFractionDigits: 0,
   });
- 
+
   return (
     <Dialog
       open={open}
@@ -595,7 +584,7 @@ export const FarmerPaymentInstallmentDialog = ({
           />
         )}
       </DialogTitle>
- 
+
       <DialogContent sx={{ py: 3 }}>
         {!completed ? (
           <Box sx={{ space: 3 }}>
@@ -605,7 +594,7 @@ export const FarmerPaymentInstallmentDialog = ({
             >
               Project: <strong>{projectName}</strong>
             </Typography>
- 
+
             <Box sx={{ mb: 3, space: 1.5 }}>
               {paymentItems.map((item) => (
                 <Box
@@ -695,7 +684,7 @@ export const FarmerPaymentInstallmentDialog = ({
                 </Box>
               ))}
             </Box>
- 
+
             <Box
               sx={{
                 p: 2,
@@ -757,7 +746,7 @@ export const FarmerPaymentInstallmentDialog = ({
           </Box>
         )}
       </DialogContent>
- 
+
       <DialogActions
         sx={{
           p: 2,
@@ -797,7 +786,7 @@ export const FarmerPaymentInstallmentDialog = ({
           </Button>
         )}
       </DialogActions>
- 
+
       {isProcessing && (
         <LinearProgress
           sx={{
@@ -811,5 +800,3 @@ export const FarmerPaymentInstallmentDialog = ({
     </Dialog>
   );
 };
- 
- 

@@ -1,3 +1,5 @@
+import { AppButton } from "../../../../shared/components";
+
 interface GhostButtonProps {
   href?: string;
   icon?: React.ReactNode;
@@ -13,39 +15,16 @@ export function GhostButton({
   children,
   onClick,
 }: GhostButtonProps) {
-  const baseClasses =
-    "inline-flex items-center justify-center gap-2 font-semibold text-white transition-all hover:opacity-80 active:scale-[0.97]";
-
-  if (href) {
-    return (
-      <a
-        href={href}
-        className={`${baseClasses} ${className}`}
-        style={{
-          color: "var(--text-secondary)",
-          border: "1px solid var(--bg-subtle)",
-          textDecoration: "none",
-        }}
-      >
-        {icon}
-        {children}
-      </a>
-    );
-  }
-
   return (
-    <button
+    <AppButton
+      href={href}
       onClick={onClick}
-      className={`${baseClasses} ${className}`}
-      style={{
-        color: "var(--text-secondary)",
-        border: "1px solid var(--bg-subtle)",
-        background: "var(--bg-overlay)",
-      }}
+      variant="ghost"
+      size="md"
+      className={className}
+      leadingIcon={icon}
     >
-      {icon}
       {children}
-    </button>
+    </AppButton>
   );
 }
- 

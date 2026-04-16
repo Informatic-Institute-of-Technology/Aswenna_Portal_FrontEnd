@@ -134,7 +134,6 @@ const FarmerJobCard: React.FC<FarmerJobCardProps> = ({
               textAlign: "center",
             }}
           >
-            {/* Name */}
             <Typography
               variant="h6"
               sx={{
@@ -148,7 +147,6 @@ const FarmerJobCard: React.FC<FarmerJobCardProps> = ({
               {job.farmerName}
             </Typography>
 
-            {/* Rating */}
             <Box
               sx={{ display: "flex", alignItems: "center", gap: 0.6, mb: 0.3 }}
             >
@@ -170,8 +168,6 @@ const FarmerJobCard: React.FC<FarmerJobCardProps> = ({
                 (24 reviews)
               </Typography>
             </Box>
-
-            {/* Location */}
             <Box
               sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 2 }}
             >
@@ -183,8 +179,6 @@ const FarmerJobCard: React.FC<FarmerJobCardProps> = ({
                 {job.district}
               </Typography>
             </Box>
-
-            {/* Stats Grid - RATE IS PROMINENT */}
             <Box
               sx={{
                 display: "grid",
@@ -279,7 +273,6 @@ const FarmerJobCard: React.FC<FarmerJobCardProps> = ({
               </Box>
             </Box>
 
-            {/* Skills - UPDATED CONTENT */}
             <Box sx={{ width: "100%", mb: 2.5 }}>
               <Box
                 sx={{
@@ -434,7 +427,6 @@ const FarmerJobCard: React.FC<FarmerJobCardProps> = ({
         },
       }}
     >
-      {/* Header */}
       <Box
         sx={{
           p: 2,

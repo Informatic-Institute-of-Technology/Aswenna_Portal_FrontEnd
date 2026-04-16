@@ -58,7 +58,7 @@ const ProjectDetailsDialog = ({
   const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
-    id: "google-map-script", // Same ID as LocationMapDialog to share loading
+    id: "google-map-script",
   });
   const [budgetExpanded, setBudgetExpanded] = useState(false);
 
@@ -173,7 +173,10 @@ const ProjectDetailsDialog = ({
   }, [project]);
 
   const landownerRentalSummary = useMemo(() => {
-    const total = landownerInstallments.reduce((sum, item) => sum + item.amount, 0);
+    const total = landownerInstallments.reduce(
+      (sum, item) => sum + item.amount,
+      0,
+    );
     const paid = landownerInstallments
       .filter((item) => item.status === "paid")
       .reduce((sum, item) => sum + item.amount, 0);
@@ -286,9 +289,7 @@ const ProjectDetailsDialog = ({
             icon: "🚨",
             timestamp: milestone.endDate,
           });
-        }
-        // Warning: In-progress milestone nearing deadline
-        else if (
+        } else if (
           milestone.status === "in-progress" &&
           daysDiff >= 0 &&
           daysDiff <= 5
@@ -375,9 +376,9 @@ const ProjectDetailsDialog = ({
         };
       case "success":
         return {
-          bg: "var(--color-lime-muted)",
-          border: "var(--color-lime)",
-          text: "var(--color-lime)",
+          bg: "rgba(133, 164, 70, 0.12)",
+          border: "#85a446",
+          text: "#85a446",
         };
       case "info":
         return {
@@ -399,20 +400,20 @@ const ProjectDetailsDialog = ({
   const getRiskColor = () => {
     switch (project.riskLevel) {
       case "LOW":
-        return "var(--color-lime)";
+        return "#85a446";
       case "MEDIUM":
         return "var(--color-amber)";
       case "HIGH":
         return "var(--color-overdue)";
       default:
-        return "var(--color-lime)";
+        return "#85a446";
     }
   };
 
   const getMilestoneStatusColor = (status: string) => {
     switch (status) {
       case "completed":
-        return "var(--color-lime)";
+        return "#85a446";
       case "in-progress":
         return "var(--color-info-blue)";
       case "delayed":
@@ -425,7 +426,7 @@ const ProjectDetailsDialog = ({
   const getPaymentStatusColor = (status: string) => {
     switch (status) {
       case "paid":
-        return "var(--color-lime)";
+        return "#85a446";
       case "pending":
         return "var(--color-amber)";
       case "overdue":
@@ -456,7 +457,7 @@ const ProjectDetailsDialog = ({
         PaperProps={{
           sx: {
             borderRadius: "16px",
-            background: "var(--bg-overlay)",
+            background: "#0a0a0a",
             maxHeight: "95vh",
           },
         }}
@@ -490,7 +491,7 @@ const ProjectDetailsDialog = ({
                 sx={{
                   bgcolor:
                     project.status === "active"
-                      ? "var(--color-lime)"
+                      ? "#85a446"
                       : project.status === "completed"
                         ? "var(--color-info-blue)"
                         : "var(--color-amber)",
@@ -511,18 +512,21 @@ const ProjectDetailsDialog = ({
           </IconButton>
         </DialogTitle>
 
-        <Divider sx={{ borderColor: "var(--surface-light)" }} />
+        <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.05)" }} />
 
-        {/* Tabs */}
         <Box
-          sx={{ borderBottom: 1, borderColor: "var(--surface-light)", px: 3 }}
+          sx={{
+            borderBottom: 1,
+            borderColor: "rgba(255, 255, 255, 0.05)",
+            px: 3,
+          }}
         >
           <Tabs
             value={activeTab}
             onChange={(_, newValue) => setActiveTab(newValue)}
             textColor="inherit"
             TabIndicatorProps={{
-              sx: { bgcolor: "var(--color-lime)" },
+              sx: { bgcolor: "#85a446" },
             }}
           >
             <Tab
@@ -543,9 +547,7 @@ const ProjectDetailsDialog = ({
             )}
             <Tab
               label={
-                isLandownerView
-                  ? "Rental Installments"
-                  : "Payments & Finance"
+                isLandownerView ? "Rental Installments" : "Payments & Finance"
               }
               sx={{
                 color: "var(--text-on-dark)",
@@ -571,9 +573,9 @@ const ProjectDetailsDialog = ({
                     sx={{
                       mb: 3,
                       p: 3,
-                      bgcolor: "var(--color-lime-muted)",
+                      bgcolor: "rgba(133, 164, 70, 0.12)",
                       borderRadius: 2,
-                      border: "1px solid var(--color-lime-muted-strong)",
+                      border: "1px solid rgba(133, 164, 70, 0.22)",
                     }}
                   >
                     <Box
@@ -620,10 +622,10 @@ const ProjectDetailsDialog = ({
                       sx={{
                         height: 12,
                         borderRadius: 6,
-                        backgroundColor: "var(--surface-light)",
+                        backgroundColor: "rgba(255, 255, 255, 0.05)",
                         "& .MuiLinearProgress-bar": {
                           borderRadius: 6,
-                          backgroundColor: "var(--color-lime)",
+                          backgroundColor: "#85a446",
                         },
                       }}
                     />
@@ -635,9 +637,9 @@ const ProjectDetailsDialog = ({
                   sx={{
                     flex: 1,
                     p: 3,
-                    bgcolor: "var(--surface-tint)",
+                    bgcolor: "#141414",
                     borderRadius: 2,
-                    border: "1px solid var(--surface-light)",
+                    border: "1px solid rgba(255, 255, 255, 0.05)",
                   }}
                 >
                   <Typography
@@ -648,7 +650,9 @@ const ProjectDetailsDialog = ({
                     sx={{ display: "flex", alignItems: "center", gap: 1 }}
                   >
                     <AttachMoney />
-                    {isLandownerView ? "Rental Payment Summary" : "Financial Summary"}
+                    {isLandownerView
+                      ? "Rental Payment Summary"
+                      : "Financial Summary"}
                   </Typography>
                   <Box
                     sx={{
@@ -661,10 +665,17 @@ const ProjectDetailsDialog = ({
                     {isLandownerView ? (
                       <>
                         <Box>
-                          <Typography variant="caption" color="var(--text-on-dark)">
+                          <Typography
+                            variant="caption"
+                            color="var(--text-on-dark)"
+                          >
                             TOTAL RENTAL VALUE
                           </Typography>
-                          <Typography variant="h5" color="white" fontWeight={700}>
+                          <Typography
+                            variant="h5"
+                            color="white"
+                            fontWeight={700}
+                          >
                             {formatCurrency(landownerRentalSummary.total)}
                           </Typography>
                         </Box>
@@ -677,7 +688,7 @@ const ProjectDetailsDialog = ({
                           </Typography>
                           <Typography
                             variant="h6"
-                            color="var(--color-lime)"
+                            color="#85a446"
                             fontWeight={600}
                           >
                             {formatCurrency(landownerRentalSummary.paid)}
@@ -715,10 +726,10 @@ const ProjectDetailsDialog = ({
                               mt: 1,
                               height: 8,
                               borderRadius: 4,
-                              backgroundColor: "var(--surface-light)",
+                              backgroundColor: "rgba(255, 255, 255, 0.05)",
                               "& .MuiLinearProgress-bar": {
                                 borderRadius: 4,
-                                backgroundColor: "var(--color-lime)",
+                                backgroundColor: "#85a446",
                               },
                             }}
                           />
@@ -734,10 +745,17 @@ const ProjectDetailsDialog = ({
                     ) : (
                       <>
                         <Box>
-                          <Typography variant="caption" color="var(--text-on-dark)">
+                          <Typography
+                            variant="caption"
+                            color="var(--text-on-dark)"
+                          >
                             TOTAL INVESTMENT
                           </Typography>
-                          <Typography variant="h5" color="white" fontWeight={700}>
+                          <Typography
+                            variant="h5"
+                            color="white"
+                            fontWeight={700}
+                          >
                             {formatCurrency(calculatedFinancials.budget)}
                           </Typography>
                         </Box>
@@ -751,7 +769,7 @@ const ProjectDetailsDialog = ({
                             </Typography>
                             <Typography
                               variant="h6"
-                              color="var(--color-lime)"
+                              color="#85a446"
                               fontWeight={600}
                             >
                               {formatCurrency(calculatedFinancials.disbursed)}
@@ -776,15 +794,21 @@ const ProjectDetailsDialog = ({
                           </Box>
                         )}
                         <Divider
-                          sx={{ borderColor: "var(--surface-light)", my: 1 }}
+                          sx={{
+                            borderColor: "rgba(255, 255, 255, 0.05)",
+                            my: 1,
+                          }}
                         />
                         <Box>
-                          <Typography variant="caption" color="var(--text-on-dark)">
+                          <Typography
+                            variant="caption"
+                            color="var(--text-on-dark)"
+                          >
                             EXPECTED ROI
                           </Typography>
                           <Typography
                             variant="h5"
-                            color="var(--color-lime)"
+                            color="#85a446"
                             fontWeight={700}
                           >
                             {project.expectedROI}%
@@ -800,9 +824,9 @@ const ProjectDetailsDialog = ({
                     sx={{
                       flex: 1,
                       p: 3,
-                      bgcolor: "var(--surface-tint)",
+                      bgcolor: "#141414",
                       borderRadius: 2,
-                      border: "1px solid var(--surface-light)",
+                      border: "1px solid rgba(255, 255, 255, 0.05)",
                     }}
                   >
                     <Typography
@@ -843,19 +867,16 @@ const ProjectDetailsDialog = ({
                           sx={{
                             flex: 1,
                             p: 2,
-                            bgcolor: "var(--color-lime-muted)",
+                            bgcolor: "rgba(133, 164, 70, 0.12)",
                             borderRadius: 1,
                           }}
                         >
-                          <Typography
-                            variant="caption"
-                            color="var(--color-lime)"
-                          >
+                          <Typography variant="caption" color="#85a446">
                             COMPLETED
                           </Typography>
                           <Typography
                             variant="h4"
-                            color="var(--color-lime)"
+                            color="#85a446"
                             fontWeight={700}
                           >
                             {calculatedMilestones.completed}
@@ -903,10 +924,10 @@ const ProjectDetailsDialog = ({
                             mt: 1,
                             height: 8,
                             borderRadius: 4,
-                            backgroundColor: "var(--surface-light)",
+                            backgroundColor: "rgba(255, 255, 255, 0.05)",
                             "& .MuiLinearProgress-bar": {
                               borderRadius: 4,
-                              backgroundColor: "var(--color-lime)",
+                              backgroundColor: "#85a446",
                             },
                           }}
                         />
@@ -933,9 +954,9 @@ const ProjectDetailsDialog = ({
                   sx={{
                     mb: 3,
                     p: 2.5,
-                    bgcolor: "var(--surface-tint)",
+                    bgcolor: "#141414",
                     borderRadius: 2,
-                    border: "1px solid var(--surface-light)",
+                    border: "1px solid rgba(255, 255, 255, 0.05)",
                   }}
                 >
                   <Typography
@@ -959,7 +980,7 @@ const ProjectDetailsDialog = ({
                           (n) => n.type === "critical",
                         )
                           ? "var(--color-overdue)"
-                          : "var(--color-lime)",
+                          : "#85a446",
                         color: "white",
                         fontWeight: 700,
                         height: 20,
@@ -980,10 +1001,10 @@ const ProjectDetailsDialog = ({
                         borderRadius: "3px",
                       },
                       "&::-webkit-scrollbar-thumb": {
-                        background: "var(--surface-light)",
+                        background: "rgba(255, 255, 255, 0.05)",
                         borderRadius: "3px",
                         "&:hover": {
-                          background: "var(--surface-light)",
+                          background: "rgba(255, 255, 255, 0.05)",
                         },
                       },
                     }}
@@ -1102,9 +1123,9 @@ const ProjectDetailsDialog = ({
                 sx={{
                   mb: 3,
                   p: 3,
-                  bgcolor: "var(--surface-tint)",
+                  bgcolor: "#141414",
                   borderRadius: 2,
-                  border: "1px solid var(--surface-light)",
+                  border: "1px solid rgba(255, 255, 255, 0.05)",
                 }}
               >
                 <Typography
@@ -1120,16 +1141,16 @@ const ProjectDetailsDialog = ({
                     sx={{
                       flex: 1,
                       p: 2,
-                      bgcolor: "var(--color-lime-muted)",
+                      bgcolor: "rgba(133, 164, 70, 0.12)",
                       borderRadius: 2,
-                      border: "1px solid var(--color-lime-border)",
+                      border: "1px solid rgba(133, 164, 70, 0.25)",
                     }}
                   >
                     <Chip
                       label="Farmer"
                       size="small"
                       sx={{
-                        bgcolor: "var(--color-lime)",
+                        bgcolor: "#85a446",
                         color: "white",
                         fontWeight: 700,
                         mb: 2,
@@ -1148,7 +1169,7 @@ const ProjectDetailsDialog = ({
                         sx={{
                           width: 56,
                           height: 56,
-                          border: "2px solid var(--color-lime)",
+                          border: "2px solid #85a446",
                         }}
                       />
                       <Box>
@@ -1292,9 +1313,9 @@ const ProjectDetailsDialog = ({
                   sx={{
                     flex: 1,
                     p: 3,
-                    bgcolor: "var(--surface-tint)",
+                    bgcolor: "#141414",
                     borderRadius: 2,
-                    border: "1px solid var(--surface-light)",
+                    border: "1px solid rgba(255, 255, 255, 0.05)",
                   }}
                 >
                   <Typography
@@ -1307,7 +1328,6 @@ const ProjectDetailsDialog = ({
                     <LocationOn /> Location Details
                   </Typography>
                   <Box sx={{ mt: 2, display: "flex", gap: 3 }}>
-                    {/* Left side - Location text details */}
                     <Box
                       sx={{
                         flex: 1,
@@ -1365,7 +1385,6 @@ const ProjectDetailsDialog = ({
                       )}
                     </Box>
 
-                    {/* Right side - Embedded Map */}
                     {project.coordinates && isLoaded && (
                       <Box
                         sx={{
@@ -1373,7 +1392,7 @@ const ProjectDetailsDialog = ({
                           height: 220,
                           borderRadius: 2,
                           overflow: "hidden",
-                          border: "2px solid var(--color-lime-border)",
+                          border: "2px solid rgba(133, 164, 70, 0.25)",
                         }}
                       >
                         <GoogleMap
@@ -1503,7 +1522,6 @@ const ProjectDetailsDialog = ({
                     )}
                   </Box>
 
-                  {/* Button below both sections */}
                   {project.coordinates && (
                     <Button
                       variant="outlined"
@@ -1512,14 +1530,14 @@ const ProjectDetailsDialog = ({
                       onClick={() => setMapDialogOpen(true)}
                       sx={{
                         mt: 2,
-                        borderColor: "var(--color-lime)",
-                        color: "var(--color-lime)",
+                        borderColor: "#85a446",
+                        color: "#85a446",
                         textTransform: "none",
                         fontWeight: 600,
                         py: 1.5,
                         "&:hover": {
-                          borderColor: "var(--color-lime-hover)",
-                          bgcolor: "var(--color-lime-muted)",
+                          borderColor: "#93b34e",
+                          bgcolor: "rgba(133, 164, 70, 0.12)",
                         },
                       }}
                     >
@@ -1528,14 +1546,13 @@ const ProjectDetailsDialog = ({
                   )}
                 </Box>
 
-                {/* Risk Assessment */}
                 <Box
                   sx={{
                     flex: 1,
                     p: 3,
-                    bgcolor: "var(--surface-tint)",
+                    bgcolor: "#141414",
                     borderRadius: 2,
-                    border: "1px solid var(--surface-light)",
+                    border: "1px solid rgba(255, 255, 255, 0.05)",
                   }}
                 >
                   <Typography
@@ -1564,11 +1581,11 @@ const ProjectDetailsDialog = ({
                           sx={{ display: "flex", alignItems: "center", gap: 1 }}
                         >
                           <CheckCircle
-                            sx={{ color: "var(--color-lime)", fontSize: 24 }}
+                            sx={{ color: "#85a446", fontSize: 24 }}
                           />
                           <Typography
                             variant="body1"
-                            color="var(--color-lime)"
+                            color="#85a446"
                             fontWeight={600}
                           >
                             No Issues Detected
@@ -1597,18 +1614,25 @@ const ProjectDetailsDialog = ({
             </Box>
           )}
 
-          {/* Milestones Tab */}
           {activeTab === 1 && !isLandownerView && (
             <Box>
-              <Typography
-                variant="h5"
-                color="white"
-                gutterBottom
-                fontWeight={600}
-                sx={{ mb: 3 }}
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}
               >
-                Project Milestones & Progress Tracking
-              </Typography>
+                {" "}
+                <Box
+                  sx={{
+                    width: 6,
+                    height: 24,
+                    borderRadius: 4,
+                    bgcolor: "#85a446",
+                  }}
+                />{" "}
+                <Typography variant="h6" color="white" fontWeight={600}>
+                  {" "}
+                  Project Milestones & Progress Tracking{" "}
+                </Typography>{" "}
+              </Box>
               {project.milestones && project.milestones.length > 0 ? (
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
                   {project.milestones.map((milestone, index) => (
@@ -1616,9 +1640,9 @@ const ProjectDetailsDialog = ({
                       key={milestone.id}
                       sx={{
                         p: 3,
-                        bgcolor: "var(--surface-tint)",
+                        bgcolor: "#141414",
                         borderRadius: 2,
-                        border: "1px solid var(--surface-light)",
+                        border: "1px solid rgba(255, 255, 255, 0.05)",
                         borderLeft: `4px solid ${getMilestoneStatusColor(milestone.status)}`,
                       }}
                     >
@@ -1700,7 +1724,7 @@ const ProjectDetailsDialog = ({
                                 </Typography>
                                 <Typography
                                   variant="body2"
-                                  color="var(--color-lime)"
+                                  color="#85a446"
                                   fontWeight={600}
                                 >
                                   {formatDate(milestone.completedDate)}
@@ -1716,7 +1740,7 @@ const ProjectDetailsDialog = ({
                               </Typography>
                               <Typography
                                 variant="body2"
-                                color="var(--color-lime)"
+                                color="#85a446"
                                 fontWeight={600}
                               >
                                 {formatCurrency(milestone.payment)}
@@ -1754,7 +1778,7 @@ const ProjectDetailsDialog = ({
                           sx={{
                             height: 10,
                             borderRadius: 5,
-                            backgroundColor: "var(--surface-light)",
+                            backgroundColor: "rgba(255, 255, 255, 0.05)",
                             "& .MuiLinearProgress-bar": {
                               borderRadius: 5,
                               backgroundColor: getMilestoneStatusColor(
@@ -1775,7 +1799,6 @@ const ProjectDetailsDialog = ({
             </Box>
           )}
 
-          {/* Payments Tab */}
           {activeTab === (isLandownerView ? 1 : 2) && (
             <Box>
               <Typography
@@ -1790,15 +1813,14 @@ const ProjectDetailsDialog = ({
                   : "Payment Schedule & Financial Breakdown"}
               </Typography>
 
-              {/* Financial Breakdown - Auto-Calculated */}
               {!isLandownerView && calculatedBudgetBreakdown.length > 0 && (
                 <Box
                   sx={{
                     mb: 4,
                     p: 3,
-                    bgcolor: "var(--surface-tint)",
+                    bgcolor: "#141414",
                     borderRadius: 2,
-                    border: "1px solid var(--surface-light)",
+                    border: "1px solid rgba(255, 255, 255, 0.05)",
                   }}
                 >
                   <Box
@@ -1827,7 +1849,7 @@ const ProjectDetailsDialog = ({
                           }
                           onClick={() => setBudgetExpanded(!budgetExpanded)}
                           sx={{
-                            color: "var(--color-lime)",
+                            color: "#85a446",
                             textTransform: "none",
                             fontWeight: 600,
                           }}
@@ -1897,7 +1919,7 @@ const ProjectDetailsDialog = ({
                             sx={{
                               height: 10,
                               borderRadius: 5,
-                              backgroundColor: "var(--surface-light)",
+                              backgroundColor: "rgba(255, 255, 255, 0.05)",
                               "& .MuiLinearProgress-bar": {
                                 borderRadius: 5,
                                 backgroundColor: getCategoryColor(
@@ -1935,7 +1957,7 @@ const ProjectDetailsDialog = ({
                       sx={{
                         mt: 2,
                         pt: 2,
-                        borderTop: "1px solid var(--surface-light)",
+                        borderTop: "1px solid rgba(255, 255, 255, 0.05)",
                         textAlign: "center",
                       }}
                     >
@@ -1949,8 +1971,9 @@ const ProjectDetailsDialog = ({
                 </Box>
               )}
 
-              {/* Payment Schedule */}
-              {!isLandownerView && project.payments && project.payments.length > 0 ? (
+              {!isLandownerView &&
+              project.payments &&
+              project.payments.length > 0 ? (
                 <Box>
                   <Typography
                     variant="h6"
@@ -1971,7 +1994,6 @@ const ProjectDetailsDialog = ({
                   >
                     {project.payments.map((payment) => {
                       const daysRemaining = getDaysRemaining(payment.dueDate);
-                      // Determine actual display status: if pending and overdue, show as overdue
                       const displayStatus =
                         payment.status === "pending" && daysRemaining < 0
                           ? "overdue"
@@ -1982,7 +2004,7 @@ const ProjectDetailsDialog = ({
                           key={payment.id}
                           sx={{
                             p: 2.5,
-                            bgcolor: "var(--bg-elevated)",
+                            bgcolor: "#141414",
                             borderRadius: 2,
                             border: "1px solid var(--border-subtle)",
                             borderLeft: `4px solid ${getPaymentStatusColor(displayStatus)}`,
@@ -2044,10 +2066,7 @@ const ProjectDetailsDialog = ({
                                   Due: {formatDate(payment.dueDate)}
                                 </Typography>
                                 {payment.paidDate && (
-                                  <Typography
-                                    variant="body2"
-                                    color="var(--color-lime)"
-                                  >
+                                  <Typography variant="body2" color="#85a446">
                                     <CheckCircle
                                       sx={{
                                         fontSize: 14,
@@ -2104,17 +2123,16 @@ const ProjectDetailsDialog = ({
                     })}
                   </Box>
 
-                  {/* Commission Earnings Summary for Commission-Based Projects */}
                   {project.investmentType === "commission" &&
                     project.earnedCommission !== undefined &&
                     project.earnedCommission > 0 && (
                       <Box
                         sx={{
                           p: 2.5,
-                          bgcolor: "var(--surface-tint)",
+                          bgcolor: "#141414",
                           borderRadius: 2,
-                          border: "1px solid var(--surface-light)",
-                          borderLeft: `4px solid var(--color-lime)`,
+                          border: "1px solid rgba(255, 255, 255, 0.05)",
+                          borderLeft: `4px solid #85a446`,
                           mt: 2,
                         }}
                       >
@@ -2145,7 +2163,7 @@ const ProjectDetailsDialog = ({
                                 label={`${project.commissionRate}% RATE`}
                                 size="small"
                                 sx={{
-                                  bgcolor: "var(--color-lime)",
+                                  bgcolor: "#85a446",
                                   color: "white",
                                   fontWeight: 600,
                                   fontSize: "0.75rem",
@@ -2155,7 +2173,7 @@ const ProjectDetailsDialog = ({
                                 label="INVESTOR INCOME"
                                 size="small"
                                 sx={{
-                                  bgcolor: "var(--color-lime)",
+                                  bgcolor: "#85a446",
                                   color: "white",
                                   fontWeight: 600,
                                   fontSize: "0.75rem",
@@ -2175,7 +2193,7 @@ const ProjectDetailsDialog = ({
                           </Box>
                           <Typography
                             variant="h6"
-                            color="var(--color-lime)"
+                            color="#85a446"
                             fontWeight={700}
                           >
                             {formatCurrency(project.earnedCommission)}
@@ -2190,18 +2208,20 @@ const ProjectDetailsDialog = ({
                 </Typography>
               ) : null}
 
-              {/* Land Rental Section */}
               {isLandownerView && (
                 <Box sx={{ mt: 4 }}>
                   <Box
                     sx={{
                       mb: 2,
                       p: 2,
-                      bgcolor: "var(--surface-tint)",
+                      bgcolor: "#141414",
                       borderRadius: 2,
-                      border: "1px solid var(--surface-light)",
+                      border: "1px solid rgba(255, 255, 255, 0.05)",
                       display: "grid",
-                      gridTemplateColumns: { xs: "1fr 1fr", md: "repeat(4, 1fr)" },
+                      gridTemplateColumns: {
+                        xs: "1fr 1fr",
+                        md: "repeat(4, 1fr)",
+                      },
                       gap: 1.5,
                     }}
                   >
@@ -2209,7 +2229,11 @@ const ProjectDetailsDialog = ({
                       <Typography variant="caption" color="var(--text-on-dark)">
                         TOTAL RENTAL
                       </Typography>
-                      <Typography variant="subtitle1" color="white" fontWeight={700}>
+                      <Typography
+                        variant="subtitle1"
+                        color="white"
+                        fontWeight={700}
+                      >
                         {formatCurrency(landownerRentalSummary.total)}
                       </Typography>
                     </Box>
@@ -2217,7 +2241,11 @@ const ProjectDetailsDialog = ({
                       <Typography variant="caption" color="var(--text-on-dark)">
                         COMPLETED
                       </Typography>
-                      <Typography variant="subtitle1" color="var(--color-lime)" fontWeight={700}>
+                      <Typography
+                        variant="subtitle1"
+                        color="#85a446"
+                        fontWeight={700}
+                      >
                         {formatCurrency(landownerRentalSummary.paid)}
                       </Typography>
                     </Box>
@@ -2225,7 +2253,11 @@ const ProjectDetailsDialog = ({
                       <Typography variant="caption" color="var(--text-on-dark)">
                         PENDING
                       </Typography>
-                      <Typography variant="subtitle1" color="var(--color-amber)" fontWeight={700}>
+                      <Typography
+                        variant="subtitle1"
+                        color="var(--color-amber)"
+                        fontWeight={700}
+                      >
                         {formatCurrency(landownerRentalSummary.pending)}
                       </Typography>
                     </Box>
@@ -2233,7 +2265,11 @@ const ProjectDetailsDialog = ({
                       <Typography variant="caption" color="var(--text-on-dark)">
                         OVERDUE
                       </Typography>
-                      <Typography variant="subtitle1" color="var(--color-overdue)" fontWeight={700}>
+                      <Typography
+                        variant="subtitle1"
+                        color="var(--color-overdue)"
+                        fontWeight={700}
+                      >
                         {formatCurrency(landownerRentalSummary.overdue)}
                       </Typography>
                     </Box>
@@ -2259,138 +2295,135 @@ const ProjectDetailsDialog = ({
                       sx={{ display: "flex", flexDirection: "column", gap: 2 }}
                     >
                       {landownerInstallments.map((rental) => (
-                      <Box
-                        key={rental.id}
-                        sx={{
-                          p: 2.5,
-                          bgcolor: "var(--bg-elevated)",
-                          borderRadius: 2,
-                          border: "1px solid var(--color-orange-border)",
-                          borderLeft: `4px solid ${
-                            rental.status === "paid"
-                              ? "var(--color-olive)"
-                              : rental.status === "overdue"
-                                ? "var(--color-overdue)"
-                                : "var(--color-info)"
-                          }`,
-                        }}
-                      >
                         <Box
+                          key={rental.id}
                           sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
+                            p: 2.5,
+                            bgcolor: "#141414",
+                            borderRadius: 2,
+                            border: "1px solid var(--color-orange-border)",
+                            borderLeft: `4px solid ${
+                              rental.status === "paid"
+                                ? "var(--color-olive)"
+                                : rental.status === "overdue"
+                                  ? "var(--color-overdue)"
+                                  : "var(--color-info)"
+                            }`,
                           }}
                         >
-                          <Box sx={{ flex: 1 }}>
-                            <Box
-                              sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 2,
-                                mb: 1,
-                              }}
-                            >
-                              <Typography
-                                variant="body1"
-                                color="white"
-                                fontWeight={600}
-                              >
-                                {rental.title}
-                              </Typography>
-                              <Chip
-                                label={rental.status.toUpperCase()}
-                                size="small"
-                                sx={{
-                                  bgcolor:
-                                    rental.status === "paid"
-                                      ? "var(--color-olive)"
-                                      : rental.status === "overdue"
-                                        ? "var(--color-overdue)"
-                                        : "var(--color-info)",
-                                  color: "white",
-                                  fontWeight: 600,
-                                  fontSize: "0.75rem",
-                                }}
-                              />
-                            </Box>
-                            <Box
-                              sx={{
-                                display: "flex",
-                                gap: 4,
-                                alignItems: "center",
-                                flexWrap: "wrap",
-                              }}
-                            >
-                              <Typography
-                                variant="body2"
-                                color="var(--text-on-dark)"
-                              >
-                                <Landscape
-                                  sx={{
-                                    fontSize: 13,
-                                    mr: 0.5,
-                                    verticalAlign: "middle",
-                                    color: "var(--color-orange)",
-                                  }}
-                                />
-                                {rental.landArea || "Monthly rental"}
-                              </Typography>
-                              <Typography
-                                variant="body2"
-                                color="var(--text-on-dark)"
-                              >
-                                <CalendarToday
-                                  sx={{
-                                    fontSize: 14,
-                                    mr: 0.5,
-                                    verticalAlign: "middle",
-                                  }}
-                                />
-                                Due: {formatDate(rental.dueDate)}
-                              </Typography>
-                              {rental.paidDate && (
-                                <Typography
-                                  variant="body2"
-                                  color="var(--color-lime)"
-                                >
-                                  <CheckCircle
-                                    sx={{
-                                      fontSize: 14,
-                                      mr: 0.5,
-                                      verticalAlign: "middle",
-                                    }}
-                                  />
-                                  Paid: {formatDate(rental.paidDate)}
-                                </Typography>
-                              )}
-                              {rental.status === "overdue" && (
-                                <Typography
-                                  variant="body2"
-                                  color="var(--color-overdue)"
-                                >
-                                  <WarningAmber
-                                    sx={{
-                                      fontSize: 14,
-                                      mr: 0.5,
-                                      verticalAlign: "middle",
-                                    }}
-                                  />
-                                  {Math.abs(getDaysRemaining(rental.dueDate))}{" "}
-                                  days overdue
-                                </Typography>
-                              )}
-                            </Box>
-                          </Box>
-                          <Typography
-                            variant="h6"
-                            color="white"
-                            fontWeight={700}
+                          <Box
+                            sx={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                            }}
                           >
-                            {formatCurrency(rental.amount)}
-                          </Typography>
+                            <Box sx={{ flex: 1 }}>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 2,
+                                  mb: 1,
+                                }}
+                              >
+                                <Typography
+                                  variant="body1"
+                                  color="white"
+                                  fontWeight={600}
+                                >
+                                  {rental.title}
+                                </Typography>
+                                <Chip
+                                  label={rental.status.toUpperCase()}
+                                  size="small"
+                                  sx={{
+                                    bgcolor:
+                                      rental.status === "paid"
+                                        ? "var(--color-olive)"
+                                        : rental.status === "overdue"
+                                          ? "var(--color-overdue)"
+                                          : "var(--color-info)",
+                                    color: "white",
+                                    fontWeight: 600,
+                                    fontSize: "0.75rem",
+                                  }}
+                                />
+                              </Box>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  gap: 4,
+                                  alignItems: "center",
+                                  flexWrap: "wrap",
+                                }}
+                              >
+                                <Typography
+                                  variant="body2"
+                                  color="var(--text-on-dark)"
+                                >
+                                  <Landscape
+                                    sx={{
+                                      fontSize: 13,
+                                      mr: 0.5,
+                                      verticalAlign: "middle",
+                                      color: "var(--color-orange)",
+                                    }}
+                                  />
+                                  {rental.landArea || "Monthly rental"}
+                                </Typography>
+                                <Typography
+                                  variant="body2"
+                                  color="var(--text-on-dark)"
+                                >
+                                  <CalendarToday
+                                    sx={{
+                                      fontSize: 14,
+                                      mr: 0.5,
+                                      verticalAlign: "middle",
+                                    }}
+                                  />
+                                  Due: {formatDate(rental.dueDate)}
+                                </Typography>
+                                {rental.paidDate && (
+                                  <Typography variant="body2" color="#85a446">
+                                    <CheckCircle
+                                      sx={{
+                                        fontSize: 14,
+                                        mr: 0.5,
+                                        verticalAlign: "middle",
+                                      }}
+                                    />
+                                    Paid: {formatDate(rental.paidDate)}
+                                  </Typography>
+                                )}
+                                {rental.status === "overdue" && (
+                                  <Typography
+                                    variant="body2"
+                                    color="var(--color-overdue)"
+                                  >
+                                    <WarningAmber
+                                      sx={{
+                                        fontSize: 14,
+                                        mr: 0.5,
+                                        verticalAlign: "middle",
+                                      }}
+                                    />
+                                    {Math.abs(getDaysRemaining(rental.dueDate))}{" "}
+                                    days overdue
+                                  </Typography>
+                                )}
+                              </Box>
+                            </Box>
+                            <Typography
+                              variant="h6"
+                              color="white"
+                              fontWeight={700}
+                            >
+                              {formatCurrency(rental.amount)}
+                            </Typography>
+                          </Box>
                         </Box>
-                      </Box>
                       ))}
                     </Box>
                   ) : (
@@ -2427,12 +2460,12 @@ const ProjectDetailsDialog = ({
                     startIcon={<LocationOn />}
                     onClick={() => setMapDialogOpen(true)}
                     sx={{
-                      bgcolor: "var(--color-lime)",
+                      bgcolor: "#85a446",
                       color: "white",
                       textTransform: "none",
                       fontWeight: 600,
                       "&:hover": {
-                        bgcolor: "var(--color-lime-hover)",
+                        bgcolor: "#93b34e",
                       },
                     }}
                   >
@@ -2561,15 +2594,14 @@ const ProjectDetailsDialog = ({
                     </Box>
                   </Box>
 
-                  {/* Other Team Members */}
                   {project.partyMembers.map((member) => (
                     <Box
                       key={member.id}
                       sx={{
                         p: 3,
-                        bgcolor: "var(--surface-tint)",
+                        bgcolor: "#141414",
                         borderRadius: 2,
-                        border: "1px solid var(--surface-light)",
+                        border: "1px solid rgba(255, 255, 255, 0.05)",
                       }}
                     >
                       <Box sx={{ display: "flex", gap: 3 }}>
@@ -2578,7 +2610,7 @@ const ProjectDetailsDialog = ({
                           sx={{
                             width: 80,
                             height: 80,
-                            border: "3px solid var(--color-lime-border)",
+                            border: "3px solid rgba(133, 164, 70, 0.25)",
                           }}
                         />
                         <Box sx={{ flex: 1 }}>
@@ -2603,7 +2635,7 @@ const ProjectDetailsDialog = ({
                               sx={{
                                 bgcolor:
                                   member.role === "farmer"
-                                    ? "var(--color-lime)"
+                                    ? "#85a446"
                                     : member.role === "investor"
                                       ? "var(--color-info-blue)"
                                       : "var(--color-orange)",
@@ -2728,7 +2760,7 @@ const ProjectDetailsDialog = ({
           )}
         </DialogContent>
 
-        <Divider sx={{ borderColor: "var(--surface-light)" }} />
+        <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.05)" }} />
 
         <DialogActions sx={{ p: 3, justifyContent: "space-between" }}>
           <Button
@@ -2736,11 +2768,11 @@ const ProjectDetailsDialog = ({
             variant="outlined"
             sx={{
               color: "white",
-              borderColor: "var(--surface-light)",
+              borderColor: "rgba(255, 255, 255, 0.05)",
               textTransform: "none",
               px: 3,
               "&:hover": {
-                borderColor: "var(--surface-light)",
+                borderColor: "rgba(255, 255, 255, 0.05)",
                 bgcolor: "var(--surface-muted)",
               },
             }}
@@ -2750,13 +2782,13 @@ const ProjectDetailsDialog = ({
           <Button
             variant="contained"
             sx={{
-              bgcolor: "var(--color-lime)",
+              bgcolor: "#85a446",
               color: "white",
               textTransform: "none",
               px: 4,
               fontWeight: 600,
               "&:hover": {
-                bgcolor: "var(--color-lime-hover)",
+                bgcolor: "#93b34e",
               },
             }}
           >
@@ -2765,7 +2797,6 @@ const ProjectDetailsDialog = ({
         </DialogActions>
       </Dialog>
 
-      {/* Location Map Dialog - Separate from main dialog */}
       {project.partyMembers && project.coordinates && (
         <LocationMapDialog
           open={mapDialogOpen}

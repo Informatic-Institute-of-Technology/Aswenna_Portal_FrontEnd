@@ -22,6 +22,7 @@ import {
   Divider,
   IconButton,
   Stack,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import type { ReactNode } from "react";
@@ -94,136 +95,159 @@ const FarmerOpportunityOfferCard = ({
     : (cd?.sponsorshipTitle ?? "Untitled");
   const bgUrl = resolveBgUrl(offer.backgroundImage);
 
-  const stats: Array<{ label: string; value: string; icon: ReactNode }> =
-    isHarvest
-      ? [
-          {
-            label: "Quantity Needed",
-            value:
-              `${hd?.requiredQuantity ?? 0} ${hd?.quantityUnit ?? ""}`.trim(),
-            icon: (
-              <ScaleOutlined
-                sx={{ fontSize: 14, color: "primary.main", mt: 0.2 }}
-              />
-            ),
-          },
-          ...(hd?.totalBudget && hd.totalBudget > 0
-            ? [
-                {
-                  label: "Total Budget",
-                  value: formatCurrency(hd.totalBudget),
-                  icon: (
-                    <MonetizationOn
-                      sx={{ fontSize: 14, color: "success.main", mt: 0.2 }}
-                    />
-                  ),
-                },
-              ]
-            : []),
-          ...(hd?.pricePerUnit && hd.pricePerUnit > 0
-            ? [
-                {
-                  label: "Price / Unit",
-                  value: formatCurrency(hd.pricePerUnit),
-                  icon: (
-                    <MonetizationOn
-                      sx={{ fontSize: 14, color: "warning.main", mt: 0.2 }}
-                    />
-                  ),
-                },
-              ]
-            : []),
-          ...(offer.expectedROI > 0
-            ? [
-                {
-                  label: "Expected ROI",
-                  value: `${offer.expectedROI}%`,
-                  icon: (
-                    <Percent
-                      sx={{ fontSize: 14, color: "info.main", mt: 0.2 }}
-                    />
-                  ),
-                },
-              ]
-            : []),
-          ...(hd?.deliveryLocation
-            ? [
-                {
-                  label: "Delivery",
-                  value: hd.deliveryLocation,
-                  icon: (
-                    <LocationOn
-                      sx={{ fontSize: 14, color: "error.main", mt: 0.2 }}
-                    />
-                  ),
-                },
-              ]
-            : []),
-        ]
-      : [
-          ...((cd?.minimumInvestment ?? 0) > 0 ||
-          (cd?.maximumInvestment ?? 0) > 0
-            ? [
-                {
-                  label: "Investment Range",
-                  value: `${formatCurrency(cd?.minimumInvestment ?? 0)} – ${formatCurrency(cd?.maximumInvestment ?? 0)}`,
-                  icon: (
-                    <MonetizationOn
-                      sx={{ fontSize: 14, color: "success.main", mt: 0.2 }}
-                    />
-                  ),
-                },
-              ]
-            : []),
-          ...((cd?.commissionRate ?? 0) > 0
-            ? [
-                {
-                  label: "Commission Rate",
-                  value: `${cd?.commissionRate ?? 0}%`,
-                  icon: (
-                    <Percent
-                      sx={{ fontSize: 14, color: "info.main", mt: 0.2 }}
-                    />
-                  ),
-                },
-              ]
-            : []),
-          ...(offer.expectedROI > 0
-            ? [
-                {
-                  label: "Expected ROI",
-                  value: `${offer.expectedROI}%`,
-                  icon: (
-                    <MonetizationOn
-                      sx={{ fontSize: 14, color: "warning.main", mt: 0.2 }}
-                    />
-                  ),
-                },
-              ]
-            : []),
-          {
-            label: "Method",
-            value: cd?.preferredFarmingMethod ?? "Any",
-            icon: (
-              <Agriculture
-                sx={{ fontSize: 14, color: "primary.main", mt: 0.2 }}
-              />
-            ),
-          },
-          ...(supportTypes.length > 0
-            ? [
-                {
-                  label: "Support",
-                  value: supportTypes.join(", "),
-                  icon: (
-                    <Groups
-                      sx={{ fontSize: 14, color: "secondary.main", mt: 0.2 }}
-                    />
-                  ),
-                },
-              ]
-            : []),
-        ];
+  const formatPartyLabel = (
+    name?: string,
+    id?: string,
+    fallback: string = "Not assigned",
+  ) => {
+    if (name && id) return `${name} (${id})`;
+    if (name) return name;
+    if (id) return `ID: ${id}`;
+    return fallback;
+  };
+
+  const investorLabel = offer.investor?.fullName ?? "Investor not assigned";
+  const landOwnerLabel = formatPartyLabel(
+    offer.landOwnerName,
+    offer.landOwnerId,
+    "Landowner not assigned",
+  );
+
+  const truncateWithEllipsis = (value: string, maxChars: number) => {
+    if (value.length <= maxChars) return value;
+    return `${value.slice(0, maxChars - 1)}…`;
+  };
+
+  const stats: Array<{
+    label: string;
+    value: string;
+    icon: ReactNode;
+    tooltip?: string;
+  }> = isHarvest
+    ? [
+        {
+          label: "Quantity Needed",
+          value:
+            `${hd?.requiredQuantity ?? 0} ${hd?.quantityUnit ?? ""}`.trim(),
+          icon: (
+            <ScaleOutlined
+              sx={{ fontSize: 14, color: "primary.main", mt: 0.2 }}
+            />
+          ),
+        },
+        ...(hd?.totalBudget && hd.totalBudget > 0
+          ? [
+              {
+                label: "Total Budget",
+                value: formatCurrency(hd.totalBudget),
+                icon: (
+                  <MonetizationOn
+                    sx={{ fontSize: 14, color: "success.main", mt: 0.2 }}
+                  />
+                ),
+              },
+            ]
+          : []),
+        ...(hd?.pricePerUnit && hd.pricePerUnit > 0
+          ? [
+              {
+                label: "Price / Unit",
+                value: formatCurrency(hd.pricePerUnit),
+                icon: (
+                  <MonetizationOn
+                    sx={{ fontSize: 14, color: "warning.main", mt: 0.2 }}
+                  />
+                ),
+              },
+            ]
+          : []),
+        ...(offer.expectedROI > 0
+          ? [
+              {
+                label: "Expected ROI",
+                value: `${offer.expectedROI}%`,
+                icon: (
+                  <Percent sx={{ fontSize: 14, color: "info.main", mt: 0.2 }} />
+                ),
+              },
+            ]
+          : []),
+        ...(hd?.deliveryLocation
+          ? [
+              {
+                label: "Delivery",
+                value: truncateWithEllipsis(hd.deliveryLocation, 32),
+                tooltip: hd.deliveryLocation,
+                icon: (
+                  <LocationOn
+                    sx={{ fontSize: 14, color: "error.main", mt: 0.2 }}
+                  />
+                ),
+              },
+            ]
+          : []),
+      ]
+    : [
+        ...((cd?.minimumInvestment ?? 0) > 0 || (cd?.maximumInvestment ?? 0) > 0
+          ? [
+              {
+                label: "Investment Range",
+                value: `${formatCurrency(cd?.minimumInvestment ?? 0)} – ${formatCurrency(cd?.maximumInvestment ?? 0)}`,
+                icon: (
+                  <MonetizationOn
+                    sx={{ fontSize: 14, color: "success.main", mt: 0.2 }}
+                  />
+                ),
+              },
+            ]
+          : []),
+        ...((cd?.commissionRate ?? 0) > 0
+          ? [
+              {
+                label: "Commission Rate",
+                value: `${cd?.commissionRate ?? 0}%`,
+                icon: (
+                  <Percent sx={{ fontSize: 14, color: "info.main", mt: 0.2 }} />
+                ),
+              },
+            ]
+          : []),
+        ...(offer.expectedROI > 0
+          ? [
+              {
+                label: "Expected ROI",
+                value: `${offer.expectedROI}%`,
+                icon: (
+                  <MonetizationOn
+                    sx={{ fontSize: 14, color: "warning.main", mt: 0.2 }}
+                  />
+                ),
+              },
+            ]
+          : []),
+        {
+          label: "Method",
+          value: cd?.preferredFarmingMethod ?? "Any",
+          icon: (
+            <Agriculture
+              sx={{ fontSize: 14, color: "primary.main", mt: 0.2 }}
+            />
+          ),
+        },
+        ...(supportTypes.length > 0
+          ? [
+              {
+                label: "Support",
+                value: supportTypes.join(", "),
+                icon: (
+                  <Groups
+                    sx={{ fontSize: 14, color: "secondary.main", mt: 0.2 }}
+                  />
+                ),
+              },
+            ]
+          : []),
+      ];
 
   const visibleStats = stats.slice(0, 4);
 
@@ -275,18 +299,6 @@ const FarmerOpportunityOfferCard = ({
               flexWrap: "wrap",
             }}
           >
-            <Chip
-              label={isHarvest ? "Harvest Offer" : "Sponsorship"}
-              size="small"
-              sx={{
-                background: isHarvest
-                  ? "rgba(76,175,80,0.85)"
-                  : "rgba(33,150,243,0.85)",
-                color: "#fff",
-                fontWeight: 600,
-                fontSize: "0.68rem",
-              }}
-            />
             <Chip
               label="Awaiting Farmers"
               size="small"
@@ -352,33 +364,50 @@ const FarmerOpportunityOfferCard = ({
             mb: 1.5,
           }}
         >
-          {visibleStats.map((stat, index) => (
-            <Box
-              key={`${stat.label}-${index}`}
-              sx={{ display: "flex", alignItems: "flex-start", gap: 0.5 }}
-            >
-              {stat.icon}
-              <Box>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  display="block"
-                >
-                  {stat.label}
-                </Typography>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    fontWeight: 700,
-                    textTransform:
-                      stat.label === "Method" ? "capitalize" : "none",
-                  }}
-                >
-                  {stat.value}
-                </Typography>
+          {visibleStats.map((stat, index) => {
+            const valueNode = (
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: 700,
+                  textTransform:
+                    stat.label === "Method" ? "capitalize" : "none",
+                  maxWidth: 160,
+                  display: "inline-block",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {stat.value}
+              </Typography>
+            );
+
+            return (
+              <Box
+                key={`${stat.label}-${index}`}
+                sx={{ display: "flex", alignItems: "flex-start", gap: 0.5 }}
+              >
+                {stat.icon}
+                <Box>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    display="block"
+                  >
+                    {stat.label}
+                  </Typography>
+                  {stat.tooltip ? (
+                    <Tooltip title={stat.tooltip} placement="top" arrow>
+                      {valueNode}
+                    </Tooltip>
+                  ) : (
+                    valueNode
+                  )}
+                </Box>
               </Box>
-            </Box>
-          ))}
+            );
+          })}
         </Box>
 
         <Divider sx={{ mb: 1.5 }} />
@@ -386,16 +415,35 @@ const FarmerOpportunityOfferCard = ({
           sx={{
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: "flex-start",
             flexWrap: "wrap",
             gap: 0.5,
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-            <Groups sx={{ fontSize: 14, color: "text.secondary" }} />
-            <Typography variant="caption" color="text.secondary">
-              {offer.applicationsCount ?? 0} Applications
-            </Typography>
+          <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.75 }}>
+            <Groups sx={{ fontSize: 14, color: "text.secondary", mt: 0.25 }} />
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ fontWeight: 600 }}
+              >
+                Investor
+              </Typography>
+              <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                {investorLabel}
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ fontWeight: 600, mt: 0.25 }}
+              >
+                Landowner
+              </Typography>
+              <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                {landOwnerLabel}
+              </Typography>
+            </Box>
           </Box>
           {offer.expiredDate && (
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>

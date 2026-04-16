@@ -2,7 +2,7 @@ import AswendLogo from "@/assets/Aswenna Logo.png";
 import { otpService } from "@/services";
 import "@/styles/EmailVerification.css";
 import { CircularProgress, Step, StepLabel, Stepper } from "@mui/material";
-import type { FormEvent, KeyboardEvent } from "react";
+import type { ClipboardEvent, FormEvent, KeyboardEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Notification from "../shared/components/Notification";
@@ -75,7 +75,6 @@ const EmailVerification = () => {
     if (!/^\d*$/.test(value)) {
       return;
     }
-
     const newCode = [...code];
     newCode[index] = value;
     setCode(newCode);
@@ -86,24 +85,44 @@ const EmailVerification = () => {
   };
 
   const handleKeyDown = (index: number, e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && !code[index] && index > 0) {
+    if (e.key === "Backspace") {
+      e.preventDefault();
+      const newCode = [...code];
+      if (newCode[index]) {
+        newCode[index] = "";
+        setCode(newCode);
+      } else if (index > 0) {
+        newCode[index - 1] = "";
+        setCode(newCode);
+        inputRefs.current[index - 1]?.focus();
+      }
+      return;
+    }
+
+    if (e.key === "ArrowLeft" && index > 0) {
+      e.preventDefault();
       inputRefs.current[index - 1]?.focus();
+    }
+    if (e.key === "ArrowRight" && index < 5) {
+      e.preventDefault();
+      inputRefs.current[index + 1]?.focus();
     }
   };
 
-  const handlePaste = (e: React.ClipboardEvent) => {
+  const handlePaste = (e: ClipboardEvent<HTMLDivElement>) => {
     e.preventDefault();
-    const pastedData = e.clipboardData.getData("text").slice(0, 6);
-    if (!/^\d+$/.test(pastedData)) return;
+    const pasted = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, 6);
+    if (!pasted) return;
 
     const newCode = [...code];
-    for (let i = 0; i < pastedData.length && i < 6; i++) {
-      newCode[i] = pastedData[i];
+    for (let i = 0; i < pasted.length; i++) {
+      newCode[i] = pasted[i];
     }
     setCode(newCode);
-
-    const nextIndex = Math.min(pastedData.length, 5);
-    inputRefs.current[nextIndex]?.focus();
+    inputRefs.current[Math.min(pasted.length, 5)]?.focus();
   };
 
   const handleVerify = async (e: FormEvent) => {

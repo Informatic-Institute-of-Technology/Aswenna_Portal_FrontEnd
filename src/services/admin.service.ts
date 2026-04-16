@@ -443,29 +443,10 @@ class AdminService {
     }
   }
 
-  /**
-   * ============================================================================
-   * ALL PROJECTS DASHBOARD METHODS
-   * ============================================================================
-   *
-   * Handles fetching and aggregating data from multiple APIs for the
-   * All Projects dashboard (Super Admin view)
-   */
-
-  /**
-   * Fetch all active projects from all sources concurrently
-   *
-   * Data Flow:
-   * 1. Calls getFarmerProjects() → /v1/farmer-project → normalizes to UnifiedProject[]
-   * 2. Calls getInvestorOffers() → /v1/investor-offer → normalizes to UnifiedProject[]
-   * 3. Combines both results into single array
-   * 4. Caches for 5 minutes with TTL validation
-   */
   async fetchActiveProjects(useCache = true): Promise<UnifiedProject[]> {
     try {
       const cacheKey = "active:all";
 
-      // Check cache
       if (useCache && this.projectsCache.has(cacheKey)) {
         const cached = this.projectsCache.get(cacheKey);
         if (cached && Date.now() - cached.timestamp < 5 * 60 * 1000) {
@@ -481,7 +462,6 @@ class AdminService {
         this.getInvestorOffers(),
       ]);
 
-      // Combine and normalize
       const allProjects = [...farmerProjects, ...investorOffers];
       this.projectsCache.set(cacheKey, {
         data: allProjects,
@@ -500,14 +480,6 @@ class AdminService {
     }
   }
 
-  /**
-   * Fetch all projects from all sources (no status filter)
-   *
-   * Data Flow:
-   * 1. Same as fetchActiveProjects but includes all statuses
-   * 2. Fetches farmer projects (harvest + commission) and investor offers (direct-harvest + sponsorship)
-   * 3. Returns normalized UnifiedProject[] with 5-minute TTL cache
-   */
   async fetchAllProjects(useCache = true): Promise<UnifiedProject[]> {
     try {
       const cacheKey = "all:all";
@@ -545,12 +517,6 @@ class AdminService {
     }
   }
 
-  /**
-   * Fetch farmer projects (harvest and commission-based) from API and normalize
-   *
-   * API Endpoint: GET /v1/farmer-project
-   * Returns: Paginated list of farmer projects with both harvest and commission types
-   */
   private async getFarmerProjects(): Promise<UnifiedProject[]> {
     try {
       const response = await getFarmerProjects();
@@ -560,7 +526,6 @@ class AdminService {
         `📊 Fetched ${farmerProjectsData.length} farmer projects from /v1/farmer-project`,
       );
 
-      // Normalize all farmer projects to UnifiedProject format
       const normalizedProjects = farmerProjectsData.map(
         (project: FarmerProjectApiItem) => {
           const normalized = normalizeFarmerProject(project);
@@ -581,12 +546,6 @@ class AdminService {
     }
   }
 
-  /**
-   * Fetch investor offers (direct harvest and sponsorship) from API and normalize
-   *
-   * API Endpoint: GET /v1/investor-offer
-   * Returns: Paginated list of investor offers with both direct-harvest and sponsorship types
-   */
   private async getInvestorOffers(): Promise<UnifiedProject[]> {
     try {
       const response = await getInvestorOffers();
@@ -598,7 +557,6 @@ class AdminService {
 
       const normalizedProjects: UnifiedProject[] = [];
 
-      // Normalize all investor offers based on their type
       investorOffersData.forEach(
         (offer: DirectHarvestOfferAPI | SponsorshipOfferAPI) => {
           try {
@@ -635,9 +593,6 @@ class AdminService {
     }
   }
 
-  /**
-   * Fetch project by ID and normalize to UnifiedProject
-   */
   async fetchProjectById(
     projectId: string,
     sourceApi: "farmer-project" | "investor-offer",
@@ -652,7 +607,6 @@ class AdminService {
         FarmerProjectApiItem | DirectHarvestOfferAPI | SponsorshipOfferAPI
       >(endpoint);
 
-      // Normalize based on source API
       if (sourceApi === "farmer-project") {
         return normalizeFarmerProject(response as FarmerProjectApiItem);
       } else {
@@ -673,16 +627,10 @@ class AdminService {
     }
   }
 
-  /**
-   * Invalidate projects cache
-   */
   invalidateProjectsCache() {
     this.projectsCache.clear();
   }
 
-  /**
-   * Projects cache storage - stores normalized UnifiedProject[] with TTL
-   */
   private projectsCache = new Map<
     string,
     { data: UnifiedProject[]; timestamp: number }

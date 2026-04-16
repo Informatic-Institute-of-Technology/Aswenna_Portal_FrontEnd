@@ -1,3 +1,4 @@
+import AswendLogo from "@/assets/Aswenna Logo.png";
 import { useAuth } from "@/Context/useAuth";
 import {
   AccountCircle,
@@ -24,8 +25,16 @@ import {
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 
-const SuperAdminSidebar = () => {
-  const { user, sessionId, logout } = useAuth();
+interface SuperAdminSidebarProps {
+  collapsed?: boolean;
+  onLogoutRequest?: () => void;
+}
+
+const SuperAdminSidebar = ({
+  collapsed = false,
+  onLogoutRequest,
+}: SuperAdminSidebarProps) => {
+  const { sessionId, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -89,73 +98,35 @@ const SuperAdminSidebar = () => {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      <Box sx={{ p: 3, textAlign: "center" }}>
-        <Box
+      <Box sx={{ p: collapsed ? 1.5 : 3, textAlign: "center" }}>
+        <Avatar
+          src={AswendLogo}
+          alt="Aswenna Logo"
           sx={{
-            position: "relative",
-            width: 128,
-            height: 128,
-            borderRadius: "50%",
+            width: collapsed ? 44 : 120,
+            height: collapsed ? 44 : 120,
             mx: "auto",
-            mb: 2,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            "&::before": {
-              content: '""',
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              borderRadius: "50%",
-              background:
-                "linear-gradient(90deg, var(--color-brand-accent), var(--color-brand-accent), var(--color-amber), var(--color-success), var(--color-info-blue), var(--color-purple), var(--color-brand-accent))",
-              backgroundSize: "400% 400%",
-              animation: "gradient-rotate 4s linear infinite",
-              zIndex: 0,
-            },
-            "@keyframes gradient-rotate": {
-              "0%": {
-                backgroundPosition: "0% 50%",
-              },
-              "50%": {
-                backgroundPosition: "100% 50%",
-              },
-              "100%": {
-                backgroundPosition: "0% 50%",
-              },
-            },
+            mb: collapsed ? 0 : 2,
           }}
-        >
-          <Avatar
-            src={
-              "https://media.licdn.com/dms/image/v2/D5603AQGcdWrGrmsTOA/profile-displayphoto-scale_200_200/B56Zl8G7MMHMAc-/0/1758723825258?e=2147483647&v=beta&t=Uvw7_97CrvgPYSXMD5hlDV-c0V6y_fCROKYAN_Gwo10"
-            }
-            alt={user?.firstName || "Super Admin"}
-            sx={{
-              width: 124,
-              height: 124,
-              position: "relative",
-              zIndex: 1,
-              border: "3px solid var(--bg-overlay)",
-            }}
-          />
-        </Box>
-        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-          {user?.fullName || "Error"}
-        </Typography>
-        <Typography
-          variant="body2"
-          sx={{
-            color: "#03ffabff",
-            fontWeight: 600,
-            textTransform: "uppercase",
-            letterSpacing: 1,
-          }}
-        >
-          Super Administrator
-        </Typography>
+        />
+        {!collapsed && (
+          <>
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              Aswenna.lk
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                color: "#03ffabff",
+                fontWeight: 600,
+                textTransform: "uppercase",
+                letterSpacing: 1,
+              }}
+            >
+              Super Admin Portal
+            </Typography>
+          </>
+        )}
       </Box>
 
       <Divider />
@@ -166,16 +137,24 @@ const SuperAdminSidebar = () => {
             key={item.path}
             selected={location.pathname === item.path}
             onClick={() => navigate(item.path)}
+            sx={{
+              justifyContent: collapsed ? "center" : "initial",
+              px: collapsed ? 1.5 : 2,
+              py: 1.25,
+            }}
           >
             <ListItemIcon
               sx={{
                 color:
                   location.pathname === item.path ? "primary.main" : "inherit",
+                minWidth: collapsed ? 0 : 40,
+                mr: collapsed ? 0 : 1,
+                justifyContent: "center",
               }}
             >
               {item.icon}
             </ListItemIcon>
-            <ListItemText primary={item.text} />
+            {!collapsed && <ListItemText primary={item.text} />}
           </ListItemButton>
         ))}
       </List>
@@ -188,16 +167,24 @@ const SuperAdminSidebar = () => {
             key={item.path}
             selected={location.pathname === item.path}
             onClick={() => navigate(item.path)}
+            sx={{
+              justifyContent: collapsed ? "center" : "initial",
+              px: collapsed ? 1.5 : 2,
+              py: 1.25,
+            }}
           >
             <ListItemIcon
               sx={{
                 color:
                   location.pathname === item.path ? "primary.main" : "inherit",
+                minWidth: collapsed ? 0 : 40,
+                mr: collapsed ? 0 : 1,
+                justifyContent: "center",
               }}
             >
               {item.icon}
             </ListItemIcon>
-            <ListItemText primary={item.text} />
+            {!collapsed && <ListItemText primary={item.text} />}
           </ListItemButton>
         ))}
       </List>
@@ -208,10 +195,10 @@ const SuperAdminSidebar = () => {
         <Button
           fullWidth
           variant="contained"
-          startIcon={<Logout />}
-          onClick={handleLogout}
+          startIcon={collapsed ? undefined : <Logout />}
+          onClick={onLogoutRequest ?? handleLogout}
           sx={{
-            py: 1.5,
+            py: collapsed ? 1.2 : 1.5,
             fontWeight: 600,
             background: "linear-gradient(135deg, #667EEA 0%, #764BA2 100%)",
             "&:hover": {
@@ -219,7 +206,7 @@ const SuperAdminSidebar = () => {
             },
           }}
         >
-          Logout
+          {collapsed ? <Logout fontSize="small" /> : "Logout"}
         </Button>
       </Box>
     </Box>

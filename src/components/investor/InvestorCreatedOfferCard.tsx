@@ -84,6 +84,31 @@ const InvestorCreatedOfferCard = ({
 
   const bgUrl = resolveBgUrl(offer.backgroundImage);
 
+  const formatPartyLabel = (
+    name?: string,
+    id?: string,
+    fallback: string = "Not assigned",
+  ) => {
+    if (name) return name;
+    if (id) return `ID: ${id}`;
+    return fallback;
+  };
+
+  const resolvedFarmerName = offer.farmer?.fullName ?? offer.farmerName;
+  const resolvedFarmerId = offer.farmer?._id ?? offer.farmerId;
+  const farmerLabel = formatPartyLabel(
+    resolvedFarmerName,
+    resolvedFarmerId,
+    "Farmer not assigned",
+  );
+
+  const resolvedLandownerName =
+    offer.landOwnerName ?? offer.landowner?.fullName;
+  const landOwnerLabel = resolvedLandownerName ?? "Landowner not assigned";
+
+  const landProjectName =
+    offer.landownerProject?.title ?? offer.landownerProject?.name;
+
   return (
     <Card
       sx={{
@@ -129,13 +154,20 @@ const InvestorCreatedOfferCard = ({
             justifyContent: "space-between",
           }}
         >
-          <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap" }}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+              alignItems: "center",
+              flexWrap: "wrap",
+            }}
+          >
             <Chip
               label={isHarvest ? "Harvest Offer" : "Sponsorship"}
               size="small"
               sx={{
                 background: isHarvest
-                  ? "rgba(76,175,80,0.85)"
+                  ? "rgba(133, 164, 70,0.85)"
                   : "rgba(33,150,243,0.85)",
                 color: "#fff",
                 fontWeight: 600,
@@ -200,7 +232,6 @@ const InvestorCreatedOfferCard = ({
           </Box>
         </Box>
       </Box>
-
 
       <CardContent sx={{ p: 2 }}>
         <Divider sx={{ mb: 1.5 }} />
@@ -363,16 +394,40 @@ const InvestorCreatedOfferCard = ({
           sx={{
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: "flex-start",
             flexWrap: "wrap",
             gap: 0.5,
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-            <Groups sx={{ fontSize: 14, color: "text.secondary" }} />
-            <Typography variant="caption" color="text.secondary">
-              {offer.applicationsCount ?? 0} Applications
-            </Typography>
+          <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.75 }}>
+            <Groups sx={{ fontSize: 14, color: "text.secondary", mt: 0.25 }} />
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ fontWeight: 600 }}
+              >
+                Farmer
+              </Typography>
+              <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                {farmerLabel}
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ fontWeight: 600, mt: 0.25 }}
+              >
+                Landowner
+              </Typography>
+              <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                {landOwnerLabel}
+              </Typography>
+              {landProjectName && (
+                <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                  {landProjectName}
+                </Typography>
+              )}
+            </Box>
           </Box>
           {deadline && (
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
@@ -384,9 +439,7 @@ const InvestorCreatedOfferCard = ({
           )}
         </Box>
 
-        <Box
-          sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 0.75 }}
-        >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 0.75 }}>
           {regions.length > 0 && (
             <>
               <LocationOn sx={{ fontSize: 13, color: "text.secondary" }} />
@@ -414,7 +467,10 @@ const InvestorCreatedOfferCard = ({
                 sx={{
                   p: 0.5,
                   color: "primary.main",
-                  "&:hover": { color: "primary.main", background: "rgba(133,164,70,0.12)" },
+                  "&:hover": {
+                    color: "primary.main",
+                    background: "rgba(133,164,70,0.12)",
+                  },
                 }}
               >
                 <Edit sx={{ fontSize: 15 }} />
@@ -429,7 +485,10 @@ const InvestorCreatedOfferCard = ({
                 sx={{
                   p: 0.5,
                   color: "error.main",
-                  "&:hover": { color: "error.main", background: "rgba(211,47,47,0.12)" },
+                  "&:hover": {
+                    color: "error.main",
+                    background: "rgba(211,47,47,0.12)",
+                  },
                 }}
               >
                 <Delete sx={{ fontSize: 15 }} />

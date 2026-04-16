@@ -29,7 +29,6 @@ const InvestmentRequestCard = ({
   );
   const isCommission = request.offerType === "commission";
 
-  // Fetch farmer profile picture using farmer ID
   useEffect(() => {
     const fetchFarmerProfile = async () => {
       try {
@@ -54,7 +53,6 @@ const InvestmentRequestCard = ({
         }
       } catch (error) {
         console.error("Failed to fetch farmer profile:", error);
-        // Fallback to farmerImage from request
         setFarmerProfileImage(request.farmerImage || null);
       }
     };
@@ -118,7 +116,6 @@ const InvestmentRequestCard = ({
           },
         }}
       >
-        {/* Hero Section with Background Image */}
         <Box
           sx={{
             position: "relative",
@@ -248,7 +245,6 @@ const InvestmentRequestCard = ({
           </Box>
         </Box>
 
-        {/* Card Content */}
         <CardContent
           sx={{
             flex: 1,
@@ -258,7 +254,6 @@ const InvestmentRequestCard = ({
             p: 2,
           }}
         >
-          {/* Description */}
           {request.description && (
             <Box>
               <Typography
@@ -291,8 +286,6 @@ const InvestmentRequestCard = ({
               </Typography>
             </Box>
           )}
-
-          {/* Location Info */}
           <Stack spacing={1}>
             <Stack direction="row" alignItems="flex-start" spacing={1}>
               <LocationOn
@@ -357,7 +350,6 @@ const InvestmentRequestCard = ({
             </Stack>
           </Stack>
 
-          {/* Stats Row - Dynamic based on offer type */}
           <Box
             sx={{
               display: "grid",
@@ -484,7 +476,6 @@ const InvestmentRequestCard = ({
             </Box>
           </Box>
 
-          {/* Commission-specific details */}
           {isCommission && (
             <Box
               sx={{
@@ -545,7 +536,6 @@ const InvestmentRequestCard = ({
             </Box>
           )}
 
-          {/* Deadline */}
           <Box
             sx={{
               display: "flex",

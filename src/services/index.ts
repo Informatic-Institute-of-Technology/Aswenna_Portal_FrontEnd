@@ -35,8 +35,10 @@ export { HttpClient, httpClient } from "./httpClient";
 export {
   createLandownerAd,
   getLandownerAdById,
+  getLandownerAds,
   type CreateLandownerAdPayload,
   type LandownerAdApiItem,
+  type LandownerInfo,
 } from "./landownerAds.service";
 export { LocationService } from "./location.service";
 export {

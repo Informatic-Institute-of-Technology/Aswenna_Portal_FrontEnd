@@ -1,11 +1,29 @@
 import { useAuth } from "@/Context/useAuth";
-import { Mail, Notifications } from "@mui/icons-material";
 import {
+  AccountCircle,
+  Logout,
+  Mail,
+  Menu,
+  Notifications,
+} from "@mui/icons-material";
+import {
+  Avatar,
   Badge,
   Box,
+  Button,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Drawer,
   IconButton,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Popover,
+  Stack,
   Toolbar,
   Typography,
 } from "@mui/material";
@@ -27,12 +45,19 @@ interface DashboardLayoutProps {
   children?: ReactNode;
 }
 
-const drawerWidth = 280;
+const expandedDrawerWidth = 280;
+const collapsedDrawerWidth = 88;
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [loading, setLoading] = useState(true);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [profileAnchorEl, setProfileAnchorEl] = useState<HTMLElement | null>(
+    null,
+  );
+  const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
+  const [sidebarPinned, setSidebarPinned] = useState(false);
+  const [isSidebarHovered, setIsSidebarHovered] = useState(false);
 
   const [notifications, setNotifications] = useState<NotificationItem[]>(
     (notificationsData as NotificationItem[]).filter(
@@ -41,6 +66,17 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   );
 
   const unreadCount = notifications.filter((n) => !n.read).length;
+  const isSidebarExpanded = sidebarPinned || isSidebarHovered;
+  const activeDrawerWidth = isSidebarExpanded
+    ? expandedDrawerWidth
+    : collapsedDrawerWidth;
+
+  const userProfilePicture = (() => {
+    const profilePicture = user?.personalInfo?.profilePicture;
+    if (!profilePicture) return undefined;
+    if (typeof profilePicture === "string") return profilePicture;
+    return profilePicture.url || undefined;
+  })();
 
   const handleNotificationClick = (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -62,6 +98,34 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     );
   };
 
+  const handleSidebarToggle = () => {
+    setSidebarPinned((prev) => !prev);
+  };
+
+  const handleProfileClick = (event: React.MouseEvent<HTMLElement>) => {
+    setProfileAnchorEl(event.currentTarget);
+  };
+
+  const handleProfileClose = () => {
+    setProfileAnchorEl(null);
+  };
+
+  const openLogoutConfirm = () => setConfirmLogoutOpen(true);
+
+  const handleLogoutRequest = () => {
+    handleProfileClose();
+    openLogoutConfirm();
+  };
+
+  const handleConfirmLogout = () => {
+    setConfirmLogoutOpen(false);
+    logout();
+  };
+
+  const handleCancelLogout = () => {
+    setConfirmLogoutOpen(false);
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
@@ -72,28 +136,48 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const renderSidebar = () => {
     switch (user?.role) {
       case "farmer":
-        return <FarmerSidebar />;
+        return (
+          <FarmerSidebar
+            collapsed={!isSidebarExpanded}
+            onLogoutRequest={openLogoutConfirm}
+          />
+        );
       case "investor":
-        return <InvestorSidebar />;
+        return (
+          <InvestorSidebar
+            collapsed={!isSidebarExpanded}
+            onLogoutRequest={openLogoutConfirm}
+          />
+        );
       case "landowner":
-        return <LandOwnerSidebar />;
+        return (
+          <LandOwnerSidebar
+            collapsed={!isSidebarExpanded}
+            onLogoutRequest={openLogoutConfirm}
+          />
+        );
       case "superadmin":
-        return <SuperAdminSidebar />;
+        return (
+          <SuperAdminSidebar
+            collapsed={!isSidebarExpanded}
+            onLogoutRequest={openLogoutConfirm}
+          />
+        );
     }
   };
 
   const getDashboardTitle = () => {
     switch (user?.role) {
       case "farmer":
-        return "Farmer Dashboard";
+        return "Farmer Portal";
       case "investor":
-        return "Investor Dashboard";
+        return "Investor Portal";
       case "landowner":
-        return "Land Owner Dashboard";
+        return "Land Owner Portal";
       case "superadmin":
-        return "Super Admin Dashboard";
+        return "Super Admin Portal";
       default:
-        return "Dashboard";
+        return "Portal";
     }
   };
 
@@ -101,12 +185,19 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
       <Drawer
         variant="permanent"
+        PaperProps={{
+          onMouseEnter: () => setIsSidebarHovered(true),
+          onMouseLeave: () => setIsSidebarHovered(false),
+        }}
         sx={{
-          width: drawerWidth,
+          width: activeDrawerWidth,
           flexShrink: 0,
+          transition: "width 0.25s ease",
           "& .MuiDrawer-paper": {
-            width: drawerWidth,
+            width: activeDrawerWidth,
             boxSizing: "border-box",
+            overflowX: "hidden",
+            transition: "width 0.25s ease",
           },
         }}
       >
@@ -118,7 +209,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         sx={{
           flexGrow: 1,
           p: 3,
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          width: { sm: `calc(100% - ${activeDrawerWidth}px)` },
+          transition: "width 0.25s ease",
         }}
       >
         <Toolbar
@@ -132,10 +224,20 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             borderColor: "divider",
           }}
         >
-          <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>
-            {getDashboardTitle()}
-          </Typography>
-          <Box sx={{ display: "flex", gap: 1 }}>
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <IconButton
+              color="inherit"
+              onClick={handleSidebarToggle}
+              sx={{ border: "1px solid", borderColor: "divider" }}
+            >
+              <Menu />
+            </IconButton>
+            <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>
+              {getDashboardTitle()}
+            </Typography>
+          </Stack>
+
+          <Box sx={{ display: "flex", gap: 1.25, alignItems: "center" }}>
             <IconButton
               color="inherit"
               sx={{ border: "1px solid", borderColor: "divider" }}
@@ -153,6 +255,43 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                 <Notifications />
               </Badge>
             </IconButton>
+
+            <Stack
+              direction="row"
+              spacing={1.25}
+              alignItems="center"
+              onClick={handleProfileClick}
+              sx={{
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2,
+                px: 1.2,
+                py: 0.75,
+                cursor: "pointer",
+                transition: "border-color 0.2s ease, box-shadow 0.2s ease",
+                "&:hover": {
+                  borderColor: "primary.main",
+                  boxShadow: 2,
+                },
+              }}
+            >
+              <Avatar
+                src={userProfilePicture}
+                alt={user?.fullName || "User"}
+                sx={{ width: 34, height: 34 }}
+              />
+              <Box sx={{ minWidth: 0 }}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 700, lineHeight: 1.2 }}
+                >
+                  {user?.fullName || "User"}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {user?.role || "Member"}
+                </Typography>
+              </Box>
+            </Stack>
           </Box>
         </Toolbar>
 
@@ -163,6 +302,86 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           onMarkAllAsRead={handleMarkAllAsRead}
           onMarkAsRead={handleMarkAsRead}
         />
+
+        <Popover
+          open={Boolean(profileAnchorEl)}
+          anchorEl={profileAnchorEl}
+          onClose={handleProfileClose}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+          transformOrigin={{ vertical: "top", horizontal: "right" }}
+          PaperProps={{
+            sx: {
+              mt: 1.25,
+              width: 280,
+              p: 2,
+              borderRadius: 3,
+              boxShadow: 4,
+            },
+          }}
+        >
+          <Stack spacing={1.5}>
+            <Stack direction="row" spacing={1.5} alignItems="center">
+              <Avatar
+                src={userProfilePicture}
+                alt={user?.fullName || "User"}
+                sx={{ width: 48, height: 48 }}
+              />
+              <Box sx={{ minWidth: 0 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                  {user?.fullName || "User"}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" noWrap>
+                  {user?.email || "randomuser@domain.com"}
+                </Typography>
+                <Typography variant="caption" color="primary.main">
+                  {user?.role || "Member"}
+                </Typography>
+              </Box>
+            </Stack>
+
+            <List dense disablePadding>
+              <ListItemButton onClick={handleProfileClose}>
+                <ListItemIcon>
+                  <AccountCircle fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary="Edit profile" />
+              </ListItemButton>
+              <ListItemButton onClick={handleLogoutRequest}>
+                <ListItemIcon>
+                  <Logout fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary="Sign out" />
+              </ListItemButton>
+            </List>
+          </Stack>
+        </Popover>
+
+        <Dialog
+          open={confirmLogoutOpen}
+          onClose={handleCancelLogout}
+          maxWidth="xs"
+          fullWidth
+        >
+          <DialogTitle sx={{ fontWeight: 700 }}>Sign out?</DialogTitle>
+          <DialogContent>
+            <Typography variant="body2" color="text.secondary">
+              You will be signed out of the portal. Any unsaved changes may be
+              lost. Do you want to continue?
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ px: 3, pb: 2 }}>
+            <Button onClick={handleCancelLogout} color="inherit">
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmLogout}
+              color="error"
+              variant="contained"
+            >
+              Sign out
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         {loading ? (
           <Container maxWidth="xl">

@@ -14,6 +14,7 @@ import {
   Upload,
 } from "@mui/icons-material";
 import React, { useState } from "react";
+import { AppButton } from "../../shared/components";
 
 interface SponsorshipDetailsProps {
   onBack: () => void;
@@ -83,6 +84,7 @@ const CROP_EMOJIS = [
 
 type CoverImage = { id: string; label: string; url: string };
 const coverImageList = coverImages as CoverImage[];
+const fallbackCoverUrl = coverImageList[0]?.url;
 
 export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
   onBack,
@@ -181,7 +183,6 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
       className="font-['Manrope'] text-slate-100 rounded-2xl flex flex-col overflow-hidden"
       style={{ background: "#0a0a0a", width: 920, maxHeight: "92vh" }}
     >
-      {/* ── Header ── */}
       <div
         className="shrink-0 flex items-center gap-3 px-5 py-4"
         style={{ background: "#0a0a0a" }}
@@ -225,11 +226,8 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
         </div>
       </div>
 
-      {/* ── Body (two-column) ── */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Left column */}
         <div className="flex-1 overflow-y-auto px-6 py-7 space-y-8">
-          {/* Offer Info */}
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-1.5 h-5 rounded-full bg-[#85a446]" />
@@ -266,8 +264,6 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
               </label>
             </div>
           </div>
-
-          {/* Preferred Regions */}
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-1.5 h-5 rounded-full bg-[#85a446]" />
@@ -372,8 +368,6 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
               )}
             </div>
           </div>
-
-          {/* Investment Details */}
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-1.5 h-5 rounded-full bg-[#85a446]" />
@@ -452,8 +446,6 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
               </div>
             </div>
           </div>
-
-          {/* Offer Expiry Date */}
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-1.5 h-5 rounded-full bg-[#85a446]" />
@@ -478,7 +470,6 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
             </label>
           </div>
 
-          {/* Farming & Support */}
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-1.5 h-5 rounded-full bg-[#85a446]" />
@@ -543,9 +534,7 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
           </div>
         </div>
 
-        {/* Right column */}
         <div className="w-[320px] shrink-0 overflow-y-auto px-5 py-7 space-y-6">
-          {/* Investor card */}
           <div
             className="rounded-xl overflow-hidden"
             style={{
@@ -593,7 +582,6 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
             </div>
           </div>
 
-          {/* Crop Icon */}
           <div>
             <div className="flex items-center gap-2 mb-3">
               <div className="w-1.5 h-5 rounded-full bg-[#85a446]" />
@@ -636,7 +624,6 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
             {errMsg("cropIcon")}
           </div>
 
-          {/* Cover Image */}
           <div>
             <div className="flex items-center gap-2 mb-2.5">
               <div className="w-1 h-4 rounded-full bg-[#85a446]" />
@@ -655,8 +642,9 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
                   alt={selectedCover.label}
                   referrerPolicy="no-referrer"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src =
-                      `https://picsum.photos/seed/${selectedCover.id}/600/340`;
+                    const target = e.target as HTMLImageElement;
+                    target.onerror = null;
+                    if (fallbackCoverUrl) target.src = fallbackCoverUrl;
                   }}
                   className="w-full h-full object-cover"
                 />
@@ -686,8 +674,9 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
                     alt={image.label}
                     referrerPolicy="no-referrer"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        `https://picsum.photos/seed/${image.id}/200/200`;
+                      const target = e.target as HTMLImageElement;
+                      target.onerror = null;
+                      if (fallbackCoverUrl) target.src = fallbackCoverUrl;
                     }}
                     className="w-full h-full object-cover"
                   />
@@ -699,23 +688,25 @@ export const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
         </div>
       </div>
 
-      {/* ── Footer ── */}
       <div
         className="shrink-0 flex items-center justify-between gap-3 px-5 py-3.5"
         style={{ background: "#0a0a0a" }}
       >
-        <button
+        <AppButton
+          variant="outline"
+          size="md"
           onClick={() => onSaveDraft(formData)}
-          className="text-slate-500 text-sm font-semibold px-4 py-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] hover:text-slate-300 transition-all"
         >
           Save Draft
-        </button>
-        <button
+        </AppButton>
+        <AppButton
+          variant="primary"
+          size="md"
+          trailingIcon={<ArrowForward fontSize="inherit" />}
           onClick={handleSubmitClick}
-          className="flex items-center gap-2 bg-[#85a446] hover:bg-[#93b34e] active:scale-[0.98] text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all shadow-lg shadow-[#85a446]/20"
         >
-          {submitLabel} <ArrowForward style={{ fontSize: 18 }} />
-        </button>
+          {submitLabel}
+        </AppButton>
       </div>
     </div>
   );

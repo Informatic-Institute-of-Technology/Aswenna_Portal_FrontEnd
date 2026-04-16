@@ -1,30 +1,30 @@
-import { useEffect, useState } from "react";
 import {
-  Box,
-  Typography,
-  Dialog,
-  DialogContent,
-  DialogActions,
-  IconButton,
-  Chip,
-  Button,
+  AttachMoney,
+  CalendarToday,
+  Close as CloseIcon,
+  Download,
+  Email,
+  Flag,
+  LocationOn,
+  Notifications,
+  Phone,
+  Star,
+} from "@mui/icons-material";
+import {
   Avatar,
+  Box,
+  Button,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  IconButton,
   LinearProgress,
   Tab,
   Tabs,
+  Typography,
 } from "@mui/material";
-import {
-  Close as CloseIcon,
-  CalendarToday,
-  AttachMoney,
-  Flag,
-  Notifications,
-  Email,
-  Phone,
-  LocationOn,
-  Star,
-  Download,
-} from "@mui/icons-material";
+import { useEffect, useState } from "react";
 
 interface ProjectDetailsDialogProps {
   open: boolean;
@@ -105,7 +105,7 @@ const breakdownColorPalette = [
   "#ff6b35",
   "#f9a825",
   "#ff9800",
-  "#4CAF50",
+  "#85a446",
   "#26a69a",
   "#29b6f6",
   "#ab47bc",
@@ -174,7 +174,7 @@ const ProjectDetailsDialog = ({
       case "INVESTOR":
         return "#2196F3";
       case "FARMER":
-        return "#4CAF50";
+        return "#85a446";
       case "LANDOWNER":
         return "#ff9800";
       default:
@@ -182,7 +182,6 @@ const ProjectDetailsDialog = ({
     }
   };
 
-  // Use project data or defaults
   const projectData = project || {
     id: "PRJ-156",
     name: "Premium Rice Cultivation",
@@ -350,19 +349,18 @@ const ProjectDetailsDialog = ({
       fullWidth
       PaperProps={{
         sx: {
-          backgroundColor: "#0a0f0a",
+          backgroundColor: "#0a0a0a",
           backgroundImage: "none",
-          border: "1px solid rgba(76, 175, 80, 0.2)",
+          border: "1px solid rgba(133, 164, 70, 0.2)",
           borderRadius: 2,
           maxHeight: "90vh",
         },
       }}
     >
-      {/* Header */}
       <Box
         sx={{
           p: 2,
-          borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
         }}
       >
         <Box
@@ -402,14 +400,13 @@ const ProjectDetailsDialog = ({
           </IconButton>
         </Box>
 
-        {/* Tabs */}
         <Tabs
           value={activeTab}
           onChange={handleTabChange}
           sx={{
             mt: 2,
             "& .MuiTabs-indicator": {
-              backgroundColor: "#6B8E23",
+              backgroundColor: "#85a446",
             },
             "& .MuiTab-root": {
               color: "#808080",
@@ -430,12 +427,10 @@ const ProjectDetailsDialog = ({
       </Box>
 
       <DialogContent sx={{ p: 0 }}>
-        {/* Overview Tab */}
         <TabPanel value={activeTab} index={0}>
           <Box sx={{ px: 3 }}>
             {showHarvestOnlySections ? (
               <>
-                {/* Overall Progress */}
                 <Box
                   sx={{
                     p: 2.5,
@@ -489,25 +484,23 @@ const ProjectDetailsDialog = ({
                     sx={{
                       height: 8,
                       borderRadius: 4,
-                      backgroundColor: "rgba(255, 255, 255, 0.1)",
+                      backgroundColor: "rgba(255, 255, 255, 0.05)",
                       "& .MuiLinearProgress-bar": {
-                        backgroundColor: "#6B8E23",
+                        backgroundColor: "#85a446",
                         borderRadius: 4,
                       },
                     }}
                   />
                 </Box>
 
-                {/* Financial Summary & Milestone Status */}
                 <div className="row g-3">
-                  {/* Financial Summary */}
                   <div className="col-12 col-md-6">
                     <Box
                       sx={{
                         p: 2.5,
                         borderRadius: 2,
-                        border: "1px solid rgba(255, 255, 255, 0.08)",
-                        backgroundColor: "#111a11",
+                        border: "1px solid rgba(255, 255, 255, 0.05)",
+                        backgroundColor: "#141414",
                         height: "100%",
                       }}
                     >
@@ -549,7 +542,7 @@ const ProjectDetailsDialog = ({
                       </Typography>
                       <Typography
                         variant="body1"
-                        sx={{ color: "#4CAF50", fontWeight: 600, mb: 0.5 }}
+                        sx={{ color: "#85a446", fontWeight: 600, mb: 0.5 }}
                       >
                         {formatCurrency(disbursedAmount)}
                       </Typography>
@@ -559,10 +552,10 @@ const ProjectDetailsDialog = ({
                         sx={{
                           height: 6,
                           borderRadius: 3,
-                          backgroundColor: "rgba(255, 255, 255, 0.1)",
+                          backgroundColor: "rgba(255, 255, 255, 0.05)",
                           mb: 2,
                           "& .MuiLinearProgress-bar": {
-                            backgroundColor: "#4CAF50",
+                            backgroundColor: "#85a446",
                             borderRadius: 3,
                           },
                         }}
@@ -589,7 +582,7 @@ const ProjectDetailsDialog = ({
                       </Typography>
                       <Typography
                         variant="h6"
-                        sx={{ color: "#4CAF50", fontWeight: 600, mb: 2 }}
+                        sx={{ color: "#85a446", fontWeight: 600, mb: 2 }}
                       >
                         {projectData.expectedROI}%
                       </Typography>
@@ -615,14 +608,13 @@ const ProjectDetailsDialog = ({
                     </Box>
                   </div>
 
-                  {/* Milestone Status */}
                   <div className="col-12 col-md-6">
                     <Box
                       sx={{
                         p: 2.5,
                         borderRadius: 2,
-                        border: "1px solid rgba(255, 255, 255, 0.08)",
-                        backgroundColor: "#111a11",
+                        border: "1px solid rgba(255, 255, 255, 0.05)",
+                        backgroundColor: "#141414",
                         height: "100%",
                       }}
                     >
@@ -662,13 +654,13 @@ const ProjectDetailsDialog = ({
                             sx={{
                               p: 1.5,
                               borderRadius: 1,
-                              backgroundColor: "rgba(76, 175, 80, 0.15)",
+                              backgroundColor: "rgba(133, 164, 70, 0.15)",
                             }}
                           >
                             <Typography
                               variant="caption"
                               sx={{
-                                color: "#4CAF50",
+                                color: "#85a446",
                                 textTransform: "uppercase",
                               }}
                             >
@@ -676,7 +668,7 @@ const ProjectDetailsDialog = ({
                             </Typography>
                             <Typography
                               variant="h5"
-                              sx={{ color: "#4CAF50", fontWeight: 600 }}
+                              sx={{ color: "#85a446", fontWeight: 600 }}
                             >
                               {completedMilestones}
                             </Typography>
@@ -721,11 +713,11 @@ const ProjectDetailsDialog = ({
                         sx={{
                           height: 8,
                           borderRadius: 4,
-                          backgroundColor: "rgba(255, 255, 255, 0.1)",
+                          backgroundColor: "rgba(255, 255, 255, 0.05)",
                           mt: 1,
                           mb: 0.5,
                           "& .MuiLinearProgress-bar": {
-                            backgroundColor: "#6B8E23",
+                            backgroundColor: "#85a446",
                             borderRadius: 4,
                           },
                         }}
@@ -737,14 +729,13 @@ const ProjectDetailsDialog = ({
                   </div>
                 </div>
 
-                {/* Latest Notifications */}
                 <Box
                   sx={{
                     mt: 3,
                     p: 2,
                     borderRadius: 2,
-                    border: "1px solid rgba(255, 255, 255, 0.08)",
-                    backgroundColor: "#111a11",
+                    border: "1px solid rgba(255, 255, 255, 0.05)",
+                    backgroundColor: "#141414",
                   }}
                 >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -812,7 +803,7 @@ const ProjectDetailsDialog = ({
                     </Typography>
                     <Typography
                       variant="h6"
-                      sx={{ color: "#4CAF50", fontWeight: 600 }}
+                      sx={{ color: "#85a446", fontWeight: 600 }}
                     >
                       {projectData.expectedROI}%
                     </Typography>
@@ -902,24 +893,34 @@ const ProjectDetailsDialog = ({
           </Box>
         </TabPanel>
 
-        {/* Milestones & Progress Tab */}
         {showHarvestOnlySections && (
           <TabPanel value={activeTab} index={milestonesTabIndex}>
             <Box sx={{ px: 3 }}>
-              <Typography
-                variant="h6"
-                sx={{ color: "#fff", fontWeight: 600, mb: 3 }}
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}
               >
-                Project Milestones & Progress Tracking
-              </Typography>
+                {" "}
+                <Box
+                  sx={{
+                    width: 6,
+                    height: 24,
+                    borderRadius: 4,
+                    bgcolor: "#85a446",
+                  }}
+                />{" "}
+                <Typography variant="h6" color="white" fontWeight={600}>
+                  {" "}
+                  Project Milestones & Progress Tracking{" "}
+                </Typography>{" "}
+              </Box>
 
               {projectMilestones.length === 0 ? (
                 <Box
                   sx={{
                     p: 2.5,
                     borderRadius: 2,
-                    border: "1px solid rgba(255, 255, 255, 0.08)",
-                    backgroundColor: "#111a11",
+                    border: "1px solid rgba(255, 255, 255, 0.05)",
+                    backgroundColor: "#141414",
                   }}
                 >
                   <Typography variant="body2" sx={{ color: "#b0b0b0" }}>
@@ -935,8 +936,8 @@ const ProjectDetailsDialog = ({
                       mb: 2,
                       borderRadius: 2,
                       border: "1px solid rgba(107, 142, 35, 0.3)",
-                      borderLeft: "4px solid #6B8E23",
-                      backgroundColor: "#111a11",
+                      borderLeft: "4px solid #85a446",
+                      backgroundColor: "#141414",
                     }}
                   >
                     <Box
@@ -1011,7 +1012,7 @@ const ProjectDetailsDialog = ({
                           >
                             Completed
                           </Typography>
-                          <Typography variant="body2" sx={{ color: "#4CAF50" }}>
+                          <Typography variant="body2" sx={{ color: "#85a446" }}>
                             {milestone.completedDate}
                           </Typography>
                         </div>
@@ -1027,7 +1028,7 @@ const ProjectDetailsDialog = ({
                         >
                           Payment
                         </Typography>
-                        <Typography variant="body2" sx={{ color: "#4CAF50" }}>
+                        <Typography variant="body2" sx={{ color: "#85a446" }}>
                           {formatCurrency(milestone.payment)}
                         </Typography>
                       </div>
@@ -1057,10 +1058,10 @@ const ProjectDetailsDialog = ({
                       sx={{
                         height: 6,
                         borderRadius: 3,
-                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        backgroundColor: "rgba(255, 255, 255, 0.05)",
                         mt: 1,
                         "& .MuiLinearProgress-bar": {
-                          backgroundColor: "#6B8E23",
+                          backgroundColor: "#85a446",
                           borderRadius: 3,
                         },
                       }}
@@ -1072,7 +1073,6 @@ const ProjectDetailsDialog = ({
           </TabPanel>
         )}
 
-        {/* Payments & Finance Tab */}
         {showHarvestOnlySections && (
           <TabPanel value={activeTab} index={paymentsTabIndex}>
             <Box sx={{ px: 3 }}>
@@ -1083,14 +1083,13 @@ const ProjectDetailsDialog = ({
                 Payment Schedule & Financial Breakdown
               </Typography>
 
-              {/* Budget Breakdown */}
               <Box
                 sx={{
                   p: 2.5,
                   mb: 3,
                   borderRadius: 2,
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
-                  backgroundColor: "#111a11",
+                  border: "1px solid rgba(255, 255, 255, 0.05)",
+                  backgroundColor: "#141414",
                 }}
               >
                 <Box
@@ -1106,7 +1105,7 @@ const ProjectDetailsDialog = ({
                       sx={{
                         width: 16,
                         height: 16,
-                        background: "linear-gradient(135deg, #ff6b35, #4CAF50)",
+                        background: "linear-gradient(135deg, #ff6b35, #85a446)",
                         borderRadius: 0.5,
                       }}
                     />
@@ -1163,7 +1162,7 @@ const ProjectDetailsDialog = ({
                             sx={{
                               height: 8,
                               borderRadius: 4,
-                              backgroundColor: "rgba(255, 255, 255, 0.1)",
+                              backgroundColor: "rgba(255, 255, 255, 0.05)",
                               "& .MuiLinearProgress-bar": {
                                 backgroundColor: category.color,
                                 borderRadius: 4,
@@ -1200,13 +1199,12 @@ const ProjectDetailsDialog = ({
                 )}
               </Box>
 
-              {/* Payment Installments */}
               <Box
                 sx={{
                   p: 2.5,
                   borderRadius: 2,
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
-                  backgroundColor: "#111a11",
+                  border: "1px solid rgba(255, 255, 255, 0.05)",
+                  backgroundColor: "#141414",
                 }}
               >
                 <Box
@@ -1314,7 +1312,7 @@ const ProjectDetailsDialog = ({
                             {payment.paidDate && (
                               <Typography
                                 variant="caption"
-                                sx={{ color: "#4CAF50" }}
+                                sx={{ color: "#85a446" }}
                               >
                                 • Paid: {payment.paidDate}
                               </Typography>
@@ -1336,7 +1334,6 @@ const ProjectDetailsDialog = ({
           </TabPanel>
         )}
 
-        {/* Team Members Tab */}
         {showTeamAndAgreement && (
           <TabPanel value={activeTab} index={teamMembersTabIndex}>
             <Box sx={{ px: 3 }}>
@@ -1358,7 +1355,7 @@ const ProjectDetailsDialog = ({
                   variant="contained"
                   startIcon={<LocationOn />}
                   sx={{
-                    backgroundColor: "#6B8E23",
+                    backgroundColor: "#85a446",
                     textTransform: "none",
                     "&:hover": {
                       backgroundColor: "#5a7a1e",
@@ -1377,7 +1374,7 @@ const ProjectDetailsDialog = ({
                     mb: 2,
                     borderRadius: 2,
                     border: "1px solid rgba(107, 142, 35, 0.2)",
-                    backgroundColor: "#111a11",
+                    backgroundColor: "#141414",
                   }}
                 >
                   <Box sx={{ display: "flex", gap: 2 }}>
@@ -1606,8 +1603,8 @@ const ProjectDetailsDialog = ({
                 sx={{
                   p: 2.5,
                   borderRadius: 2,
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
-                  backgroundColor: "#111a11",
+                  border: "1px solid rgba(255, 255, 255, 0.05)",
+                  backgroundColor: "#141414",
                   mb: 2,
                 }}
               >
@@ -1788,7 +1785,7 @@ const ProjectDetailsDialog = ({
                     variant="contained"
                     startIcon={<Download />}
                     sx={{
-                      backgroundColor: "#6B8E23",
+                      backgroundColor: "#85a446",
                       textTransform: "none",
                       "&:hover": {
                         backgroundColor: "#5a7a1e",
@@ -1817,11 +1814,10 @@ const ProjectDetailsDialog = ({
         )}
       </DialogContent>
 
-      {/* Footer */}
       <DialogActions
         sx={{
           p: 2,
-          borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+          borderTop: "1px solid rgba(255, 255, 255, 0.05)",
           justifyContent: "space-between",
         }}
       >
@@ -1833,7 +1829,7 @@ const ProjectDetailsDialog = ({
             textTransform: "none",
             px: 3,
             "&:hover": {
-              backgroundColor: "rgba(255, 255, 255, 0.1)",
+              backgroundColor: "rgba(255, 255, 255, 0.05)",
             },
           }}
         >
@@ -1843,7 +1839,7 @@ const ProjectDetailsDialog = ({
           variant="contained"
           startIcon={<Download />}
           sx={{
-            backgroundColor: "#6B8E23",
+            backgroundColor: "#85a446",
             textTransform: "none",
             px: 3,
             "&:hover": {

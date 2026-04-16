@@ -184,9 +184,6 @@ const initialProjects: Project[] = [
   },
 ];
 
-// TODO: Fetch projects dynamically from API
-// API endpoint: GET /api/farmer/projects
-
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat("en-LK", {
     style: "currency",
@@ -1510,7 +1507,7 @@ const MyProjectsPage = () => {
                   size="small"
                   sx={{
                     background: isHarvestOffer
-                      ? "rgba(76,175,80,0.85)"
+                      ? "rgba(133, 164, 70,0.85)"
                       : "rgba(33,150,243,0.85)",
                     color: "#fff",
                     fontWeight: 600,
@@ -1822,9 +1819,9 @@ const MyProjectsPage = () => {
                   size="small"
                   onClick={() => handleOpenEdit(project)}
                   sx={{
-                    color: "#22c55e",
+                    color: "#85a446",
                     "&:hover": {
-                      backgroundColor: "rgba(34, 197, 94, 0.12)",
+                      backgroundColor: "rgba(133, 164, 70, 0.12)",
                     },
                   }}
                 >
@@ -1854,7 +1851,6 @@ const MyProjectsPage = () => {
 
   return (
     <Box sx={{ p: 3, minHeight: "100vh", backgroundColor: "#0a0f0a" }}>
-      {/* Header Section */}
       <Box
         sx={{
           display: "flex",
@@ -1888,7 +1884,7 @@ const MyProjectsPage = () => {
             fontSize: "0.875rem",
             "&:hover": {
               borderColor: "#4CAF50",
-              backgroundColor: "rgba(76, 175, 80, 0.1)",
+              backgroundColor: "rgba(133, 164, 70, 0.1)",
             },
           }}
         >
@@ -1896,7 +1892,6 @@ const MyProjectsPage = () => {
         </Button>
       </Box>
 
-      {/* Active Projects Section */}
       <Box sx={{ mb: 4 }}>
         <Typography
           variant="h5"
@@ -2082,7 +2077,6 @@ const MyProjectsPage = () => {
         )}
       </section>
 
-      {/* Create Offer Dialog */}
       <CreateOfferDialog
         open={dialogOpen}
         onClose={handleCloseDialog}
@@ -2187,7 +2181,6 @@ const MyProjectsPage = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Project Details Dialog */}
       <ProjectDetailsDialog
         open={detailsDialogOpen}
         onClose={handleCloseDetails}

@@ -181,7 +181,7 @@ const RequestCard = ({
                 {name}
               </Typography>
               {isVerified && (
-                <Verified sx={{ fontSize: 15, color: "#4ade80" }} />
+                <Verified sx={{ fontSize: 15, color: "#85a446" }} />
               )}
             </Box>
             <Box

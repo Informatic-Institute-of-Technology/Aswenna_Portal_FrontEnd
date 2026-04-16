@@ -14,7 +14,6 @@ import {
 import {
   Avatar,
   Box,
-  Button,
   Chip,
   Dialog,
   IconButton,
@@ -30,6 +29,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
+import { AppButton } from "../../shared/components";
 
 export interface InvestmentRequestDialogProps {
   request: InvestmentRequest | null;
@@ -94,7 +94,6 @@ const InvestmentRequestDialog = ({
         },
       }}
     >
-      {/* Header */}
       <Box
         sx={{
           p: 2.5,
@@ -168,9 +167,7 @@ const InvestmentRequestDialog = ({
         </Stack>
       </Box>
 
-      {/* Content */}
       <Box sx={{ p: 3, overflowY: "auto", maxHeight: "calc(92vh - 180px)" }}>
-        {/* Farmer Profile Section */}
         <Box sx={{ mb: 3 }}>
           <Stack direction="row" spacing={2} alignItems="center">
             <Avatar
@@ -229,7 +226,6 @@ const InvestmentRequestDialog = ({
           </Stack>
         </Box>
 
-        {/* Full Financial Summary - Investment Transparency */}
         <Box
           sx={{
             bgcolor: "var(--bg-overlay)",
@@ -256,7 +252,6 @@ const InvestmentRequestDialog = ({
             Investment Financial Summary
           </Typography>
 
-          {/* Investment Overview Grid */}
           <Box
             sx={{
               display: "grid",
@@ -390,7 +385,6 @@ const InvestmentRequestDialog = ({
             </Box>
           </Box>
 
-          {/* Investment Type and Details */}
           <Box
             sx={{
               mb: 3,
@@ -508,7 +502,6 @@ const InvestmentRequestDialog = ({
           </Box>
         </Box>
 
-        {/* Tabs for detailed information */}
         <Box sx={{ mb: 3 }}>
           <Tabs
             value={activeTab}
@@ -537,7 +530,6 @@ const InvestmentRequestDialog = ({
             <Tab label="Payment Schedule" />
           </Tabs>
 
-          {/* Tab Panel 0: Project Details */}
           {activeTab === 0 && (
             <Box>
               <Box
@@ -658,7 +650,6 @@ const InvestmentRequestDialog = ({
             </Box>
           )}
 
-          {/* Tab Panel 1: Cost Breakdown */}
           {activeTab === 1 && (
             <Box
               sx={{
@@ -782,7 +773,6 @@ const InvestmentRequestDialog = ({
             </Box>
           )}
 
-          {/* Tab Panel 2: Payment Schedule */}
           {activeTab === 2 && (
             <Box
               sx={{
@@ -960,7 +950,6 @@ const InvestmentRequestDialog = ({
         </Box>
       </Box>
 
-      {/* Footer */}
       <Box
         sx={{
           p: 2.5,
@@ -971,80 +960,25 @@ const InvestmentRequestDialog = ({
           gap: 2,
         }}
       >
-        <Button
-          variant="outlined"
-          size="large"
-          onClick={onClose}
-          sx={{
-            borderColor: "var(--border-medium)",
-            color: "var(--text-secondary)",
-            fontWeight: 600,
-            textTransform: "none",
-            px: 4,
-            "&:hover": {
-              borderColor: "var(--neutral-700)",
-              bgcolor: "var(--surface-tint)",
-            },
-          }}
-        >
+        <AppButton variant="outline" size="md" onClick={onClose}>
           Close
-        </Button>
+        </AppButton>
         <Stack direction="row" spacing={2}>
-          <Button
-            variant="contained"
-            size="large"
-            startIcon={<GetApp />}
-            sx={{
-              bgcolor: "var(--color-lime)",
-              color: "var(--text-primary)",
-              fontWeight: 700,
-              textTransform: "none",
-              px: 4,
-              boxShadow: "0 4px 12px var(--color-lime-border)",
-              "&:hover": {
-                bgcolor: "var(--color-lime-hover)",
-                boxShadow: "0 6px 16px var(--color-lime-border)",
-              },
-            }}
-          >
+          <AppButton variant="success" size="md" leadingIcon={<GetApp />}>
             Download Full Report
-          </Button>
-          <Button
-            variant="contained"
-            size="large"
-            startIcon={<TrendingUp />}
+          </AppButton>
+          <AppButton
+            variant={request.status === "open" ? "success" : "neutral"}
+            size="md"
+            leadingIcon={<TrendingUp />}
             onClick={() => {
               onInvest?.(request.id);
               onClose();
             }}
             disabled={request.status !== "open"}
-            sx={{
-              bgcolor:
-                request.status === "open"
-                  ? "var(--color-lime)"
-                  : "var(--neutral-700)",
-              color: "var(--text-primary)",
-              fontWeight: 700,
-              textTransform: "none",
-              px: 4,
-              boxShadow:
-                request.status === "open"
-                  ? "0 4px 12px var(--color-lime-border)"
-                  : "none",
-              "&:hover": {
-                bgcolor:
-                  request.status === "open"
-                    ? "var(--color-lime-hover)"
-                    : "var(--neutral-700)",
-                boxShadow:
-                  request.status === "open"
-                    ? "0 6px 16px var(--color-lime-border)"
-                    : "none",
-              },
-            }}
           >
             {request.status === "open" ? "Invest Now" : "Not Available"}
-          </Button>
+          </AppButton>
         </Stack>
       </Box>
     </Dialog>

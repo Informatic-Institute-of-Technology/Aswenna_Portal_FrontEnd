@@ -1,6 +1,11 @@
 import type { FarmerJob, InvestmentRequest } from "@/types/farmer.types";
-import { AccountBalanceWallet, Handshake } from "@mui/icons-material";
-import { Box, Typography } from "@mui/material";
+import type { DirectHarvestOfferAPI } from "@/types/investor.types";
+import {
+  AccountBalanceWallet,
+  Handshake,
+  Landscape,
+} from "@mui/icons-material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import {
   SectionHeader,
@@ -11,12 +16,18 @@ import FarmerJobCard from "../../components/farmer/FarmerJobCard";
 import HireFarmerDialog from "../../components/investor/HireFarmerDialog";
 import InvestmentRequestCard from "../../components/investor/InvestmentRequestCard";
 import InvestmentRequestDialog from "../../components/investor/InvestmentRequestDialog";
+import LandAdCard from "../../components/investor/LandAdCard";
+import LandAdDetailDialog from "../../components/investor/LandAdDetailDialog";
 import { farmerJobsData } from "../../data/json";
 import coverImages from "../../data/json/coverImages.json";
 import {
   getFarmerProjects,
   type FarmerProjectApiItem,
 } from "../../services/farmerProject.service";
+import {
+  getLandownerAds,
+  type LandownerAdApiItem,
+} from "../../services/landownerAds.service";
 import { getInvestorOffers } from "../../services/offer.service";
 import Notification from "../../shared/components/Notification";
 import { FarmerJobType } from "../../types/farmer.types";
@@ -155,7 +166,7 @@ const mapFarmerProjectToInvestmentRequest = (
   project: FarmerProjectApiItem,
 ): InvestmentRequest => {
   const expectedHarvest = project.harvestBasedDetails?.expectedHarvest;
-  const commissionDetails = (project as any).commissionBasedDetails;
+  const commissionDetails = project.commissionBasedDetails;
 
   return {
     id: project._id,
@@ -200,8 +211,14 @@ const mapFarmerProjectToInvestmentRequest = (
         : "TBD",
     expectedROI: 0,
     commissionPercentage: commissionDetails?.commissionPercentage,
-    investmentAmount: commissionDetails?.investmentAmount,
-    numberOfInstallments: commissionDetails?.noOfInstallments,
+    investmentAmount:
+      project.offerType === "commission"
+        ? project.totalInvestmentRequired
+        : undefined,
+    numberOfInstallments:
+      project.offerType === "commission"
+        ? (project.milestoneBreakdown?.length ?? 0)
+        : undefined,
     expectedLandArea: commissionDetails?.expectedLandArea,
     status: normalizeStatus(project.status),
     farmingMethod: normalizeFarmingMethod(project.farmingMethods),
@@ -213,10 +230,20 @@ const mapFarmerProjectToInvestmentRequest = (
   };
 };
 
+type HireDialogOffer = {
+  id: string;
+  projectTitle: string;
+  cropType: string;
+  cropIcon: string;
+  requiredQuantity: number;
+  quantityUnit: string;
+  totalBudget: number;
+};
+
 const OpportunitiesPage = () => {
-  const [activeTab, setActiveTab] = useState<"investments" | "hire">(
-    "investments",
-  );
+  const [activeTab, setActiveTab] = useState<
+    "investments" | "hire" | "land-search"
+  >("investments");
   const [selectedRequest, setSelectedRequest] =
     useState<InvestmentRequest | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -224,7 +251,7 @@ const OpportunitiesPage = () => {
   const [hireDialogOpen, setHireDialogOpen] = useState(false);
   const [selectedFarmerForHire, setSelectedFarmerForHire] =
     useState<FarmerJob | null>(null);
-  const [liveOffers, setLiveOffers] = useState<any[]>([]);
+  const [liveOffers, setLiveOffers] = useState<HireDialogOffer[]>([]);
   const [investmentRequests, setInvestmentRequests] = useState<
     InvestmentRequest[]
   >([]);
@@ -233,6 +260,13 @@ const OpportunitiesPage = () => {
   const [investmentRequestsError, setInvestmentRequestsError] = useState<
     string | null
   >(null);
+
+  const [landAds, setLandAds] = useState<LandownerAdApiItem[]>([]);
+  const [landAdsLoading, setLandAdsLoading] = useState(false);
+  const [landAdsError, setLandAdsError] = useState<string | null>(null);
+  const [selectedLandAd, setSelectedLandAd] =
+    useState<LandownerAdApiItem | null>(null);
+  const [landDetailOpen, setLandDetailOpen] = useState(false);
 
   const [notification, setNotification] = useState<{
     open: boolean;
@@ -245,13 +279,13 @@ const OpportunitiesPage = () => {
         if (res.data) {
           const mappedOffers = res.data
             .filter(
-              (offer) =>
+              (offer): offer is DirectHarvestOfferAPI =>
                 offer.offerType === "direct-harvest" &&
-                offer.status !== "completed" &&
-                offer.status !== "cancelled",
+                offer.status !== "closed" &&
+                offer.status !== "expired",
             )
             .map((offer) => {
-              const details = (offer as any).harvestBaseDetails;
+              const details = offer.harvestBaseDetails;
               return {
                 id: offer._id,
                 projectTitle: details?.projectTitle || "Untitled Harvest",
@@ -292,7 +326,7 @@ const OpportunitiesPage = () => {
         if (mounted) {
           setInvestmentRequests(requests);
         }
-      } catch (error) {
+      } catch {
         if (mounted) {
           setInvestmentRequestsError(
             "Failed to load farmer projects. Please try again.",
@@ -308,6 +342,31 @@ const OpportunitiesPage = () => {
 
     loadFarmerProjects();
 
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadLandAds = async () => {
+      try {
+        setLandAdsLoading(true);
+        setLandAdsError(null);
+        const response = await getLandownerAds();
+        if (mounted) {
+          setLandAds(
+            (response.data ?? []).filter((ad) => ad.status === "ACTIVE"),
+          );
+        }
+      } catch {
+        if (mounted)
+          setLandAdsError("Failed to load land listings. Please try again.");
+      } finally {
+        if (mounted) setLandAdsLoading(false);
+      }
+    };
+    loadLandAds();
     return () => {
       mounted = false;
     };
@@ -342,7 +401,7 @@ const OpportunitiesPage = () => {
     setSelectedFarmerForHire(null);
   };
 
-  const handleHireSubmit = (farmer: FarmerJob, offer: any) => {
+  const handleHireSubmit = (farmer: FarmerJob, offer: HireDialogOffer) => {
     setNotification({
       open: true,
       message: `The Project ${offer.projectTitle} ${farmer.farmerName} has been requested`,
@@ -353,6 +412,30 @@ const OpportunitiesPage = () => {
 
   const handleCloseNotification = () => {
     setNotification((prev) => ({ ...prev, open: false }));
+  };
+
+  const handleViewLandAd = (ad: LandownerAdApiItem) => {
+    setSelectedLandAd(ad);
+    setLandDetailOpen(true);
+  };
+
+  const handleCloseLandDetail = () => {
+    setLandDetailOpen(false);
+    setSelectedLandAd(null);
+  };
+
+  const handleHireLandowner = (
+    ad: LandownerAdApiItem,
+    project?: DirectHarvestOfferAPI,
+  ) => {
+    setLandDetailOpen(false);
+    setSelectedLandAd(null);
+    setNotification({
+      open: true,
+      message: project
+        ? `Linked "${project.harvestBaseDetails.projectTitle}" to ${typeof ad.landowner === "object" && ad.landowner?.fullName ? ad.landowner.fullName : "Landowner"} for "${ad.title}"`
+        : `Hire request sent to ${typeof ad.landowner === "object" && ad.landowner?.fullName ? ad.landowner.fullName : "Landowner"} for "${ad.title}"`,
+    });
   };
 
   const tabs: TabItem[] = [
@@ -368,12 +451,17 @@ const OpportunitiesPage = () => {
       icon: <Handshake sx={{ fontSize: 20 }} />,
       count: farmerJobs.length,
     },
+    {
+      value: "land-search",
+      label: "Land Search",
+      icon: <Landscape sx={{ fontSize: 20 }} />,
+      count: landAds.length,
+    },
   ];
 
   return (
     <>
       <Box sx={{ p: 3 }}>
-        {/* Header */}
         <Box sx={{ mb: 3 }}>
           <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
             Opportunities
@@ -386,7 +474,9 @@ const OpportunitiesPage = () => {
         <TabNavigation
           activeTab={activeTab}
           tabs={tabs}
-          onChange={(value) => setActiveTab(value as "investments" | "hire")}
+          onChange={(value) =>
+            setActiveTab(value as "investments" | "hire" | "land-search")
+          }
           variant="dark"
         />
 
@@ -517,6 +607,83 @@ const OpportunitiesPage = () => {
             )}
           </Box>
         )}
+
+        {activeTab === "land-search" && (
+          <Box>
+            <SectionHeader
+              title="Land Search"
+              description="Browse available agricultural land plots from verified landowners"
+              accentColor="var(--color-brand-accent)"
+              showLeftBorder={true}
+            />
+
+            {landAdsLoading ? (
+              <Box sx={{ textAlign: "center", py: 10 }}>
+                <CircularProgress
+                  size={40}
+                  sx={{ color: "var(--color-brand-accent)" }}
+                />
+                <Typography
+                  variant="body2"
+                  sx={{ mt: 2, color: "text.secondary" }}
+                >
+                  Loading land listings…
+                </Typography>
+              </Box>
+            ) : landAdsError ? (
+              <Box
+                sx={{
+                  textAlign: "center",
+                  py: 8,
+                  bgcolor: "var(--surface-tint)",
+                  borderRadius: 2,
+                  color: "text.secondary",
+                }}
+              >
+                <Typography variant="h6" gutterBottom>
+                  Couldn&apos;t load land listings
+                </Typography>
+                <Typography variant="body2">{landAdsError}</Typography>
+              </Box>
+            ) : landAds.length > 0 ? (
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
+                  gap: 3,
+                }}
+              >
+                {landAds.map((ad) => (
+                  <LandAdCard
+                    key={ad._id}
+                    ad={ad}
+                    onViewDetails={handleViewLandAd}
+                  />
+                ))}
+              </Box>
+            ) : (
+              <Box
+                sx={{
+                  textAlign: "center",
+                  py: 8,
+                  bgcolor: "var(--surface-tint)",
+                  borderRadius: 2,
+                  color: "text.secondary",
+                }}
+              >
+                <Landscape
+                  sx={{ fontSize: 56, color: "rgba(133, 164, 70,0.3)", mb: 1 }}
+                />
+                <Typography variant="h6" gutterBottom>
+                  No land listings available
+                </Typography>
+                <Typography variant="body2">
+                  Check back later for new land rental opportunities
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        )}
       </Box>
 
       <InvestmentRequestDialog
@@ -532,6 +699,13 @@ const OpportunitiesPage = () => {
         farmer={selectedFarmerForHire}
         offers={liveOffers}
         onSubmit={handleHireSubmit}
+      />
+
+      <LandAdDetailDialog
+        open={landDetailOpen}
+        onClose={handleCloseLandDetail}
+        ad={selectedLandAd}
+        onHire={handleHireLandowner}
       />
 
       <Notification

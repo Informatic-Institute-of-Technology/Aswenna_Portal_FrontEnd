@@ -1,3 +1,9 @@
+import {
+  generateCultivationEscrowAgreementPDF,
+  generateLandLeaseAgreementPDF,
+  type AgreementDetails,
+} from "../../../utils/agreementGenerator";
+
 interface Step {
   title: string;
   description: string;
@@ -14,16 +20,49 @@ interface ConnectionJourneyProps {
   requestId: string;
   farmerName: string;
   steps: Step[];
+  agreementType?: "Investor-Farmer" | "Investor-Landowner";
+  agreementDetails?: Partial<AgreementDetails>;
 }
 
-const ConnectionJourney = ({ farmerName, steps }: ConnectionJourneyProps) => {
+const ConnectionJourney = ({
+  farmerName,
+  steps,
+  agreementType,
+  agreementDetails,
+}: ConnectionJourneyProps) => {
+
+  const handleGeneratePDF = () => {
+    const base: AgreementDetails = {
+      agreementType: agreementType ?? "Investor-Farmer",
+      investorName: agreementDetails?.investorName ?? "[Investor Name]",
+      investorNIC: agreementDetails?.investorNIC,
+      investorContact: agreementDetails?.investorContact,
+      counterpartyName: agreementDetails?.counterpartyName ?? farmerName,
+      counterpartyNIC: agreementDetails?.counterpartyNIC,
+      counterpartyContact: agreementDetails?.counterpartyContact,
+      projectRefId: agreementDetails?.projectRefId,
+      targetCrop: agreementDetails?.targetCrop,
+      propertyLocation: agreementDetails?.propertyLocation,
+      acreage: agreementDetails?.acreage,
+      designatedCultivator: agreementDetails?.designatedCultivator,
+      leaseDurationMonths: agreementDetails?.leaseDurationMonths,
+      leaseStartDate: agreementDetails?.leaseStartDate,
+      leaseEndDate: agreementDetails?.leaseEndDate,
+      grossMonthlyRental: agreementDetails?.grossMonthlyRental,
+      estimatedStartDate: agreementDetails?.estimatedStartDate,
+      estimatedEndDate: agreementDetails?.estimatedEndDate,
+      totalGrossInvestment: agreementDetails?.totalGrossInvestment,
+      milestones: agreementDetails?.milestones,
+    };
+    if (base.agreementType === "Investor-Landowner") {
+      generateLandLeaseAgreementPDF(base);
+    } else {
+      generateCultivationEscrowAgreementPDF(base);
+    }
+  };
+
   return (
-    <div
-      style={{
-        background: "transparent",
-      }}
-      className="p-6"
-    >
+    <div style={{ background: "transparent" }} className="p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-bold text-gray-900 dark:text-white">
           Connection Journey
@@ -60,7 +99,7 @@ const ConnectionJourney = ({ farmerName, steps }: ConnectionJourneyProps) => {
                       }
                     : step.status === "completed"
                       ? {
-                          background: "#4ade80",
+                          background: "#85a446",
                           border: "2px solid rgba(74,222,128,0.3)",
                         }
                       : step.status === "active"
@@ -135,23 +174,56 @@ const ConnectionJourney = ({ farmerName, steps }: ConnectionJourneyProps) => {
                   </span>
                 )}
 
+                
+                {step.status === "active" && agreementType && (
+                  <button
+                    onClick={handleGeneratePDF}
+                    style={{
+                      marginTop: "10px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "7px 14px",
+                      borderRadius: "8px",
+                      border: "1.5px solid rgba(174,217,92,0.6)",
+                      background: "linear-gradient(135deg, rgba(133,164,70,0.18) 0%, rgba(174,217,92,0.1) 100%)",
+                      color: "#aed95c",
+                      fontSize: "0.72rem",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                      letterSpacing: "0.3px",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background =
+                        "linear-gradient(135deg, rgba(133,164,70,0.35) 0%, rgba(174,217,92,0.22) 100%)";
+                      e.currentTarget.style.borderColor = "#aed95c";
+                      e.currentTarget.style.transform = "translateY(-1px)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background =
+                        "linear-gradient(135deg, rgba(133,164,70,0.18) 0%, rgba(174,217,92,0.1) 100%)";
+                      e.currentTarget.style.borderColor = "rgba(174,217,92,0.6)";
+                      e.currentTarget.style.transform = "translateY(0)";
+                    }}
+                  >
+                    <span className="material-icons" style={{ fontSize: 14 }}>
+                      description
+                    </span>
+                    Generate Agreement PDF
+                  </button>
+                )}
+
                 {step.uploadArea && (
                   <div
                     style={{
                       background: "var(--bg-subtle)",
                       border: "2px dashed var(--color-olive-glow)",
                       transition: "all 0.3s ease",
+                      marginTop: step.status === "active" && agreementType ? "8px" : "12px",
                     }}
-                    className="mt-3 p-3 rounded-lg text-center cursor-pointer"
+                    className="p-3 rounded-lg text-center cursor-pointer"
                     onClick={step.uploadArea.onUpload}
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.borderColor =
-                        "var(--color-olive-glow)")
-                    }
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.borderColor =
-                        "var(--color-olive-glow)")
-                    }
                   >
                     <span className="material-icons text-gray-400 text-2xl mb-1">
                       cloud_upload

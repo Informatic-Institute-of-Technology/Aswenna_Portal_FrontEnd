@@ -29,6 +29,7 @@ import { useAuth } from "../../Context/useAuth";
 import coverImagesData from "../../data/json/coverImages.json";
 import { httpClient } from "../../services/httpClient";
 import type { LandownerAdApiItem } from "../../services/landownerAds.service";
+import { matchLandOwnerOffer } from "../../services/offer.service";
 import Notification from "../../shared/components/Notification";
 
 const coverImageMap = Object.fromEntries(
@@ -108,6 +109,7 @@ const ReceivedRequestsPage = () => {
   const [selectedLandOffer, setSelectedLandOffer] = useState<string | null>(
     null,
   );
+  const [matchSubmitting, setMatchSubmitting] = useState(false);
   const [loadingOffers, setLoadingOffers] = useState(false);
 
   useEffect(() => {
@@ -187,6 +189,15 @@ const ReceivedRequestsPage = () => {
       return;
     }
 
+    if (!selectedOfferForMatch._id) {
+      setNotification({
+        open: true,
+        message: "Offer id missing. Please try again.",
+        severity: "error",
+      });
+      return;
+    }
+
     const matchedLandOffer = landownerOffers.find(
       (ad) => ad._id === selectedLandOffer,
     );
@@ -194,14 +205,28 @@ const ReceivedRequestsPage = () => {
       selectedOfferForMatch.harvestBaseDetails?.projectTitle || "Harvest Offer";
     const landTitle = matchedLandOffer?.title || "Land Offer";
 
-    setNotification({
-      open: true,
-      message: `Successfully matched "${harvestTitle}" with "${landTitle}"!`,
-      severity: "success",
-    });
+    setMatchSubmitting(true);
+    try {
+      await matchLandOwnerOffer(selectedOfferForMatch._id, selectedLandOffer);
 
-    setSelectedOfferForMatch(null);
-    setSelectedLandOffer(null);
+      setNotification({
+        open: true,
+        message: `Successfully matched "${harvestTitle}" with "${landTitle}"!`,
+        severity: "success",
+      });
+
+      setSelectedOfferForMatch(null);
+      setSelectedLandOffer(null);
+    } catch (err) {
+      console.error("Failed to confirm match", err);
+      setNotification({
+        open: true,
+        message: "Failed to confirm match. Please try again.",
+        severity: "error",
+      });
+    } finally {
+      setMatchSubmitting(false);
+    }
   };
 
   const handleCloseDialog = () => {
@@ -218,7 +243,6 @@ const ReceivedRequestsPage = () => {
           </Typography>
         </Box>
 
-        {/* Active Investment Opportunities */}
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
             Investment Opportunities ({offers.length})
@@ -309,7 +333,7 @@ const ReceivedRequestsPage = () => {
                             label="Harvest Offer"
                             size="small"
                             sx={{
-                              background: "rgba(76,175,80,0.85)",
+                              background: "rgba(133, 164, 70,0.85)",
                               color: "#fff",
                               fontWeight: 600,
                               fontSize: "0.68rem",
@@ -759,10 +783,10 @@ const ReceivedRequestsPage = () => {
           <Button
             onClick={handleConfirmMatch}
             variant="contained"
-            disabled={!selectedLandOffer || loadingOffers}
+            disabled={!selectedLandOffer || loadingOffers || matchSubmitting}
             sx={{ textTransform: "none", fontWeight: 600 }}
           >
-            Confirm Match
+            {matchSubmitting ? "Matching..." : "Confirm Match"}
           </Button>
         </DialogActions>
       </Dialog>

@@ -1,6 +1,15 @@
 import { Box, CircularProgress, Typography } from "@mui/material";
-import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
+import {
+  GoogleMap,
+  InfoWindow,
+  Marker,
+  useLoadScript,
+} from "@react-google-maps/api";
 import { useCallback, useEffect, useState } from "react";
+import type {
+  LandownerAdApiItem,
+  LocationData,
+} from "../services/landownerAds.service";
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
@@ -12,6 +21,7 @@ interface Coordinates {
 interface LocationMarker extends Coordinates {
   id?: string | number;
   name: string;
+  adId?: string;
   farmers?: number;
   investors?: number;
   landowners?: number;
@@ -33,7 +43,39 @@ interface SriLankaMapProps {
   coordinates?: Coordinates;
   userDistribution?: { [key: string]: number };
   provinceDistribution?: ProvinceDistribution;
+  landAds?: LandownerAdApiItem[];
 }
+
+const getCoordinatesFromLocation = (
+  location?: string | LocationData,
+): Coordinates | null => {
+  if (!location || typeof location === "string") return null;
+  const loc = location as LocationData;
+  if (
+    typeof loc.latitude === "number" &&
+    !Number.isNaN(loc.latitude) &&
+    typeof loc.longitude === "number" &&
+    !Number.isNaN(loc.longitude)
+  ) {
+    return { lat: loc.latitude, lng: loc.longitude };
+  }
+  return null;
+};
+
+const getGeocodeAddressFromLocation = (
+  location?: string | LocationData,
+): string | null => {
+  if (!location) return null;
+  if (typeof location === "string") {
+    const trimmed = location.trim();
+    return trimmed ? `${trimmed}, Sri Lanka` : null;
+  }
+  const loc = location as LocationData;
+  const parts = [loc.street, loc.city, loc.district, loc.province]
+    .map((p) => (p || "").trim())
+    .filter(Boolean);
+  return parts.length > 0 ? `${parts.join(", ")}, Sri Lanka` : null;
+};
 
 const mapContainerStyle = {
   width: "100%",
@@ -78,15 +120,19 @@ const SriLankaMap = ({
   coordinates,
   userDistribution,
   provinceDistribution,
+  landAds,
 }: SriLankaMapProps) => {
   const [loading, setLoading] = useState(
-    !coordinates && !userDistribution && !provinceDistribution,
+    !coordinates && !userDistribution && !provinceDistribution && !landAds,
   );
   const [error, setError] = useState<string | null>(null);
   const [mapCoordinates, setMapCoordinates] = useState<Coordinates | null>(
     coordinates || null,
   );
   const [markers, setMarkers] = useState<LocationMarker[]>([]);
+  const [selectedMarker, setSelectedMarker] = useState<LocationMarker | null>(
+    null,
+  );
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
@@ -119,6 +165,10 @@ const SriLankaMap = ({
       const data = await response.json();
       console.log("Geocoding response:", data);
 
+      if (data.status === "ZERO_RESULTS") {
+        return null;
+      }
+
       if (data.status !== "OK") {
         throw new Error(`Geocoding API error: ${data.status}`);
       }
@@ -138,7 +188,63 @@ const SriLankaMap = ({
   }, []);
 
   useEffect(() => {
-    // If provinceDistribution provided, geocode all provinces and create markers for each role
+    if (landAds && landAds.length > 0) {
+      const fetchLandAdMarkers = async () => {
+        setLoading(true);
+        setError(null);
+
+        const fetchedMarkers: LocationMarker[] = [];
+        const geocodeCache = new Map<string, Coordinates | null>();
+
+        for (const ad of landAds) {
+          let coords = getCoordinatesFromLocation(ad.location);
+
+          if (!coords) {
+            const address = getGeocodeAddressFromLocation(ad.location);
+            if (address) {
+              if (geocodeCache.has(address)) {
+                coords = geocodeCache.get(address) || null;
+              } else {
+                const resolvedCoords = await getLocationData(address);
+                geocodeCache.set(address, resolvedCoords);
+                coords = resolvedCoords;
+              }
+            }
+          }
+
+          if (!coords) continue;
+
+          fetchedMarkers.push({
+            lat: coords.lat,
+            lng: coords.lng,
+            id: ad._id,
+            adId: ad._id,
+            name: ad.title || "Land Ad",
+            type: "mixed",
+          });
+        }
+
+        setMarkers(fetchedMarkers);
+
+        if (fetchedMarkers.length > 0) {
+          const centerLat =
+            fetchedMarkers.reduce((sum, m) => sum + m.lat, 0) /
+            fetchedMarkers.length;
+          const centerLng =
+            fetchedMarkers.reduce((sum, m) => sum + m.lng, 0) /
+            fetchedMarkers.length;
+          setMapCoordinates({ lat: centerLat, lng: centerLng });
+        } else {
+          setMapCoordinates({ lat: 7.8731, lng: 80.7718 });
+        }
+
+        setLoading(false);
+      };
+
+      fetchLandAdMarkers();
+      return;
+    }
+
     if (provinceDistribution && Object.keys(provinceDistribution).length > 0) {
       const fetchProvinceMarkers = async () => {
         setLoading(true);
@@ -149,8 +255,7 @@ const SriLankaMap = ({
             `${province} Province, Sri Lanka`,
           );
           if (coords) {
-            // Create separate markers for each user type in this province
-            const offset = 0.05; // Small offset to separate markers
+            const offset = 0.05;
 
             if (data.farmers > 0) {
               fetchedMarkers.push({
@@ -261,6 +366,7 @@ const SriLankaMap = ({
     coordinates,
     userDistribution,
     provinceDistribution,
+    landAds,
     getLocationData,
   ]);
 
@@ -367,6 +473,8 @@ const SriLankaMap = ({
         >
           {markers.map((marker, index) => {
             const getTitle = () => {
+              if (marker.adId)
+                return `Land Ad ID: ${marker.adId} | ${marker.name}`;
               if (marker.type === "farmers")
                 return `${marker.name} - Farmers: ${marker.farmers}`;
               if (marker.type === "investors")
@@ -390,9 +498,38 @@ const SriLankaMap = ({
                       }
                     : undefined
                 }
+                onClick={() => setSelectedMarker(marker)}
               />
             );
           })}
+
+          {selectedMarker && (
+            <InfoWindow
+              position={{ lat: selectedMarker.lat, lng: selectedMarker.lng }}
+              onCloseClick={() => setSelectedMarker(null)}
+            >
+              <Box sx={{ minWidth: 220, p: 0.3 }}>
+                <Typography sx={{ fontWeight: 700, fontSize: "0.82rem" }}>
+                  {selectedMarker.name}
+                </Typography>
+                {selectedMarker.adId ? (
+                  <Typography sx={{ fontSize: "0.74rem", mt: 0.4 }}>
+                    Land Ad ID: {selectedMarker.adId}
+                  </Typography>
+                ) : (
+                  <Typography sx={{ fontSize: "0.74rem", mt: 0.4 }}>
+                    {selectedMarker.type === "farmers"
+                      ? `Farmers: ${selectedMarker.farmers}`
+                      : selectedMarker.type === "investors"
+                        ? `Investors: ${selectedMarker.investors}`
+                        : selectedMarker.type === "landowners"
+                          ? `Landowners: ${selectedMarker.landowners}`
+                          : `Total: ${selectedMarker.total}`}
+                  </Typography>
+                )}
+              </Box>
+            </InfoWindow>
+          )}
         </GoogleMap>
       </Box>
     </Box>

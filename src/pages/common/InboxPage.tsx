@@ -1,5 +1,7 @@
 import { useAuth } from "@/Context/useAuth";
 import { adminService, type ApiUser } from "@/services/admin.service";
+import Notification from "@/shared/components/Notification";
+import { useChatStore, useNotification } from "@/shared/hooks";
 import type { Conversation, Message } from "@/types/chat.types";
 import {
   Check,
@@ -21,8 +23,6 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "../../styles/InboxPage.css";
-import Notification from "@/shared/components/Notification";
-import { useChatStore, useNotification } from "@/shared/hooks";
 
 import { config } from "@/core/config";
 
@@ -1074,7 +1074,6 @@ const InboxPage = () => {
                     const value = e.target.value;
                     setInputText(value);
                     setTyping(value.trim().length > 0);
-                    // auto-resize
                     e.target.style.height = "auto";
                     e.target.style.height =
                       Math.min(e.target.scrollHeight, 120) + "px";

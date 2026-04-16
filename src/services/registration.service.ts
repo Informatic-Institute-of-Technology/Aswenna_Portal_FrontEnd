@@ -1,6 +1,5 @@
 import { httpClient } from "./httpClient";
 
-// Base interfaces
 export interface PersonalInfo {
   nicNumber: string;
   birthday: string;

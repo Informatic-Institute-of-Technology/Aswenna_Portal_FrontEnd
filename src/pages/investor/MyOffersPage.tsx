@@ -8,6 +8,7 @@ import {
   BarChart,
   Folder,
   HourglassEmpty,
+  Refresh,
   Settings,
   WarningAmber,
 } from "@mui/icons-material";
@@ -48,8 +49,11 @@ const MyOffersPage = () => {
   const { user } = useAuth();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useState<OfferCardProps | null>(null);
-  const { notification, showError, showSuccess, hideNotification } = useNotification();
+  const [selectedProject, setSelectedProject] = useState<OfferCardProps | null>(
+    null,
+  );
+  const { notification, showError, showSuccess, hideNotification } =
+    useNotification();
   const [createdOffers, setCreatedOffers] = useState<InvestorOfferAPI[]>([]);
   const [createdOffersLoading, setCreatedOffersLoading] = useState(true);
 
@@ -57,12 +61,14 @@ const MyOffersPage = () => {
   const [offerToEdit, setOfferToEdit] = useState<InvestorOfferAPI | null>(null);
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [offerToDelete, setOfferToDelete] = useState<InvestorOfferAPI | null>(null);
+  const [offerToDelete, setOfferToDelete] = useState<InvestorOfferAPI | null>(
+    null,
+  );
   const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchOffers = () => {
     setCreatedOffersLoading(true);
-    getInvestorOffers()
+    getInvestorOffers({ status: "open" })
       .then((res) => setCreatedOffers(res.data ?? []))
       .catch(() => setCreatedOffers([]))
       .finally(() => setCreatedOffersLoading(false));
@@ -201,7 +207,6 @@ const MyOffersPage = () => {
         </div>
       </Box>
 
-      {/* Active Projects Section */}
       <section className="mb-5">
         <Typography
           variant="h5"
@@ -266,25 +271,50 @@ const MyOffersPage = () => {
       />
 
       <section className="mb-5">
-        <Typography
-          variant="h5"
+        <Box
           sx={{
-            fontWeight: 700,
-            mb: 3,
             display: "flex",
             alignItems: "center",
-            gap: 1,
-            "&::before": {
-              content: '""',
-              width: 4,
-              height: 24,
-              background: "linear-gradient(180deg, #f59e0b 0%, #fbbf24 100%)",
-              borderRadius: 1,
-            },
+            justifyContent: "space-between",
+            gap: 2,
+            mb: 3,
           }}
         >
-          My Created Offers
-        </Typography>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 700,
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              "&::before": {
+                content: '""',
+                width: 4,
+                height: 24,
+                background: "linear-gradient(180deg, #f59e0b 0%, #fbbf24 100%)",
+                borderRadius: 1,
+              },
+            }}
+          >
+            My Created Offers
+          </Typography>
+
+          <Tooltip title="Refresh">
+            <span>
+              <IconButton
+                onClick={fetchOffers}
+                disabled={createdOffersLoading}
+                sx={{
+                  border: "1px solid",
+                  borderColor: "divider",
+                  borderRadius: 2,
+                }}
+              >
+                <Refresh />
+              </IconButton>
+            </span>
+          </Tooltip>
+        </Box>
 
         {createdOffersLoading ? (
           <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
@@ -417,7 +447,9 @@ const MyOffersPage = () => {
           },
         }}
       >
-        <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1.5, pb: 1 }}>
+        <DialogTitle
+          sx={{ display: "flex", alignItems: "center", gap: 1.5, pb: 1 }}
+        >
           <WarningAmber sx={{ color: "error.main", fontSize: 28 }} />
           <Typography variant="h6" sx={{ fontWeight: 700 }}>
             Delete Offer
@@ -441,14 +473,25 @@ const MyOffersPage = () => {
             >
               <Typography variant="body2" sx={{ fontWeight: 600 }}>
                 {offerToDelete.offerType === "direct-harvest"
-                  ? (offerToDelete as { harvestBaseDetails?: { projectTitle?: string } })
-                    .harvestBaseDetails?.projectTitle ?? "Harvest Offer"
-                  : (offerToDelete as { commissionDetails?: { sponsorshipTitle?: string } })
-                    .commissionDetails?.sponsorshipTitle ?? "Sponsorship Offer"}
+                  ? ((
+                      offerToDelete as {
+                        harvestBaseDetails?: { projectTitle?: string };
+                      }
+                    ).harvestBaseDetails?.projectTitle ?? "Harvest Offer")
+                  : ((
+                      offerToDelete as {
+                        commissionDetails?: { sponsorshipTitle?: string };
+                      }
+                    ).commissionDetails?.sponsorshipTitle ??
+                    "Sponsorship Offer")}
               </Typography>
               <Typography
                 variant="caption"
-                sx={{ color: "error.main", fontWeight: 600, textTransform: "capitalize" }}
+                sx={{
+                  color: "error.main",
+                  fontWeight: 600,
+                  textTransform: "capitalize",
+                }}
               >
                 {offerToDelete.offerType}
               </Typography>
